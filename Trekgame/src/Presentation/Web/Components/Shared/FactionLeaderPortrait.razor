@@ -1,0 +1,304 @@
+@* Faction Leader Portrait Component - Displays leader portrait from generated spritesheet *@
+@inject HttpClient Http
+
+<div class="faction-leader-portrait @SizeClass" style="@ContainerStyle">
+    @if (_isLoaded && _leaderData != null)
+    {
+        <div class="portrait-sprite" style="@GetSpriteStyle()"></div>
+    }
+    else if (_isLoading)
+    {
+        <div class="portrait-loading">
+            <span class="loading-spinner"></span>
+        </div>
+    }
+    else
+    {
+        <div class="portrait-fallback">
+            <span class="fallback-icon">@GetFallbackIcon()</span>
+        </div>
+    }
+    @if (ShowName && !string.IsNullOrEmpty(_leaderData?.Name))
+    {
+        <span class="portrait-name">@GetDisplayName()</span>
+    }
+</div>
+
+@code {
+    [Parameter] public string? FactionId { get; set; }
+    [Parameter] public string Size { get; set; } = "medium"; // small, medium, large, xlarge
+    [Parameter] public bool ShowName { get; set; } = false;
+    [Parameter] public string? CustomStyle { get; set; }
+
+    private LeaderSpriteData? _leaderData;
+    private ManifestData? _manifest;
+    private bool _isLoading = true;
+    private bool _isLoaded = false;
+    private static ManifestData? _cachedManifest;
+
+    private string SizeClass => $"portrait-{Size}";
+    private string ContainerStyle => CustomStyle ?? "";
+
+    private int DisplaySize => Size switch
+    {
+        "small" => 48,
+        "medium" => 72,
+        "large" => 96,
+        "xlarge" => 128,
+        _ => 72
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadManifestAsync();
+        FindLeader();
+        _isLoading = false;
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (_manifest != null)
+        {
+            FindLeader();
+        }
+    }
+
+    private async Task LoadManifestAsync()
+    {
+        if (_cachedManifest != null)
+        {
+            _manifest = _cachedManifest;
+            return;
+        }
+
+        try
+        {
+            _manifest = await Http.GetFromJsonAsync<ManifestData>(
+                "assets/universal/generated/special_factionleaders_manifest.json");
+            _cachedManifest = _manifest;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Failed to load faction leaders manifest: {ex.Message}");
+        }
+    }
+
+    private void FindLeader()
+    {
+        if (_manifest == null || string.IsNullOrEmpty(FactionId))
+        {
+            _isLoaded = false;
+            return;
+        }
+
+        var factionLower = FactionId.ToLowerInvariant();
+        
+        // Map faction to leader search pattern
+        var searchPattern = factionLower switch
+        {
+            "federation" => "federation president",
+            "klingon" => "klingon chancellor",
+            "romulan" => "romulan praetor",
+            "cardassian" => "cardassian legate",
+            "ferengi" => "ferengi grand nagus",
+            "dominion" => "dominion",
+            "borg" => "borg queen",
+            "breen" => "breen thot",
+            "gorn" => "gorn",
+            "andorian" => "andorian",
+            "vulcan" => "vulcan",
+            "trill" => "trill",
+            "bajoran" => "bajoran kai",
+            "tholian" => "tholian",
+            "orion" => "orion",
+            "independent" or "neutral" or "maquis" => "independent",
+            _ => factionLower
+        };
+
+        _leaderData = _manifest.Assets?.FirstOrDefault(a => 
+            a.Name.ToLowerInvariant().Contains(searchPattern));
+        
+        _isLoaded = _leaderData != null;
+    }
+
+    private string GetSpriteStyle()
+    {
+        if (_leaderData == null || _manifest == null) return "";
+
+        var cellSize = _manifest.Grid?.CellSize ?? 360;
+        var cols = _manifest.Grid?.Columns ?? 4;
+        var x = _leaderData.Col * cellSize;
+        var y = _leaderData.Row * cellSize;
+        var totalWidth = cols * cellSize;
+        var totalHeight = (_manifest.Grid?.Rows ?? 4) * cellSize;
+
+        // Scale factor
+        var scale = (double)DisplaySize / cellSize;
+
+        return $@"
+            width: {DisplaySize}px;
+            height: {DisplaySize}px;
+            background-image: url('assets/universal/generated/special_factionleaders.png');
+            background-position: -{x * scale}px -{y * scale}px;
+            background-size: {totalWidth * scale}px {totalHeight * scale}px;
+            background-repeat: no-repeat;
+            border-radius: 8px;
+        ";
+    }
+
+    private string GetDisplayName()
+    {
+        if (_leaderData == null) return FactionId ?? "";
+        
+        // Extract title from full name like "Leader Klingon Chancellor Male"
+        var name = _leaderData.Name;
+        if (name.StartsWith("Leader ")) name = name[7..];
+        
+        // Remove gender suffix
+        name = name.Replace(" Male", "").Replace(" Female", "");
+        
+        return name;
+    }
+
+    private string GetFallbackIcon()
+    {
+        return FactionId?.ToLowerInvariant() switch
+        {
+            "federation" => "🌟",
+            "klingon" => "⚔️",
+            "romulan" => "🦅",
+            "cardassian" => "🔶",
+            "ferengi" => "💰",
+            "borg" => "🔲",
+            "dominion" => "👁️",
+            "breen" => "🥶",
+            "gorn" => "🦎",
+            "andorian" => "❄️",
+            "vulcan" => "🖖",
+            "trill" => "🔵",
+            "bajoran" => "🙏",
+            "tholian" => "🔺",
+            "orion" => "💚",
+            _ => "👤"
+        };
+    }
+
+    // Data models for JSON
+    private class ManifestData
+    {
+        public string? FactionName { get; set; }
+        public string? CategoryName { get; set; }
+        public GridData? Grid { get; set; }
+        public string? SpriteSheetPath { get; set; }
+        public List<LeaderSpriteData>? Assets { get; set; }
+    }
+
+    private class GridData
+    {
+        public int Columns { get; set; }
+        public int Rows { get; set; }
+        public int TotalAssets { get; set; }
+        public int CellSize { get; set; }
+    }
+
+    private class LeaderSpriteData
+    {
+        public int Row { get; set; }
+        public int Col { get; set; }
+        public string Name { get; set; } = "";
+        public string Type { get; set; } = "";
+    }
+}
+
+<style>
+    .faction-leader-portrait {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .portrait-sprite {
+        image-rendering: auto;
+        image-rendering: crisp-edges;
+    }
+
+    .portrait-loading,
+    .portrait-fallback {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        border: 2px solid var(--theme-primary, #ff9900);
+    }
+
+    .loading-spinner {
+        width: 24px;
+        height: 24px;
+        border: 3px solid rgba(255, 153, 0, 0.3);
+        border-top-color: #ff9900;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    .fallback-icon {
+        font-size: 2em;
+    }
+
+    .portrait-name {
+        margin-top: 4px;
+        font-size: 0.75em;
+        color: var(--theme-text-dim, #aaa);
+        text-align: center;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    /* Size variants */
+    .portrait-small {
+        width: 48px;
+    }
+    .portrait-small .portrait-loading,
+    .portrait-small .portrait-fallback {
+        width: 48px;
+        height: 48px;
+    }
+    .portrait-small .fallback-icon { font-size: 1.5em; }
+
+    .portrait-medium {
+        width: 72px;
+    }
+    .portrait-medium .portrait-loading,
+    .portrait-medium .portrait-fallback {
+        width: 72px;
+        height: 72px;
+    }
+    .portrait-medium .fallback-icon { font-size: 2em; }
+
+    .portrait-large {
+        width: 96px;
+    }
+    .portrait-large .portrait-loading,
+    .portrait-large .portrait-fallback {
+        width: 96px;
+        height: 96px;
+    }
+    .portrait-large .fallback-icon { font-size: 2.5em; }
+
+    .portrait-xlarge {
+        width: 128px;
+    }
+    .portrait-xlarge .portrait-loading,
+    .portrait-xlarge .portrait-fallback {
+        width: 128px;
+        height: 128px;
+    }
+    .portrait-xlarge .fallback-icon { font-size: 3em; }
+
+    @@keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+</style>

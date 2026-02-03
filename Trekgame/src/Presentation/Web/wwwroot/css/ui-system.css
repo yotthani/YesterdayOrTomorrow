@@ -1,0 +1,634 @@
+/* ============================================
+   STAR TREK GAME - DYNAMIC UI SYSTEM
+   SVG/CSS Based with Textures & Shaders
+   ============================================ */
+
+/* ============================================
+   SECTION 1: CSS CUSTOM PROPERTIES (VARIABLES)
+   These change per faction theme
+   ============================================ */
+
+:root {
+  /* Default (Federation) Theme */
+  --ui-primary: #4a9eff;
+  --ui-secondary: #ff9944;
+  --ui-accent: #44ddff;
+  --ui-warning: #ffcc00;
+  --ui-danger: #ff4455;
+  --ui-success: #44dd66;
+  
+  --ui-bg-dark: #0a0c14;
+  --ui-bg-medium: #141a28;
+  --ui-bg-light: #1e2840;
+  
+  --ui-border-dark: #1a2030;
+  --ui-border-medium: #2a3a50;
+  --ui-border-light: #3a4a60;
+  
+  --ui-text-bright: #ffffff;
+  --ui-text-normal: #c0c8d4;
+  --ui-text-dim: #707888;
+  
+  /* Glow & Effect Intensities */
+  --glow-intensity: 0.6;
+  --noise-opacity: 0.03;
+  --scanline-opacity: 0.02;
+}
+
+/* Faction Theme Overrides */
+[data-theme="klingon"] {
+  --ui-primary: #cc2020;
+  --ui-secondary: #882020;
+  --ui-accent: #ff4444;
+  --ui-bg-dark: #0a0505;
+  --ui-bg-medium: #1a0a0a;
+  --ui-border-dark: #301010;
+}
+
+[data-theme="romulan"] {
+  --ui-primary: #20aa60;
+  --ui-secondary: #106030;
+  --ui-accent: #40ff80;
+  --ui-bg-dark: #050a08;
+  --ui-bg-medium: #0a1a10;
+  --ui-border-dark: #103020;
+}
+
+[data-theme="cardassian"] {
+  --ui-primary: #aa8855;
+  --ui-secondary: #665533;
+  --ui-accent: #ddaa66;
+  --ui-bg-dark: #0a0805;
+  --ui-bg-medium: #1a1408;
+  --ui-border-dark: #302810;
+}
+
+[data-theme="borg"] {
+  --ui-primary: #00ff00;
+  --ui-secondary: #004400;
+  --ui-accent: #88ff88;
+  --ui-bg-dark: #000800;
+  --ui-bg-medium: #001a00;
+  --ui-border-dark: #003000;
+  --glow-intensity: 0.8;
+}
+
+[data-theme="dominion"] {
+  --ui-primary: #aa66dd;
+  --ui-secondary: #663388;
+  --ui-accent: #dd88ff;
+  --ui-bg-dark: #080510;
+  --ui-bg-medium: #100a1a;
+  --ui-border-dark: #201030;
+}
+
+[data-theme="ferengi"] {
+  --ui-primary: #ffaa00;
+  --ui-secondary: #aa6600;
+  --ui-accent: #ffdd44;
+  --ui-bg-dark: #0a0800;
+  --ui-bg-medium: #1a1000;
+  --ui-border-dark: #302000;
+}
+
+/* ============================================
+   SECTION 2: TEXTURE PATTERNS (SVG-based)
+   ============================================ */
+
+/* Noise/Static Texture */
+.texture-noise {
+  position: relative;
+}
+.texture-noise::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  opacity: var(--noise-opacity);
+  pointer-events: none;
+  mix-blend-mode: overlay;
+}
+
+/* Scanlines */
+.texture-scanlines::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.1) 2px,
+    rgba(0, 0, 0, 0.1) 4px
+  );
+  opacity: var(--scanline-opacity);
+  pointer-events: none;
+}
+
+/* Metal Brushed Texture */
+.texture-brushed-metal {
+  background-image: 
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 1px,
+      rgba(255,255,255,0.02) 1px,
+      rgba(255,255,255,0.02) 2px
+    ),
+    linear-gradient(180deg, 
+      rgba(255,255,255,0.05) 0%, 
+      transparent 50%, 
+      rgba(0,0,0,0.1) 100%
+    );
+}
+
+/* Hex Grid Pattern */
+.texture-hex-grid {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='49' viewBox='0 0 28 49'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5zM3 17.9v12.7l10.99 6.34 11-6.35V17.9l-11-6.34L3 17.9z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* Circuit Board Pattern */
+.texture-circuit {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cpath fill='none' stroke='%2330ff30' stroke-opacity='0.1' stroke-width='0.5' d='M0 20h10l5-5h10l5 5h10M20 0v10l-5 5v10l5 5v10'/%3E%3Ccircle fill='%2330ff30' fill-opacity='0.15' cx='20' cy='20' r='2'/%3E%3C/svg%3E");
+}
+
+/* ============================================
+   SECTION 3: LCARS-STYLE UI COMPONENTS
+   ============================================ */
+
+/* LCARS Panel Base */
+.lcars-panel {
+  position: relative;
+  background: var(--ui-bg-medium);
+  border: 1px solid var(--ui-border-dark);
+  border-radius: 0;
+  overflow: hidden;
+}
+
+/* LCARS Rounded Corner (top-left style) */
+.lcars-panel--rounded-tl {
+  border-radius: 40px 0 0 0;
+  padding-left: 20px;
+}
+
+.lcars-panel--rounded-tr {
+  border-radius: 0 40px 0 0;
+  padding-right: 20px;
+}
+
+.lcars-panel--rounded-bl {
+  border-radius: 0 0 0 40px;
+  padding-left: 20px;
+}
+
+.lcars-panel--rounded-br {
+  border-radius: 0 0 40px 0;
+  padding-right: 20px;
+}
+
+/* LCARS Header Bar */
+.lcars-header {
+  display: flex;
+  align-items: stretch;
+  height: 40px;
+  background: var(--ui-bg-dark);
+}
+
+.lcars-header__elbow {
+  width: 80px;
+  height: 100%;
+  background: var(--ui-primary);
+  border-radius: 0 0 20px 0;
+  position: relative;
+}
+
+.lcars-header__elbow::after {
+  content: '';
+  position: absolute;
+  right: -20px;
+  bottom: 0;
+  width: 20px;
+  height: 20px;
+  background: radial-gradient(circle at 0 0, transparent 20px, var(--ui-primary) 20px);
+}
+
+.lcars-header__bar {
+  flex: 1;
+  height: 20px;
+  margin-top: 20px;
+  background: var(--ui-primary);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+}
+
+.lcars-header__title {
+  font-family: 'Antonio', 'Orbitron', sans-serif;
+  font-size: 14px;
+  letter-spacing: 2px;
+  color: var(--ui-bg-dark);
+  text-transform: uppercase;
+}
+
+.lcars-header__cap {
+  width: 60px;
+  height: 20px;
+  margin-top: 20px;
+  background: var(--ui-secondary);
+  border-radius: 0 10px 10px 0;
+}
+
+/* LCARS Sidebar */
+.lcars-sidebar {
+  width: 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 4px;
+  background: var(--ui-bg-dark);
+}
+
+.lcars-sidebar__btn {
+  height: 32px;
+  background: var(--ui-primary);
+  border: none;
+  border-radius: 0 16px 16px 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  font-family: 'Antonio', sans-serif;
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: var(--ui-bg-dark);
+  text-transform: uppercase;
+  transition: all 0.15s ease;
+}
+
+.lcars-sidebar__btn:hover {
+  filter: brightness(1.2);
+  padding-left: 16px;
+}
+
+.lcars-sidebar__btn--active {
+  background: var(--ui-accent);
+}
+
+.lcars-sidebar__btn--secondary {
+  background: var(--ui-secondary);
+}
+
+/* LCARS Button Variations */
+.lcars-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 20px;
+  background: var(--ui-primary);
+  border: none;
+  border-radius: 4px;
+  font-family: 'Antonio', sans-serif;
+  font-size: 12px;
+  letter-spacing: 1px;
+  color: var(--ui-bg-dark);
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.lcars-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.2) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.lcars-btn:hover {
+  filter: brightness(1.15);
+  transform: translateY(-1px);
+}
+
+.lcars-btn:active {
+  filter: brightness(0.9);
+  transform: translateY(0);
+}
+
+.lcars-btn--pill {
+  border-radius: 20px;
+  padding: 8px 24px;
+}
+
+.lcars-btn--outline {
+  background: transparent;
+  border: 2px solid var(--ui-primary);
+  color: var(--ui-primary);
+}
+
+.lcars-btn--danger {
+  background: var(--ui-danger);
+}
+
+.lcars-btn--success {
+  background: var(--ui-success);
+}
+
+/* ============================================
+   SECTION 4: GLOW & SHADER EFFECTS
+   ============================================ */
+
+/* Text Glow */
+.glow-text {
+  text-shadow: 
+    0 0 5px currentColor,
+    0 0 10px currentColor,
+    0 0 20px currentColor;
+  opacity: var(--glow-intensity);
+}
+
+/* Box Glow */
+.glow-box {
+  box-shadow: 
+    0 0 5px var(--ui-primary),
+    0 0 10px var(--ui-primary),
+    inset 0 0 5px rgba(255,255,255,0.1);
+}
+
+/* Animated Pulse Glow */
+@keyframes pulse-glow {
+  0%, 100% { 
+    box-shadow: 0 0 5px var(--ui-primary), 0 0 10px var(--ui-primary);
+    opacity: 0.8;
+  }
+  50% { 
+    box-shadow: 0 0 10px var(--ui-primary), 0 0 20px var(--ui-primary), 0 0 30px var(--ui-primary);
+    opacity: 1;
+  }
+}
+
+.glow-pulse {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Scanning Line Animation */
+@keyframes scan-line {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+
+.effect-scan::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 50%;
+  background: linear-gradient(
+    180deg,
+    transparent,
+    rgba(var(--ui-primary-rgb, 74, 158, 255), 0.1),
+    transparent
+  );
+  animation: scan-line 3s linear infinite;
+  pointer-events: none;
+}
+
+/* Holographic Shimmer */
+@keyframes holo-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.effect-holographic {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255,255,255,0.1) 25%,
+    rgba(255,255,255,0.2) 50%,
+    rgba(255,255,255,0.1) 75%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: holo-shimmer 3s linear infinite;
+}
+
+/* ============================================
+   SECTION 5: PROGRESS BARS & METERS
+   ============================================ */
+
+.lcars-progress {
+  height: 8px;
+  background: var(--ui-bg-dark);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.lcars-progress__fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--ui-primary), var(--ui-accent));
+  border-radius: 4px;
+  transition: width 0.3s ease;
+  position: relative;
+}
+
+.lcars-progress__fill::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.3) 0%, transparent 50%);
+}
+
+/* Segmented Progress (LCARS style) */
+.lcars-progress--segmented {
+  display: flex;
+  gap: 2px;
+  background: transparent;
+}
+
+.lcars-progress--segmented .segment {
+  flex: 1;
+  height: 100%;
+  background: var(--ui-bg-light);
+  border-radius: 2px;
+  transition: background 0.2s ease;
+}
+
+.lcars-progress--segmented .segment.active {
+  background: var(--ui-primary);
+}
+
+.lcars-progress--segmented .segment.active:last-child {
+  border-radius: 2px 8px 8px 2px;
+}
+
+/* Circular Meter */
+.lcars-meter {
+  width: 80px;
+  height: 80px;
+  position: relative;
+}
+
+.lcars-meter__ring {
+  fill: none;
+  stroke: var(--ui-bg-light);
+  stroke-width: 8;
+}
+
+.lcars-meter__value {
+  fill: none;
+  stroke: var(--ui-primary);
+  stroke-width: 8;
+  stroke-linecap: round;
+  transform: rotate(-90deg);
+  transform-origin: center;
+  transition: stroke-dasharray 0.5s ease;
+}
+
+.lcars-meter__label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Orbitron', monospace;
+  font-size: 18px;
+  color: var(--ui-text-bright);
+}
+
+/* ============================================
+   SECTION 6: DATA DISPLAYS
+   ============================================ */
+
+/* Data Card */
+.lcars-data-card {
+  background: var(--ui-bg-medium);
+  border-left: 4px solid var(--ui-primary);
+  padding: 12px 16px;
+  position: relative;
+}
+
+.lcars-data-card__label {
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--ui-text-dim);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.lcars-data-card__value {
+  font-family: 'Orbitron', monospace;
+  font-size: 24px;
+  color: var(--ui-text-bright);
+}
+
+.lcars-data-card__trend {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  font-size: 12px;
+}
+
+.lcars-data-card__trend--up { color: var(--ui-success); }
+.lcars-data-card__trend--down { color: var(--ui-danger); }
+
+/* ============================================
+   SECTION 7: TOOLTIP & POPOVER
+   ============================================ */
+
+.lcars-tooltip {
+  position: absolute;
+  background: var(--ui-bg-dark);
+  border: 1px solid var(--ui-primary);
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-size: 12px;
+  color: var(--ui-text-normal);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  z-index: 1000;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(5px);
+  transition: all 0.2s ease;
+}
+
+.lcars-tooltip.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.lcars-tooltip::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-bottom-color: var(--ui-primary);
+}
+
+/* ============================================
+   SECTION 8: ALERTS & NOTIFICATIONS
+   ============================================ */
+
+.lcars-alert {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--ui-bg-medium);
+  border-left: 4px solid var(--ui-primary);
+  border-radius: 0 4px 4px 0;
+}
+
+.lcars-alert--warning {
+  border-color: var(--ui-warning);
+  background: rgba(255, 204, 0, 0.1);
+}
+
+.lcars-alert--danger {
+  border-color: var(--ui-danger);
+  background: rgba(255, 68, 85, 0.1);
+}
+
+.lcars-alert--success {
+  border-color: var(--ui-success);
+  background: rgba(68, 221, 102, 0.1);
+}
+
+.lcars-alert__icon {
+  font-size: 20px;
+}
+
+.lcars-alert__content {
+  flex: 1;
+}
+
+.lcars-alert__title {
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.lcars-alert__message {
+  font-size: 13px;
+  color: var(--ui-text-dim);
+}
+
+/* Red Alert Animation */
+@keyframes red-alert {
+  0%, 100% { 
+    background: rgba(255, 0, 0, 0.1);
+    border-color: #ff0000;
+  }
+  50% { 
+    background: rgba(255, 0, 0, 0.3);
+    border-color: #ff4444;
+  }
+}
+
+.lcars-alert--red-alert {
+  animation: red-alert 1s ease-in-out infinite;
+  border-width: 2px;
+}

@@ -1,0 +1,183 @@
+@* FerengiShip.razor - Ship display component for Ferengi vessels *@
+
+<div class="@GetContainerClasses()" @onclick="HandleClick">
+    <div class="@GetShipClasses()"></div>
+    @if (ShowNameplate)
+    {
+        <div class="ship-nameplate ferengi-nameplate">
+            <span class="ship-name">@GetDisplayName()</span>
+            <span class="ship-class-icon">💰</span>
+        </div>
+    }
+</div>
+
+<style>
+    .ship-container.ferengi-ship {
+        display: inline-flex;
+        flex-direction: column;
+        background: linear-gradient(180deg, #3d3020 0%, #251a10 100%);
+        border: 1px solid #5a4530;
+        border-radius: 6px;
+        overflow: hidden;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+        transition: all 0.2s;
+    }
+    
+    .ship-container.ferengi-ship:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+        border-color: rgba(234, 179, 8, 0.5);
+    }
+    
+    .ship-container.ferengi-ship.selected {
+        border-color: #eab308;
+        box-shadow: 0 0 20px rgba(234, 179, 8, 0.4);
+    }
+    
+    .ferengi-nameplate {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 12px;
+        background: linear-gradient(180deg, #c9956a 0%, #8b6040 50%, #5a3a28 100%);
+        border-top: 1px solid #d4a070;
+    }
+    
+    .ferengi-nameplate .ship-name {
+        font-size: 10px;
+        font-weight: 700;
+        color: #1a1008;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        text-shadow: 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+    
+    .ferengi-nameplate .ship-class-icon {
+        width: 22px;
+        height: 22px;
+        background: linear-gradient(180deg, #d4a070 0%, #8b6040 100%);
+        border: 2px solid #5a3a28;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+    }
+</style>
+
+@code {
+    [Parameter] public string ShipType { get; set; } = "dkora";
+    [Parameter] public string Size { get; set; } = "medium";
+    [Parameter] public string Category { get; set; } = "military";
+    [Parameter] public bool ShowNameplate { get; set; } = false;
+    [Parameter] public bool IsSelected { get; set; } = false;
+    [Parameter] public string? DisplayName { get; set; }
+    [Parameter] public EventCallback<string> OnClick { get; set; }
+    [Parameter] public string? CssClass { get; set; }
+
+    private string GetContainerClasses()
+    {
+        var classes = new List<string> { "ship-container", "ferengi-ship" };
+        if (IsSelected) classes.Add("selected");
+        if (OnClick.HasDelegate) classes.Add("clickable");
+        if (!string.IsNullOrEmpty(CssClass)) classes.Add(CssClass);
+        return string.Join(" ", classes);
+    }
+
+    private string GetShipClasses()
+    {
+        var classes = new List<string> { "ship-card", "ferengi", Category, ShipType.ToLowerInvariant() };
+        if (!string.IsNullOrEmpty(Size)) classes.Add(Size);
+        return string.Join(" ", classes);
+    }
+
+    private async Task HandleClick()
+    {
+        if (OnClick.HasDelegate)
+            await OnClick.InvokeAsync(ShipType);
+    }
+
+    private string GetDisplayName()
+    {
+        if (!string.IsNullOrEmpty(DisplayName)) return DisplayName;
+        return ShipType.ToLowerInvariant() switch
+        {
+            // Military
+            "dkora" => "D'Kora",
+            "attack-ship" => "Attack Ship",
+            "raider" => "Raider",
+            "privateer" => "Privateer",
+            "marauder-tng" => "Marauder (TNG)",
+            "marauder-ds9" => "Marauder (DS9)",
+            "heavy-raider" => "Heavy Raider",
+            "escort" => "Escort",
+            "missile-ship" => "Missile Ship",
+            "mercenary" => "Mercenary",
+            "patrol" => "Patrol Craft",
+            "enforcer" => "Enforcer",
+            "commerce-raider" => "Commerce Raider",
+            "salvage-armed" => "Salvage (Armed)",
+            "luxury-armed" => "Luxury (Armed)",
+            "flagship" => "Flagship",
+            // Civilian
+            "freighter" => "Freighter",
+            "transport" => "Transport",
+            "cargo-tug" => "Cargo Tug",
+            "merchantman" => "Merchantman",
+            "mining" => "Mining Ship",
+            "salvage" => "Salvage Vessel",
+            "repair" => "Repair Tug",
+            "survey" => "Survey Ship",
+            "luxury-yacht" => "Luxury Yacht",
+            "trade-cruiser" => "Trade Cruiser",
+            "gambling" => "Gambling Ship",
+            "courier" => "Courier",
+            "shuttlepod" => "Shuttlepod",
+            "workbee" => "Ferengi Workbee",
+            "colony" => "Colony Ship",
+            "waste-transport" => "Waste Transport",
+            _ => ShipType
+        };
+    }
+
+    // Ship data with profit potential!
+    public static readonly ShipData[] MilitaryShips = new[]
+    {
+        // Capital
+        new ShipData("dkora", "D'Kora", "Marauder", 10, 8, 2, 6, 100),
+        new ShipData("marauder-tng", "Marauder (TNG)", "Marauder", 9, 7, 2, 6, 90),
+        new ShipData("marauder-ds9", "Marauder (DS9)", "Marauder", 10, 8, 2, 6, 95),
+        new ShipData("flagship", "Flagship", "Dreadnought", 12, 10, 3, 5, 150),
+        // Combat
+        new ShipData("attack-ship", "Attack Ship", "Attacker", 8, 5, 1, 7, 60),
+        new ShipData("raider", "Raider", "Raider", 7, 4, 1, 8, 50),
+        new ShipData("privateer", "Privateer", "Raider", 6, 4, 1, 8, 55),
+        new ShipData("heavy-raider", "Heavy Raider", "Raider", 9, 6, 1, 6, 70),
+        new ShipData("escort", "Escort", "Escort", 6, 5, 1, 7, 45),
+        // Support
+        new ShipData("missile-ship", "Missile Ship", "Artillery", 10, 3, 1, 5, 65),
+        new ShipData("mercenary", "Mercenary", "Mercenary", 8, 5, 1, 7, 80),
+        new ShipData("patrol", "Patrol Craft", "Patrol", 5, 4, 2, 8, 40),
+        new ShipData("enforcer", "Enforcer", "Enforcer", 7, 6, 1, 6, 55),
+        new ShipData("commerce-raider", "Commerce Raider", "Raider", 6, 3, 1, 9, 75),
+    };
+
+    public static readonly ShipData[] CivilianShips = new[]
+    {
+        new ShipData("freighter", "Freighter", "Freighter", 1, 3, 0, 5, 120),
+        new ShipData("transport", "Transport", "Transport", 1, 2, 0, 5, 80),
+        new ShipData("cargo-tug", "Cargo Tug", "Tug", 1, 2, 0, 4, 60),
+        new ShipData("merchantman", "Merchantman", "Trader", 2, 4, 1, 5, 100),
+        new ShipData("mining", "Mining Ship", "Industrial", 2, 3, 1, 3, 90),
+        new ShipData("salvage", "Salvage Vessel", "Salvage", 2, 2, 2, 4, 85),
+        new ShipData("repair", "Repair Tug", "Support", 1, 3, 2, 4, 50),
+        new ShipData("survey", "Survey Ship", "Science", 1, 2, 4, 5, 70),
+        new ShipData("luxury-yacht", "Luxury Yacht", "Yacht", 2, 3, 1, 7, 200),
+        new ShipData("trade-cruiser", "Trade Cruiser", "Trader", 3, 5, 2, 6, 150),
+        new ShipData("gambling", "Gambling Ship", "Entertainment", 1, 3, 1, 5, 300),
+        new ShipData("courier", "Courier", "Courier", 1, 1, 0, 10, 40),
+        new ShipData("colony", "Colony Ship", "Colonizer", 1, 4, 1, 3, 180),
+    };
+
+    public record ShipData(string Type, string Name, string Class, int Attack, int Defense, int Science, int Speed, int ProfitPotential);
+}

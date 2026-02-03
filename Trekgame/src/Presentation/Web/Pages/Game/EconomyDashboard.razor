@@ -1,0 +1,819 @@
+@page "/game/economy"
+@using System.Text.Json
+@inject HttpClient Http
+@inject NavigationManager Nav
+
+<div class="economy-dashboard @GetFactionClass()">
+    <div class="dashboard-header">
+        <h1>💰 Empire Economy</h1>
+        <button class="btn-back" @onclick="GoBack">← Back to Galaxy</button>
+    </div>
+
+    @if (_loading)
+    {
+        <div class="loading">Loading economy data...</div>
+    }
+    else
+    {
+        <div class="dashboard-content">
+            <!-- Resource Overview -->
+            <div class="panel resources-panel">
+                <h2>Treasury</h2>
+                
+                <div class="resource-section">
+                    <h3>Primary Resources</h3>
+                    <div class="resources-grid">
+                        <div class="resource-card">
+                            <div class="resource-icon">💰</div>
+                            <div class="resource-info">
+                                <span class="resource-name">Credits</span>
+                                <span class="resource-value">@_economy?.Credits</span>
+                                <span class="resource-change @GetChangeClass(_economy?.CreditsNet ?? 0)">
+                                    @FormatChange(_economy?.CreditsNet ?? 0)/turn
+                                </span>
+                            </div>
+                            <div class="resource-bar">
+                                <div class="bar-fill" style="width: @GetPercentage(_economy?.Credits ?? 0, 10000)%"></div>
+                            </div>
+                        </div>
+
+                        <div class="resource-card">
+                            <div class="resource-icon">⚡</div>
+                            <div class="resource-info">
+                                <span class="resource-name">Energy</span>
+                                <span class="resource-value @GetBalanceClass(_economy?.EnergyNet ?? 0)">@_economy?.EnergyNet</span>
+                                <span class="resource-detail">
+                                    +@_economy?.EnergyIncome / -@_economy?.EnergyExpense
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="resource-card">
+                            <div class="resource-icon">🔩</div>
+                            <div class="resource-info">
+                                <span class="resource-name">Minerals</span>
+                                <span class="resource-value">@_economy?.Minerals</span>
+                                <span class="resource-change @GetChangeClass(_economy?.MineralsNet ?? 0)">
+                                    @FormatChange(_economy?.MineralsNet ?? 0)/turn
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="resource-card">
+                            <div class="resource-icon">🌾</div>
+                            <div class="resource-info">
+                                <span class="resource-name">Food</span>
+                                <span class="resource-value @GetBalanceClass(_economy?.FoodNet ?? 0)">@_economy?.FoodNet</span>
+                                <span class="resource-detail">
+                                    +@_economy?.FoodIncome / -@_economy?.FoodExpense
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="resource-card">
+                            <div class="resource-icon">📦</div>
+                            <div class="resource-info">
+                                <span class="resource-name">Consumer Goods</span>
+                                <span class="resource-value @GetBalanceClass(_economy?.ConsumerGoodsNet ?? 0)">@_economy?.ConsumerGoodsNet</span>
+                                <span class="resource-detail">
+                                    +@_economy?.ConsumerGoodsIncome / -@_economy?.ConsumerGoodsExpense
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="resource-section">
+                    <h3>Strategic Resources</h3>
+                    <div class="resources-grid strategic">
+                        <div class="resource-card strategic">
+                            <div class="resource-icon">💎</div>
+                            <div class="resource-info">
+                                <span class="resource-name">Dilithium</span>
+                                <span class="resource-value">@_economy?.Dilithium</span>
+                                <span class="resource-change @GetChangeClass(_economy?.DilithiumIncome ?? 0)">
+                                    @FormatChange(_economy?.DilithiumIncome ?? 0)/turn
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="resource-card strategic">
+                            <div class="resource-icon">🔷</div>
+                            <div class="resource-info">
+                                <span class="resource-name">Deuterium</span>
+                                <span class="resource-value">@_economy?.Deuterium</span>
+                                <span class="resource-detail">Fleet fuel</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="resource-section">
+                    <h3>Research Output</h3>
+                    <div class="resources-grid research">
+                        <div class="resource-card research physics">
+                            <div class="resource-icon">🔬</div>
+                            <div class="resource-info">
+                                <span class="resource-name">Physics</span>
+                                <span class="resource-value">+@_economy?.PhysicsIncome/turn</span>
+                            </div>
+                        </div>
+
+                        <div class="resource-card research engineering">
+                            <div class="resource-icon">⚙️</div>
+                            <div class="resource-info">
+                                <span class="resource-name">Engineering</span>
+                                <span class="resource-value">+@_economy?.EngineeringIncome/turn</span>
+                            </div>
+                        </div>
+
+                        <div class="resource-card research society">
+                            <div class="resource-icon">📚</div>
+                            <div class="resource-info">
+                                <span class="resource-name">Society</span>
+                                <span class="resource-value">+@_economy?.SocietyIncome/turn</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trade Routes Panel -->
+            <div class="panel trade-panel">
+                <h2>🚀 Trade Routes (@_tradeReport?.ActiveRoutes / @_tradeReport?.MaxRoutes)</h2>
+
+                <div class="trade-summary">
+                    <div class="trade-stat">
+                        <span class="label">Trade Income</span>
+                        <span class="value positive">+@_tradeReport?.TotalTradeIncome/turn</span>
+                    </div>
+                    <div class="trade-stat">
+                        <span class="label">Internal</span>
+                        <span class="value">@_tradeReport?.InternalRoutes</span>
+                    </div>
+                    <div class="trade-stat">
+                        <span class="label">External</span>
+                        <span class="value">@_tradeReport?.ExternalRoutes</span>
+                    </div>
+                    @if (_tradeReport?.DisruptedRoutes > 0)
+                    {
+                        <div class="trade-stat warning">
+                            <span class="label">Disrupted</span>
+                            <span class="value">@_tradeReport?.DisruptedRoutes</span>
+                        </div>
+                    }
+                </div>
+
+                <div class="trade-routes-list">
+                    @if (_tradeReport?.Routes != null)
+                    {
+                        @foreach (var route in _tradeReport.Routes)
+                        {
+                            <div class="route-card @route.Status.ToLower()">
+                                <div class="route-header">
+                                    <span class="route-path">@route.SourceSystem → @route.DestinationSystem</span>
+                                    <span class="route-type @route.Type.ToLower()">@route.Type</span>
+                                </div>
+                                <div class="route-details">
+                                    <span class="route-value">💰 +@route.TradeValue/turn</span>
+                                    <span class="route-protection">🛡️ @route.ProtectionLevel%</span>
+                                    <span class="route-status @route.Status.ToLower()">@route.Status</span>
+                                </div>
+                                <button class="btn-cancel" @onclick="() => CancelRoute(route.Id)">Cancel</button>
+                            </div>
+                        }
+                    }
+                </div>
+
+                <button class="btn-new-route" @onclick="ShowNewRouteModal">+ New Trade Route</button>
+            </div>
+
+            <!-- Market Panel -->
+            <div class="panel market-panel">
+                <h2>📊 Galactic Market</h2>
+
+                <div class="market-prices">
+                    <div class="price-card">
+                        <span class="item">Minerals</span>
+                        <span class="buy">Buy: @_marketPrices?.MineralsBuy.ToString("F1")</span>
+                        <span class="sell">Sell: @_marketPrices?.MineralsSell.ToString("F1")</span>
+                        <div class="trade-buttons">
+                            <button @onclick="() => OpenTradeModal_Minerals_Buy()">Buy</button>
+                            <button @onclick="() => OpenTradeModal_Minerals_Sell()">Sell</button>
+                        </div>
+                    </div>
+
+                    <div class="price-card">
+                        <span class="item">Food</span>
+                        <span class="buy">Buy: @_marketPrices?.FoodBuy.ToString("F1")</span>
+                        <span class="sell">Sell: @_marketPrices?.FoodSell.ToString("F1")</span>
+                        <div class="trade-buttons">
+                            <button @onclick="() => OpenTradeModal_Food_Buy()">Buy</button>
+                            <button @onclick="() => OpenTradeModal_Food_Sell()">Sell</button>
+                        </div>
+                    </div>
+
+                    <div class="price-card">
+                        <span class="item">Consumer Goods</span>
+                        <span class="buy">Buy: @_marketPrices?.ConsumerGoodsBuy.ToString("F1")</span>
+                        <span class="sell">Sell: @_marketPrices?.ConsumerGoodsSell.ToString("F1")</span>
+                        <div class="trade-buttons">
+                            <button @onclick="() => OpenTradeModal_ConsumerGoods_Buy()">Buy</button>
+                            <button @onclick="() => OpenTradeModal_ConsumerGoods_Sell()">Sell</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Trade Modal -->
+    @if (_showTradeModal)
+    {
+        <div class="modal-overlay" @onclick="CloseTradeModal">
+            <div class="modal trade-modal" @onclick:stopPropagation="true">
+                <h2>@(_isBuying ? "Buy" : "Sell") @_tradeResource</h2>
+                
+                <div class="trade-form">
+                    <div class="input-group">
+                        <label>Amount:</label>
+                        <input type="number" @bind="_tradeAmount" min="1" max="1000" />
+                    </div>
+                    
+                    <div class="trade-preview">
+                        <span>Total Cost/Gain: </span>
+                        <span class="@(_isBuying ? "negative" : "positive")">
+                            @((_isBuying ? "-" : "+"))@CalculateTradeCost() Credits
+                        </span>
+                    </div>
+                </div>
+
+                <div class="modal-buttons">
+                    <button class="btn-confirm" @onclick="ExecuteTrade">Confirm</button>
+                    <button class="btn-cancel" @onclick="CloseTradeModal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    .economy-dashboard {
+        min-height: 100vh;
+        padding: 20px;
+        background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3a 100%);
+        color: white;
+    }
+
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .dashboard-header h1 {
+        margin: 0;
+    }
+
+    .dashboard-content {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    .panel {
+        background: rgba(0,0,0,0.4);
+        border-radius: 15px;
+        padding: 20px;
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .panel h2 {
+        margin-top: 0;
+        padding-bottom: 15px;
+        border-bottom: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .resources-panel {
+        grid-column: span 2;
+    }
+
+    .resource-section {
+        margin-bottom: 25px;
+    }
+
+    .resource-section h3 {
+        margin: 15px 0 10px;
+        color: #888;
+        font-size: 0.9em;
+        text-transform: uppercase;
+    }
+
+    .resources-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+    }
+
+    .resource-card {
+        background: rgba(255,255,255,0.05);
+        border-radius: 10px;
+        padding: 15px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .resource-icon {
+        font-size: 2em;
+    }
+
+    .resource-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .resource-name {
+        color: #888;
+        font-size: 0.85em;
+    }
+
+    .resource-value {
+        font-size: 1.5em;
+        font-weight: bold;
+    }
+
+    .resource-change, .resource-detail {
+        font-size: 0.85em;
+    }
+
+    .resource-change.positive { color: #2ecc71; }
+    .resource-change.negative { color: #e74c3c; }
+    .resource-change.neutral { color: #888; }
+
+    .resource-value.positive { color: #2ecc71; }
+    .resource-value.negative { color: #e74c3c; }
+
+    .resource-card.strategic {
+        border-color: rgba(155, 89, 182, 0.3);
+        background: rgba(155, 89, 182, 0.1);
+    }
+
+    .resource-card.research {
+        border-color: rgba(52, 152, 219, 0.3);
+    }
+    
+    .resource-card.physics { background: linear-gradient(135deg, rgba(52, 152, 219, 0.1), transparent); }
+    .resource-card.engineering { background: linear-gradient(135deg, rgba(230, 126, 34, 0.1), transparent); }
+    .resource-card.society { background: linear-gradient(135deg, rgba(46, 204, 113, 0.1), transparent); }
+
+    .trade-summary {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 20px;
+        padding: 15px;
+        background: rgba(255,255,255,0.05);
+        border-radius: 10px;
+    }
+
+    .trade-stat {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .trade-stat .label {
+        color: #888;
+        font-size: 0.85em;
+    }
+
+    .trade-stat .value {
+        font-size: 1.2em;
+        font-weight: bold;
+    }
+
+    .trade-stat .value.positive { color: #2ecc71; }
+    .trade-stat.warning .value { color: #e74c3c; }
+
+    .trade-routes-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        max-height: 300px;
+        overflow-y: auto;
+    }
+
+    .route-card {
+        background: rgba(255,255,255,0.05);
+        border-radius: 8px;
+        padding: 12px;
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .route-card.disrupted {
+        border-color: #e67e22;
+        background: rgba(230, 126, 34, 0.1);
+    }
+
+    .route-card.blockaded {
+        border-color: #e74c3c;
+        background: rgba(231, 76, 60, 0.1);
+    }
+
+    .route-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+    }
+
+    .route-type {
+        padding: 2px 8px;
+        border-radius: 10px;
+        font-size: 0.8em;
+    }
+
+    .route-type.internal { background: #3498db; }
+    .route-type.external { background: #9b59b6; }
+    .route-type.blackmarket { background: #2c3e50; }
+
+    .route-details {
+        display: flex;
+        gap: 15px;
+        font-size: 0.9em;
+        color: #aaa;
+    }
+
+    .route-status.active { color: #2ecc71; }
+    .route-status.disrupted { color: #e67e22; }
+    .route-status.blockaded { color: #e74c3c; }
+
+    .btn-new-route {
+        width: 100%;
+        padding: 12px;
+        margin-top: 15px;
+        background: #3498db;
+        border: none;
+        border-radius: 8px;
+        color: white;
+        cursor: pointer;
+        font-size: 1em;
+    }
+
+    .market-prices {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .price-card {
+        display: grid;
+        grid-template-columns: 1fr auto auto auto;
+        align-items: center;
+        gap: 20px;
+        padding: 15px;
+        background: rgba(255,255,255,0.05);
+        border-radius: 8px;
+    }
+
+    .price-card .item {
+        font-weight: bold;
+    }
+
+    .price-card .buy {
+        color: #e74c3c;
+    }
+
+    .price-card .sell {
+        color: #2ecc71;
+    }
+
+    .trade-buttons {
+        display: flex;
+        gap: 10px;
+    }
+
+    .trade-buttons button {
+        padding: 5px 15px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .trade-buttons button:first-child {
+        background: #27ae60;
+    }
+
+    .trade-buttons button:last-child {
+        background: #e67e22;
+    }
+
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+
+    .modal {
+        background: #1a1a2e;
+        border-radius: 15px;
+        padding: 25px;
+        min-width: 400px;
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .trade-form {
+        margin: 20px 0;
+    }
+
+    .input-group {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 15px;
+    }
+
+    .input-group input {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid rgba(255,255,255,0.2);
+        border-radius: 5px;
+        background: rgba(255,255,255,0.1);
+        color: white;
+        font-size: 1.1em;
+    }
+
+    .trade-preview {
+        padding: 15px;
+        background: rgba(255,255,255,0.05);
+        border-radius: 8px;
+        text-align: center;
+        font-size: 1.2em;
+    }
+
+    .modal-buttons {
+        display: flex;
+        gap: 15px;
+        margin-top: 20px;
+    }
+
+    .modal-buttons button {
+        flex: 1;
+        padding: 12px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1em;
+    }
+
+    .btn-confirm { background: #27ae60; color: white; }
+    .btn-cancel { background: #7f8c8d; color: white; }
+    .btn-back {
+        padding: 10px 20px;
+        background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.2);
+        border-radius: 5px;
+        color: white;
+        cursor: pointer;
+    }
+
+    .loading {
+        text-align: center;
+        padding: 50px;
+        font-size: 1.2em;
+        color: #888;
+    }
+
+    @@media (max-width: 1000px) {
+        .dashboard-content {
+            grid-template-columns: 1fr;
+        }
+        .resources-panel {
+            grid-column: span 1;
+        }
+    }
+</style>
+
+@code {
+    private bool _loading = true;
+    private EconomyData? _economy;
+    private TradeRouteReport? _tradeReport;
+    private MarketPrices? _marketPrices;
+    
+    // Trade modal
+    private bool _showTradeModal = false;
+    private string _tradeResource = "";
+    private bool _isBuying = true;
+    private int _tradeAmount = 100;
+
+    private string _factionId = "federation";
+    private Guid _houseId = Guid.Empty; // Would come from game state
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        _loading = true;
+        try
+        {
+            // Mock data for now - would load from API
+            _economy = new EconomyData
+            {
+                Credits = 5000,
+                CreditsNet = 150,
+                Energy = 50,
+                EnergyIncome = 80,
+                EnergyExpense = 30,
+                EnergyNet = 50,
+                Minerals = 2000,
+                MineralsNet = 75,
+                Food = 100,
+                FoodIncome = 120,
+                FoodExpense = 100,
+                FoodNet = 20,
+                ConsumerGoods = 200,
+                ConsumerGoodsIncome = 40,
+                ConsumerGoodsExpense = 35,
+                ConsumerGoodsNet = 5,
+                Dilithium = 15,
+                DilithiumIncome = 2,
+                Deuterium = 50,
+                PhysicsIncome = 25,
+                EngineeringIncome = 30,
+                SocietyIncome = 20
+            };
+
+            _tradeReport = new TradeRouteReport
+            {
+                ActiveRoutes = 3,
+                MaxRoutes = 6,
+                TotalTradeIncome = 45,
+                InternalRoutes = 2,
+                ExternalRoutes = 1,
+                DisruptedRoutes = 0,
+                Routes = new List<TradeRouteInfo>
+                {
+                    new() { SourceSystem = "Sol", DestinationSystem = "Alpha Centauri", Type = "Internal", Status = "Active", TradeValue = 15, ProtectionLevel = 80 },
+                    new() { SourceSystem = "Sol", DestinationSystem = "Vulcan", Type = "Internal", Status = "Active", TradeValue = 20, ProtectionLevel = 60 },
+                    new() { SourceSystem = "Andoria", DestinationSystem = "Tellar", Type = "External", Status = "Active", TradeValue = 10, ProtectionLevel = 40 }
+                }
+            };
+
+            _marketPrices = new MarketPrices
+            {
+                MineralsBuy = 1.2,
+                MineralsSell = 0.9,
+                FoodBuy = 1.0,
+                FoodSell = 0.8,
+                ConsumerGoodsBuy = 2.5,
+                ConsumerGoodsSell = 2.0
+            };
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading economy: {ex.Message}");
+        }
+        _loading = false;
+    }
+
+    private void GoBack() => Nav.NavigateTo("/game/galaxy");
+
+    private string GetFactionClass() => _factionId.ToLower();
+    
+    private string GetChangeClass(int value) => value switch
+    {
+        > 0 => "positive",
+        < 0 => "negative",
+        _ => "neutral"
+    };
+
+    private string GetBalanceClass(int value) => value switch
+    {
+        > 0 => "positive",
+        < 0 => "negative",
+        _ => ""
+    };
+
+    private string FormatChange(int value) => value >= 0 ? $"+{value}" : value.ToString();
+    
+    private int GetPercentage(int current, int max) => max > 0 ? (current * 100 / max) : 0;
+
+    // Helper methods for trade buttons
+    private void OpenTradeModal_Minerals_Buy() => OpenTradeModal("minerals", true);
+    private void OpenTradeModal_Minerals_Sell() => OpenTradeModal("minerals", false);
+    private void OpenTradeModal_Food_Buy() => OpenTradeModal("food", true);
+    private void OpenTradeModal_Food_Sell() => OpenTradeModal("food", false);
+    private void OpenTradeModal_ConsumerGoods_Buy() => OpenTradeModal("consumer_goods", true);
+    private void OpenTradeModal_ConsumerGoods_Sell() => OpenTradeModal("consumer_goods", false);
+
+    private void OpenTradeModal(string resource, bool buying)
+    {
+        _tradeResource = resource;
+        _isBuying = buying;
+        _tradeAmount = 100;
+        _showTradeModal = true;
+    }
+
+    private void CloseTradeModal() => _showTradeModal = false;
+
+    private int CalculateTradeCost()
+    {
+        var price = _tradeResource switch
+        {
+            "minerals" => _isBuying ? _marketPrices?.MineralsBuy : _marketPrices?.MineralsSell,
+            "food" => _isBuying ? _marketPrices?.FoodBuy : _marketPrices?.FoodSell,
+            "consumer_goods" => _isBuying ? _marketPrices?.ConsumerGoodsBuy : _marketPrices?.ConsumerGoodsSell,
+            _ => 1.0
+        };
+        return (int)(_tradeAmount * (price ?? 1.0));
+    }
+
+    private async Task ExecuteTrade()
+    {
+        // Would call API
+        await Task.Delay(100);
+        CloseTradeModal();
+        await LoadData();
+    }
+
+    private async Task CancelRoute(Guid routeId)
+    {
+        // Would call API
+        await Task.Delay(100);
+        await LoadData();
+    }
+
+    private void ShowNewRouteModal()
+    {
+        // Would show route creation modal
+    }
+
+    // Data classes
+    public class EconomyData
+    {
+        public int Credits { get; set; }
+        public int CreditsNet { get; set; }
+        public int Energy { get; set; }
+        public int EnergyIncome { get; set; }
+        public int EnergyExpense { get; set; }
+        public int EnergyNet { get; set; }
+        public int Minerals { get; set; }
+        public int MineralsNet { get; set; }
+        public int Food { get; set; }
+        public int FoodIncome { get; set; }
+        public int FoodExpense { get; set; }
+        public int FoodNet { get; set; }
+        public int ConsumerGoods { get; set; }
+        public int ConsumerGoodsIncome { get; set; }
+        public int ConsumerGoodsExpense { get; set; }
+        public int ConsumerGoodsNet { get; set; }
+        public int Dilithium { get; set; }
+        public int DilithiumIncome { get; set; }
+        public int Deuterium { get; set; }
+        public int PhysicsIncome { get; set; }
+        public int EngineeringIncome { get; set; }
+        public int SocietyIncome { get; set; }
+    }
+
+    public class TradeRouteReport
+    {
+        public int ActiveRoutes { get; set; }
+        public int MaxRoutes { get; set; }
+        public int TotalTradeIncome { get; set; }
+        public int InternalRoutes { get; set; }
+        public int ExternalRoutes { get; set; }
+        public int DisruptedRoutes { get; set; }
+        public List<TradeRouteInfo> Routes { get; set; } = new();
+    }
+
+    public class TradeRouteInfo
+    {
+        public Guid Id { get; set; }
+        public string SourceSystem { get; set; } = "";
+        public string DestinationSystem { get; set; } = "";
+        public string Type { get; set; } = "";
+        public string Status { get; set; } = "";
+        public int TradeValue { get; set; }
+        public int ProtectionLevel { get; set; }
+    }
+
+    public class MarketPrices
+    {
+        public double MineralsBuy { get; set; }
+        public double MineralsSell { get; set; }
+        public double FoodBuy { get; set; }
+        public double FoodSell { get; set; }
+        public double ConsumerGoodsBuy { get; set; }
+        public double ConsumerGoodsSell { get; set; }
+    }
+}

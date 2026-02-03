@@ -1,0 +1,35 @@
+{
+  "category": "EventCharacters",
+  "description": "Generic NPC characters for random events - NOT specific Star Trek characters",
+  "assets": [
+    { "id": "merchant_trader", "name": "Merchant Trader Friendly", "match": ["merchant", "trader"], "prompt": { "title": "SPACE MERCHANT/TRADER", "appearance": ["Weathered but friendly face", "Various alien species possible", "Practical clothing"], "accessories": ["Trade goods visible", "PADD or inventory device"], "expression": "Welcoming, ready to deal", "setting": "Trading post or ship cargo bay" }},
+    { "id": "smuggler_shady", "name": "Smuggler Shady Hooded", "match": ["smuggler", "shady"], "prompt": { "title": "SMUGGLER", "appearance": ["Hooded or obscured features", "Shifty eyes", "Worn clothing"], "accessories": ["Hidden pockets", "Concealed items"], "expression": "Suspicious, calculating", "setting": "Dark corner of station" }},
+    { "id": "scientist_researcher", "name": "Scientist Researcher Excited", "match": ["scientist", "researcher"], "prompt": { "title": "SCIENTIST/RESEARCHER", "appearance": ["Lab coat or research attire", "Various species", "Intellectual look"], "accessories": ["Tricorder", "Data PADDs", "Scientific equipment"], "expression": "Excited about discovery", "setting": "Laboratory or research station" }},
+    { "id": "diplomat_ambassador", "name": "Diplomat Ambassador Formal", "match": ["diplomat", "ambassador"], "prompt": { "title": "DIPLOMAT/AMBASSADOR", "appearance": ["Formal robes or attire", "Dignified bearing", "Various species"], "accessories": ["Diplomatic credentials", "Formal sash or medallion"], "expression": "Composed, diplomatic", "setting": "Conference room or embassy" }},
+    { "id": "refugee_desperate", "name": "Refugee Desperate Pleading", "match": ["refugee", "desperate"], "prompt": { "title": "REFUGEE", "appearance": ["Worn, damaged clothing", "Tired, stressed features", "Various species"], "accessories": ["Meager belongings", "Children possibly"], "expression": "Desperate, pleading for help", "setting": "Refugee camp or damaged ship" }},
+    { "id": "pirate_captain", "name": "Pirate Captain Threatening", "match": ["pirate", "raider"], "prompt": { "title": "PIRATE/RAIDER CAPTAIN", "appearance": ["Intimidating presence", "Battle scars", "Mixed armor pieces"], "accessories": ["Weapons visible", "Stolen insignia"], "expression": "Threatening, demanding", "setting": "Pirate vessel bridge" }},
+    { "id": "colonist_settler", "name": "Colonist Settler Hopeful", "match": ["colonist", "settler"], "prompt": { "title": "COLONIST/SETTLER", "appearance": ["Practical frontier clothing", "Hardworking look", "Various species"], "accessories": ["Farming or building tools", "Supplies"], "expression": "Hopeful, determined", "setting": "New colony or frontier world" }},
+    { "id": "miner_worker", "name": "Miner Worker Tired", "match": ["miner", "worker"], "prompt": { "title": "MINER/INDUSTRIAL WORKER", "appearance": ["Dirty work clothes", "Protective gear", "Fatigued"], "accessories": ["Mining equipment", "Hard hat or helmet"], "expression": "Tired but resilient", "setting": "Mining facility or asteroid" }},
+    { "id": "doctor_medical", "name": "Doctor Medical Officer Caring", "match": ["doctor", "medical"], "prompt": { "title": "DOCTOR/MEDICAL OFFICER", "appearance": ["Medical uniform or coat", "Clean, professional", "Various species"], "accessories": ["Medical tricorder", "Hypospray", "Medical bag"], "expression": "Caring, concerned", "setting": "Sickbay or medical facility" }},
+    { "id": "engineer_technical", "name": "Engineer Technical Expert", "match": ["engineer", "technical"], "prompt": { "title": "ENGINEER/TECHNICIAN", "appearance": ["Work uniform with tools", "Grease stains possible", "Practical"], "accessories": ["Engineering tools", "PADD with schematics"], "expression": "Focused, problem-solving", "setting": "Engine room or technical bay" }},
+    { "id": "spy_intelligence", "name": "Spy Intelligence Agent", "match": ["spy", "intelligence", "agent"], "prompt": { "title": "SPY/INTELLIGENCE AGENT", "appearance": ["Nondescript clothing", "Forgettable features intentional", "Alert eyes"], "accessories": ["Hidden devices", "Multiple identities"], "expression": "Watchful, calculating", "setting": "Shadows, crowded areas" }},
+    { "id": "religious_leader", "name": "Religious Leader Spiritual", "match": ["religious", "spiritual", "priest"], "prompt": { "title": "RELIGIOUS LEADER", "appearance": ["Ceremonial robes", "Religious symbols", "Serene demeanor"], "accessories": ["Holy objects", "Sacred texts"], "expression": "Peaceful, wise", "setting": "Temple or shrine" }},
+    { "id": "bounty_hunter", "name": "Bounty Hunter Determined", "match": ["bounty", "hunter"], "prompt": { "title": "BOUNTY HUNTER", "appearance": ["Armored or tactical gear", "Weapon holsters", "Tough demeanor"], "accessories": ["Tracking devices", "Restraints", "Weapons"], "expression": "Determined, professional", "setting": "Hunting target" }},
+    { "id": "bartender_innkeeper", "name": "Bartender Innkeeper Friendly", "match": ["bartender", "innkeeper"], "prompt": { "title": "BARTENDER/INNKEEPER", "appearance": ["Service attire", "Friendly face", "Various species"], "accessories": ["Drinks, glasses", "Bar towel"], "expression": "Welcoming, good listener", "setting": "Bar or tavern" }},
+    { "id": "criminal_thug", "name": "Criminal Thug Menacing", "match": ["criminal", "thug"], "prompt": { "title": "CRIMINAL/THUG", "appearance": ["Intimidating build", "Rough clothing", "Scars or tattoos"], "accessories": ["Weapons", "Stolen goods"], "expression": "Menacing, aggressive", "setting": "Back alley or hideout" }},
+    { "id": "noble_aristocrat", "name": "Noble Aristocrat Haughty", "match": ["noble", "aristocrat"], "prompt": { "title": "NOBLE/ARISTOCRAT", "appearance": ["Expensive clothing", "Jewelry", "Refined features"], "accessories": ["Status symbols", "Attendants"], "expression": "Haughty, superior", "setting": "Palace or estate" }}
+  ],
+  "styleGuide": {
+    "material": "Plasticine clay with subtle comic-like shader",
+    "quality": "High-end stop-motion animation (Laika/Aardman style)",
+    "lighting": "Soft, cinematic studio lighting",
+    "composition": "Medium shot portrait, 3/4 view",
+    "background": "Solid black (#000000)",
+    "critical": [
+      "Generic NPCs - NOT specific Star Trek characters",
+      "Can be any alien species or human",
+      "Should convey their role/profession clearly",
+      "Expression and accessories define character type"
+    ]
+  }
+}

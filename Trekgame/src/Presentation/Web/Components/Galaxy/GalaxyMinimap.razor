@@ -1,0 +1,140 @@
+@namespace StarTrekGame.Web.Components.Galaxy
+
+<div class="galaxy-minimap" style="width: @(Width)px; height: @(Height)px;">
+    <svg viewBox="@ViewBox" preserveAspectRatio="xMidYMid meet">
+        @* Background *@
+        <rect x="@MinX" y="@MinY" width="@MapWidth" height="@MapHeight" 
+              fill="rgba(10, 10, 30, 0.8)"/>
+        
+        @* Hyperlanes *@
+        @if (ShowHyperlanes)
+        {
+            @foreach (var lane in Hyperlanes)
+            {
+                <line x1="@lane.X1" y1="@lane.Y1" x2="@lane.X2" y2="@lane.Y2"
+                      stroke="rgba(50, 70, 100, 0.5)" stroke-width="0.5"/>
+            }
+        }
+        
+        @* Star Systems *@
+        @foreach (var system in Systems)
+        {
+            var color = system.FactionColor ?? "#555";
+            var size = system.IsSelected ? 4 : 3;
+            
+            <circle cx="@system.X" cy="@system.Y" r="@size" fill="@color">
+                @if (system.IsSelected)
+                {
+                    <animate attributeName="r" values="3;5;3" dur="1s" repeatCount="indefinite"/>
+                }
+            </circle>
+        }
+        
+        @* Viewport indicator *@
+        <rect x="@ViewportX" y="@ViewportY" 
+              width="@ViewportWidth" height="@ViewportHeight"
+              fill="none" stroke="#ffcc00" stroke-width="2"
+              class="viewport-rect"/>
+    </svg>
+    
+    @* Click overlay for navigation *@
+    <div class="click-overlay" @onclick="OnMinimapClick" @onmousemove="OnMinimapDrag"></div>
+</div>
+
+<style>
+    .galaxy-minimap {
+        position: relative;
+        background: rgba(10, 10, 30, 0.9);
+        border: 2px solid #ff9900;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+    
+    .galaxy-minimap svg {
+        width: 100%;
+        height: 100%;
+    }
+    
+    .click-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        cursor: pointer;
+    }
+    
+    .viewport-rect {
+        transition: all 0.1s ease-out;
+    }
+</style>
+
+@code {
+    [Parameter] public int Width { get; set; } = 180;
+    [Parameter] public int Height { get; set; } = 180;
+    [Parameter] public List<MinimapSystem> Systems { get; set; } = new();
+    [Parameter] public List<MinimapHyperlane> Hyperlanes { get; set; } = new();
+    [Parameter] public bool ShowHyperlanes { get; set; } = true;
+    
+    [Parameter] public double ViewportX { get; set; }
+    [Parameter] public double ViewportY { get; set; }
+    [Parameter] public double ViewportWidth { get; set; }
+    [Parameter] public double ViewportHeight { get; set; }
+    
+    [Parameter] public EventCallback<(double X, double Y)> OnNavigate { get; set; }
+    
+    // Computed bounds
+    private double MinX => Systems.Any() ? Systems.Min(s => s.X) - 20 : -100;
+    private double MaxX => Systems.Any() ? Systems.Max(s => s.X) + 20 : 100;
+    private double MinY => Systems.Any() ? Systems.Min(s => s.Y) - 20 : -100;
+    private double MaxY => Systems.Any() ? Systems.Max(s => s.Y) + 20 : 100;
+    private double MapWidth => MaxX - MinX;
+    private double MapHeight => MaxY - MinY;
+    private string ViewBox => $"{MinX} {MinY} {MapWidth} {MapHeight}";
+    
+    private bool _isDragging = false;
+    
+    private async Task OnMinimapClick(MouseEventArgs e)
+    {
+        var coords = CalculateMapCoords(e);
+        await OnNavigate.InvokeAsync(coords);
+    }
+    
+    private async Task OnMinimapDrag(MouseEventArgs e)
+    {
+        if (e.Buttons == 1) // Left mouse button
+        {
+            var coords = CalculateMapCoords(e);
+            await OnNavigate.InvokeAsync(coords);
+        }
+    }
+    
+    private (double X, double Y) CalculateMapCoords(MouseEventArgs e)
+    {
+        // Convert mouse position to map coordinates
+        var relX = e.OffsetX / Width;
+        var relY = e.OffsetY / Height;
+        
+        var mapX = MinX + (relX * MapWidth);
+        var mapY = MinY + (relY * MapHeight);
+        
+        return (mapX, mapY);
+    }
+    
+    public class MinimapSystem
+    {
+        public Guid Id { get; set; }
+        public double X { get; set; }
+        public double Y { get; set; }
+        public string? FactionColor { get; set; }
+        public bool IsSelected { get; set; }
+    }
+    
+    public class MinimapHyperlane
+    {
+        public double X1 { get; set; }
+        public double Y1 { get; set; }
+        public double X2 { get; set; }
+        public double Y2 { get; set; }
+    }
+}

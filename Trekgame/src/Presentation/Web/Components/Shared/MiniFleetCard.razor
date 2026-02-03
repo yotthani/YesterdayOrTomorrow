@@ -1,0 +1,180 @@
+@* Mini Fleet Card - Compact fleet display for lists and sidebars *@
+
+<div class="mini-fleet-card @(IsSelected ? "selected" : "") @(IsMoving ? "moving" : "")" @onclick="OnClick">
+    <div class="fleet-icon">
+        🚀
+        @if (ShipCount > 1)
+        {
+            <span class="ship-count">@ShipCount</span>
+        }
+    </div>
+    
+    <div class="fleet-info">
+        <div class="fleet-name">@Name</div>
+        <div class="fleet-details">
+            @if (!string.IsNullOrEmpty(Location))
+            {
+                <span class="fleet-location">📍 @Location</span>
+            }
+            @if (IsMoving && !string.IsNullOrEmpty(Destination))
+            {
+                <span class="fleet-destination">→ @Destination</span>
+            }
+        </div>
+    </div>
+    
+    <div class="fleet-stats">
+        <div class="stat attack" title="Attack Power">⚔️ @Attack</div>
+        <div class="stat defense" title="Defense">🛡️ @Defense</div>
+    </div>
+    
+    @if (IsMoving)
+    {
+        <div class="movement-indicator">
+            <div class="movement-progress" style="width: @(MovementProgress)%"></div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public Guid FleetId { get; set; }
+    [Parameter] public string Name { get; set; } = "Fleet";
+    [Parameter] public int ShipCount { get; set; } = 1;
+    [Parameter] public string? Location { get; set; }
+    [Parameter] public string? Destination { get; set; }
+    [Parameter] public int Attack { get; set; }
+    [Parameter] public int Defense { get; set; }
+    [Parameter] public bool IsSelected { get; set; }
+    [Parameter] public bool IsMoving { get; set; }
+    [Parameter] public int MovementProgress { get; set; }
+    [Parameter] public EventCallback OnClick { get; set; }
+}
+
+<style>
+    .mini-fleet-card {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        background: rgba(20, 30, 50, 0.6);
+        border: 1px solid rgba(68, 136, 255, 0.2);
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .mini-fleet-card:hover {
+        background: rgba(30, 40, 60, 0.8);
+        border-color: rgba(68, 136, 255, 0.4);
+        transform: translateX(4px);
+    }
+
+    .mini-fleet-card.selected {
+        background: rgba(68, 136, 255, 0.15);
+        border-color: #4488ff;
+        box-shadow: 0 0 15px rgba(68, 136, 255, 0.2);
+    }
+
+    .mini-fleet-card.moving {
+        border-color: rgba(255, 170, 0, 0.5);
+    }
+
+    .fleet-icon {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 8px;
+        font-size: 20px;
+        position: relative;
+    }
+
+    .ship-count {
+        position: absolute;
+        bottom: -4px;
+        right: -4px;
+        background: #4488ff;
+        color: #fff;
+        font-size: 10px;
+        font-weight: 700;
+        padding: 2px 5px;
+        border-radius: 10px;
+        min-width: 16px;
+        text-align: center;
+    }
+
+    .fleet-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .fleet-name {
+        font-weight: 600;
+        font-size: 14px;
+        color: #fff;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .fleet-details {
+        display: flex;
+        gap: 8px;
+        font-size: 11px;
+        color: #888;
+        margin-top: 2px;
+    }
+
+    .fleet-location {
+        color: #88aacc;
+    }
+
+    .fleet-destination {
+        color: #ffaa00;
+    }
+
+    .fleet-stats {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        align-items: flex-end;
+    }
+
+    .stat {
+        font-size: 11px;
+        color: #aaa;
+        white-space: nowrap;
+    }
+
+    .stat.attack { color: #ff8866; }
+    .stat.defense { color: #88aaff; }
+
+    .movement-indicator {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: rgba(255, 170, 0, 0.2);
+    }
+
+    .movement-progress {
+        height: 100%;
+        background: linear-gradient(90deg, #ffaa00, #ffcc44);
+        transition: width 0.3s;
+    }
+
+    /* Moving animation */
+    .mini-fleet-card.moving .fleet-icon {
+        animation: fleet-pulse 2s ease-in-out infinite;
+    }
+
+    @@keyframes fleet-pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+    }
+</style>

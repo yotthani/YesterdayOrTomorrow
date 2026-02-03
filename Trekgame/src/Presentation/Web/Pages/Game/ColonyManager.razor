@@ -1,0 +1,1745 @@
+@page "/game/colony/{ColonyId:guid}"
+@page "/game/colony-manager"
+@layout StellarisLayout
+@using MudBlazor
+@using Microsoft.AspNetCore.Components
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+
+<PageTitle>Colony Manager - Galactic Strategy</PageTitle>
+
+<div class="colony-wrapper" data-theme="@_raceId">
+    @if (_loading)
+    {
+        <div class="loading-overlay">
+            <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+            <span>Loading Colony Data...</span>
+        </div>
+    }
+
+    <header class="colony-header">
+        <a href="/game/map" class="back-btn">◄ GALAXY MAP</a>
+        <div class="colony-title">
+            <h1>@_colony.Name</h1>
+            <span class="colony-meta">@_colony.PlanetClass • @_colony.SystemName</span>
+        </div>
+        <div class="colony-stats-bar">
+            @foreach (var res in _resources)
+            {
+                <div class="resource-item" title="@res.Tooltip">
+                    <span class="res-icon">@res.Icon</span>
+                    <span class="res-value">@res.Value</span>
+                    <span class="res-change @(res.Change >= 0 ? "positive" : "negative")">
+                        @(res.Change >= 0 ? "+" : "")@res.Change
+                    </span>
+                </div>
+            }
+        </div>
+        <div class="header-bars">
+            <div class="stat-bar morale">
+                <span class="bar-label">Morale</span>
+                <div class="bar-track">
+                    <div class="bar-fill @GetMoraleClass(_colony.Morale)" style="width: @(_colony.Morale)%"></div>
+                </div>
+                <span class="bar-value">@_colony.Morale%</span>
+            </div>
+            <div class="stat-bar stability">
+                <span class="bar-label">Stability</span>
+                <div class="bar-track">
+                    <div class="bar-fill @GetStabilityClass(_colony.Stability)" style="width: @(_colony.Stability)%"></div>
+                </div>
+                <span class="bar-value">@_colony.Stability%</span>
+            </div>
+        </div>
+        <button class="end-turn-btn" @onclick="EndTurn">END TURN</button>
+    </header>
+
+    <div class="colony-content">
+        <!-- LEFT PANEL: Population & Jobs -->
+        <aside class="colony-panel left-panel">
+            <div class="panel-section population-section">
+                <div class="section-header">
+                    <h3>👥 POPULATION</h3>
+                    <span class="pop-count">@_totalPops / @_maxPops</span>
+                </div>
+                <div class="pop-bar">
+                    <div class="pop-fill" style="width: @(_totalPops * 100 / _maxPops)%"></div>
+                </div>
+                <div class="pop-growth">
+                    <span>Growth: +@_popGrowth/turn</span>
+                </div>
+                <div class="species-list">
+                    @foreach (var species in _species)
+                    {
+                        <div class="species-item">
+                            <span class="species-icon">@species.Icon</span>
+                            <span class="species-name">@species.Name</span>
+                            <div class="species-bar">
+                                <div class="species-fill" style="width: @species.Percentage%; background: @species.Color;"></div>
+                            </div>
+                            <span class="species-count">@species.Count</span>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="panel-section jobs-section">
+                <div class="section-header">
+                    <h3>💼 JOBS</h3>
+                    <span class="employment">@_employmentRate% employed</span>
+                </div>
+                @if (_unemployedPops > 0)
+                {
+                    <div class="unemployed-warning">
+                        ⚠️ @_unemployedPops unemployed pops
+                    </div>
+                }
+                <div class="jobs-list">
+                    @foreach (var job in _jobs)
+                    {
+                        <div class="job-item">
+                            <span class="job-icon" style="color: @job.CategoryColor;">@job.Icon</span>
+                            <div class="job-info">
+                                <span class="job-name">@job.Name</span>
+                                <span class="job-output">@job.OutputText</span>
+                            </div>
+                            <div class="job-slots">
+                                <span class="filled">@job.Filled</span>/<span class="total">@job.Total</span>
+                            </div>
+                            <div class="job-actions">
+                                <button class="job-btn add" @onclick="() => AssignWorker(job.Id)" 
+                                        disabled="@(job.Filled >= job.Total || _unemployedPops <= 0)">+</button>
+                                <button class="job-btn remove" @onclick="() => RemoveWorker(job.Id)"
+                                        disabled="@(job.Filled <= 0)">−</button>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="panel-section events-section">
+                <div class="section-header">
+                    <h3>📜 RECENT EVENTS</h3>
+                </div>
+                <div class="events-list">
+                    @foreach (var evt in _events.Take(5))
+                    {
+                        <div class="event-item @evt.Type">
+                            <span class="event-icon">@GetEventIcon(evt.Type)</span>
+                            <span class="event-text">@evt.Title</span>
+                            <span class="event-turn">Turn @evt.Turn</span>
+                        </div>
+                    }
+                </div>
+            </div>
+        </aside>
+
+        <!-- CENTER: Building Grid -->
+        <main class="colony-center">
+            <div class="district-tabs">
+                @foreach (var district in _districts)
+                {
+                    <button class="district-tab @(_selectedDistrict == district.Id ? "active" : "")"
+                            @onclick="() => SelectDistrict(district.Id)">
+                        <span class="district-icon">@district.Icon</span>
+                        <span class="district-name">@district.Name</span>
+                        <span class="district-count">@district.Used/@district.Total</span>
+                    </button>
+                }
+            </div>
+
+            <div class="building-grid">
+                @for (int i = 0; i < 25; i++)
+                {
+                    var slotIndex = i;
+                    var building = GetBuildingAt(slotIndex);
+                    var isLocked = slotIndex >= _unlockedSlots;
+                    var isSelected = _selectedSlot == slotIndex;
+                    var isConstructing = _constructionSlot == slotIndex;
+
+                    <div class="grid-slot @(isLocked ? "locked" : "") @(isSelected ? "selected" : "") @(building != null ? "occupied" : "empty") @(isConstructing ? "constructing" : "")"
+                         @onclick="() => SelectSlot(slotIndex)">
+                        @if (isLocked)
+                        {
+                            <div class="slot-locked">
+                                <span class="lock-icon">🔒</span>
+                                <span class="unlock-req">Lvl @GetUnlockLevel(slotIndex)</span>
+                            </div>
+                        }
+                        else if (isConstructing)
+                        {
+                            <div class="slot-constructing">
+                                <span class="construct-icon">@_constructingBuilding?.Icon</span>
+                                <div class="construct-progress">
+                                    <div class="progress-fill" style="width: @_constructionProgress%"></div>
+                                </div>
+                                <span class="construct-turns">@_constructionTurns turns</span>
+                            </div>
+                        }
+                        else if (building != null)
+                        {
+                            <div class="slot-building @building.Category">
+                                <div class="building-sprite" style="background-position: @(-building.SpriteCol * 333)px @(-building.SpriteRow * 155)px;"></div>
+                                <span class="building-name">@building.ShortName</span>
+                                <span class="building-level">Lvl @building.Level</span>
+                                @if (!building.IsActive)
+                                {
+                                    <span class="building-status disabled">OFF</span>
+                                }
+                                @if (building.IsDamaged)
+                                {
+                                    <span class="building-status damaged">⚠️</span>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="slot-empty">
+                                <span class="empty-icon">+</span>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+
+            <div class="construction-queue">
+                <div class="queue-header">
+                    <h3>🔨 CONSTRUCTION QUEUE</h3>
+                    <span class="queue-count">@_constructionQueue.Count / 5</span>
+                </div>
+                <div class="queue-list">
+                    @if (_constructionQueue.Any())
+                    {
+                        @foreach (var item in _constructionQueue)
+                        {
+                            var isFirst = item == _constructionQueue.First();
+                            <div class="queue-item @(isFirst ? "active" : "")">
+                                <span class="queue-icon">@item.Icon</span>
+                                <div class="queue-info">
+                                    <span class="queue-name">@item.Name</span>
+                                    @if (isFirst)
+                                    {
+                                        <div class="queue-progress">
+                                            <div class="progress-fill" style="width: @item.Progress%"></div>
+                                        </div>
+                                    }
+                                    <span class="queue-turns">@item.TurnsLeft turns</span>
+                                </div>
+                                <div class="queue-actions">
+                                    @if (!isFirst)
+                                    {
+                                        <button class="queue-btn" @onclick="() => MoveQueueUp(item.Id)">▲</button>
+                                    }
+                                    @if (item != _constructionQueue.Last())
+                                    {
+                                        <button class="queue-btn" @onclick="() => MoveQueueDown(item.Id)">▼</button>
+                                    }
+                                    <button class="queue-btn cancel" @onclick="() => CancelConstruction(item.Id)">✕</button>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="queue-empty">No construction in progress</div>
+                    }
+                </div>
+            </div>
+            @* Ship Production Panel *@
+            @if (_hasShipyard)
+            {
+                <div class="ship-production-panel">
+                    <div class="panel-header">
+                        <h3>🚀 SHIP PRODUCTION</h3>
+                        <span class="shipyard-level">Shipyard Lvl @_shipyardLevel</span>
+                    </div>
+                    <div class="ship-classes">
+                        @foreach (var ship in _availableShips)
+                        {
+                            <div class="ship-class @(_selectedShipClass == ship.Name ? "selected" : "") @(!ship.CanBuild ? "locked" : "")"
+                                 @onclick="() => SelectShipClass(ship)">
+                                <div class="ship-icon">@ship.Icon</div>
+                                <div class="ship-info">
+                                    <span class="ship-name">@ship.Name</span>
+                                    <span class="ship-stats">⚔@ship.Attack 🛡@ship.Defense 💨@ship.Speed</span>
+                                </div>
+                                <div class="ship-cost">
+                                    <span>@ship.Cost 💰</span>
+                                    <span>@ship.BuildTime turns</span>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    @if (_selectedShipClass != null)
+                    {
+                        <div class="ship-build-options">
+                            <div class="quantity-selector">
+                                <button class="qty-btn" @onclick="() => _shipQuantity = Math.Max(1, _shipQuantity - 1)">-</button>
+                                <span class="qty-value">@_shipQuantity</span>
+                                <button class="qty-btn" @onclick="() => _shipQuantity = Math.Min(10, _shipQuantity + 1)">+</button>
+                            </div>
+                            <button class="build-ship-btn" @onclick="BuildShips">
+                                BUILD @_shipQuantity × @_selectedShipClass
+                            </button>
+                        </div>
+                    }
+                    <div class="ship-queue">
+                        <span class="queue-label">Building:</span>
+                        @if (_shipBuildQueue.Any())
+                        {
+                            @foreach (var item in _shipBuildQueue.Take(3))
+                            {
+                                <span class="queue-ship">@item.Name (@item.TurnsLeft)</span>
+                            }
+                        }
+                        else
+                        {
+                            <span class="queue-empty-text">None</span>
+                        }
+                    </div>
+                </div>
+            }
+        </main>
+
+        <!-- RIGHT PANEL: Details / Build Options -->
+        <aside class="colony-panel right-panel">
+            @if (_selectedSlot.HasValue)
+            {
+                var building = GetBuildingAt(_selectedSlot.Value);
+                @if (building != null)
+                {
+                    <!-- Building Details -->
+                    <div class="panel-section building-details">
+                        <div class="section-header">
+                            <h3>🏛️ BUILDING DETAILS</h3>
+                            <button class="close-btn" @onclick="ClearSelection">✕</button>
+                        </div>
+                        <div class="building-header">
+                            <span class="detail-icon @building.Category">@building.Icon</span>
+                            <div class="detail-title">
+                                <span class="detail-name">@building.Name</span>
+                                <span class="detail-level">Level @building.Level / @building.MaxLevel</span>
+                            </div>
+                        </div>
+                        <p class="building-desc">@building.Description</p>
+                        <div class="building-outputs">
+                            <h4>Output</h4>
+                            @foreach (var output in building.Outputs)
+                            {
+                                <div class="output-row">
+                                    <span class="output-icon">@output.Icon</span>
+                                    <span class="output-name">@output.Name</span>
+                                    <span class="output-value">+@output.Amount</span>
+                                </div>
+                            }
+                        </div>
+                        <div class="building-jobs">
+                            <h4>Jobs Provided</h4>
+                            @foreach (var job in building.ProvidedJobs)
+                            {
+                                <div class="job-row">
+                                    <span>@job.Name</span>
+                                    <span>@job.Slots slots</span>
+                                </div>
+                            }
+                        </div>
+                        <div class="building-maintenance">
+                            <span>Maintenance:</span>
+                            <span>@building.MaintenanceCost 💰/turn</span>
+                        </div>
+                        <div class="building-actions">
+                            @if (building.Level < building.MaxLevel)
+                            {
+                                <button class="action-btn upgrade" @onclick="() => UpgradeBuilding(building.Id)">
+                                    ⬆️ Upgrade (@building.UpgradeCost ⚙️)
+                                </button>
+                            }
+                            <button class="action-btn toggle" @onclick="() => ToggleBuilding(building.Id)">
+                                @(building.IsActive ? "⏸️ Disable" : "▶️ Enable")
+                            </button>
+                            <button class="action-btn demolish" @onclick="() => ShowDemolishConfirm(building.Id)">
+                                🗑️ Demolish
+                            </button>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <!-- Build New Building -->
+                    <div class="panel-section build-options">
+                        <div class="section-header">
+                            <h3>🏗️ BUILD NEW</h3>
+                            <button class="close-btn" @onclick="ClearSelection">✕</button>
+                        </div>
+                        <div class="build-categories">
+                            <button class="cat-btn @(_buildCategory == "all" ? "active" : "")" @onclick='() => _buildCategory = "all"'>All</button>
+                            <button class="cat-btn resource @(_buildCategory == "resource" ? "active" : "")" @onclick='() => _buildCategory = "resource"'>Resource</button>
+                            <button class="cat-btn production @(_buildCategory == "production" ? "active" : "")" @onclick='() => _buildCategory = "production"'>Production</button>
+                            <button class="cat-btn research @(_buildCategory == "research" ? "active" : "")" @onclick='() => _buildCategory = "research"'>Research</button>
+                            <button class="cat-btn military @(_buildCategory == "military" ? "active" : "")" @onclick='() => _buildCategory = "military"'>Military</button>
+                            <button class="cat-btn civic @(_buildCategory == "civic" ? "active" : "")" @onclick='() => _buildCategory = "civic"'>Civic</button>
+                        </div>
+                        <div class="available-buildings">
+                            @foreach (var avail in GetFilteredBuildings())
+                            {
+                                <div class="avail-building @avail.Category @(_selectedBuilding?.Type == avail.Type ? "selected" : "") @(!avail.CanBuild ? "locked" : "")"
+                                     @onclick="() => SelectBuilding(avail)">
+                                    <div class="avail-sprite" style="background-position: @(-avail.SpriteCol * 333)px @(-avail.SpriteRow * 155)px;"></div>
+                                    <div class="avail-info">
+                                        <span class="avail-name">@avail.Name</span>
+                                        <span class="avail-desc">@avail.ShortDesc</span>
+                                    </div>
+                                    <div class="avail-cost">
+                                        <span>@avail.Cost ⚙️</span>
+                                        <span>@avail.BuildTime turns</span>
+                                    </div>
+                                    @if (!avail.CanBuild)
+                                    {
+                                        <span class="avail-req">@avail.Requirement</span>
+                                    }
+                                </div>
+                            }
+                        </div>
+                        @if (_selectedBuilding != null)
+                        {
+                            <div class="build-preview">
+                                <h4>@_selectedBuilding.Name</h4>
+                                <p>@_selectedBuilding.Description</p>
+                                <button class="build-btn" @onclick="StartConstruction"
+                                        disabled="@(_constructionQueue.Count >= 5)">
+                                    🔨 Start Construction
+                                </button>
+                            </div>
+                        }
+                    </div>
+                }
+            }
+            else
+            {
+                <!-- Colony Summary -->
+                <div class="panel-section colony-summary">
+                    <div class="section-header">
+                        <h3>📊 COLONY SUMMARY</h3>
+                    </div>
+                    <div class="summary-stats">
+                        <div class="summary-row">
+                            <span>Founded:</span>
+                            <span>Turn @_colony.FoundedTurn</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Age:</span>
+                            <span>@_colony.Age turns</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Habitability:</span>
+                            <span class="@GetHabitabilityClass(_colony.Habitability)">@_colony.Habitability%</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Infrastructure:</span>
+                            <span>Level @_colony.InfrastructureLevel</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Defense:</span>
+                            <span>@_colony.DefenseRating</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-section modifiers-section">
+                    <div class="section-header">
+                        <h3>📋 ACTIVE MODIFIERS</h3>
+                    </div>
+                    <div class="modifiers-list">
+                        @foreach (var mod in _modifiers)
+                        {
+                            <div class="modifier-item @(mod.IsPositive ? "positive" : "negative")">
+                                <span class="mod-icon">@(mod.IsPositive ? "✓" : "✗")</span>
+                                <span class="mod-text">@mod.Text</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="panel-section focus-section">
+                    <div class="section-header">
+                        <h3>🎯 COLONY FOCUS</h3>
+                    </div>
+                    <select class="focus-select" @bind="_colonyFocus">
+                        <option value="balanced">Balanced</option>
+                        <option value="growth">Population Growth</option>
+                        <option value="production">Production</option>
+                        <option value="research">Research</option>
+                        <option value="military">Military</option>
+                        <option value="trade">Trade</option>
+                    </select>
+                    <p class="focus-desc">@GetFocusDescription(_colonyFocus)</p>
+                </div>
+            }
+        </aside>
+    </div>
+</div>
+
+@if (_showDemolishConfirm)
+{
+    <div class="modal-overlay" @onclick="HideDemolishConfirm">
+        <div class="modal-content" @onclick:stopPropagation="true">
+            <h3>Confirm Demolition</h3>
+            <p>Are you sure you want to demolish this building? This action cannot be undone.</p>
+            <div class="modal-actions">
+                <button class="modal-btn cancel" @onclick="HideDemolishConfirm">Cancel</button>
+                <button class="modal-btn confirm" @onclick="ConfirmDemolish">Demolish</button>
+            </div>
+        </div>
+    </div>
+}
+
+<style>
+/* Colony Manager Styles */
+.colony-wrapper {
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(135deg, #06080c 0%, #0c1018 50%, #080c12 100%);
+    display: flex;
+    flex-direction: column;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    color: #c8d4e8;
+}
+
+.loading-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    z-index: 1000;
+}
+
+/* Header */
+.colony-header {
+    height: 80px;
+    background: linear-gradient(180deg, rgba(15, 20, 30, 0.98) 0%, rgba(10, 14, 22, 0.99) 100%);
+    border-bottom: 1px solid rgba(96, 165, 250, 0.3);
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    gap: 20px;
+}
+
+.back-btn {
+    padding: 8px 14px;
+    background: rgba(59, 130, 246, 0.2);
+    border: 1px solid rgba(59, 130, 246, 0.4);
+    border-radius: 4px;
+    color: #60a5fa;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.back-btn:hover { background: rgba(59, 130, 246, 0.4); }
+
+.colony-title h1 {
+    margin: 0;
+    font-size: 20px;
+    color: #fff;
+}
+
+.colony-meta {
+    font-size: 11px;
+    color: rgba(96, 165, 250, 0.7);
+}
+
+.colony-stats-bar {
+    display: flex;
+    gap: 16px;
+    margin-left: 20px;
+}
+
+.resource-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    background: rgba(20, 30, 50, 0.6);
+    border-radius: 4px;
+}
+
+.res-icon { font-size: 16px; }
+.res-value { font-size: 14px; font-weight: 600; color: #fff; }
+.res-change { font-size: 11px; }
+.res-change.positive { color: #4ade80; }
+.res-change.negative { color: #f87171; }
+
+.header-bars {
+    display: flex;
+    gap: 16px;
+    margin-left: auto;
+}
+
+.stat-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.bar-label { font-size: 10px; color: rgba(200, 212, 232, 0.6); width: 50px; }
+
+.bar-track {
+    width: 100px;
+    height: 8px;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.3s;
+}
+
+.bar-fill.good { background: linear-gradient(90deg, #22c55e, #4ade80); }
+.bar-fill.moderate { background: linear-gradient(90deg, #eab308, #facc15); }
+.bar-fill.poor { background: linear-gradient(90deg, #dc2626, #f87171); }
+
+.bar-value { font-size: 12px; font-weight: 600; width: 35px; }
+
+.end-turn-btn {
+    padding: 10px 20px;
+    background: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%);
+    border: none;
+    border-radius: 6px;
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.end-turn-btn:hover { background: linear-gradient(180deg, #60a5fa 0%, #3b82f6 100%); }
+
+/* Content Layout */
+.colony-content {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 280px 1fr 320px;
+    gap: 12px;
+    padding: 12px;
+    overflow-y: auto;
+    max-height: calc(100vh - 100px);
+}
+
+/* Panels */
+.colony-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow-y: auto;
+}
+
+.panel-section {
+    background: linear-gradient(180deg, rgba(20, 28, 45, 0.95) 0%, rgba(12, 18, 30, 0.98) 100%);
+    border: 1px solid rgba(96, 165, 250, 0.2);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    background: linear-gradient(90deg, rgba(59, 130, 246, 0.3) 0%, rgba(37, 99, 235, 0.15) 100%);
+    border-bottom: 1px solid rgba(96, 165, 250, 0.2);
+}
+
+.section-header h3 {
+    margin: 0;
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: #60a5fa;
+}
+
+.close-btn {
+    width: 24px;
+    height: 24px;
+    background: rgba(239, 68, 68, 0.2);
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    border-radius: 4px;
+    color: #f87171;
+    cursor: pointer;
+}
+
+/* Population Section */
+.pop-count { font-size: 12px; color: #fff; }
+
+.pop-bar {
+    margin: 10px 14px;
+    height: 10px;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.pop-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #8b5cf6, #a78bfa);
+    border-radius: 5px;
+}
+
+.pop-growth {
+    padding: 0 14px 10px;
+    font-size: 11px;
+    color: #4ade80;
+}
+
+.species-list { padding: 0 14px 14px; }
+
+.species-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+}
+
+.species-icon { font-size: 16px; }
+.species-name { font-size: 11px; width: 70px; }
+.species-bar { flex: 1; height: 6px; background: rgba(0,0,0,0.3); border-radius: 3px; overflow: hidden; }
+.species-fill { height: 100%; border-radius: 3px; }
+.species-count { font-size: 11px; width: 25px; text-align: right; }
+
+/* Jobs Section */
+.employment { font-size: 11px; color: #4ade80; }
+
+.unemployed-warning {
+    margin: 8px 14px;
+    padding: 8px;
+    background: rgba(234, 179, 8, 0.2);
+    border: 1px solid rgba(234, 179, 8, 0.4);
+    border-radius: 4px;
+    font-size: 11px;
+    color: #fbbf24;
+}
+
+.jobs-list { padding: 8px 14px; }
+
+.job-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    background: rgba(20, 30, 50, 0.4);
+    border-radius: 4px;
+    margin-bottom: 6px;
+}
+
+.job-icon { font-size: 18px; }
+.job-info { flex: 1; }
+.job-name { display: block; font-size: 12px; color: #fff; }
+.job-output { display: block; font-size: 10px; color: rgba(200, 212, 232, 0.6); }
+.job-slots { font-size: 12px; }
+.job-slots .filled { color: #4ade80; }
+.job-slots .total { color: rgba(200, 212, 232, 0.6); }
+
+.job-actions { display: flex; gap: 4px; }
+
+.job-btn {
+    width: 24px;
+    height: 24px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.job-btn.add { background: rgba(74, 222, 128, 0.2); color: #4ade80; }
+.job-btn.remove { background: rgba(248, 113, 113, 0.2); color: #f87171; }
+.job-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+/* Events */
+.events-list { padding: 8px 14px; }
+
+.event-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(96, 165, 250, 0.1);
+}
+
+.event-icon { font-size: 14px; }
+.event-text { flex: 1; font-size: 11px; }
+.event-turn { font-size: 10px; color: rgba(200, 212, 232, 0.5); }
+
+.event-item.positive { color: #4ade80; }
+.event-item.negative { color: #f87171; }
+.event-item.neutral { color: #fbbf24; }
+
+/* Building Grid */
+.colony-center {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.district-tabs {
+    display: flex;
+    gap: 6px;
+    padding: 8px;
+    background: rgba(15, 20, 30, 0.8);
+    border-radius: 6px;
+}
+
+.district-tab {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    background: rgba(30, 40, 60, 0.5);
+    border: 1px solid transparent;
+    border-radius: 4px;
+    color: rgba(200, 212, 232, 0.7);
+    font-size: 11px;
+    cursor: pointer;
+}
+
+.district-tab:hover { background: rgba(40, 50, 70, 0.6); }
+.district-tab.active { background: rgba(59, 130, 246, 0.3); border-color: rgba(96, 165, 250, 0.5); color: #fff; }
+
+.building-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 180px);
+    gap: 8px;
+    padding: 16px;
+    background: linear-gradient(180deg, rgba(15, 20, 35, 0.9) 0%, rgba(10, 14, 25, 0.95) 100%);
+    border: 1px solid rgba(96, 165, 250, 0.2);
+    border-radius: 8px;
+    overflow-y: auto;
+    max-height: calc(100vh - 200px);
+}
+
+.grid-slot {
+    width: 180px;
+    height: 180px;
+    border: 2px solid rgba(96, 165, 250, 0.2);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.grid-slot:hover:not(.locked) { border-color: rgba(96, 165, 250, 0.5); }
+.grid-slot.selected { border-color: #fbbf24; box-shadow: 0 0 15px rgba(251, 191, 36, 0.3); }
+.grid-slot.locked { background: rgba(30, 30, 40, 0.4); cursor: not-allowed; }
+.grid-slot.occupied { background: rgba(30, 50, 80, 0.3); }
+.grid-slot.constructing { background: rgba(234, 179, 8, 0.1); border-color: rgba(234, 179, 8, 0.4); }
+
+.slot-locked {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: rgba(150, 150, 170, 0.5);
+}
+
+.lock-icon { font-size: 20px; }
+.unlock-req { font-size: 9px; }
+
+.slot-building {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    padding: 8px;
+    gap: 4px;
+}
+
+.slot-building.resource { border-left: 3px solid #10b981; }
+.slot-building.production { border-left: 3px solid #f59e0b; }
+.slot-building.research { border-left: 3px solid #8b5cf6; }
+.slot-building.military { border-left: 3px solid #ef4444; }
+.slot-building.civic { border-left: 3px solid #3b82f6; }
+
+.building-sprite {
+    width: 100px;
+    height: 100px;
+    background-image: url('/images/buildings/federation_buildings.png');
+    background-size: 2000px 1090px;
+    background-repeat: no-repeat;
+    border-radius: 4px;
+}
+
+.avail-sprite {
+    width: 60px;
+    height: 60px;
+    background-image: url('/images/buildings/federation_buildings.png');
+    background-size: 2000px 1090px;
+    background-repeat: no-repeat;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+.building-icon { font-size: 24px; display: none; }
+.building-level { font-size: 9px; color: #fbbf24; background: rgba(0,0,0,0.6); padding: 2px 8px; border-radius: 10px; }
+.building-name { font-size: 9px; color: rgba(200, 212, 232, 0.9); text-align: center; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.building-status { position: absolute; top: 4px; right: 4px; font-size: 10px; }
+.building-status.disabled { color: #f87171; }
+.building-status.damaged { color: #fbbf24; }
+
+.slot-empty { color: rgba(96, 165, 250, 0.3); }
+.empty-icon { font-size: 24px; }
+
+.slot-constructing {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.construct-icon { font-size: 20px; }
+.construct-progress { width: 80%; height: 4px; background: rgba(0,0,0,0.4); border-radius: 2px; }
+.construct-progress .progress-fill { height: 100%; background: #fbbf24; border-radius: 2px; }
+.construct-turns { font-size: 9px; color: #fbbf24; }
+
+/* Construction Queue */
+.construction-queue {
+    background: linear-gradient(180deg, rgba(20, 28, 45, 0.95) 0%, rgba(12, 18, 30, 0.98) 100%);
+    border: 1px solid rgba(96, 165, 250, 0.2);
+    border-radius: 8px;
+}
+
+.queue-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    background: rgba(59, 130, 246, 0.2);
+    border-bottom: 1px solid rgba(96, 165, 250, 0.2);
+}
+
+.queue-header h3 { margin: 0; font-size: 11px; color: #60a5fa; }
+.queue-count { font-size: 11px; color: rgba(200, 212, 232, 0.6); }
+
+.queue-list { padding: 8px; }
+
+.queue-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px;
+    background: rgba(20, 30, 50, 0.4);
+    border-radius: 4px;
+    margin-bottom: 6px;
+}
+
+.queue-item.active { border-left: 3px solid #fbbf24; }
+
+.queue-icon { font-size: 20px; }
+.queue-info { flex: 1; }
+.queue-name { display: block; font-size: 12px; color: #fff; }
+.queue-progress { height: 4px; background: rgba(0,0,0,0.4); border-radius: 2px; margin: 4px 0; }
+.queue-progress .progress-fill { height: 100%; background: #fbbf24; border-radius: 2px; }
+.queue-turns { font-size: 10px; color: rgba(200, 212, 232, 0.6); }
+
+.queue-actions { display: flex; gap: 4px; }
+
+.queue-btn {
+    width: 24px;
+    height: 24px;
+    background: rgba(59, 130, 246, 0.2);
+    border: none;
+    border-radius: 4px;
+    color: #60a5fa;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.queue-btn.cancel { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+
+.queue-empty {
+    padding: 20px;
+    text-align: center;
+    color: rgba(200, 212, 232, 0.4);
+    font-size: 12px;
+}
+
+/* Right Panel - Details */
+.building-details, .build-options, .colony-summary, .modifiers-section, .focus-section {
+    padding-bottom: 12px;
+}
+
+.building-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+}
+
+.detail-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+}
+
+.detail-icon.resource { background: rgba(16, 185, 129, 0.2); }
+.detail-icon.production { background: rgba(245, 158, 11, 0.2); }
+.detail-icon.research { background: rgba(139, 92, 246, 0.2); }
+.detail-icon.military { background: rgba(239, 68, 68, 0.2); }
+.detail-icon.civic { background: rgba(59, 130, 246, 0.2); }
+
+.detail-name { display: block; font-size: 16px; color: #fff; font-weight: 600; }
+.detail-level { display: block; font-size: 11px; color: rgba(200, 212, 232, 0.6); }
+
+.building-desc {
+    padding: 0 14px 12px;
+    font-size: 12px;
+    color: rgba(200, 212, 232, 0.8);
+    line-height: 1.5;
+}
+
+.building-outputs, .building-jobs, .building-maintenance {
+    padding: 8px 14px;
+    border-top: 1px solid rgba(96, 165, 250, 0.1);
+}
+
+.building-outputs h4, .building-jobs h4 {
+    margin: 0 0 8px;
+    font-size: 10px;
+    color: rgba(96, 165, 250, 0.6);
+    letter-spacing: 1px;
+}
+
+.output-row, .job-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 0;
+    font-size: 12px;
+}
+
+.output-icon { font-size: 14px; }
+.output-name { flex: 1; }
+.output-value { color: #4ade80; }
+
+.building-maintenance {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+}
+
+.building-actions {
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.action-btn {
+    padding: 10px;
+    border: none;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.action-btn.upgrade { background: rgba(59, 130, 246, 0.3); color: #60a5fa; }
+.action-btn.toggle { background: rgba(234, 179, 8, 0.3); color: #fbbf24; }
+.action-btn.demolish { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+
+/* Build Options */
+.build-categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 10px 14px;
+}
+
+.cat-btn {
+    padding: 6px 10px;
+    background: rgba(30, 40, 60, 0.5);
+    border: 1px solid transparent;
+    border-radius: 4px;
+    color: rgba(200, 212, 232, 0.7);
+    font-size: 10px;
+    cursor: pointer;
+}
+
+.cat-btn.active { border-color: #60a5fa; color: #fff; }
+.cat-btn.resource.active { border-color: #10b981; }
+.cat-btn.production.active { border-color: #f59e0b; }
+.cat-btn.research.active { border-color: #8b5cf6; }
+.cat-btn.military.active { border-color: #ef4444; }
+.cat-btn.civic.active { border-color: #3b82f6; }
+
+.available-buildings {
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 0 14px;
+}
+
+.avail-building {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background: rgba(20, 30, 50, 0.4);
+    border: 1px solid transparent;
+    border-radius: 6px;
+    margin-bottom: 6px;
+    cursor: pointer;
+}
+
+.avail-building:hover:not(.locked) { border-color: rgba(96, 165, 250, 0.4); }
+.avail-building.selected { border-color: #fbbf24; background: rgba(251, 191, 36, 0.1); }
+.avail-building.locked { opacity: 0.5; cursor: not-allowed; }
+
+.avail-icon { font-size: 24px; display: none; }
+.avail-info { flex: 1; }
+.avail-name { display: block; font-size: 12px; color: #fff; }
+.avail-desc { display: block; font-size: 10px; color: rgba(200, 212, 232, 0.6); }
+.avail-cost { font-size: 10px; color: rgba(200, 212, 232, 0.6); text-align: right; }
+.avail-req { font-size: 9px; color: #f87171; }
+
+.build-preview {
+    padding: 12px 14px;
+    border-top: 1px solid rgba(96, 165, 250, 0.2);
+}
+
+.build-preview h4 { margin: 0 0 6px; font-size: 14px; color: #fff; }
+.build-preview p { margin: 0 0 12px; font-size: 11px; color: rgba(200, 212, 232, 0.7); }
+
+.build-btn {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(180deg, #22c55e 0%, #16a34a 100%);
+    border: none;
+    border-radius: 6px;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.build-btn:hover { background: linear-gradient(180deg, #4ade80 0%, #22c55e 100%); }
+.build-btn:disabled { background: rgba(100, 100, 100, 0.3); cursor: not-allowed; }
+
+/* Summary */
+.summary-stats { padding: 12px 14px; }
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    font-size: 12px;
+    border-bottom: 1px solid rgba(96, 165, 250, 0.1);
+}
+
+.modifiers-list { padding: 8px 14px; }
+
+.modifier-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    font-size: 11px;
+}
+
+.modifier-item.positive .mod-icon { color: #4ade80; }
+.modifier-item.negative .mod-icon { color: #f87171; }
+
+.focus-select {
+    width: calc(100% - 28px);
+    margin: 12px 14px;
+    padding: 10px;
+    background: rgba(20, 30, 50, 0.8);
+    border: 1px solid rgba(96, 165, 250, 0.3);
+    border-radius: 6px;
+    color: #fff;
+    font-size: 12px;
+}
+
+.focus-desc {
+    padding: 0 14px 12px;
+    font-size: 11px;
+    color: rgba(200, 212, 232, 0.6);
+}
+
+/* Modal */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: linear-gradient(180deg, #1a2235 0%, #0f1520 100%);
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    border-radius: 12px;
+    padding: 24px;
+    max-width: 400px;
+}
+
+.modal-content h3 { margin: 0 0 12px; color: #f87171; }
+.modal-content p { margin: 0 0 20px; font-size: 13px; color: rgba(200, 212, 232, 0.8); }
+
+.modal-actions { display: flex; gap: 12px; justify-content: flex-end; }
+
+.modal-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.modal-btn.cancel { background: rgba(100, 100, 120, 0.3); color: #fff; }
+.modal-btn.confirm { background: rgba(239, 68, 68, 0.8); color: #fff; }
+    /* Ship Production Panel */
+    .ship-production-panel {
+        background: rgba(15, 25, 40, 0.9);
+        border: 1px solid rgba(60, 90, 130, 0.5);
+        border-radius: 8px;
+        padding: 16px;
+        margin-top: 16px;
+    }
+    .ship-production-panel .panel-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+    .ship-production-panel h3 {
+        font-size: 14px;
+        color: #ff9900;
+        margin: 0;
+    }
+    .shipyard-level {
+        font-size: 11px;
+        color: #7890a8;
+        background: rgba(0,0,0,0.3);
+        padding: 4px 8px;
+        border-radius: 4px;
+    }
+    .ship-classes {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        max-height: 200px;
+        overflow-y: auto;
+    }
+    .ship-class {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px;
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(60, 90, 130, 0.3);
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.15s;
+    }
+    .ship-class:hover { border-color: rgba(74, 158, 255, 0.5); background: rgba(74, 158, 255, 0.1); }
+    .ship-class.selected { border-color: #4a9eff; background: rgba(74, 158, 255, 0.2); }
+    .ship-class.locked { opacity: 0.5; cursor: not-allowed; }
+    .ship-icon { font-size: 24px; }
+    .ship-info { flex: 1; }
+    .ship-name { display: block; font-weight: 600; color: #c8d4e8; font-size: 13px; }
+    .ship-stats { font-size: 10px; color: #7890a8; }
+    .ship-cost { text-align: right; font-size: 11px; color: #a8c0d8; }
+    .ship-build-options {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid rgba(60, 90, 130, 0.3);
+    }
+    .quantity-selector {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .qty-btn {
+        width: 28px;
+        height: 28px;
+        background: rgba(74, 158, 255, 0.2);
+        border: 1px solid rgba(74, 158, 255, 0.5);
+        border-radius: 4px;
+        color: #4a9eff;
+        font-size: 16px;
+        cursor: pointer;
+    }
+    .qty-btn:hover { background: rgba(74, 158, 255, 0.3); }
+    .qty-value { font-size: 16px; font-weight: 600; color: #fff; min-width: 30px; text-align: center; }
+    .build-ship-btn {
+        flex: 1;
+        padding: 10px 16px;
+        background: linear-gradient(180deg, #2a6a2a, #1a4a1a);
+        border: 1px solid #44aa44;
+        border-radius: 6px;
+        color: #88ff88;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.15s;
+    }
+    .build-ship-btn:hover { background: linear-gradient(180deg, #3a8a3a, #2a6a2a); }
+    .ship-queue {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 12px;
+        font-size: 11px;
+        color: #7890a8;
+    }
+    .queue-ship {
+        background: rgba(255, 153, 0, 0.2);
+        padding: 2px 8px;
+        border-radius: 4px;
+        color: #ff9900;
+    }
+</style>
+
+@code {
+    [Parameter] public Guid? ColonyId { get; set; }
+
+    private bool _loading = true;
+    private string _raceId = "federation";
+    private ColonyData _colony = new();
+    private List<ResourceData> _resources = new();
+    private List<SpeciesData> _species = new();
+    private List<JobData> _jobs = new();
+    private List<DistrictData> _districts = new();
+    private List<BuildingData> _buildings = new();
+    private List<QueueItem> _constructionQueue = new();
+    private List<ColonyEvent> _events = new();
+    private List<ModifierData> _modifiers = new();
+    private List<AvailableBuilding> _availableBuildings = new();
+    
+    // Ship Production
+    private bool _hasShipyard = true;
+    private int _shipyardLevel = 1;
+    private string? _selectedShipClass;
+    private int _shipQuantity = 1;
+    private List<ShipClassData> _availableShips = new();
+    private List<ShipQueueItem> _shipBuildQueue = new();
+
+    private int _totalPops = 24;
+    private int _maxPops = 30;
+    private int _popGrowth = 2;
+    private int _unemployedPops = 3;
+    private int _employmentRate = 88;
+    private int _unlockedSlots = 20;
+    private int? _selectedSlot;
+    private int? _constructionSlot = 3;
+    private int _constructionProgress = 65;
+    private int _constructionTurns = 2;
+    private string _selectedDistrict = "core";
+    private string _buildCategory = "all";
+    private string _colonyFocus = "balanced";
+    private AvailableBuilding? _selectedBuilding;
+    private AvailableBuilding? _constructingBuilding;
+    private bool _showDemolishConfirm;
+    private Guid? _demolishBuildingId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadColonyData();
+        InitializeShipData();
+    }
+
+    private async Task LoadColonyData()
+    {
+        _loading = true;
+        await Task.Delay(100);
+
+        _colony = new ColonyData
+        {
+            Id = ColonyId ?? Guid.NewGuid(),
+            Name = "New Earth",
+            PlanetClass = "Class M",
+            SystemName = "Alpha Centauri",
+            ColonyType = "Core World",
+            Morale = 75,
+            Stability = 82,
+            Habitability = 90,
+            InfrastructureLevel = 3,
+            DefenseRating = 150,
+            FoundedTurn = 1,
+            Age = 52
+        };
+
+        _resources = new List<ResourceData>
+        {
+            new() { Icon = "💰", Name = "Credits", Value = 1250, Change = 45, Tooltip = "Empire currency" },
+            new() { Icon = "⚙️", Name = "Production", Value = 180, Change = 12, Tooltip = "Manufacturing output" },
+            new() { Icon = "🔬", Name = "Research", Value = 95, Change = 8, Tooltip = "Science output" },
+            new() { Icon = "🌾", Name = "Food", Value = 45, Change = 5, Tooltip = "Food surplus" },
+            new() { Icon = "💎", Name = "Dilithium", Value = 28, Change = 2, Tooltip = "Strategic resource" },
+            new() { Icon = "⚡", Name = "Energy", Value = 340, Change = -15, Tooltip = "Power grid" }
+        };
+
+        _species = new List<SpeciesData>
+        {
+            new() { Name = "Human", Icon = "👤", Count = 18, Percentage = 75, Color = "#60a5fa" },
+            new() { Name = "Vulcan", Icon = "🖖", Count = 3, Percentage = 12, Color = "#22c55e" },
+            new() { Name = "Andorian", Icon = "💠", Count = 2, Percentage = 8, Color = "#3b82f6" },
+            new() { Name = "Tellarite", Icon = "🐗", Count = 1, Percentage = 5, Color = "#f59e0b" }
+        };
+
+        _jobs = new List<JobData>
+        {
+            new() { Id = Guid.NewGuid(), Name = "Administrator", Icon = "👔", Filled = 2, Total = 2, CategoryColor = "#3b82f6", OutputText = "+10 Stability" },
+            new() { Id = Guid.NewGuid(), Name = "Scientist", Icon = "🔬", Filled = 3, Total = 4, CategoryColor = "#8b5cf6", OutputText = "+8 Research each" },
+            new() { Id = Guid.NewGuid(), Name = "Engineer", Icon = "🔧", Filled = 4, Total = 5, CategoryColor = "#f59e0b", OutputText = "+6 Production each" },
+            new() { Id = Guid.NewGuid(), Name = "Farmer", Icon = "🌾", Filled = 5, Total = 5, CategoryColor = "#10b981", OutputText = "+4 Food each" },
+            new() { Id = Guid.NewGuid(), Name = "Miner", Icon = "⛏️", Filled = 4, Total = 6, CategoryColor = "#10b981", OutputText = "+5 Minerals each" },
+            new() { Id = Guid.NewGuid(), Name = "Soldier", Icon = "🛡️", Filled = 3, Total = 3, CategoryColor = "#ef4444", OutputText = "+15 Defense each" }
+        };
+
+        _districts = new List<DistrictData>
+        {
+            new() { Id = "core", Name = "Core", Icon = "🏛️", Used = 5, Total = 5 },
+            new() { Id = "industrial", Name = "Industrial", Icon = "🏭", Used = 3, Total = 5 },
+            new() { Id = "research", Name = "Research", Icon = "🔬", Used = 2, Total = 4 },
+            new() { Id = "residential", Name = "Residential", Icon = "🏠", Used = 4, Total = 6 },
+            new() { Id = "military", Name = "Military", Icon = "🛡️", Used = 1, Total = 3 }
+        };
+
+        _buildings = new List<BuildingData>
+        {
+            new() { Id = Guid.NewGuid(), SlotIndex = 0, Name = "Starfleet HQ", ShortName = "HQ", Icon = "🏛️", Level = 2, MaxLevel = 5, Category = "civic", IsActive = true,
+                Description = "The administrative center of the colony.", MaintenanceCost = 5, UpgradeCost = 200, SpriteRow = 0, SpriteCol = 0,
+                Outputs = new List<OutputData> { new() { Icon = "💰", Name = "Credits", Amount = 15 }, new() { Icon = "📊", Name = "Stability", Amount = 5 } },
+                ProvidedJobs = new List<JobInfo> { new() { Name = "Administrator", Slots = 2 } } },
+            new() { Id = Guid.NewGuid(), SlotIndex = 1, Name = "Agricultural Dome", ShortName = "Agri-Dome", Icon = "🌾", Level = 3, MaxLevel = 5, Category = "resource", IsActive = true,
+                Description = "Produces food for the colony population.", MaintenanceCost = 3, UpgradeCost = 100, SpriteRow = 5, SpriteCol = 1,
+                Outputs = new List<OutputData> { new() { Icon = "🌾", Name = "Food", Amount = 12 } },
+                ProvidedJobs = new List<JobInfo> { new() { Name = "Farmer", Slots = 5 } } },
+            new() { Id = Guid.NewGuid(), SlotIndex = 2, Name = "Resource Processor", ShortName = "Processor", Icon = "⚙️", Level = 2, MaxLevel = 5, Category = "resource", IsActive = true,
+                Description = "Processes raw materials.", MaintenanceCost = 4, UpgradeCost = 120, SpriteRow = 0, SpriteCol = 4,
+                Outputs = new List<OutputData> { new() { Icon = "⚙️", Name = "Production", Amount = 15 } },
+                ProvidedJobs = new List<JobInfo> { new() { Name = "Miner", Slots = 4 } } },
+            new() { Id = Guid.NewGuid(), SlotIndex = 5, Name = "Science Lab", ShortName = "Science", Icon = "🔬", Level = 2, MaxLevel = 5, Category = "research", IsActive = true,
+                Description = "Conducts scientific research.", MaintenanceCost = 6, UpgradeCost = 180, SpriteRow = 1, SpriteCol = 3,
+                Outputs = new List<OutputData> { new() { Icon = "🔬", Name = "Research", Amount = 20 } },
+                ProvidedJobs = new List<JobInfo> { new() { Name = "Scientist", Slots = 3 } } },
+            new() { Id = Guid.NewGuid(), SlotIndex = 6, Name = "Fabrication Plant", ShortName = "Factory", Icon = "🏭", Level = 2, MaxLevel = 5, Category = "production", IsActive = true,
+                Description = "Manufacturing facility.", MaintenanceCost = 5, UpgradeCost = 150, SpriteRow = 5, SpriteCol = 2,
+                Outputs = new List<OutputData> { new() { Icon = "⚙️", Name = "Production", Amount = 25 } },
+                ProvidedJobs = new List<JobInfo> { new() { Name = "Engineer", Slots = 4 } } },
+            new() { Id = Guid.NewGuid(), SlotIndex = 10, Name = "Habitat Ring", ShortName = "Housing", Icon = "🏠", Level = 2, MaxLevel = 5, Category = "civic", IsActive = true,
+                Description = "Housing for colonists.", MaintenanceCost = 2, UpgradeCost = 80, SpriteRow = 1, SpriteCol = 1,
+                Outputs = new List<OutputData> { new() { Icon = "🏠", Name = "Housing", Amount = 15 } },
+                ProvidedJobs = new List<JobInfo>() },
+            new() { Id = Guid.NewGuid(), SlotIndex = 15, Name = "Defensive Array", ShortName = "Defense", Icon = "🛡️", Level = 1, MaxLevel = 3, Category = "military", IsActive = true,
+                Description = "Defense installation.", MaintenanceCost = 8, UpgradeCost = 250, SpriteRow = 1, SpriteCol = 4,
+                Outputs = new List<OutputData> { new() { Icon = "🛡️", Name = "Defense", Amount = 25 } },
+                ProvidedJobs = new List<JobInfo> { new() { Name = "Soldier", Slots = 3 } } }
+        };
+
+        _constructionQueue = new List<QueueItem>
+        {
+            new() { Id = Guid.NewGuid(), Name = "Dilithium Refinery", Icon = "💎", Cost = 300, Progress = 65, TurnsLeft = 2, BuildTime = 5 },
+            new() { Id = Guid.NewGuid(), Name = "Shield Generator", Icon = "🔰", Cost = 400, Progress = 0, TurnsLeft = 6, BuildTime = 6 }
+        };
+
+        _constructingBuilding = new AvailableBuilding { Name = "Dilithium Refinery", Icon = "💎" };
+
+        _events = new List<ColonyEvent>
+        {
+            new() { Title = "Population Boom", Type = "positive", Turn = 52 },
+            new() { Title = "Trade Agreement", Type = "positive", Turn = 50 },
+            new() { Title = "Power Fluctuation", Type = "negative", Turn = 48 },
+            new() { Title = "Scientific Discovery", Type = "positive", Turn = 45 },
+            new() { Title = "Festival", Type = "neutral", Turn = 43 }
+        };
+
+        _modifiers = new List<ModifierData>
+        {
+            new() { Text = "+20% Production (Industrial Focus)", IsPositive = true },
+            new() { Text = "+15% Research (Science Council)", IsPositive = true },
+            new() { Text = "+10% Food (Fertile Soil)", IsPositive = true },
+            new() { Text = "-5% Morale (Overcrowding)", IsPositive = false }
+        };
+
+        _availableBuildings = new List<AvailableBuilding>
+        {
+            new() { Type = "starfleet_hq", Name = "Starfleet HQ", Icon = "🏛️", Category = "civic", ShortDesc = "Command center", Description = "Central command for all operations.", Cost = 500, BuildTime = 8, CanBuild = true, SpriteRow = 0, SpriteCol = 0 },
+            new() { Type = "academy", Name = "Academy", Icon = "🎓", Category = "civic", ShortDesc = "Training facility", Description = "Trains officers and crew.", Cost = 300, BuildTime = 5, CanBuild = true, SpriteRow = 0, SpriteCol = 1 },
+            new() { Type = "warp_factory", Name = "Warp Core Factory", Icon = "⚡", Category = "production", ShortDesc = "Warp cores", Description = "Produces warp cores for starships.", Cost = 400, BuildTime = 6, CanBuild = true, SpriteRow = 0, SpriteCol = 2 },
+            new() { Type = "shipyard", Name = "Shipyard", Icon = "🚀", Category = "production", ShortDesc = "Construct ships", Description = "Orbital shipyard for vessel construction.", Cost = 500, BuildTime = 8, CanBuild = false, Requirement = "Requires: Starport", SpriteRow = 0, SpriteCol = 3 },
+            new() { Type = "resource_processor", Name = "Resource Processor", Icon = "⚙️", Category = "resource", ShortDesc = "Process raw materials", Description = "Refines raw materials.", Cost = 150, BuildTime = 4, CanBuild = true, SpriteRow = 0, SpriteCol = 4 },
+            new() { Type = "power_generator", Name = "Power Generator", Icon = "🔋", Category = "resource", ShortDesc = "Energy production", Description = "Fusion power plant.", Cost = 120, BuildTime = 3, CanBuild = true, SpriteRow = 0, SpriteCol = 5 },
+            new() { Type = "power_generator_adv", Name = "Advanced Generator", Icon = "⚡", Category = "resource", ShortDesc = "Advanced energy", Description = "Matter/antimatter reactor.", Cost = 250, BuildTime = 5, CanBuild = true, SpriteRow = 1, SpriteCol = 0 },
+            new() { Type = "habitat_ring", Name = "Habitat Ring", Icon = "🏠", Category = "civic", ShortDesc = "Housing", Description = "Orbital habitat for population.", Cost = 200, BuildTime = 4, CanBuild = true, SpriteRow = 1, SpriteCol = 1 },
+            new() { Type = "medical_center", Name = "Medical Center", Icon = "🏥", Category = "civic", ShortDesc = "Healthcare", Description = "Advanced medical facility.", Cost = 180, BuildTime = 4, CanBuild = true, SpriteRow = 1, SpriteCol = 2 },
+            new() { Type = "science_lab", Name = "Science Lab", Icon = "🔬", Category = "research", ShortDesc = "Research", Description = "Scientific research laboratory.", Cost = 150, BuildTime = 4, CanBuild = true, SpriteRow = 1, SpriteCol = 3 },
+            new() { Type = "defensive_array", Name = "Defensive Array", Icon = "🛡️", Category = "military", ShortDesc = "Orbital defense", Description = "Planetary defense grid.", Cost = 300, BuildTime = 5, CanBuild = true, SpriteRow = 1, SpriteCol = 4 },
+            new() { Type = "phaser_turret", Name = "Phaser Turret", Icon = "🔫", Category = "military", ShortDesc = "Ground defense", Description = "Phaser defense emplacement.", Cost = 150, BuildTime = 3, CanBuild = true, SpriteRow = 1, SpriteCol = 5 },
+            new() { Type = "phaser_turret_heavy", Name = "Heavy Phaser", Icon = "💥", Category = "military", ShortDesc = "Heavy defense", Description = "Heavy phaser battery.", Cost = 250, BuildTime = 4, CanBuild = true, SpriteRow = 2, SpriteCol = 0 },
+            new() { Type = "shield_emitter", Name = "Shield Emitter", Icon = "🛡️", Category = "military", ShortDesc = "Shields", Description = "Planetary shield generator.", Cost = 350, BuildTime = 5, CanBuild = true, SpriteRow = 2, SpriteCol = 1 },
+            new() { Type = "trade_station", Name = "Trade Station", Icon = "💰", Category = "production", ShortDesc = "Commerce", Description = "Trade and commerce hub.", Cost = 200, BuildTime = 4, CanBuild = true, SpriteRow = 2, SpriteCol = 2 },
+            new() { Type = "supply_depot", Name = "Supply Depot", Icon = "📦", Category = "resource", ShortDesc = "Storage", Description = "Resource storage facility.", Cost = 100, BuildTime = 3, CanBuild = true, SpriteRow = 2, SpriteCol = 3 },
+            new() { Type = "comm_relay", Name = "Communications Relay", Icon = "📡", Category = "civic", ShortDesc = "Communications", Description = "Subspace comm array.", Cost = 150, BuildTime = 3, CanBuild = true, SpriteRow = 2, SpriteCol = 4 },
+            new() { Type = "sensor_array", Name = "Sensor Array", Icon = "📡", Category = "research", ShortDesc = "Long-range sensors", Description = "Deep space sensor array.", Cost = 200, BuildTime = 4, CanBuild = true, SpriteRow = 2, SpriteCol = 5 },
+            new() { Type = "diplomatic_center", Name = "Diplomatic Center", Icon = "🤝", Category = "civic", ShortDesc = "Diplomacy", Description = "Embassy and diplomatic hub.", Cost = 250, BuildTime = 5, CanBuild = true, SpriteRow = 3, SpriteCol = 0 },
+            new() { Type = "diplomatic_center_adv", Name = "Embassy Complex", Icon = "🏛️", Category = "civic", ShortDesc = "Advanced diplomacy", Description = "Full diplomatic complex.", Cost = 400, BuildTime = 6, CanBuild = true, SpriteRow = 3, SpriteCol = 1 },
+            new() { Type = "security_outpost", Name = "Security Outpost", Icon = "👮", Category = "military", ShortDesc = "Security", Description = "Internal security facility.", Cost = 150, BuildTime = 3, CanBuild = true, SpriteRow = 3, SpriteCol = 2 },
+            new() { Type = "detention_facility", Name = "Detention Facility", Icon = "🔒", Category = "military", ShortDesc = "Prison", Description = "High-security detention.", Cost = 180, BuildTime = 4, CanBuild = true, SpriteRow = 3, SpriteCol = 3 },
+            new() { Type = "reeducation_center", Name = "Re-Education Center", Icon = "📚", Category = "civic", ShortDesc = "Training", Description = "Workforce training center.", Cost = 200, BuildTime = 4, CanBuild = true, SpriteRow = 3, SpriteCol = 4 },
+            new() { Type = "monument", Name = "Monument to Exploration", Icon = "🗽", Category = "civic", ShortDesc = "Morale boost", Description = "Inspirational monument.", Cost = 300, BuildTime = 5, CanBuild = true, SpriteRow = 3, SpriteCol = 5 },
+            new() { Type = "atmospheric_stabilizer", Name = "Atmospheric Stabilizer", Icon = "🌡️", Category = "resource", ShortDesc = "Terraforming", Description = "Climate control system.", Cost = 350, BuildTime = 6, CanBuild = true, SpriteRow = 4, SpriteCol = 1 },
+            new() { Type = "geothermal_plant", Name = "Geothermal Plant", Icon = "🌋", Category = "resource", ShortDesc = "Geothermal energy", Description = "Geothermal power extraction.", Cost = 200, BuildTime = 4, CanBuild = true, SpriteRow = 4, SpriteCol = 2 },
+            new() { Type = "transporter_pad", Name = "Transporter Pad", Icon = "✨", Category = "civic", ShortDesc = "Transport hub", Description = "Personnel transport system.", Cost = 150, BuildTime = 3, CanBuild = true, SpriteRow = 4, SpriteCol = 3 },
+            new() { Type = "shuttle_hangar", Name = "Shuttle Hangar", Icon = "🛸", Category = "production", ShortDesc = "Shuttlecraft", Description = "Shuttle maintenance bay.", Cost = 180, BuildTime = 4, CanBuild = true, SpriteRow = 4, SpriteCol = 4 },
+            new() { Type = "storage_silos", Name = "Storage Silos", Icon = "🏭", Category = "resource", ShortDesc = "Bulk storage", Description = "Industrial storage facility.", Cost = 100, BuildTime = 2, CanBuild = true, SpriteRow = 4, SpriteCol = 5 },
+            new() { Type = "research_facility", Name = "Research Facility", Icon = "🔬", Category = "research", ShortDesc = "Advanced research", Description = "Cutting-edge research complex.", Cost = 300, BuildTime = 5, CanBuild = true, SpriteRow = 5, SpriteCol = 0 },
+            new() { Type = "agricultural_dome", Name = "Agricultural Dome", Icon = "🌾", Category = "resource", ShortDesc = "Food production", Description = "Hydroponic farming dome.", Cost = 120, BuildTime = 3, CanBuild = true, SpriteRow = 5, SpriteCol = 1 },
+            new() { Type = "fabrication_plant", Name = "Fabrication Plant", Icon = "🏭", Category = "production", ShortDesc = "Manufacturing", Description = "Industrial replicator complex.", Cost = 250, BuildTime = 5, CanBuild = true, SpriteRow = 5, SpriteCol = 2 },
+            new() { Type = "training_facility", Name = "Training Facility", Icon = "🎯", Category = "military", ShortDesc = "Military training", Description = "Combat training center.", Cost = 200, BuildTime = 4, CanBuild = true, SpriteRow = 5, SpriteCol = 3 },
+            new() { Type = "bunker", Name = "Bunker", Icon = "🏰", Category = "military", ShortDesc = "Fortification", Description = "Hardened defensive structure.", Cost = 180, BuildTime = 4, CanBuild = true, SpriteRow = 5, SpriteCol = 4 },
+            new() { Type = "barracks", Name = "Barracks", Icon = "🛏️", Category = "military", ShortDesc = "Troop housing", Description = "Military personnel quarters.", Cost = 120, BuildTime = 3, CanBuild = true, SpriteRow = 5, SpriteCol = 5 }
+        };
+
+        _loading = false;
+    }
+
+    private void SelectSlot(int index)
+    {
+        if (index >= _unlockedSlots) return;
+        _selectedSlot = _selectedSlot == index ? null : index;
+        _selectedBuilding = null;
+    }
+
+    private void ClearSelection()
+    {
+        _selectedSlot = null;
+        _selectedBuilding = null;
+    }
+
+    private void SelectDistrict(string districtId) => _selectedDistrict = districtId;
+
+    private void SelectBuilding(AvailableBuilding building)
+    {
+        if (building.CanBuild)
+            _selectedBuilding = _selectedBuilding?.Type == building.Type ? null : building;
+    }
+
+    private BuildingData? GetBuildingAt(int slotIndex) => _buildings.FirstOrDefault(b => b.SlotIndex == slotIndex);
+
+    private int GetUnlockLevel(int slotIndex) => slotIndex < 10 ? 1 : slotIndex < 15 ? 2 : slotIndex < 20 ? 3 : 4;
+
+    private IEnumerable<AvailableBuilding> GetFilteredBuildings() =>
+        _buildCategory == "all" ? _availableBuildings : _availableBuildings.Where(b => b.Category == _buildCategory);
+
+    private async Task StartConstruction()
+    {
+        if (_selectedBuilding == null || !_selectedSlot.HasValue || _constructionQueue.Count >= 5) return;
+        _constructionQueue.Add(new QueueItem
+        {
+            Id = Guid.NewGuid(), Name = _selectedBuilding.Name, Icon = _selectedBuilding.Icon,
+            Cost = _selectedBuilding.Cost, Progress = 0, TurnsLeft = _selectedBuilding.BuildTime, BuildTime = _selectedBuilding.BuildTime
+        });
+        Snackbar.Add($"{_selectedBuilding.Name} added to queue", Severity.Success);
+        _selectedBuilding = null;
+    }
+
+    private async Task AssignWorker(Guid jobId)
+    {
+        var job = _jobs.FirstOrDefault(j => j.Id == jobId);
+        if (job != null && job.Filled < job.Total && _unemployedPops > 0)
+        {
+            job.Filled++;
+            _unemployedPops--;
+            _employmentRate = (int)((_totalPops - _unemployedPops) * 100.0 / _totalPops);
+            Snackbar.Add($"Worker assigned to {job.Name}", Severity.Success);
+        }
+    }
+
+    private async Task RemoveWorker(Guid jobId)
+    {
+        var job = _jobs.FirstOrDefault(j => j.Id == jobId);
+        if (job != null && job.Filled > 0)
+        {
+            job.Filled--;
+            _unemployedPops++;
+            _employmentRate = (int)((_totalPops - _unemployedPops) * 100.0 / _totalPops);
+            Snackbar.Add($"Worker removed from {job.Name}", Severity.Info);
+        }
+    }
+
+    private async Task UpgradeBuilding(Guid buildingId)
+    {
+        var building = _buildings.FirstOrDefault(b => b.Id == buildingId);
+        if (building != null && building.Level < building.MaxLevel)
+        {
+            _constructionQueue.Add(new QueueItem
+            {
+                Id = Guid.NewGuid(), Name = $"{building.Name} Upgrade", Icon = building.Icon,
+                Cost = building.UpgradeCost, Progress = 0, TurnsLeft = 3, BuildTime = 3
+            });
+            Snackbar.Add($"{building.Name} upgrade queued", Severity.Success);
+        }
+    }
+
+    private async Task ToggleBuilding(Guid buildingId)
+    {
+        var building = _buildings.FirstOrDefault(b => b.Id == buildingId);
+        if (building != null)
+        {
+            building.IsActive = !building.IsActive;
+            Snackbar.Add(building.IsActive ? $"{building.Name} enabled" : $"{building.Name} disabled", Severity.Info);
+        }
+    }
+
+    private void ShowDemolishConfirm(Guid buildingId) { _demolishBuildingId = buildingId; _showDemolishConfirm = true; }
+    private void HideDemolishConfirm() { _showDemolishConfirm = false; _demolishBuildingId = null; }
+
+    private async Task ConfirmDemolish()
+    {
+        if (_demolishBuildingId.HasValue)
+        {
+            var building = _buildings.FirstOrDefault(b => b.Id == _demolishBuildingId.Value);
+            if (building != null)
+            {
+                _buildings.Remove(building);
+                Snackbar.Add($"{building.Name} demolished", Severity.Warning);
+                ClearSelection();
+            }
+        }
+        HideDemolishConfirm();
+    }
+
+    private async Task MoveQueueUp(Guid itemId)
+    {
+        var index = _constructionQueue.FindIndex(q => q.Id == itemId);
+        if (index > 1) { var item = _constructionQueue[index]; _constructionQueue.RemoveAt(index); _constructionQueue.Insert(index - 1, item); }
+    }
+
+    private async Task MoveQueueDown(Guid itemId)
+    {
+        var index = _constructionQueue.FindIndex(q => q.Id == itemId);
+        if (index > 0 && index < _constructionQueue.Count - 1) { var item = _constructionQueue[index]; _constructionQueue.RemoveAt(index); _constructionQueue.Insert(index + 1, item); }
+    }
+
+    private async Task CancelConstruction(Guid itemId)
+    {
+        _constructionQueue.RemoveAll(q => q.Id == itemId);
+        Snackbar.Add("Construction cancelled", Severity.Info);
+    }
+
+    private async Task EndTurn() => Snackbar.Add("Processing turn...", Severity.Info);
+
+    private string GetMoraleClass(int morale) => morale >= 70 ? "good" : morale >= 40 ? "moderate" : "poor";
+    private string GetStabilityClass(int stability) => stability >= 70 ? "good" : stability >= 40 ? "moderate" : "poor";
+    private string GetHabitabilityClass(int habitability) => habitability >= 70 ? "good" : habitability >= 40 ? "moderate" : "poor";
+    private string GetEventIcon(string type) => type == "positive" ? "✨" : type == "negative" ? "⚠️" : "ℹ️";
+    private string GetFocusDescription(string focus) => focus switch
+    {
+        "growth" => "+25% Population Growth, -10% Production",
+        "production" => "+25% Production Output, -10% Research",
+        "research" => "+25% Research Output, -10% Production",
+        "military" => "+25% Defense, +10% Ship Production, -15% Growth",
+        "trade" => "+25% Credits, +10% Morale, -10% Production",
+        _ => "Balanced development across all sectors"
+    };
+
+    // Data Classes
+    private class ColonyData
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; } = "";
+        public string PlanetClass { get; set; } = "";
+        public string SystemName { get; set; } = "";
+        public string ColonyType { get; set; } = "";
+        public int Morale { get; set; }
+        public int Stability { get; set; }
+        public int Habitability { get; set; }
+        public int InfrastructureLevel { get; set; }
+        public int DefenseRating { get; set; }
+        public int FoundedTurn { get; set; }
+        public int Age { get; set; }
+    }
+
+    private class ResourceData { public string Icon { get; set; } = ""; public string Name { get; set; } = ""; public int Value { get; set; } public int Change { get; set; } public string Tooltip { get; set; } = ""; }
+    private class SpeciesData { public string Name { get; set; } = ""; public string Icon { get; set; } = ""; public int Count { get; set; } public int Percentage { get; set; } public string Color { get; set; } = ""; }
+    private class JobData { public Guid Id { get; set; } public string Name { get; set; } = ""; public string Icon { get; set; } = ""; public int Filled { get; set; } public int Total { get; set; } public string CategoryColor { get; set; } = ""; public string OutputText { get; set; } = ""; }
+    private class DistrictData { public string Id { get; set; } = ""; public string Name { get; set; } = ""; public string Icon { get; set; } = ""; public int Used { get; set; } public int Total { get; set; } }
+    private class BuildingData { public Guid Id { get; set; } public int SlotIndex { get; set; } public string Name { get; set; } = ""; public string ShortName { get; set; } = ""; public string Icon { get; set; } = ""; public int Level { get; set; } public int MaxLevel { get; set; } public string Category { get; set; } = ""; public bool IsActive { get; set; } public bool IsDamaged { get; set; } public string Description { get; set; } = ""; public int MaintenanceCost { get; set; } public int UpgradeCost { get; set; } public List<OutputData> Outputs { get; set; } = new(); public List<JobInfo> ProvidedJobs { get; set; } = new(); public int SpriteRow { get; set; } public int SpriteCol { get; set; } }
+    private class OutputData { public string Icon { get; set; } = ""; public string Name { get; set; } = ""; public int Amount { get; set; } }
+    private class JobInfo { public string Name { get; set; } = ""; public int Slots { get; set; } }
+    private class QueueItem { public Guid Id { get; set; } public string Name { get; set; } = ""; public string Icon { get; set; } = ""; public int Cost { get; set; } public int Progress { get; set; } public int TurnsLeft { get; set; } public int BuildTime { get; set; } }
+    private class ColonyEvent { public string Title { get; set; } = ""; public string Type { get; set; } = ""; public int Turn { get; set; } }
+    private class ModifierData { public string Text { get; set; } = ""; public bool IsPositive { get; set; } }
+    private class AvailableBuilding { 
+        public string Type { get; set; } = ""; 
+        public string Name { get; set; } = ""; 
+        public string Icon { get; set; } = ""; 
+        public string Category { get; set; } = ""; 
+        public string ShortDesc { get; set; } = ""; 
+        public string Description { get; set; } = ""; 
+        public int Cost { get; set; } 
+        public int BuildTime { get; set; } 
+        public bool CanBuild { get; set; } 
+        public string? Requirement { get; set; }
+        public int SpriteRow { get; set; } = 0;
+        public int SpriteCol { get; set; } = 0;
+    }
+    private class ShipClassData { public string Name { get; set; } = ""; public string Icon { get; set; } = ""; public int Attack { get; set; } public int Defense { get; set; } public int Speed { get; set; } public int Cost { get; set; } public int BuildTime { get; set; } public bool CanBuild { get; set; } = true; }
+    private class ShipQueueItem { public string Name { get; set; } = ""; public int TurnsLeft { get; set; } }
+
+    private void SelectShipClass(ShipClassData ship)
+    {
+        if (ship.CanBuild)
+        {
+            _selectedShipClass = ship.Name;
+            _shipQuantity = 1;
+        }
+    }
+
+    private async Task BuildShips()
+    {
+        if (_selectedShipClass == null || ColonyId == null) return;
+        
+        try
+        {
+            // Would call API: await Api.QueueShipAsync(ColonyId.Value, _selectedShipClass, _shipQuantity);
+            var ship = _availableShips.FirstOrDefault(s => s.Name == _selectedShipClass);
+            if (ship != null)
+            {
+                for (int i = 0; i < _shipQuantity; i++)
+                {
+                    _shipBuildQueue.Add(new ShipQueueItem { Name = ship.Name, TurnsLeft = ship.BuildTime });
+                }
+            }
+            _selectedShipClass = null;
+            StateHasChanged();
+        }
+        catch { }
+    }
+
+    private void InitializeShipData()
+    {
+        _availableShips = new List<ShipClassData>
+        {
+            new() { Name = "Scout", Icon = "🔍", Attack = 30, Defense = 15, Speed = 18, Cost = 50, BuildTime = 2 },
+            new() { Name = "Destroyer", Icon = "⚔", Attack = 60, Defense = 30, Speed = 12, Cost = 100, BuildTime = 3 },
+            new() { Name = "Cruiser", Icon = "🚀", Attack = 100, Defense = 50, Speed = 8, Cost = 200, BuildTime = 5 },
+            new() { Name = "Battleship", Icon = "💪", Attack = 200, Defense = 100, Speed = 5, Cost = 400, BuildTime = 8 },
+            new() { Name = "Carrier", Icon = "🛸", Attack = 150, Defense = 75, Speed = 6, Cost = 350, BuildTime = 7 },
+            new() { Name = "Colony Ship", Icon = "🌍", Attack = 10, Defense = 25, Speed = 4, Cost = 300, BuildTime = 6, CanBuild = _shipyardLevel >= 2 },
+        };
+    }
+}

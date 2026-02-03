@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="federation">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="description" content="Galactic Strategy - A Star Trek-inspired 4X space strategy game" />
+    <meta name="theme-color" content="#ff9900" />
+    
+    <title>Galactic Strategy</title>
+    <base href="/" />
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+    
+    <!-- MudBlazor CSS -->
+    <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
+    
+    <!-- Game CSS (order matters) -->
+    <link href="css/lcars-design-system.css" rel="stylesheet" />
+    <link href="css/faction-themes.css" rel="stylesheet" />
+    <link href="css/galaxy-visuals.css" rel="stylesheet" />
+    <link href="css/system-visuals.css" rel="stylesheet" />
+    <link href="css/game-ui-panels.css" rel="stylesheet" />
+    <link href="css/app.css" rel="stylesheet" />
+    
+    <!-- 3D Theme & Assets -->
+    <link href="css/theme-3d.css" rel="stylesheet" />
+    <link href="css/race-portraits-v2.css" rel="stylesheet" />
+    
+    <!-- Ship Sprites by Faction -->
+    <link href="css/federation-ships.css" rel="stylesheet" />
+    <link href="css/klingon-ships.css" rel="stylesheet" />
+    <link href="css/romulan-ships.css" rel="stylesheet" />
+    <link href="css/cardassian-ships.css" rel="stylesheet" />
+    <link href="css/ferengi-ships.css" rel="stylesheet" />
+    <link href="css/borg-ships.css" rel="stylesheet" />
+    <link href="css/dominion-ships.css" rel="stylesheet" />
+    
+    <style>
+        /* Initial loading screen styles */
+        .loading-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #000 0%, #0a0a18 50%, #000 100%);
+            overflow: hidden;
+        }
+        
+        .loading-logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #ff9900;
+            letter-spacing: 0.3em;
+            text-shadow: 0 0 30px rgba(255, 153, 0, 0.5);
+            animation: logo-pulse 2s ease-in-out infinite;
+        }
+        
+        .loading-subtitle {
+            margin-top: 8px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            color: #666;
+            letter-spacing: 0.2em;
+        }
+        
+        .loading-bar-container {
+            margin-top: 40px;
+            width: 300px;
+            height: 4px;
+            background: rgba(255, 153, 0, 0.2);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        
+        .loading-bar {
+            height: 100%;
+            width: 30%;
+            background: linear-gradient(90deg, #ff9900, #ffcc00);
+            border-radius: 2px;
+            animation: loading-slide 1.5s ease-in-out infinite;
+        }
+        
+        .loading-status {
+            margin-top: 16px;
+            font-size: 0.75rem;
+            color: #555;
+            letter-spacing: 0.1em;
+        }
+        
+        @keyframes logo-pulse {
+            0%, 100% { opacity: 1; text-shadow: 0 0 30px rgba(255, 153, 0, 0.5); }
+            50% { opacity: 0.8; text-shadow: 0 0 50px rgba(255, 153, 0, 0.8); }
+        }
+        
+        @keyframes loading-slide {
+            0% { transform: translateX(-100%); }
+            50% { transform: translateX(250%); }
+            100% { transform: translateX(-100%); }
+        }
+    </style>
+    <link href="css/stellaris-ui.css" rel="stylesheet" />
+</head>
+
+<body>
+    <div id="app">
+        <div class="loading-screen">
+            <div class="loading-logo">GALACTIC STRATEGY</div>
+            <div class="loading-subtitle">STAR TREK UNIVERSE</div>
+            <div class="loading-bar-container">
+                <div class="loading-bar"></div>
+            </div>
+            <div class="loading-status">INITIALIZING SYSTEMS...</div>
+        </div>
+    </div>
+
+    <div id="blazor-error-ui" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); 
+         z-index: 10000; align-items: center; justify-content: center;">
+        <div style="background: linear-gradient(135deg, #1a1a2e 0%, #0a0a18 100%); padding: 40px; 
+                    border-radius: 16px; text-align: center; border: 2px solid #ff4444;
+                    box-shadow: 0 0 40px rgba(255, 68, 68, 0.3); max-width: 600px;">
+            <h2 style="color: #ff6666; font-family: 'Orbitron', sans-serif; letter-spacing: 2px;">
+                APPLICATION ERROR
+            </h2>
+            <p style="color: #888; margin: 16px 0;">An error occurred while loading the application.</p>
+            <p style="color: #666; font-size: 12px; margin: 8px 0;">Check browser console (F12) for details.</p>
+            <pre id="blazor-error-details" style="color: #ff9999; font-size: 11px; text-align: left; 
+                 background: #111; padding: 12px; border-radius: 4px; margin: 16px 0; 
+                 max-height: 200px; overflow: auto; display: none;"></pre>
+            <button onclick="location.reload()" 
+                    style="background: linear-gradient(90deg, #ff9900, #ffcc00); color: #000; border: none; 
+                           padding: 14px 32px; border-radius: 8px; cursor: pointer; font-weight: 700;
+                           font-family: 'Orbitron', sans-serif; letter-spacing: 1px;
+                           transition: transform 0.2s, box-shadow 0.2s;">
+                RELOAD
+            </button>
+        </div>
+    </div>
+
+    <!-- Blazor & MudBlazor JS -->
+    <script src="_framework/blazor.webassembly.js" autostart="false"></script>
+    <script src="_content/MudBlazor/MudBlazor.min.js"></script>
+    
+    <script>
+        // Start Blazor with error handling
+        Blazor.start().catch(function(err) {
+            console.error('Blazor startup error:', err);
+            var errorUi = document.getElementById('blazor-error-ui');
+            var errorDetails = document.getElementById('blazor-error-details');
+            if (errorUi) {
+                errorUi.style.display = 'flex';
+                if (errorDetails && err) {
+                    errorDetails.style.display = 'block';
+                    errorDetails.textContent = err.toString();
+                }
+            }
+        });
+    </script>
+    
+    <!-- Theme management -->
+    <script>
+        // Global theme switching function (called from Blazor)
+        window.setGameTheme = function(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            // Also update body class for additional styling hooks
+            document.body.className = document.body.className.replace(/theme-\w+/g, '');
+            document.body.classList.add('theme-' + theme);
+            console.log('Theme set to:', theme);
+        };
+        
+        // Apply stored theme on page load (before Blazor initializes)
+        (function() {
+            try {
+                var theme = localStorage.getItem('ui-theme');
+                if (theme) {
+                    // Remove quotes if stored as JSON string
+                    theme = theme.replace(/"/g, '');
+                    window.setGameTheme(theme);
+                }
+            } catch (e) {
+                console.log('Could not load theme from storage');
+            }
+        })();
+    </script>
+    
+    <!-- Galaxy Map Canvas Renderer -->
+    <script src="js/GalaxyRenderer.js"></script>
+    
+    <!-- Google Fonts for Stellaris-style UI -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Roboto:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="js/sounds.js"></script>
+    <script src="js/tooltips.js"></script>
+    <script src="js/keyboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,201 @@
+/* ==============================================
+   GALACTIC STRATEGY - Romulan Ships
+   3D Rendered Style with Nameplates
+   
+   Two sprite sheets:
+   - military_ships.png: Warbirds, Scouts, Combat vessels
+   - civilian_ships.png: Transports, support vessels
+   
+   Both: 2000 x 1103 px, 6 columns x 3 rows
+   ============================================== */
+
+/* ==============================================
+   Base Romulan Ship Component
+   ============================================== */
+
+.ship-card.romulan {
+    background-repeat: no-repeat;
+    background-size: 1000px 552px; /* 50% scale default */
+}
+
+/* ==============================================
+   ROMULAN MILITARY SHIPS
+   Sheet: romulan/military_ships.png
+   
+   Row 1: D'deridex, Valdore, Mogai, Scimitar, Bird-of-Prey (22c), Scout
+   Row 2: Scout, Science Vessel, Drone Ship, D7 Variant, T'Liss, T'Varo
+   Row 3: T'Varo, Dhelan, Harpy, Griffin, Hathos, Vastam
+   ============================================== */
+
+.ship-card.romulan.military {
+    background-image: url('/images/ships/romulan/military_ships.png');
+}
+
+/* Row 1 */
+.ship-card.romulan.dderidex       { background-position: 0 0; }
+.ship-card.romulan.valdore        { background-position: -166px 0; }
+.ship-card.romulan.mogai          { background-position: -333px 0; }
+.ship-card.romulan.scimitar       { background-position: -500px 0; }
+.ship-card.romulan.bird-of-prey   { background-position: -666px 0; }
+.ship-card.romulan.scout          { background-position: -833px 0; }
+
+/* Row 2 */
+.ship-card.romulan.scout-alt      { background-position: 0 -184px; }
+.ship-card.romulan.science-vessel { background-position: -166px -184px; }
+.ship-card.romulan.drone          { background-position: -333px -184px; }
+.ship-card.romulan.d7-variant     { background-position: -500px -184px; }
+.ship-card.romulan.tliss          { background-position: -666px -184px; }
+.ship-card.romulan.tvaro          { background-position: -833px -184px; }
+
+/* Row 3 */
+.ship-card.romulan.tvaro-alt      { background-position: 0 -368px; }
+.ship-card.romulan.dhelan         { background-position: -166px -368px; }
+.ship-card.romulan.harpy          { background-position: -333px -368px; }
+.ship-card.romulan.griffin        { background-position: -500px -368px; }
+.ship-card.romulan.hathos         { background-position: -666px -368px; }
+.ship-card.romulan.vastam         { background-position: -833px -368px; }
+
+/* ==============================================
+   ROMULAN CIVILIAN SHIPS
+   Sheet: romulan/civilian_ships.png
+   
+   Row 1: Shuttle, Runabout, Transport, Freighter, Science Ship, Scout
+   Row 2: Courier, Colony Ship, Colony Ship, Mining Vessel, Repair Ship, Repair Ship
+   Row 3: Trawler, Cargo Ship, Diplomatic, Yacht, Barge, Survey Ship
+   ============================================== */
+
+.ship-card.romulan.civilian {
+    background-image: url('/images/ships/romulan/civilian_ships.png');
+}
+
+/* Row 1 */
+.ship-card.romulan.shuttle        { background-position: 0 0; }
+.ship-card.romulan.runabout       { background-position: -166px 0; }
+.ship-card.romulan.transport      { background-position: -333px 0; }
+.ship-card.romulan.freighter      { background-position: -500px 0; }
+.ship-card.romulan.science        { background-position: -666px 0; }
+.ship-card.romulan.scout-civ      { background-position: -833px 0; }
+
+/* Row 2 */
+.ship-card.romulan.courier        { background-position: 0 -184px; }
+.ship-card.romulan.colony         { background-position: -166px -184px; }
+.ship-card.romulan.colony-alt     { background-position: -333px -184px; }
+.ship-card.romulan.mining         { background-position: -500px -184px; }
+.ship-card.romulan.repair         { background-position: -666px -184px; }
+.ship-card.romulan.repair-alt     { background-position: -833px -184px; }
+
+/* Row 3 */
+.ship-card.romulan.trawler        { background-position: 0 -368px; }
+.ship-card.romulan.cargo          { background-position: -166px -368px; }
+.ship-card.romulan.diplomatic     { background-position: -333px -368px; }
+.ship-card.romulan.yacht          { background-position: -500px -368px; }
+.ship-card.romulan.barge          { background-position: -666px -368px; }
+.ship-card.romulan.survey         { background-position: -833px -368px; }
+
+/* ==============================================
+   Large Size Positions (100% scale)
+   ============================================== */
+
+.ship-card.romulan.large {
+    background-size: 2000px 1103px;
+}
+
+/* Military Large */
+.ship-card.romulan.large.dderidex       { background-position: 0 0; }
+.ship-card.romulan.large.valdore        { background-position: -333px 0; }
+.ship-card.romulan.large.mogai          { background-position: -666px 0; }
+.ship-card.romulan.large.scimitar       { background-position: -1000px 0; }
+.ship-card.romulan.large.bird-of-prey   { background-position: -1333px 0; }
+.ship-card.romulan.large.scout          { background-position: -1666px 0; }
+
+.ship-card.romulan.large.scout-alt      { background-position: 0 -368px; }
+.ship-card.romulan.large.science-vessel { background-position: -333px -368px; }
+.ship-card.romulan.large.drone          { background-position: -666px -368px; }
+.ship-card.romulan.large.d7-variant     { background-position: -1000px -368px; }
+.ship-card.romulan.large.tliss          { background-position: -1333px -368px; }
+.ship-card.romulan.large.tvaro          { background-position: -1666px -368px; }
+
+.ship-card.romulan.large.tvaro-alt      { background-position: 0 -736px; }
+.ship-card.romulan.large.dhelan         { background-position: -333px -736px; }
+.ship-card.romulan.large.harpy          { background-position: -666px -736px; }
+.ship-card.romulan.large.griffin        { background-position: -1000px -736px; }
+.ship-card.romulan.large.hathos         { background-position: -1333px -736px; }
+.ship-card.romulan.large.vastam         { background-position: -1666px -736px; }
+
+/* Civilian Large */
+.ship-card.romulan.large.shuttle        { background-position: 0 0; }
+.ship-card.romulan.large.runabout       { background-position: -333px 0; }
+.ship-card.romulan.large.transport      { background-position: -666px 0; }
+.ship-card.romulan.large.freighter      { background-position: -1000px 0; }
+.ship-card.romulan.large.science        { background-position: -1333px 0; }
+.ship-card.romulan.large.scout-civ      { background-position: -1666px 0; }
+
+/* ==============================================
+   Small Size Positions (25% scale)
+   ============================================== */
+
+.ship-card.romulan.small {
+    background-size: 500px 276px;
+}
+
+.ship-card.romulan.small.dderidex       { background-position: 0 0; }
+.ship-card.romulan.small.valdore        { background-position: -83px 0; }
+.ship-card.romulan.small.mogai          { background-position: -166px 0; }
+.ship-card.romulan.small.scimitar       { background-position: -250px 0; }
+.ship-card.romulan.small.bird-of-prey   { background-position: -333px 0; }
+.ship-card.romulan.small.scout          { background-position: -416px 0; }
+
+.ship-card.romulan.small.scout-alt      { background-position: 0 -92px; }
+.ship-card.romulan.small.science-vessel { background-position: -83px -92px; }
+.ship-card.romulan.small.drone          { background-position: -166px -92px; }
+.ship-card.romulan.small.d7-variant     { background-position: -250px -92px; }
+.ship-card.romulan.small.tliss          { background-position: -333px -92px; }
+.ship-card.romulan.small.tvaro          { background-position: -416px -92px; }
+
+.ship-card.romulan.small.tvaro-alt      { background-position: 0 -184px; }
+.ship-card.romulan.small.dhelan         { background-position: -83px -184px; }
+.ship-card.romulan.small.harpy          { background-position: -166px -184px; }
+.ship-card.romulan.small.griffin        { background-position: -250px -184px; }
+.ship-card.romulan.small.hathos         { background-position: -333px -184px; }
+.ship-card.romulan.small.vastam         { background-position: -416px -184px; }
+
+/* ==============================================
+   Romulan Frame Style (Green Glow)
+   ============================================== */
+
+.ship-frame.romulan {
+    border-color: rgba(16, 185, 129, 0.6);
+    box-shadow: 
+        0 4px 12px rgba(0, 0, 0, 0.5),
+        0 0 20px rgba(16, 185, 129, 0.3);
+}
+
+.ship-frame.romulan.selected {
+    border-color: #fbbf24;
+    box-shadow: 
+        0 4px 12px rgba(0, 0, 0, 0.5),
+        0 0 25px rgba(251, 191, 36, 0.4);
+}
+
+/* ==============================================
+   Romulan Ship Selection Glow
+   ============================================== */
+
+@keyframes romulan-ship-glow {
+    0%, 100% { box-shadow: 0 0 15px rgba(16, 185, 129, 0.4); }
+    50% { box-shadow: 0 0 25px rgba(16, 185, 129, 0.6); }
+}
+
+.ship-card.romulan.selected {
+    animation: romulan-ship-glow 2s ease-in-out infinite;
+}
+
+/* Cloaking effect for Romulan ships */
+@keyframes romulan-cloak {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+.ship-card.romulan.cloaking {
+    animation: romulan-cloak 1.5s ease-in-out infinite;
+}

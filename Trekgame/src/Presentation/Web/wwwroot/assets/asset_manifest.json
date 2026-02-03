@@ -1,0 +1,298 @@
+{
+  "version": "1.43.63",
+  "generatedAt": "2026-02-02",
+  "description": "TrekGame Asset Library",
+  "notes": {
+    "generated": "AI-generated base assets (claymation style)",
+    "sourced": "External assets from NASA, OpenGameArt, etc. for variety",
+    "guideline": "See docs/AssetSourcingGuide.md for external asset sourcing"
+  },
+  "structure": {
+    "factions/{faction_name}/": "Faction-specific assets (ships, structures, troops, UI)",
+    "universal/": "Shared assets (planets, stars, anomalies, characters)",
+    "universal/{category}/generated/": "Our AI-generated base assets",
+    "universal/{category}/sourced/": "External assets for variety"
+  },
+  "factions": {
+    "federation": {
+      "status": "partial",
+      "categories": {
+        "militaryships": {
+          "file": "federation_militaryships_spritesheet.png",
+          "grid": "6x6",
+          "count": 36,
+          "status": "complete"
+        },
+        "civilianships": {
+          "file": "federation_civilianships_spritesheet.png",
+          "grid": "6x6",
+          "count": 36,
+          "status": "complete"
+        },
+        "militarystructures": {
+          "file": "federation_militarystructures_spritesheet.png",
+          "grid": "6x6",
+          "count": 36,
+          "status": "complete"
+        },
+        "civilianstructures": {
+          "file": "federation_civilianstructures_spritesheet.png",
+          "grid": "6x6",
+          "count": 36,
+          "status": "complete"
+        },
+        "buildings": {
+          "file": "federation_buildings_spritesheet.png",
+          "grid": "8x6",
+          "count": 48,
+          "status": "complete"
+        },
+        "troops": {
+          "file": "federation_troops_spritesheet.png",
+          "grid": "6x6",
+          "count": 36,
+          "status": "complete"
+        },
+        "vehicles": {
+          "file": "federation_vehicles_spritesheet.png",
+          "grid": "4x4",
+          "count": 16,
+          "status": "complete"
+        },
+        "portraits": {
+          "file": "federation_portraits_spritesheet.png",
+          "grid": "6x6",
+          "count": 36,
+          "status": "complete"
+        },
+        "housesymbols": {
+          "grid": "8x6",
+          "count": 48,
+          "status": "pending"
+        },
+        "uielements": {
+          "grid": "6x6",
+          "count": 36,
+          "status": "pending"
+        },
+        "uiicons": {
+          "grid": "8x6",
+          "count": 48,
+          "status": "pending"
+        },
+        "effects": {
+          "grid": "6x6",
+          "count": 36,
+          "status": "pending"
+        }
+      }
+    },
+    "klingon": {
+      "status": "partial",
+      "categories": {
+        "buildings": {
+          "file": "klingon_buildings_spritesheet.png",
+          "grid": "8x6",
+          "count": 48,
+          "status": "complete"
+        },
+        "militaryships": {
+          "file": "klingon_militaryships_spritesheet.png",
+          "grid": "6x6",
+          "count": 36,
+          "status": "complete"
+        },
+        "portraits": {
+          "file": "klingon_portraits_spritesheet.png",
+          "grid": "6x6",
+          "count": 36,
+          "status": "complete"
+        }
+      }
+    },
+    "romulan": {
+      "status": "partial",
+      "categories": {
+        "buildings": {
+          "file": "romulan_buildings_spritesheet.png",
+          "grid": "8x6",
+          "count": 48,
+          "status": "complete"
+        },
+        "militaryships": {
+          "file": "romulan_militaryships_spritesheet.png",
+          "grid": "6x6",
+          "count": 36,
+          "status": "complete"
+        }
+      }
+    },
+    "cardassian": {
+      "status": "partial",
+      "categories": {
+        "buildings": {
+          "file": "cardassian_buildings_spritesheet.png",
+          "grid": "8x6",
+          "count": 48,
+          "status": "complete"
+        },
+        "militaryships": {
+          "file": "cardassian_militaryships_spritesheet.png",
+          "grid": "6x6",
+          "count": 36,
+          "status": "complete"
+        }
+      }
+    },
+    "ferengi": {
+      "status": "partial",
+      "categories": {
+        "buildings": {
+          "file": "ferengi_buildings_spritesheet.png",
+          "grid": "8x6",
+          "count": 48,
+          "status": "complete"
+        },
+        "militaryships": {
+          "file": "ferengi_militaryships_spritesheet.png",
+          "grid": "6x6",
+          "count": 36,
+          "status": "complete"
+        }
+      }
+    },
+    "borg": {
+      "status": "partial",
+      "categories": {
+        "buildings": {
+          "file": "borg_buildings_spritesheet.png",
+          "grid": "8x6",
+          "count": 48,
+          "status": "complete"
+        },
+        "militaryships": {
+          "file": "borg_militaryships_spritesheet.png",
+          "grid": "6x6",
+          "count": 36,
+          "status": "complete"
+        }
+      }
+    },
+    "dominion": {
+      "status": "partial",
+      "categories": {
+        "buildings": {
+          "file": "dominion_buildings_spritesheet.png",
+          "grid": "8x6",
+          "count": 48,
+          "status": "complete"
+        },
+        "militaryships": {
+          "file": "dominion_militaryships_spritesheet.png",
+          "grid": "6x6",
+          "count": 36,
+          "status": "complete"
+        }
+      }
+    },
+    "breen": {
+      "status": "pending"
+    },
+    "gorn": {
+      "status": "pending"
+    },
+    "andorian": {
+      "status": "pending"
+    },
+    "vulcan": {
+      "status": "pending"
+    }
+  },
+  "universal": {
+    "planets": {
+      "status": "complete",
+      "generated": {
+        "file": "planets_spritesheet.png",
+        "grid": "6x6",
+        "count": 36
+      },
+      "sourced": {
+        "target": "50-100+",
+        "sources": [
+          "NASA",
+          "OpenGameArt"
+        ]
+      }
+    },
+    "stars": {
+      "status": "complete",
+      "generated": {
+        "file": "stars_spritesheet.png",
+        "grid": "4x4",
+        "count": 16
+      },
+      "sourced": {
+        "target": "50+",
+        "sources": [
+          "NASA",
+          "ESA/Hubble"
+        ]
+      }
+    },
+    "anomalies": {
+      "status": "pending",
+      "grid": "6x6",
+      "count": 36
+    },
+    "galaxytiles": {
+      "status": "pending",
+      "grid": "6x6",
+      "count": 36
+    },
+    "systemelements": {
+      "status": "pending",
+      "grid": "6x6",
+      "count": 36
+    },
+    "factionsymbols": {
+      "status": "pending",
+      "grid": "4x4",
+      "count": 16
+    },
+    "factionleaders": {
+      "status": "complete",
+      "file": "generated/special_factionleaders.png",
+      "grid": "4x4",
+      "count": 16,
+      "note": "All 16 faction leaders for diplomacy/contacts"
+    },
+    "specialcharacters": {
+      "status": "pending",
+      "grid": "4x4",
+      "count": 16,
+      "note": "Q, Data, Khan, etc."
+    },
+    "eventcharacters": {
+      "status": "pending",
+      "grid": "6x6",
+      "count": 36,
+      "note": "Generic aliens for random events"
+    },
+    "special_characters": {
+      "status": "complete",
+      "generated": {
+        "file": "special_specialcharacters_spritesheet.png",
+        "grid": "4x4",
+        "count": 16
+      }
+    }
+  },
+  "summary": {
+    "totalFactions": 11,
+    "factionAssetsComplete": "Federation (8/12 categories)",
+    "universalComplete": "Planets, Stars, FactionLeaders",
+    "universalPending": "Anomalies, GalaxyTiles, SystemElements, FactionSymbols, SpecialCharacters, EventCharacters",
+    "generatedAssets": 332,
+    "targetWithSourced": "1000+ total variations"
+  }
+}

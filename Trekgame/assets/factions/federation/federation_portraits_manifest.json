@@ -1,0 +1,268 @@
+{
+  "factionName": "Federation",
+  "categoryName": "Portraits",
+  "grid": {
+    "columns": 6,
+    "rows": 6,
+    "totalAssets": 36,
+    "cellSize": 360,
+    "spriteWidth": 2160,
+    "spriteHeight": 2160
+  },
+  "spriteSheetPath": "federation_portraits.png",
+  "generatedAt": "2026-01-30T14:55:10.374Z",
+  "assets": [
+    {
+      "row": 0,
+      "col": 0,
+      "name": "Human Male Young Officer",
+      "type": "Portraits",
+      "promptUsed": ""
+    },
+    {
+      "row": 0,
+      "col": 1,
+      "name": "Human Male Admiral",
+      "type": "Portraits",
+      "promptUsed": ""
+    },
+    {
+      "row": 0,
+      "col": 2,
+      "name": "Human Male Civilian",
+      "type": "Portraits",
+      "promptUsed": ""
+    },
+    {
+      "row": 0,
+      "col": 3,
+      "name": "Human Male Scientist",
+      "type": "Portraits",
+      "promptUsed": ""
+    },
+    {
+      "row": 0,
+      "col": 4,
+      "name": "Human Female Young Officer",
+      "type": "Portraits",
+      "promptUsed": ""
+    },
+    {
+      "row": 0,
+      "col": 5,
+      "name": "Human Female Admiral",
+      "type": "Portraits",
+      "promptUsed": ""
+    },
+    {
+      "row": 1,
+      "col": 0,
+      "name": "Human Female Civilian",
+      "type": "Portraits",
+      "promptUsed": ""
+    },
+    {
+      "row": 1,
+      "col": 1,
+      "name": "Human Female Doctor",
+      "type": "Portraits",
+      "promptUsed": ""
+    },
+    {
+      "row": 1,
+      "col": 2,
+      "name": "Vulcan Male Young",
+      "type": "Portraits",
+      "promptUsed": ""
+    },
+    {
+      "row": 1,
+      "col": 3,
+      "name": "Vulcan Male Elder",
+      "type": "Portraits",
+      "promptUsed": ""
+    },
+    {
+      "row": 1,
+      "col": 4,
+      "name": "Vulcan Female Young",
+      "type": "Portraits",
+      "promptUsed": ""
+    },
+    {
+      "row": 1,
+      "col": 5,
+      "name": "Vulcan Female Elder",
+      "type": "Portraits",
+      "promptUsed": ""
+    },
+    {
+      "row": 2,
+      "col": 0,
+      "name": "Andorian Male",
+      "type": "Portraits",
+      "promptUsed": ""
+    },
+    {
+      "row": 2,
+      "col": 1,
+      "name": "Andorian Female",
+      "type": "Portraits",
+      "promptUsed": ""
+    },
+    {
+      "row": 2,
+      "col": 2,
+      "name": "Tellarite Male",
+      "type": "Portraits",
+      "promptUsed": ""
+    },
+    {
+      "row": 2,
+      "col": 3,
+      "name": "Tellarite Female",
+      "type": "Portraits",
+      "promptUsed": ""
+    },
+    {
+      "row": 2,
+      "col": 4,
+      "name": "Bolian Male",
+      "type": "Portraits",
+      "promptUsed": ""
+    },
+    {
+      "row": 2,
+      "col": 5,
+      "name": "Bolian Female",
+      "type": "Portraits",
+      "promptUsed": ""
+    },
+    {
+      "row": 3,
+      "col": 0,
+      "name": "Trill Male Joined",
+      "type": "Portraits",
+      "promptUsed": ""
+    },
+    {
+      "row": 3,
+      "col": 1,
+      "name": "Trill Female Joined",
+      "type": "Portraits",
+      "promptUsed": ""
+    },
+    {
+      "row": 3,
+      "col": 2,
+      "name": "Betazoid Male",
+      "type": "Portraits",
+      "promptUsed": ""
+    },
+    {
+      "row": 3,
+      "col": 3,
+      "name": "Betazoid Female",
+      "type": "Portraits",
+      "promptUsed": ""
+    },
+    {
+      "row": 3,
+      "col": 4,
+      "name": "Bajoran Male",
+      "type": "Portraits",
+      "promptUsed": ""
+    },
+    {
+      "row": 3,
+      "col": 5,
+      "name": "Bajoran Female",
+      "type": "Portraits",
+      "promptUsed": ""
+    },
+    {
+      "row": 4,
+      "col": 0,
+      "name": "Human Male Engineer",
+      "type": "Portraits",
+      "promptUsed": ""
+    },
+    {
+      "row": 4,
+      "col": 1,
+      "name": "Human Female Engineer",
+      "type": "Portraits",
+      "promptUsed": ""
+    },
+    {
+      "row": 4,
+      "col": 2,
+      "name": "Human Male Tactical",
+      "type": "Portraits",
+      "promptUsed": ""
+    },
+    {
+      "row": 4,
+      "col": 3,
+      "name": "Human Female Tactical",
+      "type": "Portraits",
+      "promptUsed": ""
+    },
+    {
+      "row": 4,
+      "col": 4,
+      "name": "Caitian Male",
+      "type": "Portraits",
+      "promptUsed": ""
+    },
+    {
+      "row": 4,
+      "col": 5,
+      "name": "Caitian Female",
+      "type": "Portraits",
+      "promptUsed": ""
+    },
+    {
+      "row": 5,
+      "col": 0,
+      "name": "Benzite Male",
+      "type": "Portraits",
+      "promptUsed": ""
+    },
+    {
+      "row": 5,
+      "col": 1,
+      "name": "Denobulan Male",
+      "type": "Portraits",
+      "promptUsed": ""
+    },
+    {
+      "row": 5,
+      "col": 2,
+      "name": "Saurian Male",
+      "type": "Portraits",
+      "promptUsed": ""
+    },
+    {
+      "row": 5,
+      "col": 3,
+      "name": "Efrosian Male",
+      "type": "Portraits",
+      "promptUsed": ""
+    },
+    {
+      "row": 5,
+      "col": 4,
+      "name": "Rigelian Female",
+      "type": "Portraits",
+      "promptUsed": ""
+    },
+    {
+      "row": 5,
+      "col": 5,
+      "name": "Ktarian Female",
+      "type": "Portraits",
+      "promptUsed": ""
+    }
+  ]
+}

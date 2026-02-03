@@ -1,0 +1,143 @@
+@namespace StarTrekGame.Web.Components.Galaxy
+
+@* SVG Group for a Star System - meant to be used inside an SVG element *@
+
+<g class="star-system-node @(IsSelected ? "selected" : "") @(IsHovered ? "hovered" : "") @(IsTargetMode ? "target-mode" : "")"
+   transform="translate(@X.ToString("F1"), @Y.ToString("F1"))"
+   @onclick="OnClick"
+   @onclick:stopPropagation="true"
+   @onmouseenter="OnMouseEnter"
+   @onmouseleave="OnMouseLeave"
+   style="cursor: pointer;">
+    
+    @* Territory indicator ring *@
+    @if (ControllingFactionId.HasValue)
+    {
+        <circle r="@(StarSize + 10)" 
+                fill="@FactionColor" 
+                fill-opacity="0.15"
+                stroke="@FactionColor"
+                stroke-width="1"
+                stroke-opacity="0.4"/>
+    }
+    
+    @* Selection animation ring *@
+    @if (IsSelected)
+    {
+        <circle r="@(StarSize + 14)" fill="none" stroke="#ffcc00" stroke-width="2" opacity="0.8">
+            <animate attributeName="r" values="@(StarSize + 12);@(StarSize + 16);@(StarSize + 12)" 
+                     dur="2s" repeatCount="indefinite"/>
+            <animate attributeName="stroke-opacity" values="1;0.5;1" 
+                     dur="2s" repeatCount="indefinite"/>
+        </circle>
+    }
+    
+    @* Star outer glow *@
+    <circle r="@(StarSize + 6)" fill="@StarColor" opacity="0.25" class="star-glow"/>
+    
+    @* Star core *@
+    <circle r="@StarSize" fill="@StarGradient" class="star-core">
+        <animate attributeName="r" values="@(StarSize - 0.5);@(StarSize + 0.5);@(StarSize - 0.5)" 
+                 dur="@(3 + (StarSize * 0.1))s" repeatCount="indefinite"/>
+    </circle>
+    
+    @* Colony indicator *@
+    @if (HasColony)
+    {
+        <g transform="translate(@(StarSize + 4), @(-StarSize - 4))">
+            <circle r="5" fill="#22cc44" stroke="#115522" stroke-width="1"/>
+            <circle r="2" fill="#88ff88"/>
+        </g>
+    }
+    
+    @* Fleet indicator *@
+    @if (FleetCount > 0)
+    {
+        <g transform="translate(@(-StarSize - 4), @(-StarSize - 4))">
+            <polygon points="0,-6 5,4 -5,4" fill="@FleetColor" stroke="@FleetStrokeColor" stroke-width="1"/>
+            @if (FleetCount > 1)
+            {
+                @((MarkupString)$"<text x=\"8\" y=\"2\" font-size=\"8\" fill=\"{FleetColor}\" font-weight=\"bold\">{FleetCount}</text>")
+            }
+        </g>
+    }
+    
+    @* System name label *@
+    @((MarkupString)$"<text y=\"{StarSize + 16}\" text-anchor=\"middle\" font-size=\"9\" font-family=\"'Segoe UI', sans-serif\" fill=\"{LabelColor}\" opacity=\"{LabelOpacity}\" class=\"system-label\">{Name}</text>")
+    
+    @* Danger indicator for enemy presence *@
+    @if (HasEnemyFleet)
+    {
+        <circle r="@(StarSize + 18)" fill="none" stroke="#ff4444" stroke-width="1" 
+                stroke-dasharray="4,4" opacity="0.6">
+            <animate attributeName="stroke-dashoffset" from="0" to="8" dur="1s" repeatCount="indefinite"/>
+        </circle>
+    }
+</g>
+
+@code {
+    [Parameter] public Guid SystemId { get; set; }
+    [Parameter] public string Name { get; set; } = "";
+    [Parameter] public double X { get; set; }
+    [Parameter] public double Y { get; set; }
+    [Parameter] public string? StarType { get; set; }
+    [Parameter] public Guid? ControllingFactionId { get; set; }
+    [Parameter] public string? FactionColor { get; set; }
+    [Parameter] public bool HasColony { get; set; }
+    [Parameter] public int FleetCount { get; set; }
+    [Parameter] public bool HasEnemyFleet { get; set; }
+    [Parameter] public bool IsPlayerOwned { get; set; }
+    [Parameter] public bool IsSelected { get; set; }
+    [Parameter] public bool IsHovered { get; set; }
+    [Parameter] public bool IsTargetMode { get; set; }
+    [Parameter] public bool ShowLabel { get; set; }
+    
+    [Parameter] public EventCallback<Guid> OnSystemClicked { get; set; }
+    [Parameter] public EventCallback<Guid> OnSystemHovered { get; set; }
+    [Parameter] public EventCallback OnSystemUnhovered { get; set; }
+    
+    // Computed properties
+    private int StarSize => StarType?.ToLower() switch
+    {
+        "blue" or "o" or "b" => 8,
+        "white" or "a" or "f" => 6,
+        "yellow" or "g" => 5,
+        "orange" or "k" => 5,
+        "red" or "m" => 4,
+        _ => 5
+    };
+    
+    private string StarColor => StarType?.ToLower() switch
+    {
+        "yellow" or "g" => "#ffdd44",
+        "orange" or "k" => "#ff8c00",
+        "red" or "m" => "#ff4444",
+        "blue" or "o" or "b" => "#4488ff",
+        "white" or "a" or "f" => "#ffffff",
+        _ => "#ffdd44"
+    };
+    
+    private string StarGradient => $"url(#grad-{StarType?.ToLower() ?? "yellow"})";
+    
+    private string LabelColor => ControllingFactionId.HasValue ? (FactionColor ?? "#99ccff") : "#99ccff";
+    
+    private string LabelOpacity => (IsSelected || IsHovered || ShowLabel) ? "1" : "0";
+    
+    private string FleetColor => IsPlayerOwned ? "#ffaa00" : "#ff6666";
+    private string FleetStrokeColor => IsPlayerOwned ? "#886600" : "#883333";
+    
+    private async Task OnClick()
+    {
+        await OnSystemClicked.InvokeAsync(SystemId);
+    }
+    
+    private async Task OnMouseEnter()
+    {
+        await OnSystemHovered.InvokeAsync(SystemId);
+    }
+    
+    private async Task OnMouseLeave()
+    {
+        await OnSystemUnhovered.InvokeAsync();
+    }
+}

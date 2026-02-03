@@ -1,0 +1,786 @@
+/* ================================================================
+   GALAXY VISUALS - Rich 4X Strategy Game Visual System
+   Inspired by Stellaris, Star Trek Infinite, and BOTF
+   ================================================================ */
+
+/* ================================================================
+   SECTION 1: GALAXY BACKGROUND & NEBULAE
+   Creates the rich, atmospheric space background
+   ================================================================ */
+
+.galaxy-wrapper {
+    --galaxy-bg-deep: #020208;
+    --galaxy-bg-mid: #080818;
+    --nebula-purple: rgba(120, 60, 180, 0.4);
+    --nebula-blue: rgba(40, 100, 200, 0.35);
+    --nebula-orange: rgba(200, 100, 40, 0.3);
+    --nebula-green: rgba(40, 150, 100, 0.25);
+    --nebula-pink: rgba(180, 80, 120, 0.3);
+}
+
+/* Rich layered space background */
+.space-background {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: 
+        /* Core galactic glow */
+        radial-gradient(ellipse 120% 80% at 50% 50%, 
+            rgba(60, 50, 80, 0.15) 0%, 
+            rgba(20, 20, 40, 0.1) 40%,
+            transparent 70%),
+        /* Deep space base */
+        radial-gradient(ellipse at 50% 50%, 
+            var(--galaxy-bg-mid) 0%, 
+            var(--galaxy-bg-deep) 100%);
+    pointer-events: none;
+    overflow: hidden;
+}
+
+/* Dynamic nebula clouds - multiple layered elements */
+.nebula {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    mix-blend-mode: screen;
+}
+
+/* Large purple nebula - primary */
+.nebula-1 {
+    top: 15%;
+    left: 25%;
+    width: 500px;
+    height: 400px;
+    background: radial-gradient(ellipse at 40% 40%,
+        rgba(140, 80, 200, 0.5) 0%,
+        rgba(100, 50, 160, 0.3) 30%,
+        rgba(60, 30, 120, 0.15) 60%,
+        transparent 80%);
+    filter: blur(40px);
+    opacity: 0.7;
+    animation: nebula-drift-1 120s ease-in-out infinite;
+}
+
+/* Blue nebula - secondary */
+.nebula-2 {
+    top: 55%;
+    left: 55%;
+    width: 450px;
+    height: 350px;
+    background: radial-gradient(ellipse at 60% 50%,
+        rgba(60, 140, 220, 0.5) 0%,
+        rgba(40, 100, 180, 0.3) 35%,
+        rgba(20, 60, 140, 0.15) 65%,
+        transparent 85%);
+    filter: blur(35px);
+    opacity: 0.65;
+    animation: nebula-drift-2 150s ease-in-out infinite;
+}
+
+/* Orange/gold nebula */
+.nebula-3 {
+    top: 35%;
+    left: 5%;
+    width: 400px;
+    height: 450px;
+    background: radial-gradient(ellipse at 50% 60%,
+        rgba(220, 140, 60, 0.45) 0%,
+        rgba(180, 100, 40, 0.25) 40%,
+        rgba(140, 60, 20, 0.1) 70%,
+        transparent 90%);
+    filter: blur(45px);
+    opacity: 0.6;
+    animation: nebula-drift-3 180s ease-in-out infinite;
+}
+
+/* Additional nebulae for richness */
+.nebula-4 {
+    position: absolute;
+    top: 70%;
+    left: 20%;
+    width: 350px;
+    height: 280px;
+    background: radial-gradient(ellipse at 45% 55%,
+        rgba(180, 100, 140, 0.4) 0%,
+        rgba(140, 60, 100, 0.2) 45%,
+        transparent 80%);
+    filter: blur(50px);
+    opacity: 0.5;
+    pointer-events: none;
+    mix-blend-mode: screen;
+    animation: nebula-drift-4 200s ease-in-out infinite;
+}
+
+.nebula-5 {
+    position: absolute;
+    top: 10%;
+    left: 70%;
+    width: 380px;
+    height: 320px;
+    background: radial-gradient(ellipse at 55% 45%,
+        rgba(60, 180, 140, 0.35) 0%,
+        rgba(40, 140, 100, 0.2) 40%,
+        transparent 75%);
+    filter: blur(42px);
+    opacity: 0.55;
+    pointer-events: none;
+    mix-blend-mode: screen;
+    animation: nebula-drift-5 160s ease-in-out infinite;
+}
+
+/* Subtle nebula drift animations */
+@keyframes nebula-drift-1 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    25% { transform: translate(20px, -15px) scale(1.02); }
+    50% { transform: translate(-10px, 25px) scale(0.98); }
+    75% { transform: translate(-25px, -10px) scale(1.01); }
+}
+
+@keyframes nebula-drift-2 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(-30px, 20px) scale(1.03); }
+    66% { transform: translate(25px, -15px) scale(0.97); }
+}
+
+@keyframes nebula-drift-3 {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    50% { transform: translate(15px, 30px) rotate(3deg); }
+}
+
+@keyframes nebula-drift-4 {
+    0%, 100% { transform: translate(0, 0); opacity: 0.5; }
+    50% { transform: translate(-20px, -25px); opacity: 0.6; }
+}
+
+@keyframes nebula-drift-5 {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(30px, 15px); }
+}
+
+/* Dense star field layer */
+.stars-layer {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none;
+}
+
+/* Create multiple star layers with CSS */
+.stars-layer::before,
+.stars-layer::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+}
+
+/* Bright stars layer */
+.stars-layer::before {
+    background-image: 
+        radial-gradient(2px 2px at 5% 15%, rgba(255,255,255,0.9), transparent),
+        radial-gradient(2px 2px at 12% 45%, rgba(200,220,255,0.8), transparent),
+        radial-gradient(1.5px 1.5px at 18% 75%, rgba(255,240,200,0.7), transparent),
+        radial-gradient(2px 2px at 25% 25%, rgba(255,255,255,0.85), transparent),
+        radial-gradient(1.5px 1.5px at 32% 60%, rgba(200,200,255,0.75), transparent),
+        radial-gradient(2px 2px at 38% 10%, rgba(255,220,180,0.8), transparent),
+        radial-gradient(1.5px 1.5px at 45% 85%, rgba(255,255,255,0.7), transparent),
+        radial-gradient(2px 2px at 52% 35%, rgba(180,200,255,0.85), transparent),
+        radial-gradient(1.5px 1.5px at 58% 55%, rgba(255,255,220,0.75), transparent),
+        radial-gradient(2px 2px at 65% 20%, rgba(255,255,255,0.9), transparent),
+        radial-gradient(1.5px 1.5px at 72% 70%, rgba(220,200,255,0.7), transparent),
+        radial-gradient(2px 2px at 78% 40%, rgba(255,240,220,0.8), transparent),
+        radial-gradient(1.5px 1.5px at 85% 90%, rgba(255,255,255,0.75), transparent),
+        radial-gradient(2px 2px at 92% 15%, rgba(200,220,255,0.85), transparent),
+        radial-gradient(1.5px 1.5px at 95% 65%, rgba(255,255,200,0.7), transparent);
+    opacity: 0.8;
+}
+
+/* Dim stars layer */
+.stars-layer::after {
+    background-image: 
+        radial-gradient(1px 1px at 3% 30%, rgba(255,255,255,0.5), transparent),
+        radial-gradient(1px 1px at 8% 55%, rgba(200,200,255,0.4), transparent),
+        radial-gradient(1px 1px at 15% 12%, rgba(255,255,255,0.45), transparent),
+        radial-gradient(1px 1px at 22% 78%, rgba(255,240,220,0.4), transparent),
+        radial-gradient(1px 1px at 28% 42%, rgba(255,255,255,0.5), transparent),
+        radial-gradient(1px 1px at 35% 88%, rgba(220,220,255,0.4), transparent),
+        radial-gradient(1px 1px at 42% 22%, rgba(255,255,255,0.45), transparent),
+        radial-gradient(1px 1px at 48% 68%, rgba(255,220,200,0.4), transparent),
+        radial-gradient(1px 1px at 55% 8%, rgba(255,255,255,0.5), transparent),
+        radial-gradient(1px 1px at 62% 48%, rgba(200,220,255,0.4), transparent),
+        radial-gradient(1px 1px at 68% 82%, rgba(255,255,255,0.45), transparent),
+        radial-gradient(1px 1px at 75% 28%, rgba(255,240,200,0.4), transparent),
+        radial-gradient(1px 1px at 82% 58%, rgba(255,255,255,0.5), transparent),
+        radial-gradient(1px 1px at 88% 5%, rgba(220,200,255,0.4), transparent),
+        radial-gradient(1px 1px at 95% 38%, rgba(255,255,255,0.45), transparent);
+    opacity: 0.6;
+}
+
+/* ================================================================
+   SECTION 2: TERRITORY VISUALIZATION
+   Soft glowing faction borders like Stellaris/Star Trek Infinite
+   ================================================================ */
+
+/* Territory fills rendered in SVG */
+.territory-fill {
+    opacity: 0.25;
+    transition: opacity 0.3s ease;
+}
+
+.territory-fill:hover {
+    opacity: 0.35;
+}
+
+/* Territory border glow */
+.territory-border {
+    fill: none;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    opacity: 0.6;
+    filter: url(#territory-glow);
+}
+
+/* Inner territory glow for depth */
+.territory-inner-glow {
+    opacity: 0.15;
+}
+
+/* Faction-specific territory colors */
+.territory-federation { 
+    fill: rgba(80, 120, 200, 0.3); 
+    stroke: rgba(100, 150, 255, 0.8);
+}
+.territory-klingon { 
+    fill: rgba(180, 60, 60, 0.3); 
+    stroke: rgba(220, 80, 80, 0.8);
+}
+.territory-romulan { 
+    fill: rgba(60, 140, 100, 0.3); 
+    stroke: rgba(80, 180, 120, 0.8);
+}
+.territory-cardassian { 
+    fill: rgba(160, 140, 60, 0.3); 
+    stroke: rgba(200, 180, 80, 0.8);
+}
+.territory-ferengi { 
+    fill: rgba(200, 140, 60, 0.3); 
+    stroke: rgba(255, 180, 80, 0.8);
+}
+.territory-borg { 
+    fill: rgba(60, 160, 60, 0.3); 
+    stroke: rgba(80, 200, 80, 0.8);
+}
+
+/* ================================================================
+   SECTION 3: ENHANCED STAR RENDERING
+   Detailed star graphics with coronas, flares, and type variations
+   ================================================================ */
+
+/* Base star system group */
+.star-system {
+    cursor: pointer;
+    transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.star-system:hover {
+    transform: scale(1.15);
+    filter: brightness(1.2);
+}
+
+.star-system.selected {
+    transform: scale(1.2);
+}
+
+/* Star corona effect */
+.star-corona {
+    opacity: 0.4;
+    animation: corona-pulse 4s ease-in-out infinite;
+}
+
+@keyframes corona-pulse {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.1); }
+}
+
+/* Star flare rays */
+.star-flare {
+    opacity: 0.3;
+    transform-origin: center;
+}
+
+.star-flare-1 { animation: flare-rotate 30s linear infinite; }
+.star-flare-2 { animation: flare-rotate 45s linear infinite reverse; }
+
+@keyframes flare-rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Star type specific styling */
+.star-yellow .star-body {
+    fill: url(#grad-yellow);
+    filter: url(#star-glow-yellow);
+}
+
+.star-orange .star-body {
+    fill: url(#grad-orange);
+    filter: url(#star-glow-orange);
+}
+
+.star-red .star-body {
+    fill: url(#grad-red);
+    filter: url(#star-glow-red);
+}
+
+.star-blue .star-body {
+    fill: url(#grad-blue);
+    filter: url(#star-glow-blue);
+}
+
+.star-white .star-body {
+    fill: url(#grad-white);
+    filter: url(#star-glow-white);
+}
+
+/* Binary star system */
+.star-binary .star-secondary {
+    animation: binary-orbit 8s linear infinite;
+    transform-origin: center;
+}
+
+@keyframes binary-orbit {
+    from { transform: rotate(0deg) translateX(8px); }
+    to { transform: rotate(360deg) translateX(8px); }
+}
+
+/* Red giant special */
+.star-red-giant .star-body {
+    animation: giant-pulse 6s ease-in-out infinite;
+}
+
+@keyframes giant-pulse {
+    0%, 100% { r: 14; opacity: 1; }
+    50% { r: 16; opacity: 0.9; }
+}
+
+/* Neutron star - rapid spinning effect */
+.star-neutron {
+    animation: neutron-spin 0.5s linear infinite;
+}
+
+@keyframes neutron-spin {
+    from { filter: hue-rotate(0deg); }
+    to { filter: hue-rotate(360deg); }
+}
+
+/* Black hole with accretion disk */
+.black-hole-group .accretion-disk {
+    fill: none;
+    stroke-width: 3;
+    opacity: 0.7;
+    animation: accretion-spin 10s linear infinite;
+    transform-origin: center;
+}
+
+@keyframes accretion-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.black-hole-group .event-horizon {
+    fill: #000;
+}
+
+.black-hole-group .gravitational-lensing {
+    opacity: 0.3;
+    animation: lens-warp 3s ease-in-out infinite;
+}
+
+@keyframes lens-warp {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+/* ================================================================
+   SECTION 4: HYPERLANE/WARP LANE VISUALIZATION
+   Visible trade/travel routes between systems
+   ================================================================ */
+
+.hyperlane {
+    stroke-linecap: round;
+    transition: all 0.3s ease;
+}
+
+/* Default hyperlane appearance */
+.hyperlane-default {
+    stroke: rgba(80, 100, 140, 0.4);
+    stroke-width: 1;
+}
+
+/* Active/highlighted hyperlane */
+.hyperlane.active,
+.hyperlane:hover {
+    stroke: rgba(100, 180, 255, 0.8);
+    stroke-width: 2;
+    filter: url(#lane-glow);
+}
+
+/* Hyperlane with traffic animation */
+.hyperlane-animated {
+    stroke-dasharray: 8 4;
+    animation: lane-flow 2s linear infinite;
+}
+
+@keyframes lane-flow {
+    from { stroke-dashoffset: 0; }
+    to { stroke-dashoffset: -24; }
+}
+
+/* Warp lane glow effect */
+.warp-lane-glow {
+    stroke: rgba(100, 150, 255, 0.3);
+    stroke-width: 6;
+    filter: blur(3px);
+}
+
+/* ================================================================
+   SECTION 5: ANOMALY VISUALS
+   Nebulae, asteroid fields, wormholes on the galaxy map
+   ================================================================ */
+
+/* Nebula marker on map */
+.map-nebula {
+    opacity: 0.6;
+}
+
+.map-nebula .nebula-cloud {
+    animation: nebula-swirl 20s ease-in-out infinite;
+}
+
+@keyframes nebula-swirl {
+    0%, 100% { transform: scale(1) rotate(0deg); }
+    50% { transform: scale(1.05) rotate(5deg); }
+}
+
+/* Asteroid field marker */
+.map-asteroid-field {
+    opacity: 0.7;
+}
+
+.map-asteroid-field .asteroid {
+    animation: asteroid-drift 10s ease-in-out infinite;
+}
+
+.map-asteroid-field .asteroid:nth-child(2) { animation-delay: -2s; }
+.map-asteroid-field .asteroid:nth-child(3) { animation-delay: -4s; }
+.map-asteroid-field .asteroid:nth-child(4) { animation-delay: -6s; }
+
+@keyframes asteroid-drift {
+    0%, 100% { transform: translate(0, 0); }
+    25% { transform: translate(2px, -1px); }
+    50% { transform: translate(-1px, 2px); }
+    75% { transform: translate(-2px, -1px); }
+}
+
+/* Wormhole marker */
+.map-wormhole {
+    animation: wormhole-pulse 3s ease-in-out infinite;
+}
+
+@keyframes wormhole-pulse {
+    0%, 100% { transform: scale(1); opacity: 0.8; }
+    50% { transform: scale(1.1); opacity: 1; }
+}
+
+.map-wormhole .wormhole-spiral {
+    animation: wormhole-spin 8s linear infinite;
+    transform-origin: center;
+}
+
+@keyframes wormhole-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* ================================================================
+   SECTION 6: FLEET INDICATORS
+   Rich fleet visualization on galaxy map
+   ================================================================ */
+
+.fleet-indicator {
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.fleet-indicator:hover {
+    transform: scale(1.2);
+}
+
+.fleet-indicator .fleet-icon {
+    fill: currentColor;
+}
+
+.fleet-indicator .fleet-count {
+    font-size: 8px;
+    font-weight: bold;
+    fill: white;
+    text-anchor: middle;
+}
+
+/* Fleet movement trail */
+.fleet-trail {
+    stroke-dasharray: 6 3;
+    animation: trail-flow 1s linear infinite;
+}
+
+@keyframes trail-flow {
+    from { stroke-dashoffset: 0; }
+    to { stroke-dashoffset: -18; }
+}
+
+/* Combat indicator */
+.combat-indicator {
+    animation: combat-flash 0.5s ease-in-out infinite;
+}
+
+@keyframes combat-flash {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+/* ================================================================
+   SECTION 7: COLONY INDICATORS
+   Visual representation of colonies on galaxy map
+   ================================================================ */
+
+.colony-indicator {
+    transition: transform 0.2s ease;
+}
+
+.colony-indicator:hover {
+    transform: scale(1.15);
+}
+
+/* Colony size rings */
+.colony-ring {
+    fill: none;
+    stroke-width: 1.5;
+    opacity: 0.6;
+}
+
+.colony-ring-inner { stroke-dasharray: 4 2; }
+.colony-ring-outer { stroke-dasharray: 2 2; }
+
+/* Colony development level indicator */
+.colony-level {
+    font-size: 7px;
+    font-weight: bold;
+    text-anchor: middle;
+    fill: white;
+}
+
+/* ================================================================
+   SECTION 8: SELECTION & INTERACTION EFFECTS
+   ================================================================ */
+
+/* System selection ring */
+.selection-ring {
+    fill: none;
+    stroke: #ffcc00;
+    stroke-width: 2;
+    stroke-dasharray: 8 4;
+    animation: selection-rotate 4s linear infinite;
+    transform-origin: center;
+}
+
+@keyframes selection-rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Hover highlight */
+.system-hover-highlight {
+    fill: rgba(255, 255, 255, 0.1);
+    stroke: rgba(255, 255, 255, 0.3);
+    stroke-width: 1;
+}
+
+/* Range indicator for fleet movement */
+.range-indicator {
+    fill: rgba(100, 200, 255, 0.1);
+    stroke: rgba(100, 200, 255, 0.4);
+    stroke-width: 1;
+    stroke-dasharray: 10 5;
+}
+
+/* ================================================================
+   SECTION 9: MINIMAP ENHANCEMENTS
+   ================================================================ */
+
+.minimap {
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+    width: 200px;
+    height: 200px;
+    background: rgba(0, 0, 20, 0.9);
+    border: 2px solid rgba(255, 153, 0, 0.6);
+    border-radius: 8px;
+    overflow: hidden;
+    z-index: 50;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+}
+
+.minimap::before {
+    content: 'TACTICAL';
+    position: absolute;
+    top: 4px;
+    left: 8px;
+    font-size: 8px;
+    color: rgba(255, 153, 0, 0.8);
+    letter-spacing: 2px;
+    font-weight: 600;
+    z-index: 1;
+}
+
+.minimap svg {
+    width: 100%;
+    height: 100%;
+}
+
+/* Minimap territory fills */
+.minimap .territory-fill {
+    opacity: 0.4;
+}
+
+/* Minimap viewport indicator */
+.minimap .viewport-indicator {
+    fill: none;
+    stroke: #ffcc00;
+    stroke-width: 2;
+}
+
+/* ================================================================
+   SECTION 10: UI PANEL FRAMES
+   Styled frames for all panels matching 4X aesthetic
+   ================================================================ */
+
+.game-panel {
+    background: linear-gradient(180deg, 
+        rgba(20, 25, 40, 0.95) 0%, 
+        rgba(10, 15, 25, 0.98) 100%);
+    border: 1px solid rgba(100, 120, 160, 0.4);
+    border-radius: 8px;
+    box-shadow: 
+        0 0 20px rgba(0, 0, 0, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    overflow: hidden;
+}
+
+.game-panel-header {
+    background: linear-gradient(90deg, 
+        rgba(255, 153, 0, 0.9) 0%, 
+        rgba(255, 200, 100, 0.8) 50%,
+        rgba(255, 153, 0, 0.9) 100%);
+    padding: 8px 16px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+}
+
+.game-panel-header h3 {
+    margin: 0;
+    color: #000;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.game-panel-content {
+    padding: 12px;
+}
+
+/* Corner decorations for panels */
+.panel-corner {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border-color: rgba(255, 153, 0, 0.6);
+    border-style: solid;
+}
+
+.panel-corner-tl { top: 0; left: 0; border-width: 2px 0 0 2px; }
+.panel-corner-tr { top: 0; right: 0; border-width: 2px 2px 0 0; }
+.panel-corner-bl { bottom: 0; left: 0; border-width: 0 0 2px 2px; }
+.panel-corner-br { bottom: 0; right: 0; border-width: 0 2px 2px 0; }
+
+/* ================================================================
+   SECTION 11: GRID OVERLAY (optional)
+   Subtle sector grid for tactical feel
+   ================================================================ */
+
+.sector-grid {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none;
+    opacity: 0.08;
+    background-image: 
+        linear-gradient(rgba(100, 150, 200, 0.3) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(100, 150, 200, 0.3) 1px, transparent 1px);
+    background-size: 100px 100px;
+}
+
+/* ================================================================
+   SECTION 12: LOADING & TRANSITIONS
+   ================================================================ */
+
+.galaxy-loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.galaxy-loading .spinner {
+    width: 60px;
+    height: 60px;
+    border: 3px solid rgba(255, 153, 0, 0.3);
+    border-top-color: #ff9900;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.galaxy-loading .loading-text {
+    margin-top: 16px;
+    color: #ff9900;
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+}
+
+/* Fade in animation for galaxy elements */
+.fade-in {
+    animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* ================================================================
+   SECTION 13: RESPONSIVE ADJUSTMENTS
+   ================================================================ */
+
+@media (max-width: 1200px) {
+    .nebula { transform: scale(0.8); }
+    .minimap { width: 160px; height: 160px; }
+}
+
+@media (max-width: 900px) {
+    .nebula { display: none; }
+    .stars-layer { opacity: 0.4; }
+    .minimap { width: 120px; height: 120px; }
+}

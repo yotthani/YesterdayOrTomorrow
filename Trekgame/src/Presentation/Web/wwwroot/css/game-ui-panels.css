@@ -1,0 +1,836 @@
+/* ================================================================
+   GAME UI PANELS - Rich 4X Strategy Game Interface System
+   Inspired by Stellaris, BOTF, and Star Trek New Horizons
+   ================================================================ */
+
+/* ================================================================
+   SECTION 1: BASE PANEL SYSTEM
+   Foundation for all UI panels
+   ================================================================ */
+
+:root {
+    /* Panel colors */
+    --panel-bg-primary: rgba(12, 16, 28, 0.96);
+    --panel-bg-secondary: rgba(18, 24, 40, 0.94);
+    --panel-bg-tertiary: rgba(8, 12, 22, 0.98);
+    --panel-border: rgba(80, 110, 160, 0.5);
+    --panel-border-highlight: rgba(120, 160, 220, 0.7);
+    --panel-glow: rgba(60, 100, 180, 0.3);
+    
+    /* Header colors */
+    --header-bg-primary: linear-gradient(90deg, 
+        rgba(80, 120, 180, 0.9) 0%, 
+        rgba(60, 100, 160, 0.8) 50%,
+        rgba(80, 120, 180, 0.9) 100%);
+    --header-bg-accent: linear-gradient(90deg, 
+        rgba(255, 153, 0, 0.9) 0%, 
+        rgba(255, 180, 80, 0.85) 50%,
+        rgba(255, 153, 0, 0.9) 100%);
+    
+    /* Text colors */
+    --text-primary: rgba(220, 230, 250, 0.95);
+    --text-secondary: rgba(160, 180, 210, 0.85);
+    --text-accent: #ffcc00;
+    --text-highlight: #66aaff;
+    
+    /* Status colors */
+    --status-good: #44dd66;
+    --status-warning: #ffaa33;
+    --status-danger: #ff4444;
+    --status-info: #44aaff;
+}
+
+/* Base panel container */
+.ui-panel {
+    background: var(--panel-bg-primary);
+    border: 1px solid var(--panel-border);
+    border-radius: 6px;
+    box-shadow: 
+        0 4px 20px rgba(0, 0, 0, 0.5),
+        0 0 40px var(--panel-glow),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    overflow: hidden;
+    position: relative;
+}
+
+/* Panel with glowing edge effect */
+.ui-panel::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(100, 150, 220, 0.5) 20%,
+        rgba(100, 150, 220, 0.5) 80%,
+        transparent 100%);
+}
+
+/* Panel header */
+.ui-panel-header {
+    background: var(--header-bg-primary);
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+    position: relative;
+}
+
+.ui-panel-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(255, 255, 255, 0.2) 50%,
+        transparent 100%);
+}
+
+.ui-panel-title {
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+    margin: 0;
+}
+
+.ui-panel-subtitle {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 10px;
+    letter-spacing: 1px;
+    margin-left: 12px;
+}
+
+/* Panel content area */
+.ui-panel-content {
+    padding: 16px;
+    color: var(--text-primary);
+}
+
+/* Panel footer */
+.ui-panel-footer {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 10px 16px;
+    border-top: 1px solid rgba(100, 130, 180, 0.2);
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+/* ================================================================
+   SECTION 2: PANEL VARIANTS
+   Different panel styles for different contexts
+   ================================================================ */
+
+/* Accent panel (orange header) */
+.ui-panel-accent .ui-panel-header {
+    background: var(--header-bg-accent);
+}
+
+.ui-panel-accent .ui-panel-title {
+    color: #000;
+    text-shadow: none;
+}
+
+/* Dark panel variant */
+.ui-panel-dark {
+    background: var(--panel-bg-tertiary);
+    border-color: rgba(60, 80, 120, 0.4);
+}
+
+/* Transparent panel */
+.ui-panel-transparent {
+    background: rgba(10, 15, 30, 0.8);
+    backdrop-filter: blur(10px);
+}
+
+/* Compact panel */
+.ui-panel-compact .ui-panel-header {
+    padding: 8px 12px;
+}
+
+.ui-panel-compact .ui-panel-content {
+    padding: 12px;
+}
+
+/* ================================================================
+   SECTION 3: INFORMATION DISPLAY COMPONENTS
+   Stat bars, resource displays, etc.
+   ================================================================ */
+
+/* Stat row */
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(80, 100, 140, 0.2);
+}
+
+.stat-row:last-child {
+    border-bottom: none;
+}
+
+.stat-label {
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.stat-value {
+    color: var(--text-primary);
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'Roboto Mono', 'Consolas', monospace;
+}
+
+.stat-value.positive { color: var(--status-good); }
+.stat-value.negative { color: var(--status-danger); }
+.stat-value.warning { color: var(--status-warning); }
+
+/* Resource bar */
+.resource-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 0;
+}
+
+.resource-icon {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.resource-icon svg {
+    width: 16px;
+    height: 16px;
+}
+
+.resource-amount {
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'Roboto Mono', monospace;
+    min-width: 60px;
+}
+
+.resource-change {
+    font-size: 11px;
+    margin-left: 4px;
+}
+
+.resource-change.positive { color: var(--status-good); }
+.resource-change.positive::before { content: '+'; }
+.resource-change.negative { color: var(--status-danger); }
+
+/* Progress bar */
+.progress-bar {
+    position: relative;
+    height: 8px;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid rgba(80, 100, 140, 0.3);
+}
+
+.progress-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.3s ease;
+    position: relative;
+}
+
+.progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 50%;
+    background: linear-gradient(180deg, rgba(255,255,255,0.2), transparent);
+    border-radius: 3px 3px 0 0;
+}
+
+.progress-fill-primary { background: linear-gradient(90deg, #3388ff, #66aaff); }
+.progress-fill-success { background: linear-gradient(90deg, #33aa55, #55cc77); }
+.progress-fill-warning { background: linear-gradient(90deg, #dd8800, #ffaa33); }
+.progress-fill-danger { background: linear-gradient(90deg, #cc3333, #ff5555); }
+.progress-fill-research { background: linear-gradient(90deg, #8844cc, #aa66ff); }
+.progress-fill-production { background: linear-gradient(90deg, #cc8844, #ffaa66); }
+
+.progress-label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 9px;
+    font-weight: 600;
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+    white-space: nowrap;
+}
+
+/* ================================================================
+   SECTION 4: LIST COMPONENTS
+   Scrollable lists, item displays
+   ================================================================ */
+
+/* List container */
+.ui-list {
+    max-height: 300px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+/* List item */
+.ui-list-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 12px;
+    background: rgba(30, 40, 60, 0.5);
+    border: 1px solid rgba(60, 80, 120, 0.3);
+    border-radius: 4px;
+    margin-bottom: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.ui-list-item:hover {
+    background: rgba(50, 70, 100, 0.6);
+    border-color: rgba(80, 110, 160, 0.5);
+}
+
+.ui-list-item.selected {
+    background: rgba(60, 100, 160, 0.4);
+    border-color: var(--text-accent);
+}
+
+.ui-list-item-icon {
+    width: 36px;
+    height: 36px;
+    margin-right: 12px;
+    border-radius: 4px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.ui-list-item-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.ui-list-item-title {
+    color: var(--text-primary);
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ui-list-item-subtitle {
+    color: var(--text-secondary);
+    font-size: 11px;
+}
+
+.ui-list-item-badge {
+    padding: 3px 8px;
+    background: rgba(100, 150, 200, 0.3);
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-highlight);
+    margin-left: 8px;
+}
+
+/* ================================================================
+   SECTION 5: TAB SYSTEM
+   Tabbed content panels
+   ================================================================ */
+
+.ui-tabs {
+    display: flex;
+    gap: 2px;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 4px;
+    border-radius: 4px;
+}
+
+.ui-tab {
+    padding: 8px 16px;
+    background: rgba(40, 50, 70, 0.5);
+    border: 1px solid transparent;
+    border-radius: 4px;
+    color: var(--text-secondary);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.ui-tab:hover {
+    background: rgba(60, 80, 110, 0.6);
+    color: var(--text-primary);
+}
+
+.ui-tab.active {
+    background: rgba(80, 120, 180, 0.5);
+    border-color: rgba(100, 150, 220, 0.5);
+    color: #fff;
+}
+
+.ui-tab-content {
+    padding: 16px 0;
+}
+
+/* ================================================================
+   SECTION 6: BUTTONS
+   Action buttons in various styles
+   ================================================================ */
+
+.ui-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.ui-btn::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 50%;
+    background: linear-gradient(180deg, rgba(255,255,255,0.15), transparent);
+    pointer-events: none;
+}
+
+/* Primary button */
+.ui-btn-primary {
+    background: linear-gradient(180deg, #ff9900 0%, #dd7700 100%);
+    color: #000;
+    border: 1px solid #ffaa33;
+}
+
+.ui-btn-primary:hover {
+    background: linear-gradient(180deg, #ffaa33 0%, #ee8800 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255, 153, 0, 0.4);
+}
+
+.ui-btn-primary:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(255, 153, 0, 0.3);
+}
+
+/* Secondary button */
+.ui-btn-secondary {
+    background: linear-gradient(180deg, rgba(80, 100, 140, 0.8) 0%, rgba(60, 80, 120, 0.8) 100%);
+    color: #fff;
+    border: 1px solid rgba(100, 130, 180, 0.5);
+}
+
+.ui-btn-secondary:hover {
+    background: linear-gradient(180deg, rgba(100, 130, 180, 0.9) 0%, rgba(80, 110, 160, 0.9) 100%);
+    border-color: rgba(120, 160, 220, 0.6);
+}
+
+/* Danger button */
+.ui-btn-danger {
+    background: linear-gradient(180deg, #cc3333 0%, #aa2222 100%);
+    color: #fff;
+    border: 1px solid #dd4444;
+}
+
+.ui-btn-danger:hover {
+    background: linear-gradient(180deg, #dd4444 0%, #bb3333 100%);
+}
+
+/* Success button */
+.ui-btn-success {
+    background: linear-gradient(180deg, #33aa55 0%, #228844 100%);
+    color: #fff;
+    border: 1px solid #44bb66;
+}
+
+.ui-btn-success:hover {
+    background: linear-gradient(180deg, #44bb66 0%, #33aa55 100%);
+}
+
+/* Ghost button */
+.ui-btn-ghost {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid rgba(80, 100, 140, 0.4);
+}
+
+.ui-btn-ghost:hover {
+    background: rgba(60, 80, 120, 0.3);
+    color: var(--text-primary);
+    border-color: rgba(100, 130, 180, 0.5);
+}
+
+/* Icon button */
+.ui-btn-icon {
+    padding: 8px;
+    width: 36px;
+    height: 36px;
+}
+
+/* Button sizes */
+.ui-btn-sm {
+    padding: 6px 12px;
+    font-size: 10px;
+}
+
+.ui-btn-lg {
+    padding: 14px 28px;
+    font-size: 14px;
+}
+
+/* ================================================================
+   SECTION 7: FORM ELEMENTS
+   Inputs, selects, checkboxes
+   ================================================================ */
+
+/* Input field */
+.ui-input {
+    width: 100%;
+    padding: 10px 14px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(80, 100, 140, 0.4);
+    border-radius: 4px;
+    color: var(--text-primary);
+    font-size: 13px;
+    transition: all 0.2s ease;
+}
+
+.ui-input:focus {
+    outline: none;
+    border-color: var(--text-highlight);
+    box-shadow: 0 0 0 2px rgba(100, 170, 255, 0.2);
+}
+
+.ui-input::placeholder {
+    color: rgba(150, 170, 200, 0.5);
+}
+
+/* Select field */
+.ui-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2399aabb' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 36px;
+}
+
+/* Checkbox */
+.ui-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.ui-checkbox-input {
+    width: 18px;
+    height: 18px;
+    appearance: none;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(80, 100, 140, 0.5);
+    border-radius: 3px;
+    cursor: pointer;
+    position: relative;
+}
+
+.ui-checkbox-input:checked {
+    background: var(--text-highlight);
+    border-color: var(--text-highlight);
+}
+
+.ui-checkbox-input:checked::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #000;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.ui-checkbox-label {
+    color: var(--text-primary);
+    font-size: 13px;
+}
+
+/* ================================================================
+   SECTION 8: TOOLTIPS
+   Hover information displays
+   ================================================================ */
+
+.ui-tooltip {
+    position: absolute;
+    z-index: 1000;
+    max-width: 300px;
+    background: var(--panel-bg-tertiary);
+    border: 1px solid var(--panel-border-highlight);
+    border-radius: 6px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+    pointer-events: none;
+    animation: tooltip-fade-in 0.15s ease;
+}
+
+@keyframes tooltip-fade-in {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.ui-tooltip-header {
+    padding: 8px 12px;
+    background: rgba(60, 80, 120, 0.5);
+    border-bottom: 1px solid rgba(80, 100, 140, 0.3);
+    border-radius: 5px 5px 0 0;
+}
+
+.ui-tooltip-title {
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.ui-tooltip-content {
+    padding: 10px 12px;
+    color: var(--text-secondary);
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+/* ================================================================
+   SECTION 9: GRID LAYOUTS
+   Building/district grids like Stellaris colony screen
+   ================================================================ */
+
+.ui-grid {
+    display: grid;
+    gap: 4px;
+}
+
+.ui-grid-4 { grid-template-columns: repeat(4, 1fr); }
+.ui-grid-5 { grid-template-columns: repeat(5, 1fr); }
+.ui-grid-6 { grid-template-columns: repeat(6, 1fr); }
+
+/* Grid slot */
+.ui-grid-slot {
+    aspect-ratio: 1;
+    background: rgba(30, 40, 60, 0.6);
+    border: 1px solid rgba(60, 80, 120, 0.4);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.ui-grid-slot:hover {
+    background: rgba(50, 70, 100, 0.7);
+    border-color: rgba(100, 140, 200, 0.5);
+}
+
+.ui-grid-slot.filled {
+    background: rgba(40, 60, 90, 0.7);
+}
+
+.ui-grid-slot.locked {
+    background: rgba(20, 25, 35, 0.8);
+    cursor: not-allowed;
+}
+
+.ui-grid-slot.locked::after {
+    content: '🔒';
+    font-size: 14px;
+    opacity: 0.4;
+}
+
+.ui-grid-slot-icon {
+    width: 70%;
+    height: 70%;
+}
+
+/* ================================================================
+   SECTION 10: BADGES & ICONS
+   Small status indicators
+   ================================================================ */
+
+.ui-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 8px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.ui-badge-primary {
+    background: rgba(100, 150, 220, 0.3);
+    color: var(--text-highlight);
+}
+
+.ui-badge-success {
+    background: rgba(80, 200, 120, 0.3);
+    color: var(--status-good);
+}
+
+.ui-badge-warning {
+    background: rgba(255, 180, 80, 0.3);
+    color: var(--status-warning);
+}
+
+.ui-badge-danger {
+    background: rgba(255, 100, 100, 0.3);
+    color: var(--status-danger);
+}
+
+/* Icon container */
+.ui-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ui-icon-sm { width: 16px; height: 16px; }
+.ui-icon-md { width: 24px; height: 24px; }
+.ui-icon-lg { width: 32px; height: 32px; }
+
+/* ================================================================
+   SECTION 11: DIVIDERS & SEPARATORS
+   ================================================================ */
+
+.ui-divider {
+    height: 1px;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(80, 100, 140, 0.4) 20%,
+        rgba(80, 100, 140, 0.4) 80%,
+        transparent 100%);
+    margin: 12px 0;
+}
+
+.ui-divider-vertical {
+    width: 1px;
+    height: 100%;
+    background: rgba(80, 100, 140, 0.4);
+    margin: 0 12px;
+}
+
+.ui-divider-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--text-secondary);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.ui-divider-label::before,
+.ui-divider-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(80, 100, 140, 0.4);
+}
+
+/* ================================================================
+   SECTION 12: SCROLLBARS
+   Custom styled scrollbars
+   ================================================================ */
+
+.ui-scroll::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.ui-scroll::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+}
+
+.ui-scroll::-webkit-scrollbar-thumb {
+    background: rgba(80, 100, 140, 0.5);
+    border-radius: 3px;
+}
+
+.ui-scroll::-webkit-scrollbar-thumb:hover {
+    background: rgba(100, 130, 180, 0.6);
+}
+
+/* ================================================================
+   SECTION 13: ANIMATIONS
+   Reusable animation classes
+   ================================================================ */
+
+.ui-fade-in {
+    animation: ui-fade-in 0.3s ease;
+}
+
+@keyframes ui-fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.ui-slide-in-right {
+    animation: ui-slide-in-right 0.3s ease;
+}
+
+@keyframes ui-slide-in-right {
+    from { opacity: 0; transform: translateX(20px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+.ui-slide-in-left {
+    animation: ui-slide-in-left 0.3s ease;
+}
+
+@keyframes ui-slide-in-left {
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+.ui-scale-in {
+    animation: ui-scale-in 0.2s ease;
+}
+
+@keyframes ui-scale-in {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+/* Pulse animation for alerts */
+.ui-pulse {
+    animation: ui-pulse 2s ease-in-out infinite;
+}
+
+@keyframes ui-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}

@@ -1,0 +1,411 @@
+/* ==============================================
+   GALACTIC STRATEGY - Race Portraits & Art Assets
+   Style: Animated/Illustrated Comic Style
+   
+   Art Style Guide:
+   - Clean line art with solid colors
+   - Subtle gradients for depth
+   - Warm lighting with soft shadows
+   - Distinctive environments per race
+   - Expressive but stylized faces
+   ============================================== */
+
+/* Portrait Sprite Sheet Configuration
+   Image: race_portraits_sheet.png
+   Grid: 4 columns x 4 rows
+   Each cell: ~375px x 210px (aspect ratio ~16:9)
+*/
+
+:root {
+    /* Portrait sheet dimensions */
+    --portrait-sheet-width: 1504px;
+    --portrait-sheet-height: 844px;
+    --portrait-cell-width: 376px;
+    --portrait-cell-height: 211px;
+    --portrait-cols: 4;
+    --portrait-rows: 4;
+}
+
+/* Base Portrait Container */
+.race-portrait {
+    width: 188px;
+    height: 105px;
+    background-image: url('/images/portraits/race_portraits_sheet.png');
+    background-size: 752px 422px; /* 50% scale for display */
+    background-repeat: no-repeat;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.race-portrait:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+}
+
+/* Large Portrait Version */
+.race-portrait.large {
+    width: 376px;
+    height: 211px;
+    background-size: 1504px 844px; /* Full size */
+}
+
+/* Small Portrait Version (for lists) */
+.race-portrait.small {
+    width: 94px;
+    height: 53px;
+    background-size: 376px 211px; /* 25% scale */
+    border-radius: 4px;
+}
+
+/* Thumbnail Portrait (for icons) */
+.race-portrait.thumbnail {
+    width: 48px;
+    height: 27px;
+    background-size: 192px 108px;
+    border-radius: 3px;
+}
+
+/* ==============================================
+   Portrait Positions (Row, Column)
+   Using background-position to show specific portrait
+   ============================================== */
+
+/* Row 1 */
+.race-portrait.klingon-warrior     { background-position: 0 0; }
+.race-portrait.vulcan-elder        { background-position: -188px 0; }
+.race-portrait.andorian-commander  { background-position: -376px 0; }
+.race-portrait.ferengi-merchant    { background-position: -564px 0; }
+
+/* Row 2 */
+.race-portrait.trill-officer       { background-position: 0 -105px; }
+.race-portrait.cardassian-gul      { background-position: -188px -105px; }
+.race-portrait.borg-drone          { background-position: -376px -105px; }
+.race-portrait.bajoran-civilian    { background-position: -564px -105px; }
+
+/* Row 3 */
+.race-portrait.romulan-commander   { background-position: 0 -210px; }
+.race-portrait.gorn-warrior        { background-position: -188px -210px; }
+.race-portrait.romulan-tal-shiar   { background-position: -376px -210px; }
+.race-portrait.betazoid-diplomat   { background-position: -564px -210px; }
+
+/* Row 4 */
+.race-portrait.human-admiral       { background-position: 0 -315px; }
+.race-portrait.andorian-engineer   { background-position: -188px -315px; }
+.race-portrait.jem-hadar-soldier   { background-position: -376px -315px; }
+.race-portrait.human-captain       { background-position: -564px -315px; }
+
+/* Large portrait positions */
+.race-portrait.large.klingon-warrior     { background-position: 0 0; }
+.race-portrait.large.vulcan-elder        { background-position: -376px 0; }
+.race-portrait.large.andorian-commander  { background-position: -752px 0; }
+.race-portrait.large.ferengi-merchant    { background-position: -1128px 0; }
+
+.race-portrait.large.trill-officer       { background-position: 0 -211px; }
+.race-portrait.large.cardassian-gul      { background-position: -376px -211px; }
+.race-portrait.large.borg-drone          { background-position: -752px -211px; }
+.race-portrait.large.bajoran-civilian    { background-position: -1128px -211px; }
+
+.race-portrait.large.romulan-commander   { background-position: 0 -422px; }
+.race-portrait.large.gorn-warrior        { background-position: -376px -422px; }
+.race-portrait.large.romulan-tal-shiar   { background-position: -752px -422px; }
+.race-portrait.large.betazoid-diplomat   { background-position: -1128px -422px; }
+
+.race-portrait.large.human-admiral       { background-position: 0 -633px; }
+.race-portrait.large.andorian-engineer   { background-position: -376px -633px; }
+.race-portrait.large.jem-hadar-soldier   { background-position: -752px -633px; }
+.race-portrait.large.human-captain       { background-position: -1128px -633px; }
+
+/* ==============================================
+   Faction-Themed Portrait Frames
+   ============================================== */
+
+.portrait-frame {
+    position: relative;
+    display: inline-block;
+}
+
+.portrait-frame::before {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 12px;
+    z-index: -1;
+}
+
+.portrait-frame.federation::before {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+}
+
+.portrait-frame.klingon::before {
+    background: linear-gradient(135deg, #dc2626, #7f1d1d);
+    box-shadow: 0 0 20px rgba(220, 38, 38, 0.4);
+}
+
+.portrait-frame.romulan::before {
+    background: linear-gradient(135deg, #16a34a, #14532d);
+    box-shadow: 0 0 20px rgba(22, 163, 74, 0.4);
+}
+
+.portrait-frame.cardassian::before {
+    background: linear-gradient(135deg, #d97706, #78350f);
+    box-shadow: 0 0 20px rgba(217, 119, 6, 0.4);
+}
+
+.portrait-frame.ferengi::before {
+    background: linear-gradient(135deg, #eab308, #854d0e);
+    box-shadow: 0 0 20px rgba(234, 179, 8, 0.4);
+}
+
+.portrait-frame.borg::before {
+    background: linear-gradient(135deg, #22c55e, #064e3b);
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.4);
+}
+
+.portrait-frame.dominion::before {
+    background: linear-gradient(135deg, #7c3aed, #4c1d95);
+    box-shadow: 0 0 20px rgba(124, 58, 237, 0.4);
+}
+
+/* ==============================================
+   Portrait Card Component
+   Used for character selection, diplomacy, etc.
+   ============================================== */
+
+.portrait-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px;
+    background: linear-gradient(180deg, rgba(20, 25, 40, 0.95) 0%, rgba(12, 15, 25, 0.98) 100%);
+    border: 1px solid rgba(100, 120, 160, 0.3);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.portrait-card:hover {
+    border-color: rgba(96, 165, 250, 0.6);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    transform: translateY(-4px);
+}
+
+.portrait-card.selected {
+    border-color: #fbbf24;
+    box-shadow: 0 0 20px rgba(251, 191, 36, 0.3);
+}
+
+.portrait-card .card-name {
+    margin-top: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+}
+
+.portrait-card .card-title {
+    font-size: 11px;
+    color: rgba(200, 212, 232, 0.6);
+}
+
+.portrait-card .card-faction {
+    margin-top: 8px;
+    padding: 4px 12px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    border-radius: 4px;
+}
+
+.portrait-card .card-faction.federation { background: rgba(59, 130, 246, 0.3); color: #60a5fa; }
+.portrait-card .card-faction.klingon { background: rgba(220, 38, 38, 0.3); color: #f87171; }
+.portrait-card .card-faction.romulan { background: rgba(22, 163, 74, 0.3); color: #4ade80; }
+.portrait-card .card-faction.cardassian { background: rgba(217, 119, 6, 0.3); color: #fbbf24; }
+.portrait-card .card-faction.ferengi { background: rgba(234, 179, 8, 0.3); color: #fde047; }
+
+/* ==============================================
+   Diplomatic Contact Display
+   ============================================== */
+
+.diplomatic-contact {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background: rgba(15, 20, 35, 0.9);
+    border-radius: 8px;
+    border-left: 4px solid;
+}
+
+.diplomatic-contact.friendly { border-color: #22c55e; }
+.diplomatic-contact.neutral { border-color: #eab308; }
+.diplomatic-contact.hostile { border-color: #ef4444; }
+.diplomatic-contact.unknown { border-color: #6b7280; }
+
+.diplomatic-contact .contact-info {
+    flex: 1;
+}
+
+.diplomatic-contact .contact-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 2px;
+}
+
+.diplomatic-contact .contact-title {
+    font-size: 12px;
+    color: rgba(200, 212, 232, 0.7);
+}
+
+.diplomatic-contact .contact-status {
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+.diplomatic-contact .contact-status.friendly { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
+.diplomatic-contact .contact-status.neutral { background: rgba(234, 179, 8, 0.2); color: #fbbf24; }
+.diplomatic-contact .contact-status.hostile { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+
+/* ==============================================
+   Leader Selection Grid
+   ============================================== */
+
+.leader-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+    padding: 16px;
+}
+
+.leader-option {
+    position: relative;
+    padding: 12px;
+    background: rgba(20, 25, 40, 0.8);
+    border: 2px solid rgba(60, 80, 120, 0.3);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.leader-option:hover {
+    border-color: rgba(96, 165, 250, 0.5);
+    background: rgba(30, 40, 60, 0.8);
+}
+
+.leader-option.selected {
+    border-color: #fbbf24;
+    box-shadow: 0 0 15px rgba(251, 191, 36, 0.2);
+}
+
+.leader-option .leader-portrait {
+    width: 100%;
+    aspect-ratio: 16/9;
+    background-size: cover;
+    background-position: center;
+    border-radius: 6px;
+    margin-bottom: 10px;
+}
+
+.leader-option .leader-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+}
+
+.leader-option .leader-traits {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+}
+
+.leader-option .trait {
+    padding: 3px 8px;
+    background: rgba(139, 92, 246, 0.2);
+    border-radius: 3px;
+    font-size: 9px;
+    color: #a78bfa;
+}
+
+/* ==============================================
+   Art Style Variables for UI Consistency
+   ============================================== */
+
+:root {
+    /* Comic/Illustrated Style Colors */
+    --art-outline-color: #2d3748;
+    --art-shadow-color: rgba(0, 0, 0, 0.3);
+    --art-highlight-color: rgba(255, 255, 255, 0.1);
+    
+    /* Warm lighting palette (matching portrait style) */
+    --warm-ambient: rgba(255, 200, 150, 0.05);
+    --warm-accent: #f59e0b;
+    --cool-ambient: rgba(150, 200, 255, 0.05);
+    --cool-accent: #3b82f6;
+    
+    /* Panel styling to match art */
+    --panel-bg-warm: linear-gradient(180deg, rgba(45, 35, 25, 0.9) 0%, rgba(25, 20, 15, 0.95) 100%);
+    --panel-bg-cool: linear-gradient(180deg, rgba(25, 35, 50, 0.9) 0%, rgba(15, 20, 30, 0.95) 100%);
+    --panel-bg-neutral: linear-gradient(180deg, rgba(30, 35, 45, 0.9) 0%, rgba(18, 22, 30, 0.95) 100%);
+}
+
+/* Apply warm lighting to appropriate contexts */
+.warm-lighting {
+    background: var(--warm-ambient);
+}
+
+.cool-lighting {
+    background: var(--cool-ambient);
+}
+
+/* Illustrated panel effect */
+.illustrated-panel {
+    position: relative;
+    border: 2px solid var(--art-outline-color);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.illustrated-panel::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    box-shadow: inset 0 2px 8px var(--art-shadow-color),
+                inset 0 -2px 8px var(--art-shadow-color);
+}
+
+/* ==============================================
+   Animation for portrait reveals
+   ============================================== */
+
+@keyframes portrait-reveal {
+    0% {
+        opacity: 0;
+        transform: scale(0.9);
+        filter: brightness(0.5);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+        filter: brightness(1);
+    }
+}
+
+.race-portrait.animate-in {
+    animation: portrait-reveal 0.4s ease-out;
+}
+
+@keyframes portrait-glow {
+    0%, 100% { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4); }
+    50% { box-shadow: 0 4px 20px rgba(96, 165, 250, 0.3); }
+}
+
+.race-portrait.highlight {
+    animation: portrait-glow 2s ease-in-out infinite;
+}

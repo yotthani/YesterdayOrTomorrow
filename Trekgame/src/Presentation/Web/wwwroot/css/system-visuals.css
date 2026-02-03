@@ -1,0 +1,753 @@
+/* ================================================================
+   SYSTEM VIEW VISUALS - Rich Orbital Display System
+   Inspired by Stellaris system view and Star Trek aesthetics
+   ================================================================ */
+
+/* ================================================================
+   SECTION 1: SYSTEM VIEW CONTAINER
+   ================================================================ */
+
+.system-view-wrapper {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: #000008;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Rich space background for system view */
+.system-space-bg {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: 
+        /* Subtle dust lanes */
+        radial-gradient(ellipse 200% 100% at 30% 20%, 
+            rgba(80, 60, 100, 0.08) 0%, 
+            transparent 50%),
+        radial-gradient(ellipse 150% 120% at 70% 80%, 
+            rgba(60, 80, 120, 0.06) 0%, 
+            transparent 40%),
+        /* Deep space */
+        radial-gradient(ellipse at 50% 50%, 
+            #0a0a18 0%, 
+            #020208 100%);
+    pointer-events: none;
+}
+
+/* Distant stars background */
+.system-distant-stars {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none;
+}
+
+.system-distant-stars::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: 
+        radial-gradient(1px 1px at 8% 12%, rgba(255,255,255,0.6), transparent),
+        radial-gradient(1px 1px at 15% 35%, rgba(200,220,255,0.5), transparent),
+        radial-gradient(1.5px 1.5px at 22% 68%, rgba(255,240,200,0.55), transparent),
+        radial-gradient(1px 1px at 35% 8%, rgba(255,255,255,0.5), transparent),
+        radial-gradient(1px 1px at 42% 45%, rgba(220,200,255,0.45), transparent),
+        radial-gradient(1.5px 1.5px at 55% 78%, rgba(255,255,255,0.6), transparent),
+        radial-gradient(1px 1px at 62% 22%, rgba(200,220,255,0.5), transparent),
+        radial-gradient(1px 1px at 75% 55%, rgba(255,240,220,0.45), transparent),
+        radial-gradient(1.5px 1.5px at 85% 15%, rgba(255,255,255,0.55), transparent),
+        radial-gradient(1px 1px at 92% 82%, rgba(220,220,255,0.5), transparent);
+}
+
+/* ================================================================
+   SECTION 2: CENTRAL STAR RENDERING
+   Detailed star with corona, surface activity, and type variations
+   ================================================================ */
+
+.central-star-group {
+    transform-origin: center;
+}
+
+/* Star corona - outer glow */
+.star-corona-outer {
+    opacity: 0.2;
+    animation: corona-breathe 8s ease-in-out infinite;
+}
+
+@keyframes corona-breathe {
+    0%, 100% { opacity: 0.15; transform: scale(1); }
+    50% { opacity: 0.25; transform: scale(1.05); }
+}
+
+/* Star corona - inner glow */
+.star-corona-inner {
+    opacity: 0.4;
+    animation: corona-pulse-inner 4s ease-in-out infinite;
+}
+
+@keyframes corona-pulse-inner {
+    0%, 100% { opacity: 0.35; }
+    50% { opacity: 0.5; }
+}
+
+/* Star body with surface detail */
+.star-body-main {
+    filter: url(#star-glow);
+}
+
+/* Star surface granulation (convection cells) */
+.star-surface-detail {
+    opacity: 0.3;
+    animation: surface-shift 20s linear infinite;
+}
+
+@keyframes surface-shift {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Solar prominences/flares */
+.star-prominence {
+    opacity: 0;
+    animation: prominence-burst 15s ease-in-out infinite;
+}
+
+.star-prominence:nth-child(2) { animation-delay: -5s; }
+.star-prominence:nth-child(3) { animation-delay: -10s; }
+
+@keyframes prominence-burst {
+    0%, 80%, 100% { opacity: 0; transform: scale(0.8); }
+    10%, 70% { opacity: 0.6; transform: scale(1.2); }
+}
+
+/* Star type variations */
+
+/* Yellow dwarf (G-type) - like Sol */
+.star-type-yellow .star-body-main {
+    fill: url(#star-grad-yellow);
+}
+
+/* Orange dwarf (K-type) */
+.star-type-orange .star-body-main {
+    fill: url(#star-grad-orange);
+}
+
+/* Red dwarf (M-type) */
+.star-type-red .star-body-main {
+    fill: url(#star-grad-red);
+    animation: red-dwarf-flicker 0.5s ease-in-out infinite;
+}
+
+@keyframes red-dwarf-flicker {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.95; }
+}
+
+/* Blue giant (O/B-type) */
+.star-type-blue .star-body-main {
+    fill: url(#star-grad-blue);
+}
+
+.star-type-blue .star-corona-outer {
+    animation: blue-giant-pulse 3s ease-in-out infinite;
+}
+
+@keyframes blue-giant-pulse {
+    0%, 100% { opacity: 0.25; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(1.1); }
+}
+
+/* White dwarf */
+.star-type-white .star-body-main {
+    fill: url(#star-grad-white);
+}
+
+/* Red giant */
+.star-type-red-giant .star-body-main {
+    fill: url(#star-grad-red-giant);
+    animation: giant-swell 10s ease-in-out infinite;
+}
+
+@keyframes giant-swell {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+}
+
+/* Neutron star */
+.star-type-neutron .star-body-main {
+    fill: url(#star-grad-neutron);
+    animation: neutron-spin 0.1s linear infinite;
+}
+
+.star-type-neutron .neutron-beam {
+    opacity: 0.6;
+    animation: beam-rotate 0.1s linear infinite;
+    transform-origin: center;
+}
+
+@keyframes beam-rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Black hole */
+.star-type-blackhole .event-horizon {
+    fill: #000;
+}
+
+.star-type-blackhole .accretion-disk {
+    animation: accretion-flow 5s linear infinite;
+    transform-origin: center;
+}
+
+@keyframes accretion-flow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.star-type-blackhole .gravitational-lens {
+    opacity: 0.5;
+    animation: lens-distort 4s ease-in-out infinite;
+}
+
+@keyframes lens-distort {
+    0%, 100% { transform: scale(1); filter: blur(0px); }
+    50% { transform: scale(1.02); filter: blur(1px); }
+}
+
+/* ================================================================
+   SECTION 3: ORBITAL PATHS
+   Visible orbit lines with subtle styling
+   ================================================================ */
+
+.orbit-path {
+    fill: none;
+    stroke: rgba(100, 120, 160, 0.25);
+    stroke-width: 1;
+    stroke-dasharray: 4 4;
+}
+
+.orbit-path:hover {
+    stroke: rgba(150, 180, 220, 0.4);
+}
+
+.orbit-path.selected {
+    stroke: rgba(255, 200, 100, 0.5);
+    stroke-width: 1.5;
+}
+
+/* Habitable zone indicator */
+.habitable-zone {
+    fill: rgba(80, 200, 120, 0.08);
+    stroke: rgba(80, 200, 120, 0.2);
+    stroke-width: 1;
+    stroke-dasharray: 8 4;
+}
+
+/* Frost line indicator */
+.frost-line {
+    fill: none;
+    stroke: rgba(100, 180, 255, 0.15);
+    stroke-width: 1;
+    stroke-dasharray: 2 6;
+}
+
+/* ================================================================
+   SECTION 4: PLANET RENDERING
+   Detailed planet visuals with atmosphere, rings, and features
+   ================================================================ */
+
+.planet-group {
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.planet-group:hover {
+    transform: scale(1.15);
+}
+
+.planet-group.selected {
+    transform: scale(1.2);
+}
+
+/* Planet base sphere */
+.planet-body {
+    filter: url(#planet-shadow);
+}
+
+/* Atmosphere glow */
+.planet-atmosphere {
+    fill: none;
+    opacity: 0.6;
+}
+
+/* Atmosphere types */
+.atmosphere-breathable {
+    stroke: rgba(100, 180, 255, 0.5);
+    stroke-width: 3;
+    filter: blur(2px);
+}
+
+.atmosphere-thin {
+    stroke: rgba(180, 180, 200, 0.3);
+    stroke-width: 2;
+    filter: blur(1px);
+}
+
+.atmosphere-dense {
+    stroke: rgba(255, 200, 150, 0.5);
+    stroke-width: 4;
+    filter: blur(3px);
+}
+
+.atmosphere-toxic {
+    stroke: rgba(200, 255, 100, 0.4);
+    stroke-width: 3;
+    filter: blur(2px);
+}
+
+/* Cloud layer animation */
+.planet-clouds {
+    opacity: 0.3;
+    animation: clouds-drift 60s linear infinite;
+}
+
+@keyframes clouds-drift {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Planet terminator (day/night line) */
+.planet-terminator {
+    fill: url(#terminator-gradient);
+    opacity: 0.4;
+}
+
+/* Planet surface features */
+.planet-features {
+    opacity: 0.5;
+}
+
+/* Planet types */
+
+/* Class M - Earth-like */
+.planet-class-m .planet-body {
+    fill: url(#planet-grad-earthlike);
+}
+
+.planet-class-m .planet-ocean {
+    fill: rgba(60, 120, 200, 0.7);
+}
+
+.planet-class-m .planet-land {
+    fill: rgba(80, 140, 80, 0.8);
+}
+
+/* Class L - Marginal */
+.planet-class-l .planet-body {
+    fill: url(#planet-grad-marginal);
+}
+
+/* Class H - Desert */
+.planet-class-h .planet-body {
+    fill: url(#planet-grad-desert);
+}
+
+/* Class J - Gas Giant */
+.planet-class-j .planet-body {
+    fill: url(#planet-grad-gasgiant);
+}
+
+.planet-class-j .gas-bands {
+    opacity: 0.4;
+    animation: bands-flow 30s linear infinite;
+}
+
+@keyframes bands-flow {
+    from { transform: translateX(0); }
+    to { transform: translateX(-100%); }
+}
+
+/* Class K - Adaptable */
+.planet-class-k .planet-body {
+    fill: url(#planet-grad-adaptable);
+}
+
+/* Class D - Asteroid/Planetoid */
+.planet-class-d .planet-body {
+    fill: url(#planet-grad-asteroid);
+}
+
+/* Class Y - Demon */
+.planet-class-y .planet-body {
+    fill: url(#planet-grad-demon);
+    animation: demon-pulse 2s ease-in-out infinite;
+}
+
+@keyframes demon-pulse {
+    0%, 100% { filter: brightness(1) saturate(1); }
+    50% { filter: brightness(1.2) saturate(1.3); }
+}
+
+/* Frozen world */
+.planet-frozen .planet-body {
+    fill: url(#planet-grad-frozen);
+}
+
+.planet-frozen .ice-caps {
+    fill: rgba(220, 240, 255, 0.8);
+}
+
+/* Volcanic world */
+.planet-volcanic .planet-body {
+    fill: url(#planet-grad-volcanic);
+}
+
+.planet-volcanic .lava-flows {
+    fill: rgba(255, 100, 50, 0.7);
+    animation: lava-glow 3s ease-in-out infinite;
+}
+
+@keyframes lava-glow {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 0.8; }
+}
+
+/* ================================================================
+   SECTION 5: GAS GIANT RINGS
+   Saturn-like ring systems
+   ================================================================ */
+
+.planet-rings {
+    fill: none;
+    transform-origin: center;
+}
+
+.ring-band {
+    stroke-linecap: round;
+}
+
+.ring-band-1 {
+    stroke: rgba(200, 180, 160, 0.6);
+    stroke-width: 8;
+}
+
+.ring-band-2 {
+    stroke: rgba(180, 160, 140, 0.4);
+    stroke-width: 4;
+}
+
+.ring-band-3 {
+    stroke: rgba(220, 200, 180, 0.5);
+    stroke-width: 6;
+}
+
+/* Ring gap (Cassini division style) */
+.ring-gap {
+    stroke: rgba(0, 0, 0, 0.3);
+    stroke-width: 2;
+}
+
+/* Ring shadow on planet */
+.ring-shadow {
+    fill: rgba(0, 0, 0, 0.3);
+}
+
+/* ================================================================
+   SECTION 6: ASTEROID BELT
+   Visual asteroid field between orbits
+   ================================================================ */
+
+.asteroid-belt-group {
+    opacity: 0.7;
+}
+
+.asteroid-belt-path {
+    fill: none;
+    stroke: rgba(120, 100, 80, 0.3);
+    stroke-width: 20;
+    stroke-dasharray: 2 4 1 3 3 5;
+}
+
+.asteroid {
+    fill: rgba(140, 120, 100, 0.8);
+    animation: asteroid-wobble 8s ease-in-out infinite;
+}
+
+.asteroid:nth-child(odd) {
+    animation-direction: reverse;
+}
+
+.asteroid:nth-child(3n) {
+    animation-duration: 12s;
+}
+
+.asteroid:nth-child(5n) {
+    animation-duration: 6s;
+}
+
+@keyframes asteroid-wobble {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    25% { transform: translate(1px, -1px) rotate(5deg); }
+    50% { transform: translate(-1px, 1px) rotate(-3deg); }
+    75% { transform: translate(1px, 0px) rotate(2deg); }
+}
+
+/* Large asteroid/dwarf planet in belt */
+.belt-dwarf-planet {
+    fill: url(#asteroid-grad);
+    filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.5));
+}
+
+/* ================================================================
+   SECTION 7: MOONS
+   Satellite bodies orbiting planets
+   ================================================================ */
+
+.moon-group {
+    cursor: pointer;
+}
+
+.moon-body {
+    filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.5));
+}
+
+.moon-orbit-path {
+    fill: none;
+    stroke: rgba(150, 150, 170, 0.2);
+    stroke-width: 0.5;
+    stroke-dasharray: 2 2;
+}
+
+/* Moon orbital animation */
+.moon-orbital {
+    animation: moon-orbit var(--moon-period, 10s) linear infinite;
+    transform-origin: var(--orbit-center-x, 0) var(--orbit-center-y, 0);
+}
+
+@keyframes moon-orbit {
+    from { transform: rotate(0deg) translateX(var(--moon-distance, 20px)); }
+    to { transform: rotate(360deg) translateX(var(--moon-distance, 20px)); }
+}
+
+/* ================================================================
+   SECTION 8: FLEET DISPLAY IN SYSTEM
+   Ships and stations orbiting
+   ================================================================ */
+
+.system-fleet-group {
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.system-fleet-group:hover {
+    transform: scale(1.1);
+}
+
+.fleet-ship-icon {
+    fill: currentColor;
+    filter: drop-shadow(0 0 3px currentColor);
+}
+
+/* Ship formation indicators */
+.fleet-formation {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 0.5;
+    stroke-dasharray: 2 2;
+    opacity: 0.5;
+}
+
+/* Station icon */
+.station-icon {
+    animation: station-rotate 60s linear infinite;
+    transform-origin: center;
+}
+
+@keyframes station-rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* ================================================================
+   SECTION 9: COLONY INDICATORS
+   Visual representation of planetary colonies
+   ================================================================ */
+
+.colony-marker {
+    animation: colony-pulse 2s ease-in-out infinite;
+}
+
+@keyframes colony-pulse {
+    0%, 100% { opacity: 0.8; }
+    50% { opacity: 1; }
+}
+
+.colony-city-lights {
+    fill: rgba(255, 220, 150, 0.7);
+    animation: city-twinkle 3s ease-in-out infinite;
+}
+
+@keyframes city-twinkle {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 0.9; }
+}
+
+/* Orbital structures around colonized planets */
+.orbital-structure {
+    fill: rgba(200, 200, 220, 0.8);
+    animation: orbital-drift 20s linear infinite;
+    transform-origin: center;
+}
+
+@keyframes orbital-drift {
+    from { transform: rotate(0deg) translateX(var(--orbital-distance, 25px)); }
+    to { transform: rotate(360deg) translateX(var(--orbital-distance, 25px)); }
+}
+
+/* ================================================================
+   SECTION 10: ANOMALIES IN SYSTEM VIEW
+   Debris, nebulae, special features
+   ================================================================ */
+
+/* Debris field */
+.debris-field {
+    opacity: 0.6;
+}
+
+.debris-piece {
+    fill: rgba(100, 100, 120, 0.7);
+    animation: debris-tumble 15s linear infinite;
+}
+
+@keyframes debris-tumble {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Nebula in system */
+.system-nebula {
+    opacity: 0.4;
+    animation: nebula-flow 30s ease-in-out infinite;
+}
+
+@keyframes nebula-flow {
+    0%, 100% { transform: scale(1) rotate(0deg); }
+    50% { transform: scale(1.05) rotate(3deg); }
+}
+
+/* Wormhole entrance */
+.wormhole-entrance {
+    animation: wormhole-swirl 10s linear infinite;
+    transform-origin: center;
+}
+
+@keyframes wormhole-swirl {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.wormhole-center {
+    fill: radial-gradient(circle, #000 0%, transparent 70%);
+}
+
+.wormhole-accretion {
+    fill: none;
+    stroke: url(#wormhole-gradient);
+    stroke-width: 3;
+    animation: wormhole-pulse 2s ease-in-out infinite;
+}
+
+@keyframes wormhole-pulse {
+    0%, 100% { opacity: 0.6; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.1); }
+}
+
+/* ================================================================
+   SECTION 11: SELECTION & INTERACTION
+   ================================================================ */
+
+.selection-highlight {
+    fill: none;
+    stroke: #ffcc00;
+    stroke-width: 2;
+    stroke-dasharray: 6 3;
+    animation: selection-spin 8s linear infinite;
+    transform-origin: center;
+}
+
+@keyframes selection-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Hover tooltip anchor */
+.hover-indicator {
+    fill: rgba(255, 255, 255, 0.1);
+    stroke: rgba(255, 255, 255, 0.3);
+    stroke-width: 1;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.planet-group:hover .hover-indicator,
+.moon-group:hover .hover-indicator {
+    opacity: 1;
+}
+
+/* ================================================================
+   SECTION 12: SYSTEM INFO PANELS
+   Styled information displays
+   ================================================================ */
+
+.system-info-panel {
+    position: absolute;
+    background: linear-gradient(180deg, 
+        rgba(15, 20, 35, 0.95) 0%, 
+        rgba(10, 12, 25, 0.98) 100%);
+    border: 1px solid rgba(100, 130, 180, 0.4);
+    border-radius: 8px;
+    box-shadow: 
+        0 0 30px rgba(0, 0, 0, 0.6),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    overflow: hidden;
+}
+
+.system-info-header {
+    background: linear-gradient(90deg, 
+        rgba(100, 150, 200, 0.8) 0%, 
+        rgba(60, 100, 160, 0.7) 100%);
+    padding: 10px 16px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+}
+
+.system-info-header h4 {
+    margin: 0;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.system-info-content {
+    padding: 12px;
+    color: rgba(200, 210, 230, 0.9);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+/* ================================================================
+   SECTION 13: RESPONSIVE ADJUSTMENTS
+   ================================================================ */
+
+@media (max-width: 1200px) {
+    .asteroid-belt-group { opacity: 0.5; }
+}
+
+@media (max-width: 900px) {
+    .asteroid-belt-group { display: none; }
+    .moon-orbit-path { display: none; }
+    .planet-atmosphere { stroke-width: 2; }
+}

@@ -1,0 +1,90 @@
+@using Microsoft.JSInterop
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+@implements IAsyncDisposable
+
+@* Invisible component that handles keyboard shortcuts globally *@
+
+@code {
+    private DotNetObjectReference<GlobalHotkeys>? _selfRef;
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _selfRef = DotNetObjectReference.Create(this);
+            await JS.InvokeVoidAsync("eval", @"
+                window.hotkeyHandler = (dotNetRef) => {
+                    document.addEventListener('keydown', (e) => {
+                        // Don't trigger if typing in input/textarea
+                        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) {
+                            return;
+                        }
+                        
+                        // Don't trigger with modifiers (except for shortcuts that use them)
+                        if (e.ctrlKey || e.altKey || e.metaKey) {
+                            return;
+                        }
+                        
+                        dotNetRef.invokeMethodAsync('HandleKeyDown', e.key, e.shiftKey);
+                    });
+                };
+                window.hotkeyHandler(window.hotkeyDotNetRef);
+            ");
+            await JS.InvokeVoidAsync("eval", $"window.hotkeyDotNetRef = DotNet.createJSObjectReference({{}});");
+            
+            // Register the handler
+            await JS.InvokeVoidAsync("eval", @"
+                document.addEventListener('keydown', (e) => {
+                    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) return;
+                    if (e.ctrlKey || e.altKey || e.metaKey) return;
+                    
+                    const key = e.key.toLowerCase();
+                    let url = null;
+                    
+                    switch(key) {
+                        case 'm': url = '/game/map'; break;
+                        case 'f': url = '/game/fleets'; break;
+                        case 'c': url = '/game/colonies'; break;
+                        case 'r': url = '/game/research'; break;
+                        case 'd': url = '/game/diplomacy'; break;
+                        case 'o': url = '/game/overview'; break;
+                        case 's': url = '/game/settings'; break;
+                        case 'escape': history.back(); break;
+                    }
+                    
+                    if (url) {
+                        e.preventDefault();
+                        window.location.href = url;
+                    }
+                });
+            ");
+        }
+    }
+
+    [JSInvokable]
+    public void HandleKeyDown(string key, bool shiftKey)
+    {
+        var route = key.ToLower() switch
+        {
+            "m" => "/game/map",
+            "f" => "/game/fleets",
+            "c" => "/game/colonies",
+            "r" => "/game/research",
+            "d" => "/game/diplomacy",
+            "o" => "/game/overview",
+            "s" => "/game/settings",
+            _ => null
+        };
+
+        if (route != null)
+        {
+            Navigation.NavigateTo(route);
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        _selfRef?.Dispose();
+    }
+}

@@ -1,0 +1,62 @@
+{
+  "category": "HouseSymbols",
+  "description": "House/family emblems for factions - flat 2D symbols for flags and buildings",
+  "factionStyles": {
+    "federation": {
+      "heraldry": "UFP seal variations, member world symbols",
+      "elements": ["Stars", "Laurel wreaths", "Planetary symbols", "Starfleet delta"],
+      "colors": "Blue, white, gold"
+    },
+    "klingon": {
+      "heraldry": "Great House emblems, warrior symbols",
+      "elements": ["Bat'leth motifs", "Targs", "Blades", "Trefoil variations"],
+      "colors": "Red, black, bronze",
+      "houses": ["House of Duras", "House of Mogh", "House of Martok", "House of K'mpec"]
+    },
+    "romulan": {
+      "heraldry": "Senate house symbols, raptor variations",
+      "elements": ["Birds of prey", "Twin planets", "Talons", "Stars"],
+      "colors": "Green, silver, black",
+      "houses": ["Imperial Senate", "Tal Shiar", "Military Houses"]
+    },
+    "cardassian": {
+      "heraldry": "Military unit symbols, family crests",
+      "elements": ["Geometric shapes", "Cardassian arch", "Rank symbols"],
+      "colors": "Brown, tan, gray",
+      "houses": ["Central Command", "Obsidian Order", "Military families"]
+    },
+    "ferengi": {
+      "heraldry": "Commercial house symbols, profit markers",
+      "elements": ["Latinum bars", "Profit symbols", "Ear motifs", "Commerce icons"],
+      "colors": "Gold, orange, copper",
+      "houses": ["Grand Nagus seal", "FCA symbol", "Trading houses"]
+    },
+    "dominion": {
+      "heraldry": "Founder worship symbols, unit markers",
+      "elements": ["Organic curves", "Founder symbols", "Unit designations"],
+      "colors": "Purple, violet, silver"
+    }
+  },
+  "symbolVariants": [
+    { "id": "primary", "name": "Primary House Symbol", "use": "Main house emblem" },
+    { "id": "military", "name": "Military Division", "use": "Military unit marker" },
+    { "id": "noble", "name": "Noble House", "use": "Aristocratic family" },
+    { "id": "merchant", "name": "Merchant House", "use": "Commercial family" },
+    { "id": "minor", "name": "Minor House", "use": "Lesser family" },
+    { "id": "ancient", "name": "Ancient House", "use": "Historical family" }
+  ],
+  "styleGuide": {
+    "material": "FLAT 2D graphic - NO 3D, NO metallic",
+    "quality": "Clean vector-style art",
+    "lighting": "None - flat colors only",
+    "composition": "Symbol centered, fills 80-90% of frame",
+    "background": "Solid black (#000000)",
+    "critical": [
+      "FLAT 2D symbols only - for flags and building signs",
+      "Maximum 3-4 colors per symbol",
+      "No gradients, no shading, no shadows",
+      "Must be recognizable at small sizes",
+      "Faction design language clearly visible"
+    ]
+  }
+}

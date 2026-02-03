@@ -1,0 +1,116 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs>
+    <linearGradient id="ferGold" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffd700"/>
+      <stop offset="30%" stop-color="#ffec8b"/>
+      <stop offset="50%" stop-color="#daa520"/>
+      <stop offset="100%" stop-color="#b8860b"/>
+    </linearGradient>
+    <linearGradient id="ferShine" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.5"/>
+      <stop offset="30%" stop-color="#ffffff" stop-opacity="0.1"/>
+      <stop offset="70%" stop-color="#ffffff" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.3"/>
+    </linearGradient>
+    <linearGradient id="ferDark" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#2a1f00"/>
+      <stop offset="100%" stop-color="#0f0b00"/>
+    </linearGradient>
+    <linearGradient id="latinumGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#e8e8e8"/>
+      <stop offset="25%" stop-color="#c0c0c0"/>
+      <stop offset="50%" stop-color="#a0a0a0"/>
+      <stop offset="75%" stop-color="#d0d0d0"/>
+      <stop offset="100%" stop-color="#808080"/>
+    </linearGradient>
+    <filter id="ferGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="goldShine">
+      <feSpecularLighting specularExponent="20" lighting-color="#ffffff" result="specOut">
+        <fePointLight x="50" y="50" z="100"/>
+      </feSpecularLighting>
+      <feComposite in="SourceGraphic" in2="specOut" operator="arithmetic" k1="0" k2="1" k3="1" k4="0"/>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <circle cx="100" cy="100" r="95" fill="url(#ferDark)"/>
+  
+  <!-- Ornate gold border - double ring -->
+  <circle cx="100" cy="100" r="92" fill="none" stroke="url(#ferGold)" stroke-width="8" filter="url(#ferGlow)"/>
+  <circle cx="100" cy="100" r="80" fill="none" stroke="url(#ferGold)" stroke-width="3"/>
+  
+  <!-- Decorative triangular points around border -->
+  <g fill="url(#ferGold)">
+    <polygon points="100,12 105,25 95,25"/>
+    <polygon points="100,188 105,175 95,175"/>
+    <polygon points="12,100 25,105 25,95"/>
+    <polygon points="188,100 175,105 175,95"/>
+  </g>
+  
+  <!-- THE FERENGI COMMERCE SYMBOL -->
+  
+  <!-- Stylized Ferengi head/ears (iconic silhouette) -->
+  <g fill="url(#ferGold)" stroke="#b8860b" stroke-width="1">
+    <!-- Left large ear -->
+    <ellipse cx="55" cy="60" rx="18" ry="35" transform="rotate(-20 55 60)"/>
+    <!-- Right large ear -->
+    <ellipse cx="145" cy="60" rx="18" ry="35" transform="rotate(20 145 60)"/>
+    <!-- Head -->
+    <ellipse cx="100" cy="75" rx="30" ry="25"/>
+  </g>
+  
+  <!-- Ear ridges detail -->
+  <g fill="none" stroke="#8b6914" stroke-width="1.5">
+    <path d="M42,45 Q48,55 45,70"/>
+    <path d="M48,40 Q55,52 52,68"/>
+    <path d="M158,45 Q152,55 155,70"/>
+    <path d="M152,40 Q145,52 148,68"/>
+  </g>
+  
+  <!-- Face details (simplified) -->
+  <ellipse cx="100" cy="70" rx="18" ry="15" fill="url(#ferDark)"/>
+  <g fill="url(#ferGold)">
+    <ellipse cx="92" cy="68" rx="4" ry="5"/>
+    <ellipse cx="108" cy="68" rx="4" ry="5"/>
+  </g>
+  
+  <!-- Gold-Pressed Latinum Bars Stack -->
+  <g filter="url(#ferGlow)">
+    <!-- Bottom bar (largest) -->
+    <rect x="45" y="115" width="110" height="16" rx="4" fill="url(#latinumGrad)" stroke="url(#ferGold)" stroke-width="2"/>
+    <rect x="48" y="118" width="104" height="4" fill="url(#ferShine)" opacity="0.5"/>
+    
+    <!-- Middle bar -->
+    <rect x="55" y="100" width="90" height="14" rx="3" fill="url(#ferGold)" stroke="#b8860b" stroke-width="1.5"/>
+    <rect x="58" y="103" width="84" height="3" fill="url(#ferShine)" opacity="0.6"/>
+    
+    <!-- Top bar (smallest) -->
+    <rect x="65" y="87" width="70" height="12" rx="3" fill="url(#ferGold)" stroke="#b8860b" stroke-width="1"/>
+    <rect x="68" y="89" width="64" height="2.5" fill="url(#ferShine)" opacity="0.7"/>
+  </g>
+  
+  <!-- Latinum liquid effect on bars -->
+  <g fill="url(#latinumGrad)" opacity="0.4">
+    <ellipse cx="100" cy="93" rx="25" ry="3"/>
+    <ellipse cx="100" cy="107" rx="30" ry="3"/>
+  </g>
+  
+  <!-- Commerce/Currency symbols -->
+  <g fill="url(#ferGold)" font-family="Arial, sans-serif" font-weight="bold" filter="url(#ferGlow)">
+    <text x="35" y="160" font-size="18">₲</text>
+    <text x="95" y="155" font-size="14">$</text>
+    <text x="155" y="160" font-size="18">₲</text>
+  </g>
+  
+  <!-- "Ferengi Alliance" text arc -->
+  <path id="ferArc" d="M 30,175 Q 100,205 170,175" fill="none"/>
+  <text fill="url(#ferGold)" font-family="Arial, sans-serif" font-size="10" font-weight="bold" letter-spacing="2">
+    <textPath href="#ferArc" startOffset="50%" text-anchor="middle">FERENGI ALLIANCE</textPath>
+  </text>
+  
+  <!-- Shine overlay -->
+  <circle cx="100" cy="100" r="78" fill="url(#ferShine)" opacity="0.3"/>
+</svg>

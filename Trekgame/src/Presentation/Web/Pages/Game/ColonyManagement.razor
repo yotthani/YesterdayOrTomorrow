@@ -1,0 +1,862 @@
+@page "/game/colony-detail/{ColonyId:guid}"
+@using StarTrekGame.Web.Services
+@inject HttpClient Http
+@inject IJSRuntime JS
+@inject NavigationManager Nav
+
+<div class="colony-management @GetFactionClass()">
+    @if (_loading)
+    {
+        <div class="loading-screen">
+            <div class="spinner"></div>
+            <p>Loading Colony Data...</p>
+        </div>
+    }
+    else if (_colony != null)
+    {
+        <!-- Header -->
+        <div class="colony-header">
+            <div class="colony-title">
+                <h1>@_colony.ColonyName</h1>
+                <span class="colony-location">@_colony.PlanetName, @_colony.SystemName System</span>
+            </div>
+            <div class="colony-designation @_colony.Designation.ToLower()">
+                <span>@_colony.Designation</span>
+            </div>
+            <button class="btn-back" @onclick="GoBack">← Back to Galaxy</button>
+        </div>
+
+        <div class="colony-content">
+            <!-- Left Panel: Overview -->
+            <div class="panel overview-panel">
+                <h2>Colony Overview</h2>
+                
+                <div class="stat-group">
+                    <div class="stat">
+                        <span class="stat-label">Population</span>
+                        <span class="stat-value">@_colony.TotalPopulation M</span>
+                        <div class="stat-bar">
+                            <div class="bar-fill" style="width: @(Math.Min(100, _colony.TotalPopulation * 100 / Math.Max(1, _colony.HousingCapacity)))%"></div>
+                        </div>
+                        <span class="stat-detail">Housing: @_colony.TotalPopulation / @_colony.HousingCapacity</span>
+                    </div>
+                    
+                    <div class="stat">
+                        <span class="stat-label">Stability</span>
+                        <span class="stat-value @GetStabilityClass(_colony.Stability)">@_colony.Stability%</span>
+                        <div class="stat-bar">
+                            <div class="bar-fill @GetStabilityClass(_colony.Stability)" style="width: @_colony.Stability%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat">
+                        <span class="stat-label">Habitability</span>
+                        <span class="stat-value">@_colony.Habitability%</span>
+                        <div class="stat-bar">
+                            <div class="bar-fill habitability" style="width: @_colony.Habitability%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="planet-info">
+                    <h3>Planet Features</h3>
+                    <div class="features-grid">
+                        <div class="feature">
+                            <span class="feature-icon">🌍</span>
+                            <span>@_colony.PlanetType</span>
+                        </div>
+                        @if (_colony.HasDilithium)
+                        {
+                            <div class="feature strategic">
+                                <span class="feature-icon">💎</span>
+                                <span>Dilithium</span>
+                            </div>
+                        }
+                        @if (_colony.HasDeuterium)
+                        {
+                            <div class="feature strategic">
+                                <span class="feature-icon">⚡</span>
+                                <span>Deuterium</span>
+                            </div>
+                        }
+                        @if (_colony.MineralsModifier != 0)
+                        {
+                            <div class="feature @((_colony.MineralsModifier > 0) ? "positive" : "negative")">
+                                <span class="feature-icon">🔩</span>
+                                <span>@((_colony.MineralsModifier > 0) ? "+" : "")@_colony.MineralsModifier% Minerals</span>
+                            </div>
+                        }
+                        @if (_colony.FoodModifier != 0)
+                        {
+                            <div class="feature @((_colony.FoodModifier > 0) ? "positive" : "negative")">
+                                <span class="feature-icon">🌾</span>
+                                <span>@((_colony.FoodModifier > 0) ? "+" : "")@_colony.FoodModifier% Food</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="designation-selector">
+                    <h3>Colony Designation</h3>
+                    <div class="designation-options">
+                        @foreach (var designation in _designations)
+                        {
+                            <button class="designation-btn @(designation == _colony.Designation ? "active" : "")"
+                                    @onclick="() => SetDesignation(designation)">
+                                @designation
+                            </button>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Center Panel: Buildings -->
+            <div class="panel buildings-panel">
+                <h2>Buildings (@_colony.UsedSlots / @_colony.TotalSlots Slots)</h2>
+                
+                <div class="buildings-grid">
+                    @foreach (var building in _colony.Buildings)
+                    {
+                        <div class="building-card @(building.IsActive ? "" : "inactive") @(building.IsRuined ? "ruined" : "")">
+                            <div class="building-header">
+                                <span class="building-name">@building.Name</span>
+                                @if (building.Level > 1)
+                                {
+                                    <span class="building-level">Lvl @building.Level</span>
+                                }
+                            </div>
+                            <div class="building-jobs">
+                                <span>Jobs: @building.JobsFilled / @building.JobsCount</span>
+                                <div class="job-bar">
+                                    <div class="bar-fill" style="width: @(building.JobsCount > 0 ? building.JobsFilled * 100 / building.JobsCount : 0)%"></div>
+                                </div>
+                            </div>
+                            <div class="building-actions">
+                                <button class="btn-small" @onclick="() => UpgradeBuilding(building.Id)">⬆️</button>
+                                <button class="btn-small danger" @onclick="() => DemolishBuilding(building.Id)">🗑️</button>
+                            </div>
+                        </div>
+                    }
+
+                    <!-- Add Building Button -->
+                    @if (_colony.AvailableSlots > 0)
+                    {
+                        <div class="building-card add-new" @onclick="ShowBuildMenu">
+                            <span class="add-icon">+</span>
+                            <span>Construct Building</span>
+                        </div>
+                    }
+                </div>
+
+                <!-- Build Queue -->
+                @if (_colony.BuildQueue.Any())
+                {
+                    <div class="build-queue">
+                        <h3>Construction Queue</h3>
+                        @foreach (var item in _colony.BuildQueue)
+                        {
+                            <div class="queue-item">
+                                <span class="queue-name">@item.ItemName</span>
+                                <div class="queue-progress">
+                                    <div class="progress-bar">
+                                        <div class="bar-fill" style="width: @item.PercentComplete%"></div>
+                                    </div>
+                                    <span>@item.PercentComplete%</span>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+
+            <!-- Right Panel: Population -->
+            <div class="panel population-panel">
+                <h2>Population</h2>
+                
+                @if (_populationReport != null)
+                {
+                    <div class="pop-stats">
+                        <div class="pop-stat">
+                            <span class="label">Average Happiness</span>
+                            <span class="value @GetHappinessClass(_populationReport.AverageHappiness)">
+                                @(_populationReport.AverageHappiness.ToString("F0"))%
+                            </span>
+                        </div>
+                        <div class="pop-stat">
+                            <span class="label">Employment</span>
+                            <span class="value">@_populationReport.Employed / @(_populationReport.Employed + _populationReport.Unemployed)</span>
+                        </div>
+                        <div class="pop-stat">
+                            <span class="label">Job Vacancies</span>
+                            <span class="value">@_populationReport.JobVacancies</span>
+                        </div>
+                    </div>
+
+                    <div class="species-breakdown">
+                        <h3>Species</h3>
+                        @foreach (var (species, count) in _populationReport.SpeciesBreakdown)
+                        {
+                            <div class="species-row">
+                                <span class="species-name">@species</span>
+                                <span class="species-count">@count M</span>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="political-breakdown">
+                        <h3>Political Stance</h3>
+                        <div class="political-bars">
+                            @foreach (var (stance, count) in _populationReport.PoliticalBreakdown)
+                            {
+                                <div class="political-row">
+                                    <span class="stance @stance.ToLower()">@stance</span>
+                                    <div class="stance-bar">
+                                        <div class="bar-fill @stance.ToLower()" 
+                                             style="width: @(_populationReport.TotalPopulation > 0 ? count * 100 / _populationReport.TotalPopulation : 0)%">
+                                        </div>
+                                    </div>
+                                    <span class="count">@count M</span>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Build Menu Modal -->
+        @if (_showBuildMenu)
+        {
+            <div class="modal-overlay" @onclick="HideBuildMenu">
+                <div class="modal build-modal" @onclick:stopPropagation="true">
+                    <h2>Construct Building</h2>
+                    <div class="available-buildings">
+                        @foreach (var buildingId in _availableBuildings)
+                        {
+                            var def = GetBuildingDef(buildingId);
+                            <div class="building-option" @onclick="() => ConstructBuilding(buildingId)">
+                                <div class="option-header">
+                                    <span class="option-name">@def.Name</span>
+                                    <span class="option-slots">@def.SlotsRequired Slots</span>
+                                </div>
+                                <p class="option-desc">@def.Description</p>
+                                <div class="option-cost">
+                                    @if (def.Credits > 0)
+                                    {
+                                        <span>💰 @def.Credits</span>
+                                    }
+                                    @if (def.Minerals > 0)
+                                    {
+                                        <span>🔩 @def.Minerals</span>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    <button class="btn-close" @onclick="HideBuildMenu">Close</button>
+                </div>
+            </div>
+        }
+    }
+</div>
+
+<style>
+    .colony-management {
+        min-height: 100vh;
+        padding: 20px;
+        background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3a 100%);
+    }
+
+    .colony-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 20px;
+        background: rgba(0,0,0,0.5);
+        border-radius: 10px;
+        margin-bottom: 20px;
+    }
+
+    .colony-title h1 {
+        margin: 0;
+        font-size: 2em;
+    }
+
+    .colony-location {
+        color: #888;
+        font-size: 0.9em;
+    }
+
+    .colony-designation {
+        padding: 8px 20px;
+        border-radius: 20px;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+
+    .colony-designation.balanced { background: #3498db; }
+    .colony-designation.mining { background: #e67e22; }
+    .colony-designation.agriculture { background: #27ae60; }
+    .colony-designation.research { background: #9b59b6; }
+    .colony-designation.fortress { background: #c0392b; }
+
+    .colony-content {
+        display: grid;
+        grid-template-columns: 300px 1fr 300px;
+        gap: 20px;
+    }
+
+    .panel {
+        background: rgba(0,0,0,0.4);
+        border-radius: 10px;
+        padding: 20px;
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .panel h2 {
+        margin-top: 0;
+        padding-bottom: 10px;
+        border-bottom: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .stat-group {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .stat {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .stat-label {
+        color: #888;
+        font-size: 0.9em;
+    }
+
+    .stat-value {
+        font-size: 1.5em;
+        font-weight: bold;
+    }
+
+    .stat-bar {
+        height: 8px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .bar-fill {
+        height: 100%;
+        background: #3498db;
+        transition: width 0.3s;
+    }
+
+    .bar-fill.high { background: #27ae60; }
+    .bar-fill.medium { background: #f39c12; }
+    .bar-fill.low { background: #e74c3c; }
+    .bar-fill.habitability { background: #2ecc71; }
+
+    .features-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .feature {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        padding: 5px 10px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 5px;
+        font-size: 0.85em;
+    }
+
+    .feature.strategic { background: rgba(155, 89, 182, 0.3); }
+    .feature.positive { background: rgba(39, 174, 96, 0.3); }
+    .feature.negative { background: rgba(192, 57, 43, 0.3); }
+
+    .buildings-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 15px;
+        margin-top: 15px;
+    }
+
+    .building-card {
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 8px;
+        padding: 15px;
+        transition: all 0.2s;
+    }
+
+    .building-card:hover {
+        border-color: #3498db;
+        transform: translateY(-2px);
+    }
+
+    .building-card.inactive {
+        opacity: 0.6;
+    }
+
+    .building-card.ruined {
+        border-color: #c0392b;
+        background: rgba(192, 57, 43, 0.1);
+    }
+
+    .building-card.add-new {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        border-style: dashed;
+    }
+
+    .add-icon {
+        font-size: 2em;
+        margin-bottom: 10px;
+    }
+
+    .building-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .building-name {
+        font-weight: bold;
+    }
+
+    .building-level {
+        background: #3498db;
+        padding: 2px 8px;
+        border-radius: 10px;
+        font-size: 0.8em;
+    }
+
+    .building-jobs {
+        font-size: 0.85em;
+        color: #888;
+    }
+
+    .job-bar {
+        height: 4px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 2px;
+        margin-top: 5px;
+    }
+
+    .building-actions {
+        display: flex;
+        gap: 5px;
+        margin-top: 10px;
+    }
+
+    .btn-small {
+        padding: 5px 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        background: rgba(255,255,255,0.1);
+    }
+
+    .btn-small.danger:hover {
+        background: rgba(231, 76, 60, 0.5);
+    }
+
+    .build-queue {
+        margin-top: 20px;
+        padding-top: 15px;
+        border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .queue-item {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 10px;
+        background: rgba(255,255,255,0.05);
+        border-radius: 5px;
+        margin-bottom: 10px;
+    }
+
+    .queue-progress {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .progress-bar {
+        flex: 1;
+        height: 8px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .designation-options {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 10px;
+    }
+
+    .designation-btn {
+        padding: 8px 15px;
+        border: 1px solid rgba(255,255,255,0.2);
+        border-radius: 5px;
+        background: transparent;
+        color: white;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .designation-btn:hover {
+        background: rgba(255,255,255,0.1);
+    }
+
+    .designation-btn.active {
+        background: #3498db;
+        border-color: #3498db;
+    }
+
+    .pop-stats {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .pop-stat {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .species-breakdown, .political-breakdown {
+        margin-top: 20px;
+        padding-top: 15px;
+        border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .species-row, .political-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 5px 0;
+    }
+
+    .species-name, .stance {
+        width: 100px;
+    }
+
+    .stance.loyalist { color: #2ecc71; }
+    .stance.neutral { color: #f39c12; }
+    .stance.reformist { color: #e67e22; }
+    .stance.revolutionary { color: #e74c3c; }
+
+    .stance-bar {
+        flex: 1;
+        height: 10px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 5px;
+        overflow: hidden;
+    }
+
+    .bar-fill.loyalist { background: #2ecc71; }
+    .bar-fill.neutral { background: #f39c12; }
+    .bar-fill.reformist { background: #e67e22; }
+    .bar-fill.revolutionary { background: #e74c3c; }
+
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+
+    .modal {
+        background: #1a1a2e;
+        border-radius: 15px;
+        padding: 25px;
+        max-width: 600px;
+        max-height: 80vh;
+        overflow-y: auto;
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .available-buildings {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin: 20px 0;
+    }
+
+    .building-option {
+        padding: 15px;
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .building-option:hover {
+        border-color: #3498db;
+        background: rgba(52, 152, 219, 0.1);
+    }
+
+    .option-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+    }
+
+    .option-name {
+        font-weight: bold;
+        font-size: 1.1em;
+    }
+
+    .option-slots {
+        color: #888;
+    }
+
+    .option-desc {
+        color: #aaa;
+        font-size: 0.9em;
+        margin: 0 0 10px 0;
+    }
+
+    .option-cost {
+        display: flex;
+        gap: 15px;
+        color: #f39c12;
+    }
+
+    .btn-back {
+        padding: 10px 20px;
+        background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.2);
+        border-radius: 5px;
+        color: white;
+        cursor: pointer;
+    }
+
+    .btn-close {
+        width: 100%;
+        padding: 12px;
+        background: #3498db;
+        border: none;
+        border-radius: 5px;
+        color: white;
+        cursor: pointer;
+        font-size: 1em;
+    }
+
+    .loading-screen {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+    }
+
+    .spinner {
+        width: 50px;
+        height: 50px;
+        border: 3px solid rgba(255,255,255,0.1);
+        border-top-color: #3498db;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @@keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    /* Faction theming */
+    .colony-management.federation { --accent: #3498db; }
+    .colony-management.klingon { --accent: #c0392b; }
+    .colony-management.romulan { --accent: #27ae60; }
+    .colony-management.cardassian { --accent: #8e44ad; }
+    .colony-management.ferengi { --accent: #f39c12; }
+
+    @@media (max-width: 1200px) {
+        .colony-content {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+@code {
+    [Parameter]
+    public Guid ColonyId { get; set; }
+
+    private bool _loading = true;
+    private ColonyDetailReport? _colony;
+    private PopulationReport? _populationReport;
+    private List<string> _availableBuildings = new();
+    private bool _showBuildMenu = false;
+    private string _factionId = "federation";
+    private string[] _designations = { "Balanced", "Mining", "Agriculture", "Research", "Fortress", "Trade" };
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadColonyData();
+    }
+
+    private async Task LoadColonyData()
+    {
+        _loading = true;
+        try
+        {
+            _colony = await Http.GetFromJsonAsync<ColonyDetailReport>($"api/colonies/{ColonyId}");
+            _populationReport = await Http.GetFromJsonAsync<PopulationReport>($"api/colonies/{ColonyId}/population");
+            _availableBuildings = await Http.GetFromJsonAsync<List<string>>($"api/colonies/{ColonyId}/available-buildings") ?? new();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading colony: {ex.Message}");
+        }
+        _loading = false;
+    }
+
+    private string GetFactionClass() => _factionId.ToLower();
+
+    private string GetStabilityClass(int stability) => stability switch
+    {
+        >= 70 => "high",
+        >= 40 => "medium",
+        _ => "low"
+    };
+
+    private string GetHappinessClass(double happiness) => happiness switch
+    {
+        >= 70 => "high",
+        >= 40 => "medium",
+        _ => "low"
+    };
+
+    private void ShowBuildMenu() => _showBuildMenu = true;
+    private void HideBuildMenu() => _showBuildMenu = false;
+
+    private async Task ConstructBuilding(string buildingId)
+    {
+        await Http.PostAsJsonAsync($"api/colonies/{ColonyId}/build", new { BuildingTypeId = buildingId });
+        _showBuildMenu = false;
+        await LoadColonyData();
+    }
+
+    private async Task DemolishBuilding(Guid buildingId)
+    {
+        await Http.DeleteAsync($"api/colonies/buildings/{buildingId}");
+        await LoadColonyData();
+    }
+
+    private async Task UpgradeBuilding(Guid buildingId)
+    {
+        await Http.PostAsync($"api/colonies/buildings/{buildingId}/upgrade", null);
+        await LoadColonyData();
+    }
+
+    private async Task SetDesignation(string designation)
+    {
+        if (Enum.TryParse<ColonyDesignation>(designation, out var d))
+        {
+            await Http.PostAsJsonAsync($"api/colonies/{ColonyId}/designation", new { Designation = d });
+            await LoadColonyData();
+        }
+    }
+
+    private void GoBack() => Nav.NavigateTo("/game/galaxy");
+
+    private (string Name, string Description, int Credits, int Minerals, int SlotsRequired) GetBuildingDef(string id)
+    {
+        // Simplified - in real app would come from shared definitions
+        return id switch
+        {
+            "mine" => ("Mining Complex", "Extracts minerals from planetary deposits.", 0, 100, 1),
+            "farm" => ("Hydroponic Farm", "Produces food for the colony.", 0, 50, 1),
+            "power_plant" => ("Fusion Reactor", "Generates energy.", 0, 75, 1),
+            "housing" => ("Housing Block", "Provides living space.", 0, 50, 1),
+            "research_lab" => ("Research Lab", "Conducts research.", 50, 100, 1),
+            "hospital" => ("Medical Center", "Healthcare and growth bonus.", 50, 100, 1),
+            "holosuites" => ("Holosuites", "Amenities and happiness.", 50, 75, 1),
+            "barracks" => ("Barracks", "Ground defense.", 0, 100, 1),
+            "consumer_factory" => ("Civilian Industries", "Produces consumer goods.", 0, 100, 1),
+            "trade_hub" => ("Trade Hub", "Expands trade capacity.", 150, 150, 1),
+            _ => (id, "Building", 100, 100, 1)
+        };
+    }
+
+    // Type definitions for JSON
+    public class ColonyDetailReport
+    {
+        public Guid ColonyId { get; set; }
+        public string ColonyName { get; set; } = "";
+        public string PlanetName { get; set; } = "";
+        public string SystemName { get; set; } = "";
+        public int TotalPopulation { get; set; }
+        public int HousingCapacity { get; set; }
+        public int Stability { get; set; }
+        public string Designation { get; set; } = "";
+        public int TotalSlots { get; set; }
+        public int UsedSlots { get; set; }
+        public int AvailableSlots => TotalSlots - UsedSlots;
+        public string PlanetType { get; set; } = "";
+        public int Habitability { get; set; }
+        public int MineralsModifier { get; set; }
+        public int FoodModifier { get; set; }
+        public bool HasDilithium { get; set; }
+        public bool HasDeuterium { get; set; }
+        public List<BuildingInfo> Buildings { get; set; } = new();
+        public List<BuildQueueInfo> BuildQueue { get; set; } = new();
+    }
+
+    public class BuildingInfo
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; } = "";
+        public int Level { get; set; }
+        public bool IsActive { get; set; }
+        public bool IsRuined { get; set; }
+        public int JobsCount { get; set; }
+        public int JobsFilled { get; set; }
+    }
+
+    public class BuildQueueInfo
+    {
+        public string ItemName { get; set; } = "";
+        public int PercentComplete { get; set; }
+    }
+
+    public class PopulationReport
+    {
+        public int TotalPopulation { get; set; }
+        public double AverageHappiness { get; set; }
+        public int Employed { get; set; }
+        public int Unemployed { get; set; }
+        public int JobVacancies { get; set; }
+        public Dictionary<string, int> SpeciesBreakdown { get; set; } = new();
+        public Dictionary<string, int> PoliticalBreakdown { get; set; } = new();
+    }
+
+    public enum ColonyDesignation
+    {
+        Balanced, Mining, Agriculture, Generator, Forge, Research, Trade, Fortress, Resort
+    }
+}

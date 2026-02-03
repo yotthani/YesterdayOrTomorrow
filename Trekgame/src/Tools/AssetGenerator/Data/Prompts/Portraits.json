@@ -1,0 +1,98 @@
+{
+  "category": "Portraits",
+  "description": "Generic faction member portraits for officers, crew, citizens",
+  "factionStyles": {
+    "federation": {
+      "species": ["Human", "Vulcan", "Andorian", "Tellarite", "Betazoid", "Trill", "Bajoran"],
+      "uniforms": {
+        "command": "Red/maroon uniform, captain's pips",
+        "operations": "Gold uniform, operations badge",
+        "science": "Blue uniform, science insignia",
+        "civilian": "Casual civilian clothing, no uniform"
+      },
+      "aesthetic": "Clean, professional, diverse species"
+    },
+    "klingon": {
+      "species": ["Klingon"],
+      "uniforms": {
+        "warrior": "Battle armor, House insignia",
+        "officer": "Command sash, medals",
+        "civilian": "Leather clothing, casual warrior attire"
+      },
+      "aesthetic": "Fierce, honorable, battle-ready",
+      "features": ["Forehead ridges", "Long hair", "Goatees common"]
+    },
+    "romulan": {
+      "species": ["Romulan"],
+      "uniforms": {
+        "military": "Gray/green uniform with shoulder pads",
+        "tal_shiar": "Dark uniform, minimal insignia",
+        "civilian": "Elegant robes, muted colors"
+      },
+      "aesthetic": "Secretive, calculating, elegant",
+      "features": ["Pointed ears", "V-brow ridge", "Severe hairstyles"]
+    },
+    "cardassian": {
+      "species": ["Cardassian"],
+      "uniforms": {
+        "military": "Brown armor with rank insignia",
+        "obsidian_order": "Black uniform, concealed",
+        "civilian": "Gray/brown civilian clothing"
+      },
+      "aesthetic": "Cold, efficient, authoritarian",
+      "features": ["Neck ridges", "Spoon forehead", "Gray skin", "Slicked hair"]
+    },
+    "ferengi": {
+      "species": ["Ferengi"],
+      "uniforms": {
+        "daimon": "Ornate gold jacket, headdress",
+        "merchant": "Business attire, profit symbols",
+        "civilian": "Gaudy clothing, jewelry"
+      },
+      "aesthetic": "Greedy, cunning, ostentatious",
+      "features": ["Large ears", "Sharp teeth", "Orange skin"]
+    },
+    "borg": {
+      "species": ["Assimilated various species"],
+      "appearance": {
+        "drone": "Cybernetic implants, pale skin, one eye implant",
+        "tactical": "Heavy implants, arm weapons",
+        "designation": "Numerical designation, no individual identity"
+      },
+      "aesthetic": "Cold, mechanical, terrifying",
+      "features": ["Cybernetic implants", "Pale skin", "Black tubing", "Green lights"]
+    },
+    "dominion": {
+      "species": ["Jem'Hadar", "Vorta", "Founder"],
+      "appearances": {
+        "jemhadar": "Gray scaly skin, horned forehead, soldier",
+        "vorta": "Pale skin, large ears, diplomatic",
+        "founder": "Orange waxy skin, morphing edges"
+      },
+      "aesthetic": "Genetically engineered, loyal, dangerous"
+    }
+  },
+  "portraitTypes": [
+    { "id": "officer_male", "name": "Officer Male", "role": "Military officer", "gender": "male" },
+    { "id": "officer_female", "name": "Officer Female", "role": "Military officer", "gender": "female" },
+    { "id": "crew_male", "name": "Crew Male", "role": "Ship crew", "gender": "male" },
+    { "id": "crew_female", "name": "Crew Female", "role": "Ship crew", "gender": "female" },
+    { "id": "civilian_male", "name": "Civilian Male", "role": "Citizen", "gender": "male" },
+    { "id": "civilian_female", "name": "Civilian Female", "role": "Citizen", "gender": "female" },
+    { "id": "elder_male", "name": "Elder Male", "role": "Senior/veteran", "gender": "male" },
+    { "id": "elder_female", "name": "Elder Female", "role": "Senior/veteran", "gender": "female" }
+  ],
+  "styleGuide": {
+    "material": "Claymation 3D style, detailed facial features",
+    "quality": "High-end stop-motion animation quality",
+    "lighting": "Soft portrait lighting, subsurface scattering on skin",
+    "composition": "Head and shoulders portrait, 3/4 or frontal view",
+    "background": "Solid black (#000000)",
+    "critical": [
+      "Species-accurate features are ESSENTIAL",
+      "Faction uniform/clothing clearly visible",
+      "Expression appropriate to faction culture",
+      "Gender clearly distinguishable"
+    ]
+  }
+}

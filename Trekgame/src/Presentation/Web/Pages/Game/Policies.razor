@@ -1,0 +1,75 @@
+@page "/game/policies"
+@layout StellarisLayout
+@using StarTrekGame.Web.Services
+@inject NavigationManager Navigation
+
+<PageTitle>Policies - Galactic Strategy</PageTitle>
+
+<div class="stellaris-layout">
+    <header class="st-topbar">
+        <div class="st-empire-badge"><div class="st-empire-flag">🌐</div><div class="st-empire-info"><span class="st-empire-name">Empire Policies</span></div></div>
+        <div class="st-game-controls"><button class="st-end-turn-btn" @onclick="GoBack">← BACK</button></div>
+    </header>
+    <div class="st-main">
+        <aside class="st-sidebar-left">
+            <nav class="st-nav">
+                <a href="/game/galaxy" class="st-nav-btn"><span class="st-nav-icon">🌌</span><span class="st-nav-label">Galaxy</span></a>
+                <a href="/game/policies" class="st-nav-btn active"><span class="st-nav-icon">📜</span><span class="st-nav-label">Policies</span></a>
+            </nav>
+        </aside>
+        <div class="policy-content">
+            <h1>EMPIRE POLICIES</h1>
+            <p>Configure your empire's policies and edicts.</p>
+            
+            <div class="policy-grid">
+                <div class="policy-card">
+                    <h3>Economic Policy</h3>
+                    <select class="policy-select">
+                        <option>Free Market</option>
+                        <option>Planned Economy</option>
+                        <option>Mixed Economy</option>
+                    </select>
+                </div>
+                <div class="policy-card">
+                    <h3>Military Doctrine</h3>
+                    <select class="policy-select">
+                        <option>Defensive</option>
+                        <option>Balanced</option>
+                        <option>Aggressive</option>
+                    </select>
+                </div>
+                <div class="policy-card">
+                    <h3>Diplomatic Stance</h3>
+                    <select class="policy-select">
+                        <option>Peaceful</option>
+                        <option>Neutral</option>
+                        <option>Belligerent</option>
+                    </select>
+                </div>
+                <div class="policy-card">
+                    <h3>Research Focus</h3>
+                    <select class="policy-select">
+                        <option>Balanced</option>
+                        <option>Military Tech</option>
+                        <option>Economic Tech</option>
+                        <option>Exploration</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.policy-content { flex: 1; padding: 24px; background: linear-gradient(180deg, #080c14, #040608); }
+.policy-content h1 { font-family: var(--st-font-display); font-size: 24px; color: #ff9900; letter-spacing: 3px; margin-bottom: 16px; }
+.policy-content p { color: #a8c0d8; margin-bottom: 24px; }
+.policy-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+.policy-card { background: rgba(20, 30, 45, 0.9); border: 1px solid rgba(60, 90, 130, 0.5); border-radius: 8px; padding: 20px; }
+.policy-card h3 { font-family: var(--st-font-display); font-size: 14px; color: #c8d4e8; margin-bottom: 12px; }
+.policy-select { width: 100%; padding: 10px; background: rgba(10, 15, 25, 0.8); border: 1px solid rgba(60, 90, 130, 0.5); border-radius: 4px; color: #c8d4e8; font-size: 13px; }
+</style>
+
+@code {
+    private void GoBack() => Navigation.NavigateTo("/game/galaxy");
+}

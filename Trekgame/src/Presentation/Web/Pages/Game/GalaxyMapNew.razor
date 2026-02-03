@@ -1,0 +1,1749 @@
+@page "/game/galaxy"
+@page "/game/map"
+@page "/game/map/{SystemId:guid}"
+@page "/game/galaxy/{SystemId:guid}"
+@layout StellarisLayout
+@using MudBlazor
+@using Microsoft.JSInterop
+@using StarTrekGame.Web.Services
+
+@using Blazored.LocalStorage
+@using System.Text.Json
+@implements IAsyncDisposable
+@inject IGameApiClient Api
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+@inject INotificationService NotificationSvc
+@inject ILocalStorageService LocalStorage
+@inject IJSRuntime JS
+
+<PageTitle>Galaxy - Galactic Strategy</PageTitle>
+
+<div class="stellaris-galaxy-ui @_currentRace" data-theme="@_currentRace">
+    @* ═══════════════════════════════════════════════════════════════════════
+       TOP BAR - Empire Info, Resources, Game Speed
+       ═══════════════════════════════════════════════════════════════════════ *@
+    <header class="top-bar">
+        <div class="empire-section">
+            <div class="empire-flag @_currentRace">
+                <img src="/images/emblems/@(_currentRace).svg" alt="@_currentRace" onerror="this.style.display='none'" />
+            </div>
+            <div class="empire-info">
+                <span class="empire-name">@(_currentFaction?.Name ?? "United Federation")</span>
+                <span class="government-type">Democratic Republic</span>
+            </div>
+        </div>
+        
+        <div class="resources-section">
+            <div class="resource" data-tooltip="resource-credits" title="Energy Credits">
+                
+                <span class="icon-fallback">⚡</span>
+                <div class="resource-values">
+                    <span class="current">@_resources.Energy.ToString("N0")</span>
+                    <span class="income @(_resources.EnergyIncome >= 0 ? "positive" : "negative")">
+                        @(_resources.EnergyIncome >= 0 ? "+" : "")@_resources.EnergyIncome
+                    </span>
+                </div>
+            </div>
+            <div class="resource" data-tooltip="resource-dilithium" title="Minerals">
+                <span class="icon-fallback">💎</span>
+                <div class="resource-values">
+                    <span class="current">@_resources.Minerals.ToString("N0")</span>
+                    <span class="income @(_resources.MineralsIncome >= 0 ? "positive" : "negative")">
+                        @(_resources.MineralsIncome >= 0 ? "+" : "")@_resources.MineralsIncome
+                    </span>
+                </div>
+            </div>
+            <div class="resource" title="Food">
+                <span class="icon-fallback">🌾</span>
+                <div class="resource-values">
+                    <span class="current">@_resources.Food.ToString("N0")</span>
+                </div>
+            </div>
+            <div class="resource" data-tooltip="resource-duranium" title="Alloys">
+                <span class="icon-fallback">🔩</span>
+                <div class="resource-values">
+                    <span class="current">@_resources.Alloys.ToString("N0")</span>
+                </div>
+            </div>
+            <div class="resource" data-tooltip="resource-research" title="Research">
+                <span class="icon-fallback">🔬</span>
+                <div class="resource-values">
+                    <span class="current">@_resources.Research.ToString("N0")</span>
+                </div>
+            </div>
+            <div class="resource" title="Influence">
+                <span class="icon-fallback">👑</span>
+                <div class="resource-values">
+                    <span class="current">@_resources.Influence.ToString("N0")</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="game-section">
+            <div class="turn-display">
+                <span class="label">STARDATE</span>
+                <span class="value">@GetStardate()</span>
+            </div>
+            <div class="notification-area">
+                <NotificationPanel />
+            </div>
+            <button class="help-btn" @onclick="ShowHelp" title="Help & Tutorial">❓</button>
+            <button class="settings-btn" @onclick="OpenSettings" title="Settings">⚙️</button>
+            <button class="end-turn-btn @(_hasSubmittedOrders ? "submitted" : "")" data-tooltip="action-end-turn" @onclick="EndTurn" disabled="@_processingTurn">
+                @if (_processingTurn)
+                {
+                    <span class="spinner"></span>
+                }
+                else if (_hasSubmittedOrders)
+                {
+                    <span>✓ ORDERS SENT</span>
+                }
+                else
+                {
+                    <span>END TURN</span>
+                }
+            </button>
+        </div>
+    </header>
+
+    @* ═══════════════════════════════════════════════════════════════════════
+       MAIN CONTENT
+       ═══════════════════════════════════════════════════════════════════════ *@
+    <div class="main-content">
+        @* LEFT SIDEBAR - Navigation *@
+        <aside class="left-sidebar">
+            <nav class="nav-buttons">
+                <a href="/game/galaxy" class="nav-btn active">
+                    <span class="icon">🌌</span>
+                    <span class="label">Galaxy</span>
+                </a>
+                <a href="/game/contacts" class="nav-btn">
+                    <span class="icon">👥</span>
+                    <span class="label">Contacts</span>
+                </a>
+                <a href="/game/situation" class="nav-btn">
+                    <span class="icon">📋</span>
+                    <span class="label">Situation</span>
+                </a>
+                <a href="/game/research" class="nav-btn">
+                    <span class="icon">🔬</span>
+                    <span class="label">Research</span>
+                </a>
+                <a href="/game/ship-designer" class="nav-btn">
+                    <span class="icon">🛠</span>
+                    <span class="label">Ships</span>
+                </a>
+                <a href="/game/fleets" class="nav-btn">
+                    <span class="icon">🚀</span>
+                    <span class="label">Fleets</span>
+                </a>
+                <a href="/game/colonies" class="nav-btn">
+                    <span class="icon">🏠</span>
+                    <span class="label">Planets</span>
+                </a>
+                <a href="/game/policies" class="nav-btn">
+                    <span class="icon">⚖</span>
+                    <span class="label">Policies</span>
+                </a>
+            </nav>
+            
+            <div class="sidebar-stats">
+                <div class="stat">
+                    <span class="label">Systems</span>
+                    <span class="value">@_ownedSystems / @_totalSystems</span>
+                </div>
+                <div class="stat">
+                    <span class="label">Colonies</span>
+                    <span class="value">@_colonies.Count</span>
+                </div>
+                <div class="stat">
+                    <span class="label">Fleets</span>
+                    <span class="value">@_fleets.Count</span>
+                </div>
+                <div class="stat">
+                    <span class="label">Ships</span>
+                    <span class="value">@_totalShips / @_fleetCap</span>
+                </div>
+            </div>
+        </aside>
+
+        @* GALAXY MAP CANVAS *@
+        <div class="galaxy-viewport">
+            <div id="galaxy-canvas-container" class="canvas-container"></div>
+            
+            @* Map Controls Overlay *@
+            <div class="map-controls">
+                <button class="ctrl-btn" @onclick="ZoomIn" title="Zoom In">+</button>
+                <button class="ctrl-btn" @onclick="ZoomOut" title="Zoom Out">−</button>
+                <button class="ctrl-btn" @onclick="ResetView" title="Reset View">⌂</button>
+                <div class="ctrl-divider"></div>
+                <button class="ctrl-btn @(_showLabels ? "active" : "")" @onclick="ToggleLabels" title="Toggle Labels">A</button>
+                <button class="ctrl-btn @(_showHyperlanes ? "active" : "")" @onclick="ToggleHyperlanes" title="Toggle Hyperlanes">⋈</button>
+                <button class="ctrl-btn @(_showTerritories ? "active" : "")" @onclick="ToggleTerritories" title="Toggle Territories">◎</button>
+            </div>
+            
+            @* Minimap *@
+            <div class="minimap">
+                <div class="minimap-header">GALAXY</div>
+                <div class="minimap-canvas">
+                    @foreach (var system in _systems.Take(100))
+                    {
+                        var x = ((system.X - _minX) / (_maxX - _minX)) * 100;
+                        var y = ((system.Y - _minY) / (_maxY - _minY)) * 100;
+                        var color = system.ControllingFactionId == _currentFactionId ? "#4488ff" : 
+                                   system.ControllingFactionId.HasValue ? "#888888" : "#444444";
+                        <div class="minimap-dot" 
+                             style="left: @x%; top: @y%; background: @color;"></div>
+                    }
+                    <div class="minimap-viewport" style="left: @_viewportX%; top: @_viewportY%; width: @_viewportW%; height: @_viewportH%;"></div>
+                </div>
+            </div>
+        </div>
+
+        @* RIGHT SIDEBAR - Outliner *@
+        <aside class="right-sidebar">
+            <div class="outliner">
+                <div class="outliner-header">
+                    <span>OUTLINER</span>
+                    <button class="collapse-btn">−</button>
+                </div>
+                
+                @* Selected System Info *@
+                @if (_selectedSystem != null)
+                {
+                    <div class="outliner-section selected-system">
+                        <div class="section-header">
+                            <span class="star-icon" style="color: @GetStarColor(_selectedSystem.StarType)">★</span>
+                            <span class="system-name">@_selectedSystem.Name</span>
+                        </div>
+                        <div class="section-content">
+                            <div class="info-row">
+                                <span class="label">Star Type</span>
+                                <span class="value">@(_selectedSystem.StarType ?? "Unknown")</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="label">Owner</span>
+                                <span class="value" style="color: @GetFactionColor(_selectedSystem.ControllingFactionId)">
+                                    @GetFactionName(_selectedSystem.ControllingFactionId)
+                                </span>
+                            </div>
+                            @if (_selectedSystemColony != null)
+                            {
+                                <div class="colony-info">
+                                    <div class="info-row">
+                                        <span class="label">Colony</span>
+                                        <span class="value">@_selectedSystemColony.Name</span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="label">Population</span>
+                                        <span class="value">@_selectedSystemColony.Population.ToString("N0")</span>
+                                    </div>
+                                </div>
+                            }
+                            <div class="action-buttons">
+                                <button class="action-btn" @onclick="() => ViewSystem(_selectedSystem)">
+                                    VIEW SYSTEM
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                }
+                
+                @* Fleets *@
+                <div class="outliner-section fleets-section">
+                    <div class="section-header collapsible" @onclick="() => _fleetsExpanded = !_fleetsExpanded">
+                        <span>🚀 Fleets (@_fleets.Count)</span>
+                        <span class="expand-icon">@(_fleetsExpanded ? "▼" : "▶")</span>
+                    </div>
+                    @if (_isMovingFleet && _selectedFleet != null)
+                    {
+                        <div class="fleet-movement-mode">
+                            <span>Moving: @_selectedFleet.Name</span>
+                            <button class="cancel-move-btn" @onclick="CancelFleetMovement">✕ Cancel</button>
+                        </div>
+                    }
+                    @if (_fleetsExpanded)
+                    {
+                        <div class="section-content">
+                            @foreach (var fleet in _fleets.Take(10))
+                            {
+                                <div class="outliner-item @(fleet.IsMoving ? "moving" : "") @(_selectedFleet?.Id == fleet.Id ? "selected" : "")" 
+                                     @onclick="() => SelectFleet(fleet)">
+                                    <span class="item-icon">▲</span>
+                                    <div class="item-info">
+                                        <span class="item-name">@fleet.Name</span>
+                                        <span class="item-detail">@fleet.ShipCount ships</span>
+                                    </div>
+                                    <span class="item-status @(fleet.IsMoving ? "active" : "")">
+                                        @(fleet.IsMoving ? "●" : "○")
+                                    </span>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+                
+                @* Colonies *@
+                <div class="outliner-section colonies-section">
+                    <div class="section-header collapsible" @onclick="() => _coloniesExpanded = !_coloniesExpanded">
+                        <span>🏠 Colonies (@_colonies.Count)</span>
+                        <span class="expand-icon">@(_coloniesExpanded ? "▼" : "▶")</span>
+                    </div>
+                    @if (_coloniesExpanded)
+                    {
+                        <div class="section-content">
+                            @foreach (var colony in _colonies.Take(10))
+                            {
+                                <div class="outliner-item" @onclick="() => ViewColony(colony)">
+                                    <span class="item-icon">🌍</span>
+                                    <div class="item-info">
+                                        <span class="item-name">@colony.Name</span>
+                                        <span class="item-detail">Pop: @colony.Population.ToString("N0")</span>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    @* ═══════════════════════════════════════════════════════════════════════
+       BOTTOM BAR - Notifications
+       ═══════════════════════════════════════════════════════════════════════ *@
+    <footer class="bottom-bar">
+        <div class="notifications">
+            @foreach (var notification in _notifications.Take(5))
+            {
+                <div class="notification @notification.Type" @onclick="() => DismissNotification(notification)">
+                    <span class="notif-icon">@GetNotificationIcon(notification.Type)</span>
+                    <span class="notif-text">@notification.Message</span>
+                </div>
+            }
+        </div>
+        <div class="bottom-actions">
+            <button class="bottom-btn" @onclick="OpenMenu">☰ MENU</button>
+            <button class="bottom-btn" @onclick="OpenHelp">? HELP</button>
+        </div>
+    </footer>
+</div>
+
+@* ═══════════════════════════════════════════════════════════════════════════
+   STYLES
+   ═══════════════════════════════════════════════════════════════════════════ *@
+<style>
+    /* Root variables */
+    :root {
+        --ui-bg-dark: rgba(8, 12, 20, 0.95);
+        --ui-bg-medium: rgba(15, 22, 35, 0.9);
+        --ui-bg-light: rgba(25, 35, 50, 0.85);
+        --ui-border: rgba(60, 90, 130, 0.5);
+        --ui-border-bright: rgba(80, 120, 180, 0.7);
+        --ui-text: #c8d4e8;
+        --ui-text-dim: #7890a8;
+        --ui-text-bright: #ffffff;
+        --ui-accent: #4a9eff;
+        --ui-accent-gold: #ffcc00;
+        --ui-positive: #44dd66;
+        --ui-negative: #ff5555;
+    }
+    
+    /* Federation Theme - LCARS Orange/Blue */
+    .stellaris-galaxy-ui.federation {
+        --ui-accent: #ff9900;
+        --ui-accent-gold: #ffcc00;
+        --ui-border-bright: rgba(255, 153, 0, 0.5);
+    }
+    
+    /* Klingon Theme - Red/Black */
+    .stellaris-galaxy-ui.klingon {
+        --ui-accent: #cc0000;
+        --ui-accent-gold: #ff4444;
+        --ui-border-bright: rgba(204, 0, 0, 0.5);
+        --ui-bg-dark: rgba(20, 8, 8, 0.95);
+        --ui-bg-medium: rgba(35, 15, 15, 0.9);
+    }
+    
+    /* Romulan Theme - Green */
+    .stellaris-galaxy-ui.romulan {
+        --ui-accent: #00aa44;
+        --ui-accent-gold: #44ff88;
+        --ui-border-bright: rgba(0, 170, 68, 0.5);
+        --ui-bg-dark: rgba(5, 15, 10, 0.95);
+    }
+    
+    /* Cardassian Theme - Tan/Brown */
+    .stellaris-galaxy-ui.cardassian {
+        --ui-accent: #aa8844;
+        --ui-accent-gold: #ddaa66;
+        --ui-border-bright: rgba(170, 136, 68, 0.5);
+        --ui-bg-dark: rgba(20, 15, 10, 0.95);
+    }
+    
+    /* Ferengi Theme - Gold */
+    .stellaris-galaxy-ui.ferengi {
+        --ui-accent: #ddaa00;
+        --ui-accent-gold: #ffcc00;
+        --ui-border-bright: rgba(221, 170, 0, 0.5);
+        --ui-bg-dark: rgba(20, 18, 8, 0.95);
+    }
+    
+    /* Borg Theme - Cyber Green */
+    .stellaris-galaxy-ui.borg {
+        --ui-accent: #00ffaa;
+        --ui-accent-gold: #44ffcc;
+        --ui-border-bright: rgba(0, 255, 170, 0.5);
+        --ui-bg-dark: rgba(5, 15, 12, 0.95);
+    }
+
+    .stellaris-galaxy-ui {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: #000008;
+        display: flex;
+        flex-direction: column;
+        font-family: 'Roboto', 'Segoe UI', sans-serif;
+        color: var(--ui-text);
+        overflow: hidden;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       TOP BAR
+       ═══════════════════════════════════════════════════════════════ */
+    .top-bar {
+        height: 48px;
+        background: var(--ui-bg-dark);
+        border-bottom: 1px solid var(--ui-border);
+        display: flex;
+        align-items: center;
+        padding: 0 12px;
+        gap: 20px;
+        z-index: 100;
+    }
+
+    .empire-section {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding-right: 20px;
+        border-right: 1px solid var(--ui-border);
+    }
+
+    .empire-flag {
+        width: 36px;
+        height: 36px;
+        border-radius: 4px;
+        border: 2px solid var(--ui-accent);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+    
+    .empire-flag img {
+        width: 28px;
+        height: 28px;
+        object-fit: contain;
+        filter: brightness(1.2);
+    }
+
+    .empire-flag.federation { 
+        background-color: #1a4a8c;
+        border-color: #4488ff; 
+    }
+    .empire-flag.klingon { 
+        background-color: #5c0a0a;
+        border-color: #cc0000; 
+    }
+    .empire-flag.romulan { 
+        background-color: #0a3c2c;
+        border-color: #00aa66; 
+    }
+    .empire-flag.cardassian { 
+        background-color: #5c3a0a;
+        border-color: #cc8822; 
+    }
+    .empire-flag.ferengi { 
+        background-color: #5c4a0a;
+        border-color: #ddaa22; 
+    }
+    .empire-flag.borg { 
+        background-color: #0a3c0a;
+        border-color: #22cc44; 
+    }
+
+    .empire-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .empire-name {
+        font-weight: 600;
+        font-size: 13px;
+        color: var(--ui-text-bright);
+    }
+
+    .government-type {
+        font-size: 10px;
+        color: var(--ui-text-dim);
+    }
+
+    .resources-section {
+        display: flex;
+        gap: 16px;
+        flex: 1;
+    }
+
+    .resource {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px;
+        background: var(--ui-bg-light);
+        border-radius: 4px;
+        border: 1px solid transparent;
+        transition: border-color 0.2s;
+    }
+
+    .resource:hover {
+        border-color: var(--ui-border-bright);
+    }
+
+    .resource img {
+        width: 18px;
+        height: 18px;
+    }
+
+    .icon-fallback {
+        font-size: 16px;
+    }
+
+    .resource-values {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.2;
+    }
+
+    .resource-values .current {
+        font-weight: 600;
+        font-size: 13px;
+        color: var(--ui-text-bright);
+    }
+
+    .resource-values .income {
+        font-size: 10px;
+    }
+
+    .resource-values .income.positive { color: var(--ui-positive); }
+    .resource-values .income.negative { color: var(--ui-negative); }
+
+    .game-section {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding-left: 20px;
+        border-left: 1px solid var(--ui-border);
+    }
+
+    .turn-display {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .turn-display .label {
+        font-size: 9px;
+        color: var(--ui-text-dim);
+        letter-spacing: 1px;
+    }
+
+    .turn-display .value {
+        font-family: 'Orbitron', monospace;
+        font-size: 16px;
+        color: var(--ui-accent-gold);
+    }
+
+    .help-btn {
+        width: 36px;
+        height: 36px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 6px;
+        color: #7890a8;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.15s;
+        margin-right: 8px;
+    }
+    .help-btn:hover {
+    .settings-btn {
+        width: 36px;
+        height: 36px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 6px;
+        color: #7890a8;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.15s;
+        margin-right: 8px;
+    }
+    .settings-btn:hover {
+        background: rgba(255, 153, 0, 0.2);
+        border-color: rgba(255, 153, 0, 0.5);
+        color: #ff9900;
+    }
+        background: rgba(74, 158, 255, 0.2);
+        border-color: rgba(74, 158, 255, 0.5);
+        color: #4a9eff;
+    }
+    .end-turn-btn {
+        padding: 8px 20px;
+        background: linear-gradient(180deg, #2a6a1a 0%, #1a4a0a 100%);
+        border: 1px solid #3a8a2a;
+        border-radius: 4px;
+        color: #ffffff;
+        font-weight: 600;
+        font-size: 12px;
+        cursor: pointer;
+        transition: all 0.15s;
+    }
+
+    .end-turn-btn:hover {
+        background: linear-gradient(180deg, #3a8a2a 0%, #2a6a1a 100%);
+    }
+
+    .end-turn-btn.submitted {
+        background: linear-gradient(180deg, #4a4a4a 0%, #3a3a3a 100%);
+        border-color: #5a5a5a;
+        color: var(--ui-positive);
+    }
+
+    .end-turn-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    .spinner {
+        display: inline-block;
+        width: 14px;
+        height: 14px;
+        border: 2px solid rgba(255,255,255,0.3);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+
+    @@keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       MAIN CONTENT
+       ═══════════════════════════════════════════════════════════════ */
+    .main-content {
+        flex: 1;
+        display: flex;
+        overflow: hidden;
+    }
+
+    /* LEFT SIDEBAR */
+    .left-sidebar {
+        width: 60px;
+        background: var(--ui-bg-dark);
+        border-right: 1px solid var(--ui-border);
+        display: flex;
+        flex-direction: column;
+        z-index: 50;
+    }
+
+    .nav-buttons {
+        flex: 1;
+        padding: 8px 0;
+    }
+
+    .nav-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 10px 4px;
+        color: var(--ui-text-dim);
+        text-decoration: none;
+        transition: all 0.15s;
+        border-left: 3px solid transparent;
+    }
+
+    .nav-btn:hover {
+        background: var(--ui-bg-light);
+        color: var(--ui-text);
+    }
+
+    .nav-btn.active {
+        background: var(--ui-bg-light);
+        color: var(--ui-accent);
+        border-left-color: var(--ui-accent);
+    }
+
+    .nav-btn .icon {
+        font-size: 20px;
+        margin-bottom: 2px;
+    }
+
+    .nav-btn .label {
+        font-size: 9px;
+        text-align: center;
+    }
+
+    .sidebar-stats {
+        padding: 10px 8px;
+        border-top: 1px solid var(--ui-border);
+    }
+
+    .sidebar-stats .stat {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 4px 0;
+        font-size: 10px;
+    }
+
+    .sidebar-stats .stat .label {
+        color: var(--ui-text-dim);
+    }
+
+    .sidebar-stats .stat .value {
+        color: var(--ui-text-bright);
+        font-weight: 600;
+    }
+
+    /* GALAXY VIEWPORT */
+    .galaxy-viewport {
+        flex: 1;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .canvas-container {
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%;
+        height: 100%;
+    }
+
+    .map-controls {
+        position: absolute;
+        bottom: 20px;
+        left: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        z-index: 20;
+    }
+
+    .ctrl-btn {
+        width: 36px;
+        height: 36px;
+        background: var(--ui-bg-dark);
+        border: 1px solid var(--ui-border);
+        border-radius: 4px;
+        color: var(--ui-text);
+        font-size: 18px;
+        cursor: pointer;
+        transition: all 0.15s;
+    }
+
+    .ctrl-btn:hover {
+        background: var(--ui-bg-light);
+        border-color: var(--ui-border-bright);
+    }
+
+    .ctrl-btn.active {
+        background: var(--ui-accent);
+        border-color: var(--ui-accent);
+        color: #000;
+    }
+
+    .ctrl-divider {
+        height: 1px;
+        background: var(--ui-border);
+        margin: 4px 0;
+    }
+
+    /* MINIMAP */
+    .minimap {
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+        width: 180px;
+        background: var(--ui-bg-dark);
+        border: 1px solid var(--ui-border);
+        border-radius: 4px;
+        overflow: hidden;
+        z-index: 20;
+    }
+
+    .minimap-header {
+        padding: 6px 10px;
+        background: var(--ui-bg-medium);
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 1px;
+        color: var(--ui-text-dim);
+        border-bottom: 1px solid var(--ui-border);
+    }
+
+    .minimap-canvas {
+        position: relative;
+        height: 120px;
+        background: rgba(0, 5, 15, 0.8);
+    }
+
+    .minimap-dot {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    .minimap-viewport {
+        position: absolute;
+        border: 1px solid var(--ui-accent);
+        background: rgba(74, 158, 255, 0.1);
+        pointer-events: none;
+    }
+
+    /* RIGHT SIDEBAR - OUTLINER */
+    .right-sidebar {
+        width: 280px;
+        background: var(--ui-bg-dark);
+        border-left: 1px solid var(--ui-border);
+        display: flex;
+        flex-direction: column;
+        z-index: 50;
+    }
+
+    .outliner {
+        flex: 1;
+        overflow-y: auto;
+    }
+
+    .outliner-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 12px;
+        background: var(--ui-bg-medium);
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 1px;
+        color: var(--ui-text-dim);
+        border-bottom: 1px solid var(--ui-border);
+    }
+
+    .collapse-btn {
+        background: none;
+        border: none;
+        color: var(--ui-text-dim);
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    .outliner-section {
+        border-bottom: 1px solid var(--ui-border);
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 12px;
+        background: var(--ui-bg-light);
+        font-size: 12px;
+        font-weight: 500;
+    }
+
+    .section-header.collapsible {
+        cursor: pointer;
+    }
+
+    .section-header.collapsible:hover {
+        background: rgba(40, 55, 75, 0.85);
+    }
+
+    .section-content {
+        padding: 8px;
+    }
+
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 4px 8px;
+        font-size: 11px;
+    }
+
+    .info-row .label {
+        color: var(--ui-text-dim);
+    }
+
+    .info-row .value {
+        color: var(--ui-text-bright);
+    }
+
+    .action-buttons {
+        padding: 8px;
+        display: flex;
+        gap: 8px;
+    }
+
+    .action-btn {
+        flex: 1;
+        padding: 8px 12px;
+        background: var(--ui-bg-medium);
+        border: 1px solid var(--ui-border);
+        border-radius: 4px;
+        color: var(--ui-text);
+        font-size: 11px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.15s;
+    }
+
+    .action-btn:hover {
+        background: var(--ui-accent);
+        border-color: var(--ui-accent);
+        color: #000;
+    }
+
+    .outliner-item {
+        display: flex;
+        align-items: center;
+        padding: 8px;
+        margin-bottom: 4px;
+        background: var(--ui-bg-medium);
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.15s;
+    }
+
+    .outliner-item:hover {
+        background: rgba(40, 55, 75, 0.9);
+    }
+
+    .outliner-item .item-icon {
+        font-size: 16px;
+        margin-right: 10px;
+        color: var(--ui-accent-gold);
+    }
+
+    .outliner-item .item-info {
+        flex: 1;
+    }
+
+    .outliner-item .item-name {
+        display: block;
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--ui-text-bright);
+    }
+
+    .outliner-item .item-detail {
+        display: block;
+        font-size: 10px;
+        color: var(--ui-text-dim);
+    }
+
+    .outliner-item .item-status {
+        font-size: 10px;
+        color: var(--ui-text-dim);
+    }
+
+    .outliner-item .item-status.active {
+        color: var(--ui-positive);
+    }
+
+    .outliner-item.moving {
+        border-left: 3px solid var(--ui-accent-gold);
+    }
+
+    .star-icon {
+        font-size: 18px;
+        margin-right: 8px;
+    }
+
+    .system-name {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--ui-text-bright);
+    }
+
+    .expand-icon {
+        font-size: 10px;
+        color: var(--ui-text-dim);
+    }
+
+    /* BOTTOM BAR */
+    .bottom-bar {
+        height: 36px;
+        background: var(--ui-bg-dark);
+        border-top: 1px solid var(--ui-border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 12px;
+        z-index: 100;
+    }
+
+    .notifications {
+        display: flex;
+        gap: 10px;
+        overflow-x: auto;
+    }
+
+    .notification {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 12px;
+        background: var(--ui-bg-light);
+        border-radius: 4px;
+        font-size: 11px;
+        cursor: pointer;
+        transition: all 0.15s;
+        white-space: nowrap;
+    }
+
+    .notification:hover {
+        background: var(--ui-bg-medium);
+    }
+
+    .notification.info { border-left: 3px solid var(--ui-accent); }
+    .notification.warning { border-left: 3px solid var(--ui-accent-gold); }
+    .notification.danger { border-left: 3px solid var(--ui-negative); }
+    .notification.success { border-left: 3px solid var(--ui-positive); }
+
+    .bottom-actions {
+        display: flex;
+        gap: 8px;
+    }
+
+    .bottom-btn {
+        padding: 4px 12px;
+        background: var(--ui-bg-light);
+        border: 1px solid var(--ui-border);
+        border-radius: 3px;
+        color: var(--ui-text-dim);
+        font-size: 11px;
+        cursor: pointer;
+        transition: all 0.15s;
+    }
+
+    .bottom-btn:hover {
+        background: var(--ui-bg-medium);
+        color: var(--ui-text);
+    }
+
+    /* Selected system panel */
+    .selected-system {
+        background: rgba(74, 158, 255, 0.1);
+        border-left: 3px solid var(--ui-accent);
+    }
+
+    .colony-info {
+        margin-top: 8px;
+        padding-top: 8px;
+        border-top: 1px solid var(--ui-border);
+    }
+    /* LCARS Accent for Federation Theme */
+    .stellaris-galaxy-ui.federation .top-bar {
+        border-bottom: 3px solid #ff9900;
+        background: linear-gradient(180deg, rgba(8, 12, 20, 0.95) 0%, rgba(8, 12, 20, 0.98) 100%);
+    }
+    .stellaris-galaxy-ui.federation .top-bar::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #ff9900 0%, #ff9900 10%, transparent 10%, transparent 12%, #cc9966 12%, #cc9966 40%, transparent 40%, transparent 42%, #ffcc99 42%, #ffcc99 70%, transparent 70%, transparent 72%, #cc99cc 72%);
+    }
+    .stellaris-galaxy-ui.federation .side-nav-btn.active {
+        border-left-color: #ff9900;
+        background: linear-gradient(90deg, rgba(255, 153, 0, 0.15) 0%, transparent 100%);
+    }
+    /* Fleet Movement Mode */
+    .fleet-movement-mode {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 12px;
+        background: linear-gradient(90deg, rgba(74, 158, 255, 0.3), rgba(74, 158, 255, 0.1));
+        border-left: 3px solid var(--ui-accent);
+        margin: 4px 0;
+        font-size: 12px;
+        color: var(--ui-accent);
+        animation: pulse-glow 1.5s ease-in-out infinite;
+    }
+    .cancel-move-btn {
+        background: rgba(255, 85, 85, 0.3);
+        border: 1px solid rgba(255, 85, 85, 0.6);
+        color: #ff8888;
+        padding: 4px 10px;
+        border-radius: 3px;
+        font-size: 11px;
+        cursor: pointer;
+    }
+    .cancel-move-btn:hover { background: rgba(255, 85, 85, 0.5); }
+    .outliner-item.selected {
+        background: rgba(74, 158, 255, 0.2) !important;
+        border-left: 2px solid var(--ui-accent);
+    }
+    @@keyframes pulse-glow {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.7; }
+    }
+    .notification-area {
+        position: relative;
+        margin-right: 12px;
+    }
+</style>
+
+@* Tutorial and Tooltip overlays *@
+<TutorialOverlay @ref="_tutorialOverlay" />
+<GameTooltip @ref="_tooltipComponent" />
+<SettingsMenu @ref="_settingsMenu" />
+
+@code {
+    [Parameter] public Guid? SystemId { get; set; }
+    
+    // Tutorial and Tooltip refs
+    private TutorialOverlay? _tutorialOverlay;
+    private GameTooltip? _tooltipComponent;
+    private SettingsMenu? _settingsMenu;
+
+    // Data
+    private GameDetailDto? _currentGame;
+    private FactionDetailDto? _currentFaction;
+    private List<StarSystemDto> _systems = new();
+    private List<HyperlaneDto> _hyperlanes = new();
+    private List<FleetDetailDto> _fleets = new();
+    private List<ColonyDetailDto> _colonies = new();
+    private List<FactionSummaryDto> _knownFactions = new();
+    
+    // Selection
+    private StarSystemDto? _selectedSystem;
+    private ColonyDetailDto? _selectedSystemColony;
+    private StarSystemDto? _hoveredSystem;
+    private FleetDetailDto? _selectedFleet;
+    private bool _isMovingFleet = false;
+    
+    // View state
+    private bool _showLabels = true;
+    private bool _showHyperlanes = true;
+    private bool _showTerritories = true;
+    private bool _fleetsExpanded = true;
+    private bool _coloniesExpanded = true;
+    
+    // Game state
+    private Guid? _currentFactionId;
+    private string _currentRace = "federation";
+    private int _currentTurn = 1;
+    // Game speed removed - turn-based only
+    private bool _hasSubmittedOrders = false;
+    private bool _processingTurn = false;
+    
+    // Stats
+    private int _ownedSystems = 0;
+    private int _totalSystems = 0;
+    private int _totalShips = 0;
+    private int _fleetCap = 100;
+    
+    // Bounds
+    private double _minX, _maxX, _minY, _maxY;
+    private double _viewportX = 40, _viewportY = 40, _viewportW = 20, _viewportH = 20;
+    
+    // Resources
+    private ResourceData _resources = new();
+    
+    // Notifications
+    private List<NotificationData> _notifications = new();
+    
+    // JS Reference
+    private DotNetObjectReference<GalaxyMapNew>? _dotNetRef;
+    private bool _canvasInitialized = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _dotNetRef = DotNetObjectReference.Create(this);
+        await LoadGameData();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await InitializeCanvas();
+        }
+    }
+
+    private async Task InitializeCanvas()
+    {
+        if (_canvasInitialized) return;
+        
+        try
+        {
+            // Initialize the JS canvas renderer
+            await JS.InvokeVoidAsync("initGalaxyMap", "galaxy-canvas-container");
+            
+            // Send data to renderer
+            await UpdateCanvasData();
+            
+            // Set up callbacks
+            await JS.InvokeVoidAsync("setGalaxyCallbacks", _dotNetRef);
+            
+            _canvasInitialized = true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Canvas init error: {ex.Message}");
+        }
+    }
+
+    private async Task UpdateCanvasData()
+    {
+        Console.WriteLine($"UpdateCanvasData: {_systems.Count} systems, {_hyperlanes.Count} hyperlanes");
+        if (_systems.Count == 0) 
+        {
+            Console.WriteLine("No systems to display!");
+            return;
+        }
+        
+        // Convert systems to JS-friendly format
+        var systemsData = _systems.Select(s => new {
+            id = s.Id.ToString(),
+            name = s.Name,
+            x = s.X,
+            y = s.Y,
+            starType = s.StarType?.ToLower() ?? "yellow",
+            factionId = s.ControllingFactionId?.ToString(),
+            factionName = GetFactionName(s.ControllingFactionId),
+            hasColony = _colonies.Any(c => c.SystemId == s.Id),
+            hasFleet = _fleets.Any(f => f.CurrentSystemId == s.Id),
+            isExplored = s.IsExplored
+        }).ToList();
+        
+        var hyperlanesData = _hyperlanes.Select(h => new {
+            fromId = h.FromSystemId.ToString(),
+            toId = h.ToSystemId.ToString()
+        }).ToList();
+        
+        var fleetsData = _fleets.Select(f => new {
+            id = f.Id.ToString(),
+            name = f.Name,
+            systemId = f.CurrentSystemId.ToString(),
+            destinationId = f.DestinationId?.ToString(),
+            isMoving = f.IsMoving
+        }).ToList();
+        
+        Console.WriteLine($"Sending to JS: {systemsData.Count} systems, {hyperlanesData.Count} hyperlanes");
+        
+        try
+        {
+            await JS.InvokeVoidAsync("setGalaxySystems", JsonSerializer.Serialize(systemsData));
+            await JS.InvokeVoidAsync("setGalaxyHyperlanes", JsonSerializer.Serialize(hyperlanesData));
+            await JS.InvokeVoidAsync("setGalaxyFleets", JsonSerializer.Serialize(fleetsData));
+            Console.WriteLine("Data sent to JS successfully");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error sending to JS: {ex.Message}");
+        }
+    }
+
+    private async Task LoadGameData()
+    {
+        try
+        {
+            // Load game first
+            var games = await Api.GetGamesAsync();
+            var firstGame = games.FirstOrDefault();
+            if (firstGame == null)
+            {
+                Console.WriteLine("No games found, loading mock data");
+                LoadMockData();
+                StateHasChanged();
+                return;
+            }
+            
+            _currentGame = await Api.GetGameAsync(firstGame.Id);
+            _currentTurn = _currentGame?.Turn ?? 1;
+            _knownFactions = _currentGame?.Factions.ToList() ?? new();
+            
+            // Try to get faction ID from storage, but validate it exists
+            var storedFactionId = await LocalStorage.GetItemAsync<Guid?>("currentFactionId");
+            var storedRace = await LocalStorage.GetItemAsync<string>("currentRaceId");
+            
+            // Validate stored race is a valid theme
+            var validRaces = new[] { "federation", "klingon", "romulan", "cardassian", "ferengi", "borg" };
+            _currentRace = validRaces.Contains(storedRace?.ToLower()) ? storedRace!.ToLower() : "federation";
+            
+            // Check if stored faction exists in current game
+            if (storedFactionId.HasValue && _knownFactions.Any(f => f.Id == storedFactionId.Value))
+            {
+                _currentFactionId = storedFactionId.Value;
+            }
+            else if (_knownFactions.Any())
+            {
+                // Use first non-AI faction from the game
+                var playerFaction = _knownFactions.FirstOrDefault(f => !string.IsNullOrEmpty(f.PlayerName)) 
+                    ?? _knownFactions.First();
+                _currentFactionId = playerFaction.Id;
+                await LocalStorage.SetItemAsync("currentFactionId", _currentFactionId);
+                Console.WriteLine($"Using faction {playerFaction.Name} ({_currentFactionId})");
+            }
+            
+            // Load my faction data
+            if (_currentFactionId.HasValue)
+            {
+                try
+                {
+                    _currentFaction = await Api.GetMyFactionAsync(_currentGame!.Id, _currentFactionId.Value);
+                    // Update race from faction with validation
+                    if (_currentFaction != null && !string.IsNullOrEmpty(_currentFaction.RaceId))
+                    {
+                        var raceId = _currentFaction.RaceId.ToLower();
+                        _currentRace = validRaces.Contains(raceId) ? raceId : "federation";
+                        await LocalStorage.SetItemAsync("currentRaceId", _currentRace);
+                        Console.WriteLine($"Race set to: {_currentRace}");
+                    }
+                }
+                catch (Exception ex) 
+                { 
+                    Console.WriteLine($"Faction load error: {ex.Message}");
+                }
+            }
+            
+            // Ensure UI updates with race
+            StateHasChanged();
+            
+            // Load map data
+            _systems = await Api.GetKnownSystemsAsync(_currentGame!.Id, _currentFactionId ?? Guid.Empty);
+            _hyperlanes = await Api.GetHyperlanesAsync(_currentGame!.Id);
+            
+            // Calculate bounds
+            if (_systems.Any())
+            {
+                _minX = _systems.Min(s => s.X) - 50;
+                _maxX = _systems.Max(s => s.X) + 50;
+                _minY = _systems.Min(s => s.Y) - 50;
+                _maxY = _systems.Max(s => s.Y) + 50;
+            }
+            
+            // Load faction-specific data
+            if (_currentFactionId.HasValue)
+            {
+                _fleets = await Api.GetFleetsAsync(_currentFactionId.Value);
+                _colonies = await Api.GetColoniesAsync(_currentFactionId.Value);
+            }
+            
+            // Calculate stats
+            _totalSystems = _systems.Count;
+            _ownedSystems = _systems.Count(s => s.ControllingFactionId == _currentFactionId);
+            _totalShips = _fleets.Sum(f => f.ShipCount);
+            
+            // Mock resources
+            _resources = new ResourceData
+            {
+                Energy = 1250, EnergyIncome = 45,
+                Minerals = 890, MineralsIncome = 32,
+                Food = 120,
+                Alloys = 340,
+                Research = 85,
+                Influence = 150
+            };
+            
+            // Initial notifications
+            _notifications.Add(new NotificationData { Type = "info", Message = "Welcome back, Commander!" });
+            
+            await UpdateCanvasData();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"API error, loading mock data: {ex.Message}");
+            LoadMockData();
+            StateHasChanged();
+        }
+    }
+
+    private async Task TryUpdateCanvas()
+    {
+        try { await UpdateCanvasData(); } catch { }
+    }
+
+    private void LoadMockData()
+    {
+        // Generate mock galaxy
+        var random = new Random(42);
+        _systems = new List<StarSystemDto>();
+        _hyperlanes = new List<HyperlaneDto>();
+        
+        // Create 30 systems in a spiral pattern
+        for (int i = 0; i < 30; i++)
+        {
+            var angle = i * 0.5;
+            var radius = 100 + i * 15 + random.Next(-20, 20);
+            var x = Math.Cos(angle) * radius;
+            var y = Math.Sin(angle) * radius;
+            var starTypes = new[] { "Yellow", "Red", "Blue", "Orange", "White" };
+            
+            _systems.Add(new StarSystemDto(
+                Guid.NewGuid(),
+                GetStarName(i),
+                x, y,
+                starTypes[i % starTypes.Length],
+                i < 5 ? _currentFactionId : (i < 10 ? Guid.NewGuid() : null)
+            ));
+        }
+        
+        // Create hyperlanes connecting nearby systems
+        for (int i = 0; i < _systems.Count; i++)
+        {
+            for (int j = i + 1; j < _systems.Count; j++)
+            {
+                var dx = _systems[i].X - _systems[j].X;
+                var dy = _systems[i].Y - _systems[j].Y;
+                var dist = Math.Sqrt(dx * dx + dy * dy);
+                if (dist < 80)
+                {
+                    _hyperlanes.Add(new HyperlaneDto(Guid.NewGuid(), _systems[i].Id, _systems[j].Id, Math.Max(1, (int)(dist / 20))));
+                }
+            }
+        }
+        
+        // Set bounds
+        _minX = _systems.Min(s => s.X) - 50;
+        _maxX = _systems.Max(s => s.X) + 50;
+        _minY = _systems.Min(s => s.Y) - 50;
+        _maxY = _systems.Max(s => s.Y) + 50;
+        
+        // Mock resources
+        _resources = new ResourceData { Energy = 1250, Minerals = 890, Alloys = 340, Research = 85, Influence = 150 };
+        _totalSystems = _systems.Count;
+        _ownedSystems = 5;
+        _totalShips = 24;
+        _currentTurn = 1;
+        _currentRace = "federation";
+    }
+
+    // Star Trek Stardate format: Based on TNG era (2360s+)
+    // Format: [Year][Day].[Hour fraction] e.g., 41153.7
+    // Game turn 1 = Stardate 41000.0 (start of TNG era)
+    private string GetStardate()
+    {
+        // Each turn = approximately 1 day in stardate terms
+        // Starting stardate: 41000.0 (2364, beginning of TNG)
+        var baseStardate = 41000.0;
+        var stardate = baseStardate + (_currentTurn * 1.0);
+        
+        // Add some decimal variation based on turn
+        var fraction = (_currentTurn % 10) / 10.0;
+        stardate += fraction;
+        
+        return stardate.ToString("00000.0");
+    }
+
+    private string GetStarName(int index)
+    {
+        var names = new[] { "Sol", "Alpha Centauri", "Vulcan", "Andoria", "Tellar", "Betazed", 
+            "Qo'noS", "Romulus", "Cardassia", "Ferenginar", "Bajor", "Trill",
+            "Risa", "Cait", "Denobula", "Bolarus", "Benzar", "Zakdorn",
+            "Archanis", "Starbase 12", "Deep Space 9", "Khitomer", "Narendra",
+            "Wolf 359", "Setlik", "Cestus", "Gorn", "Tholian", "Breen", "Tzenketh" };
+        return index < names.Length ? names[index] : $"System {index}";
+    }
+
+    // JS Callbacks
+    [JSInvokable]
+    public async Task OnSystemSelected(string? systemJson)
+    {
+        if (string.IsNullOrEmpty(systemJson))
+        {
+            _selectedSystem = null;
+            _selectedSystemColony = null;
+        }
+        else
+        {
+            try
+            {
+                var data = JsonSerializer.Deserialize<JsonElement>(systemJson);
+                var systemId = Guid.Parse(data.GetProperty("id").GetString()!);
+                var targetSystem = _systems.FirstOrDefault(s => s.Id == systemId);
+                
+                // If we're in fleet movement mode, move the fleet
+                if (_isMovingFleet && _selectedFleet != null && targetSystem != null)
+                {
+                    if (targetSystem.Id != _selectedFleet.CurrentSystemId)
+                    {
+                        await MoveFleetToSystem(targetSystem);
+                        return;
+                    }
+                    else
+                    {
+                        CancelFleetMovement();
+                    }
+                }
+                
+                _selectedSystem = targetSystem;
+                _selectedSystemColony = _colonies.FirstOrDefault(c => c.SystemId == systemId);
+            }
+            catch { }
+        }
+        StateHasChanged();
+    }
+
+    [JSInvokable]
+    public void OnSystemHovered(string? systemJson)
+    {
+        // Hover handling - could update tooltip
+    }
+
+    // Select system from SVG fallback
+    private void SelectSystem(StarSystemDto system)
+    {
+        _selectedSystem = system;
+        _selectedSystemColony = _colonies.FirstOrDefault(c => c.SystemId == system.Id);
+        StateHasChanged();
+    }
+
+    // Actions
+    private async Task ZoomIn() => await JS.InvokeVoidAsync("setGalaxyZoom", 2);
+    private async Task ZoomOut() => await JS.InvokeVoidAsync("setGalaxyZoom", 0.5);
+    private async Task ResetView() => await JS.InvokeVoidAsync("resetGalaxyView");
+    
+    private void ToggleLabels() { _showLabels = !_showLabels; }
+    private void ToggleHyperlanes() { _showHyperlanes = !_showHyperlanes; }
+    private void ToggleTerritories() { _showTerritories = !_showTerritories; }
+    
+    // SetSpeed removed - turn-based only
+    
+    private void ShowHelp()
+    {
+        _tutorialOverlay?.ShowTutorial();
+    }
+    
+    private void OpenSettings()
+    {
+        _settingsMenu?.Open();
+    }
+    
+    [JSInvokable]
+    public async Task HandleShortcut(string action)
+    {
+        switch (action)
+        {
+            case "endTurn":
+                if (!_processingTurn && !_hasSubmittedOrders)
+                    await EndTurn();
+                break;
+            case "navigateGalaxy":
+                // Already here
+                break;
+            case "navigateResearch":
+                Navigation.NavigateTo("/game/research");
+                break;
+            case "navigateDiplomacy":
+                Navigation.NavigateTo("/game/diplomacy");
+                break;
+            case "navigateFleets":
+                Navigation.NavigateTo("/game/fleets");
+                break;
+            case "navigateColonies":
+                Navigation.NavigateTo("/game/planets");
+                break;
+            case "closeModal":
+                _settingsMenu?.Close();
+                break;
+            case "showHelp":
+                ShowHelp();
+                break;
+        }
+        StateHasChanged();
+    }
+    
+    private async Task EndTurn()
+    {
+        if (_processingTurn) return;
+        _processingTurn = true;
+        StateHasChanged();
+        
+        try
+        {
+            if (_currentFactionId.HasValue && _currentGame != null)
+            {
+                await Api.SubmitOrdersAsync(_currentGame.Id, _currentFactionId.Value, _currentGame.Turn, new List<FleetOrderDto>(), new List<ColonyOrderDto>());
+                _hasSubmittedOrders = true;
+                _notifications.Add(new NotificationData { Type = "success", Message = "Orders submitted successfully!" });
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _processingTurn = false;
+            StateHasChanged();
+        }
+    }
+
+    private void ViewSystem(StarSystemDto system)
+    {
+        Navigation.NavigateTo($"/game/system/{system.Id}");
+    }
+
+    private async Task SelectFleet(FleetDetailDto fleet)
+    {
+        _selectedFleet = fleet;
+        _isMovingFleet = true;
+        
+        var system = _systems.FirstOrDefault(s => s.Id == fleet.CurrentSystemId);
+        if (system != null)
+        {
+            await JS.InvokeVoidAsync("centerGalaxyOnSystem", system.Id.ToString());
+        }
+        
+        _notifications.Add(new NotificationData { Type = "info", Message = $"Select destination for {fleet.Name}" });
+        StateHasChanged();
+    }
+    
+    private async Task MoveFleetToSystem(StarSystemDto targetSystem)
+    {
+        if (_selectedFleet == null) return;
+        
+        try
+        {
+            await Api.SetFleetDestinationAsync(_selectedFleet.Id, targetSystem.Id);
+            _notifications.Add(new NotificationData { Type = "success", Message = $"{_selectedFleet.Name} en route to {targetSystem.Name}" });
+            
+            // Update local fleet data
+            _selectedFleet = _selectedFleet with { DestinationId = targetSystem.Id, MovementProgress = 0 };
+            var idx = _fleets.FindIndex(f => f.Id == _selectedFleet.Id);
+            if (idx >= 0) _fleets[idx] = _selectedFleet;
+            
+            // Update canvas
+            await UpdateCanvasData();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Failed to move fleet: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _selectedFleet = null;
+            _isMovingFleet = false;
+            StateHasChanged();
+        }
+    }
+    
+    private void CancelFleetMovement()
+    {
+        _selectedFleet = null;
+        _isMovingFleet = false;
+        _notifications.RemoveAll(n => n.Message.Contains("Select destination"));
+        StateHasChanged();
+    }
+
+    private void ViewColony(ColonyDetailDto colony)
+    {
+        Navigation.NavigateTo($"/game/colony/{colony.Id}");
+    }
+
+    private void DismissNotification(NotificationData notification)
+    {
+        _notifications.Remove(notification);
+    }
+
+    private void OpenMenu() { Navigation.NavigateTo("/"); }
+    private void OpenHelp() { Navigation.NavigateTo("/game/help"); }
+
+    // Helpers
+    private string GetStarColor(string? starType) => (starType?.ToLower()) switch
+    {
+        "yellow" => "#ffdd44",
+        "orange" => "#ff8833",
+        "red" => "#ff4444",
+        "blue" => "#4488ff",
+        "white" => "#ffffff",
+        "neutron" => "#44ffff",
+        "blackhole" => "#8844ff",
+        _ => "#ffdd44"
+    };
+
+    private string GetFactionColor(Guid? factionId)
+    {
+        if (!factionId.HasValue) return "#666666";
+        
+        var faction = _knownFactions.FirstOrDefault(f => f.Id == factionId);
+        var name = faction?.Name?.ToLower() ?? "";
+        
+        if (name.Contains("federation")) return "#4488ff";
+        if (name.Contains("klingon")) return "#cc0000";
+        if (name.Contains("romulan")) return "#00aa66";
+        if (name.Contains("cardassian")) return "#cc8800";
+        if (name.Contains("ferengi")) return "#ddaa00";
+        if (name.Contains("borg")) return "#00cc44";
+        
+        return "#888888";
+    }
+
+    private string GetFactionName(Guid? factionId)
+    {
+        if (!factionId.HasValue) return "Unclaimed";
+        var faction = _knownFactions.FirstOrDefault(f => f.Id == factionId);
+        return faction?.Name ?? "Unknown";
+    }
+
+    private string GetNotificationIcon(string type) => type switch
+    {
+        "info" => "ℹ",
+        "warning" => "⚠",
+        "danger" => "⛔",
+        "success" => "✓",
+        _ => "•"
+    };
+
+    public async ValueTask DisposeAsync()
+    {
+        try
+        {
+            await JS.InvokeVoidAsync("destroyGalaxyMap");
+        }
+        catch { }
+        
+        _dotNetRef?.Dispose();
+    }
+
+    // Data classes
+    private class ResourceData
+    {
+        public int Energy { get; set; }
+        public int EnergyIncome { get; set; }
+        public int Minerals { get; set; }
+        public int MineralsIncome { get; set; }
+        public int Food { get; set; }
+        public int Alloys { get; set; }
+        public int Research { get; set; }
+        public int Influence { get; set; }
+    }
+
+    private class NotificationData
+    {
+        public string Type { get; set; } = "info";
+        public string Message { get; set; } = "";
+    }
+}

@@ -1,0 +1,120 @@
+{
+  "factionName": "Dominion",
+  "categoryName": "Buildings",
+  "architectureStyle": {
+    "description": "Organic, purple, theocratic - designed to honor the Founders and control the Jem'Hadar and Vorta",
+    "keyElements": [
+      "ORGANIC curves and shapes - like giant insects or sea creatures",
+      "PURPLE and VIOLET as primary colors - the Founders' aesthetic",
+      "Bioluminescent lighting - glowing panels, no harsh artificial light",
+      "Founder worship shrines and imagery throughout",
+      "Ketracel-white dispensers for Jem'Hadar soldiers",
+      "NO sharp angles - everything flows and curves",
+      "Structures seem grown rather than built",
+      "Central pools or chambers for Founders to rest in liquid form",
+      "Jem'Hadar barracks are spartan, Vorta quarters are comfortable",
+      "Changeling-friendly architecture - morphogenic access points",
+      "Everything designed to remind subjects of Founder divinity"
+    ],
+    "colors": "Purple, violet, lavender, with bioluminescent blue-purple accents",
+    "materials": "Bio-organic materials, living structural elements, membrane walls"
+  },
+  "buildings": [
+    {
+      "name": "Great Link Chamber",
+      "description": "Sacred space where Founders can join the Great Link. Pool of changeling matter, cathedral-like reverence."
+    },
+    {
+      "name": "Founder Temple",
+      "description": "Place of worship. Vorta and Jem'Hadar come to pay respects to their gods. Founder statues."
+    },
+    {
+      "name": "Dominion Command",
+      "description": "Military headquarters. Where Vorta commanders and Jem'Hadar Firsts coordinate operations."
+    },
+    {
+      "name": "Ketracel-White Facility",
+      "description": "Produces the drug Jem'Hadar need to survive. Most critical and heavily guarded facility."
+    },
+    {
+      "name": "Jem'Hadar Barracks",
+      "description": "Housing for soldiers. Spartan, functional, with white dispensers and weapons storage."
+    },
+    {
+      "name": "Vorta Administrative Center",
+      "description": "Where Vorta administrators manage the Dominion's affairs. Comfortable, organized."
+    },
+    {
+      "name": "Cloning Facility",
+      "description": "Where Vorta are cloned and Jem'Hadar are bred. Rows of maturation chambers."
+    },
+    {
+      "name": "Genetic Engineering Lab",
+      "description": "Creates and modifies species to serve the Founders. Jem'Hadar enhancement, Vorta programming."
+    },
+    {
+      "name": "Communications Relay",
+      "description": "Long-range subspace communication with Dominion space. Shaped like organic tower."
+    },
+    {
+      "name": "Shipyard Control",
+      "description": "Oversees construction of Jem'Hadar ships. Organic-looking administrative facility."
+    },
+    {
+      "name": "Occupation Headquarters",
+      "description": "Controls subjugated worlds. Vorta Overseer's office, Jem'Hadar garrison."
+    },
+    {
+      "name": "Punishment Chamber",
+      "description": "Where those who defy the Founders are dealt with. Jem'Hadar do not require prisons - only execution."
+    },
+    {
+      "name": "Resource Extraction",
+      "description": "Harvests materials from conquered worlds. Efficient, uncaring of environmental damage."
+    },
+    {
+      "name": "Diplomatic Mission",
+      "description": "Embassy for negotiation. Vorta diplomats excel at manipulation and false promises."
+    },
+    {
+      "name": "Training Facility",
+      "description": "Where Jem'Hadar learn combat. They emerge from birth able to fight, but tactics are trained."
+    },
+    {
+      "name": "Surveillance Center",
+      "description": "Monitors subject populations. The Founders see all, know all."
+    },
+    {
+      "name": "Propaganda Bureau",
+      "description": "Spreads the message of Founder benevolence. Resistance is futile AND sinful."
+    },
+    {
+      "name": "Medical Research",
+      "description": "Studies diseases - both to cure Founders and to use as weapons against solids."
+    },
+    {
+      "name": "Energy Generation",
+      "description": "Power plant with organic aesthetic. Provides energy for facilities."
+    },
+    {
+      "name": "Defense Battery",
+      "description": "Polaron beam weapons and torpedo launchers. Organic-looking but deadly."
+    },
+    {
+      "name": "Species Processing",
+      "description": "Evaluates conquered species for usefulness. Some serve, others are eliminated."
+    },
+    {
+      "name": "Weyoun Memorial",
+      "description": "Honors fallen Vorta administrators. New clones visit to absorb memories."
+    },
+    {
+      "name": "Victory Monument",
+      "description": "Celebrates Dominion conquests. Names of subjugated worlds inscribed."
+    },
+    {
+      "name": "Founder Residence",
+      "description": "Private quarters for Founders on solid worlds. Pool chambers, privacy, morphogenic fields."
+    }
+  ]
+}

@@ -1,0 +1,339 @@
+@page "/game/save-load"
+@using MudBlazor
+@layout StellarisLayout
+@using StarTrekGame.Web.Services
+@using Blazored.LocalStorage
+@using System.Text.Json
+@using Microsoft.JSInterop
+@inject IGameApiClient Api
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+@inject ILocalStorageService LocalStorage
+@inject ISoundService Sound
+@inject IJSRuntime JS
+
+<PageTitle>Save/Load Game - Galactic Strategy</PageTitle>
+
+<div class="saveload-wrapper">
+    <header class="lcars-header">
+        <a href="/game/overview" class="back-link">← BACK</a>
+        <h1 class="page-title">💾 SAVE / LOAD GAME</h1>
+    </header>
+
+    <div class="saveload-content">
+        <MudTabs Elevation="2" Rounded="true" Centered="true" Class="mt-4">
+            <MudTabPanel Text="💾 Save Game" Icon="@Icons.Material.Filled.Save">
+                <div class="tab-content">
+                    <MudText Typo="Typo.h6" Class="mb-4" Color="Color.Warning">Save Current Game</MudText>
+                    
+                    @if (_currentGame != null)
+                    {
+                        <MudCard Outlined="true" Class="mb-4">
+                            <MudCardContent>
+                                <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                                    <div>
+                                        <MudText Typo="Typo.h6" Color="Color.Primary">@_currentGame.Name</MudText>
+                                        <MudText Typo="Typo.body2" Color="Color.Secondary">
+                                            Turn @_currentGame.Turn • @_currentGame.Factions.Count Factions
+                                        </MudText>
+                                    </div>
+                                    <MudButton Variant="Variant.Filled" Color="Color.Success" 
+                                               StartIcon="@Icons.Material.Filled.Save"
+                                               OnClick="SaveGame" Disabled="_saving">
+                                        @if (_saving)
+                                        {
+                                            <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
+                                        }
+                                        Save to File
+                                    </MudButton>
+                                </MudStack>
+                            </MudCardContent>
+                        </MudCard>
+                        
+                        <MudAlert Severity="Severity.Info" Class="mb-4">
+                            The game will be exported as a JSON file that you can save to your computer.
+                        </MudAlert>
+                    }
+                    else
+                    {
+                        <MudAlert Severity="Severity.Warning">
+                            No active game found. Start or load a game first.
+                        </MudAlert>
+                    }
+                </div>
+            </MudTabPanel>
+            
+            <MudTabPanel Text="📂 Load Game" Icon="@Icons.Material.Filled.FolderOpen">
+                <div class="tab-content">
+                    <MudText Typo="Typo.h6" Class="mb-4" Color="Color.Warning">Load Saved Game</MudText>
+                    
+                    <MudFileUpload T="IBrowserFile" Accept=".json" FilesChanged="LoadFromFile" Class="mb-4">
+                        <ActivatorContent>
+                            <MudButton Variant="Variant.Filled" Color="Color.Primary"
+                                       StartIcon="@Icons.Material.Filled.Upload">
+                                Select Save File (.json)
+                            </MudButton>
+                        </ActivatorContent>
+                    </MudFileUpload>
+                    
+                    @if (_loadedSaveData != null)
+                    {
+                        <MudCard Outlined="true" Class="mb-4" Style="border-color: var(--mud-palette-success);">
+                            <MudCardContent>
+                                <MudText Typo="Typo.h6" Color="Color.Success">📄 @_loadedSaveData.GameName</MudText>
+                                <MudText Typo="Typo.body2">
+                                    Turn @_loadedSaveData.Turn • Saved @_loadedSaveData.SavedAt.ToLocalTime().ToString("g")
+                                </MudText>
+                                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                                    @_loadedSaveData.Factions.Count Factions • @_loadedSaveData.Systems.Count Systems
+                                </MudText>
+                                
+                                <MudStack Row="true" Class="mt-4" Spacing="2">
+                                    <MudButton Variant="Variant.Filled" Color="Color.Success"
+                                               StartIcon="@Icons.Material.Filled.PlayArrow"
+                                               OnClick="ImportAndStartGame" Disabled="_loading">
+                                        @if (_loading)
+                                        {
+                                            <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
+                                        }
+                                        Load & Play
+                                    </MudButton>
+                                    <MudButton Variant="Variant.Outlined" Color="Color.Warning"
+                                               OnClick="ClearLoadedSave">
+                                        Cancel
+                                    </MudButton>
+                                </MudStack>
+                            </MudCardContent>
+                        </MudCard>
+                    }
+                    
+                    <MudDivider Class="my-4" />
+                    
+                    <MudText Typo="Typo.h6" Class="mb-4" Color="Color.Secondary">Recent Games</MudText>
+                    
+                    @if (_saveSlots.Any())
+                    {
+                        <MudList T="SaveSlotInfo" Dense="true">
+                            @foreach (var slot in _saveSlots)
+                            {
+                                <MudListItem>
+                                    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Style="width: 100%;">
+                                        <div>
+                                            <MudText Typo="Typo.body1">@slot.Name</MudText>
+                                            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                                Turn @slot.Turn • @slot.FactionCount factions • @slot.SavedAt.ToLocalTime().ToString("g")
+                                            </MudText>
+                                        </div>
+                                        <MudButton Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
+                                                   OnClick="async () => await LoadFromServer(slot.GameId)">
+                                            Load
+                                        </MudButton>
+                                    </MudStack>
+                                </MudListItem>
+                            }
+                        </MudList>
+                    }
+                    else
+                    {
+                        <MudText Color="Color.Secondary">No saved games found on server.</MudText>
+                    }
+                </div>
+            </MudTabPanel>
+        </MudTabs>
+    </div>
+</div>
+
+<style>
+    .saveload-wrapper { min-height: 100vh; background: linear-gradient(135deg, #000010 0%, #0a0a20 100%); }
+    
+    .lcars-header { height: 60px; background: linear-gradient(180deg, #1a1a2e 0%, #0a0a18 100%); border-bottom: 3px solid #ff9900; display: flex; align-items: center; padding: 0 24px; gap: 24px; }
+    .back-link { color: #ff9900; text-decoration: none; font-weight: 600; padding: 8px 16px; border: 1px solid #ff9900; border-radius: 6px; }
+    .back-link:hover { background: #ff9900; color: #000; }
+    .page-title { color: #ffcc00; font-size: 20px; font-weight: 700; letter-spacing: 4px; margin: 0; }
+
+    .saveload-content { max-width: 800px; margin: 0 auto; padding: 24px; }
+    .tab-content { padding: 24px; }
+</style>
+
+@code {
+    private bool _loading;
+    private bool _saving;
+    private GameDetailDto? _currentGame;
+    private GameSaveData? _loadedSaveData;
+    private List<SaveSlotInfo> _saveSlots = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadCurrentGame();
+        await LoadSaveSlots();
+    }
+
+    private async Task LoadCurrentGame()
+    {
+        try
+        {
+            var games = await Api.GetGamesAsync();
+            if (games.Any())
+            {
+                _currentGame = await Api.GetGameAsync(games.First().Id);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error loading current game: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private async Task LoadSaveSlots()
+    {
+        try
+        {
+            _saveSlots = await Api.GetSaveSlotsAsync();
+        }
+        catch
+        {
+            _saveSlots = new();
+        }
+    }
+
+    private async Task SaveGame()
+    {
+        if (_currentGame == null) return;
+        
+        _saving = true;
+        try
+        {
+            await Sound.PlaySelectAsync();
+            
+            var saveData = await Api.ExportGameAsync(_currentGame.Id);
+            if (saveData == null)
+            {
+                await Sound.PlayErrorAsync();
+                Snackbar.Add("Failed to export game data", Severity.Error);
+                return;
+            }
+            
+            // Convert to JSON and download
+            var json = JsonSerializer.Serialize(saveData, new JsonSerializerOptions { WriteIndented = true });
+            var fileName = $"GalacticStrategy_{saveData.GameName.Replace(" ", "_")}_Turn{saveData.Turn}_{DateTime.Now:yyyyMMdd_HHmmss}.json";
+            
+            await DownloadFile(fileName, json);
+            
+            await Sound.PlaySuccessAsync();
+            Snackbar.Add($"Game saved as {fileName}", Severity.Success);
+        }
+        catch (Exception ex)
+        {
+            await Sound.PlayErrorAsync();
+            Snackbar.Add($"Save failed: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _saving = false;
+        }
+    }
+
+    private async Task LoadFromFile(IBrowserFile file)
+    {
+        try
+        {
+            await Sound.PlayClickAsync();
+            
+            using var stream = file.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024); // 10MB max
+            _loadedSaveData = await JsonSerializer.DeserializeAsync<GameSaveData>(stream);
+            
+            if (_loadedSaveData != null)
+            {
+                await Sound.PlayNotificationAsync();
+                Snackbar.Add($"Loaded save: {_loadedSaveData.GameName}", Severity.Info);
+            }
+        }
+        catch (Exception ex)
+        {
+            await Sound.PlayErrorAsync();
+            Snackbar.Add($"Failed to read save file: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private async Task LoadFromServer(Guid gameId)
+    {
+        _loading = true;
+        try
+        {
+            await Sound.PlaySelectAsync();
+            
+            var saveData = await Api.ExportGameAsync(gameId);
+            if (saveData != null)
+            {
+                _loadedSaveData = saveData;
+                await Sound.PlayNotificationAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            await Sound.PlayErrorAsync();
+            Snackbar.Add($"Failed to load: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private async Task ImportAndStartGame()
+    {
+        if (_loadedSaveData == null) return;
+        
+        _loading = true;
+        try
+        {
+            await Sound.PlayWarpAsync();
+            
+            var game = await Api.ImportGameAsync(_loadedSaveData);
+            if (game != null)
+            {
+                // Store the first player faction
+                var playerFaction = game.Factions.FirstOrDefault();
+                if (playerFaction != null)
+                {
+                    await LocalStorage.SetItemAsync("currentGameId", game.Id);
+                    await LocalStorage.SetItemAsync("currentFactionId", playerFaction.Id);
+                }
+                
+                await Sound.PlaySuccessAsync();
+                Snackbar.Add($"Game '{game.Name}' loaded! Turn {game.Turn}", Severity.Success);
+                
+                Navigation.NavigateTo("/game/overview");
+            }
+        }
+        catch (Exception ex)
+        {
+            await Sound.PlayErrorAsync();
+            Snackbar.Add($"Import failed: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private void ClearLoadedSave()
+    {
+        _loadedSaveData = null;
+    }
+
+    private async Task DownloadFile(string fileName, string content)
+    {
+        var bytes = System.Text.Encoding.UTF8.GetBytes(content);
+        var base64 = Convert.ToBase64String(bytes);
+        
+        await JS.InvokeVoidAsync("eval", $@"
+            const link = document.createElement('a');
+            link.href = 'data:application/json;base64,{base64}';
+            link.download = '{fileName}';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        ");
+    }
+}

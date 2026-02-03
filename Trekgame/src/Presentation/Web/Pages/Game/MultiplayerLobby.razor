@@ -1,0 +1,916 @@
+@page "/multiplayer"
+@page "/multiplayer/{LobbyId:guid}"
+@inject NavigationManager Nav
+@inject IJSRuntime JS
+@implements IAsyncDisposable
+
+<div class="multiplayer-screen">
+    <div class="screen-header">
+        <h1>🌐 Multiplayer</h1>
+        <button class="btn-back" @onclick="GoBack">← Back to Menu</button>
+    </div>
+
+    @if (_currentView == "browser")
+    {
+        <!-- LOBBY BROWSER -->
+        <div class="lobby-browser">
+            <div class="browser-header">
+                <h2>Available Games</h2>
+                <div class="browser-actions">
+                    <button class="btn-refresh" @onclick="RefreshLobbies">🔄 Refresh</button>
+                    <button class="btn-create" @onclick="ShowCreateLobby">➕ Create Game</button>
+                </div>
+            </div>
+
+            <div class="lobby-filters">
+                <input type="text" @bind="_searchFilter" placeholder="Search games..." />
+                <select @bind="_gameTypeFilter">
+                    <option value="">All Game Types</option>
+                    <option value="standard">Standard</option>
+                    <option value="quickmatch">Quick Match</option>
+                    <option value="scenario">Scenario</option>
+                </select>
+                <label class="checkbox">
+                    <input type="checkbox" @bind="_hideFullLobbies" />
+                    Hide Full Games
+                </label>
+            </div>
+
+            @if (_loading)
+            {
+                <div class="loading">Searching for games...</div>
+            }
+            else if (!_lobbies.Any())
+            {
+                <div class="no-lobbies">
+                    <span class="icon">🔍</span>
+                    <p>No games found</p>
+                    <button class="btn-create" @onclick="ShowCreateLobby">Create a New Game</button>
+                </div>
+            }
+            else
+            {
+                <div class="lobby-list">
+                    @foreach (var lobby in FilteredLobbies)
+                    {
+                        <div class="lobby-card @(lobby.IsFull ? "full" : "")">
+                            <div class="lobby-info">
+                                <h3>@lobby.Name</h3>
+                                <div class="lobby-details">
+                                    <span class="host">Host: @lobby.HostName</span>
+                                    <span class="type">@lobby.GameType</span>
+                                    <span class="size">@lobby.GalaxySize Galaxy</span>
+                                </div>
+                                <div class="lobby-meta">
+                                    <span class="players">
+                                        👥 @lobby.CurrentPlayers / @lobby.MaxPlayers
+                                    </span>
+                                    @if (lobby.HasPassword)
+                                    {
+                                        <span class="password">🔒 Password</span>
+                                    }
+                                    <span class="ping">📶 @lobby.Ping ms</span>
+                                </div>
+                            </div>
+                            <button class="btn-join" @onclick="() => JoinLobby(lobby)"
+                                    disabled="@lobby.IsFull">
+                                @(lobby.IsFull ? "Full" : "Join")
+                            </button>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    }
+    else if (_currentView == "create")
+    {
+        <!-- CREATE LOBBY -->
+        <div class="create-lobby">
+            <h2>Create New Game</h2>
+            
+            <div class="create-form">
+                <div class="form-group">
+                    <label>Game Name</label>
+                    <input type="text" @bind="_newLobby.Name" placeholder="My Galactic Conquest" />
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Max Players</label>
+                        <select @bind="_newLobby.MaxPlayers">
+                            <option value="2">2 Players</option>
+                            <option value="4">4 Players</option>
+                            <option value="6">6 Players</option>
+                            <option value="8">8 Players</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Galaxy Size</label>
+                        <select @bind="_newLobby.GalaxySize">
+                            <option value="small">Small (50 systems)</option>
+                            <option value="medium">Medium (100 systems)</option>
+                            <option value="large">Large (200 systems)</option>
+                            <option value="huge">Huge (400 systems)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Game Type</label>
+                        <select @bind="_newLobby.GameType">
+                            <option value="standard">Standard</option>
+                            <option value="conquest">Total Conquest</option>
+                            <option value="federation">Federation Building</option>
+                            <option value="crisis">Crisis Survival</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Turn Timer</label>
+                        <select @bind="_newLobby.TurnTimer">
+                            <option value="0">No Limit</option>
+                            <option value="120">2 Minutes</option>
+                            <option value="300">5 Minutes</option>
+                            <option value="600">10 Minutes</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Password (optional)</label>
+                    <input type="password" @bind="_newLobby.Password" placeholder="Leave empty for public" />
+                </div>
+
+                <div class="form-group checkboxes">
+                    <label class="checkbox">
+                        <input type="checkbox" @bind="_newLobby.AllowSpectators" />
+                        Allow Spectators
+                    </label>
+                    <label class="checkbox">
+                        <input type="checkbox" @bind="_newLobby.EnableCrisis" />
+                        Enable Crisis Events
+                    </label>
+                </div>
+
+                <div class="form-actions">
+                    <button class="btn-cancel" @onclick='() => _currentView = "browser"'>Cancel</button>
+                    <button class="btn-create" @onclick="CreateLobby">Create Game</button>
+                </div>
+            </div>
+        </div>
+    }
+    else if (_currentView == "lobby")
+    {
+        <!-- IN LOBBY -->
+        <div class="game-lobby">
+            <div class="lobby-header">
+                <h2>@_currentLobby?.Name</h2>
+                <div class="lobby-settings">
+                    <span>@_currentLobby?.GalaxySize Galaxy</span>
+                    <span>@_currentLobby?.GameType</span>
+                    @if (_currentLobby?.TurnTimer > 0)
+                    {
+                        <span>⏱️ @(_currentLobby.TurnTimer / 60)min turns</span>
+                    }
+                </div>
+            </div>
+
+            <div class="lobby-content">
+                <!-- Player Slots -->
+                <div class="player-slots">
+                    <h3>Players (@_players.Count / @_currentLobby?.MaxPlayers)</h3>
+                    
+                    @for (int i = 0; i < (_currentLobby?.MaxPlayers ?? 4); i++)
+                    {
+                        var player = i < _players.Count ? _players[i] : null;
+                        <div class="player-slot @(player != null ? "filled" : "empty") @(player?.IsReady == true ? "ready" : "")">
+                            @if (player != null)
+                            {
+                                <div class="player-info">
+                                    <span class="player-name">
+                                        @player.Name
+                                        @if (player.IsHost)
+                                        {
+                                            <span class="host-badge">👑</span>
+                                        }
+                                    </span>
+                                    <span class="player-faction @player.Faction?.ToLower()">
+                                        @(player.Faction ?? "Selecting...")
+                                    </span>
+                                </div>
+                                <div class="player-status">
+                                    @if (player.IsReady)
+                                    {
+                                        <span class="ready">✓ Ready</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="not-ready">Not Ready</span>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <span class="empty-slot">Waiting for player...</span>
+                            }
+                        </div>
+                    }
+                </div>
+
+                <!-- Faction Selection -->
+                <div class="faction-selection">
+                    <h3>Select Your Faction</h3>
+                    <div class="faction-grid">
+                        @foreach (var faction in _availableFactions)
+                        {
+                            var taken = _players.Any(p => p.Faction == faction.Id && p.Id != _myPlayerId);
+                            <div class="faction-card @faction.Id.ToLower() @(_selectedFaction == faction.Id ? "selected" : "") @(taken ? "taken" : "")"
+                                 @onclick="() => SelectFaction(faction.Id)">
+                                <div class="faction-emblem">@faction.Emblem</div>
+                                <div class="faction-name">@faction.Name</div>
+                                @if (taken)
+                                {
+                                    <div class="taken-overlay">Taken</div>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Chat -->
+                <div class="lobby-chat">
+                    <h3>Chat</h3>
+                    <div class="chat-messages">
+                        @foreach (var msg in _chatMessages)
+                        {
+                            <div class="chat-message @(msg.IsSystem ? "system" : "")">
+                                @if (!msg.IsSystem)
+                                {
+                                    <span class="sender">@msg.Sender:</span>
+                                }
+                                <span class="text">@msg.Text</span>
+                            </div>
+                        }
+                    </div>
+                    <div class="chat-input">
+                        <input type="text" @bind="_chatInput" @onkeypress="HandleChatKeyPress" 
+                               placeholder="Type a message..." />
+                        <button @onclick="SendChat">Send</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lobby-actions">
+                <button class="btn-leave" @onclick="LeaveLobby">Leave Game</button>
+                
+                @if (_isHost)
+                {
+                    <button class="btn-start" @onclick="StartGame" 
+                            disabled="@(!CanStartGame)">
+                        Start Game
+                    </button>
+                }
+                else
+                {
+                    <button class="btn-ready @(_isReady ? "ready" : "")" @onclick="ToggleReady">
+                        @(_isReady ? "✓ Ready" : "Ready Up")
+                    </button>
+                }
+            </div>
+        </div>
+    }
+
+    <!-- Connection Status -->
+    <div class="connection-status @_connectionStatus.ToLower()">
+        <span class="indicator"></span>
+        <span class="text">@_connectionStatus</span>
+    </div>
+</div>
+
+<style>
+    .multiplayer-screen {
+        min-height: 100vh;
+        padding: 20px;
+        background: linear-gradient(135deg, #05051a 0%, #0a0a2a 100%);
+        color: white;
+    }
+
+    .screen-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+    }
+
+    .screen-header h1 { margin: 0; }
+
+    .lobby-browser, .create-lobby, .game-lobby {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .browser-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .browser-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .lobby-filters {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 20px;
+        padding: 15px;
+        background: rgba(0,0,0,0.3);
+        border-radius: 10px;
+    }
+
+    .lobby-filters input[type="text"] {
+        flex: 1;
+        padding: 10px 15px;
+        border: 1px solid rgba(255,255,255,0.2);
+        border-radius: 8px;
+        background: rgba(255,255,255,0.05);
+        color: white;
+    }
+
+    .lobby-filters select {
+        padding: 10px 15px;
+        border: 1px solid rgba(255,255,255,0.2);
+        border-radius: 8px;
+        background: rgba(255,255,255,0.1);
+        color: white;
+    }
+
+    .checkbox {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+    }
+
+    .lobby-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .lobby-card {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 20px;
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 10px;
+        transition: all 0.2s;
+    }
+
+    .lobby-card:hover {
+        background: rgba(255,255,255,0.08);
+        border-color: rgba(255,255,255,0.2);
+    }
+
+    .lobby-card.full {
+        opacity: 0.6;
+    }
+
+    .lobby-info h3 {
+        margin: 0 0 5px 0;
+    }
+
+    .lobby-details, .lobby-meta {
+        display: flex;
+        gap: 15px;
+        font-size: 0.9em;
+        color: #888;
+    }
+
+    .lobby-meta {
+        margin-top: 5px;
+    }
+
+    .btn-join, .btn-create, .btn-refresh, .btn-start, .btn-ready, .btn-leave, .btn-cancel {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: all 0.2s;
+    }
+
+    .btn-join { background: #27ae60; color: white; }
+    .btn-create { background: #3498db; color: white; }
+    .btn-refresh { background: rgba(255,255,255,0.1); color: white; }
+    .btn-start { background: #27ae60; color: white; }
+    .btn-ready { background: #f39c12; color: white; }
+    .btn-ready.ready { background: #27ae60; }
+    .btn-leave { background: #e74c3c; color: white; }
+    .btn-cancel { background: #7f8c8d; color: white; }
+
+    .btn-join:disabled, .btn-start:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .no-lobbies {
+        text-align: center;
+        padding: 60px 20px;
+        color: #888;
+    }
+
+    .no-lobbies .icon {
+        font-size: 4em;
+        display: block;
+        margin-bottom: 15px;
+    }
+
+    /* Create Lobby Form */
+    .create-form {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 30px;
+        background: rgba(0,0,0,0.4);
+        border-radius: 15px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: #888;
+    }
+
+    .form-group input, .form-group select {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid rgba(255,255,255,0.2);
+        border-radius: 8px;
+        background: rgba(255,255,255,0.05);
+        color: white;
+        font-size: 1em;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    .form-group.checkboxes {
+        display: flex;
+        gap: 30px;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 15px;
+        justify-content: flex-end;
+        margin-top: 30px;
+    }
+
+    /* Game Lobby */
+    .lobby-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .lobby-settings {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        color: #888;
+    }
+
+    .lobby-content {
+        display: grid;
+        grid-template-columns: 1fr 1fr 300px;
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .player-slots, .faction-selection, .lobby-chat {
+        background: rgba(0,0,0,0.4);
+        border-radius: 15px;
+        padding: 20px;
+    }
+
+    .player-slots h3, .faction-selection h3, .lobby-chat h3 {
+        margin: 0 0 15px 0;
+        padding-bottom: 10px;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .player-slot {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 15px;
+        margin-bottom: 10px;
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 8px;
+    }
+
+    .player-slot.ready {
+        border-color: #27ae60;
+    }
+
+    .player-slot.empty {
+        opacity: 0.5;
+    }
+
+    .player-name {
+        font-weight: bold;
+    }
+
+    .host-badge {
+        margin-left: 5px;
+    }
+
+    .player-faction {
+        font-size: 0.85em;
+        color: #888;
+    }
+
+    .player-status .ready { color: #27ae60; }
+    .player-status .not-ready { color: #888; }
+
+    .faction-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    .faction-card {
+        padding: 15px;
+        text-align: center;
+        background: rgba(255,255,255,0.05);
+        border: 2px solid transparent;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.2s;
+        position: relative;
+    }
+
+    .faction-card:hover {
+        background: rgba(255,255,255,0.1);
+    }
+
+    .faction-card.selected {
+        border-color: #3498db;
+        background: rgba(52, 152, 219, 0.2);
+    }
+
+    .faction-card.taken {
+        opacity: 0.4;
+        cursor: not-allowed;
+    }
+
+    .faction-emblem {
+        font-size: 2em;
+        margin-bottom: 5px;
+    }
+
+    .taken-overlay {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0,0,0,0.8);
+        padding: 5px 15px;
+        border-radius: 15px;
+        font-size: 0.8em;
+    }
+
+    .chat-messages {
+        height: 200px;
+        overflow-y: auto;
+        padding: 10px;
+        background: rgba(0,0,0,0.3);
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+
+    .chat-message {
+        padding: 5px 0;
+        font-size: 0.9em;
+    }
+
+    .chat-message.system {
+        color: #f39c12;
+        font-style: italic;
+    }
+
+    .chat-message .sender {
+        color: #3498db;
+        margin-right: 5px;
+    }
+
+    .chat-input {
+        display: flex;
+        gap: 10px;
+    }
+
+    .chat-input input {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid rgba(255,255,255,0.2);
+        border-radius: 8px;
+        background: rgba(255,255,255,0.05);
+        color: white;
+    }
+
+    .chat-input button {
+        padding: 10px 20px;
+        background: #3498db;
+        border: none;
+        border-radius: 8px;
+        color: white;
+        cursor: pointer;
+    }
+
+    .lobby-actions {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .connection-status {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 15px;
+        background: rgba(0,0,0,0.8);
+        border-radius: 20px;
+        font-size: 0.85em;
+    }
+
+    .connection-status .indicator {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+    }
+
+    .connection-status.connected .indicator { background: #27ae60; }
+    .connection-status.connecting .indicator { background: #f39c12; }
+    .connection-status.disconnected .indicator { background: #e74c3c; }
+
+    .btn-back {
+        padding: 10px 20px;
+        background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.2);
+        border-radius: 5px;
+        color: white;
+        cursor: pointer;
+    }
+
+    .loading {
+        text-align: center;
+        padding: 40px;
+        color: #888;
+    }
+
+    @@media (max-width: 1000px) {
+        .lobby-content {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+@code {
+    [Parameter]
+    public Guid? LobbyId { get; set; }
+
+    private string _currentView = "browser";
+    private bool _loading = true;
+    private List<LobbyDisplay> _lobbies = new();
+    private LobbyDisplay? _currentLobby;
+    private List<PlayerDisplay> _players = new();
+    private List<FactionOption> _availableFactions = new();
+    private List<ChatMessageDisplay> _chatMessages = new();
+
+    private string _searchFilter = "";
+    private string _gameTypeFilter = "";
+    private bool _hideFullLobbies = false;
+
+    private CreateLobbyModel _newLobby = new();
+    private string _selectedFaction = "";
+    private string _chatInput = "";
+    
+    private Guid _myPlayerId = Guid.NewGuid();
+    private bool _isHost = false;
+    private bool _isReady = false;
+    private string _connectionStatus = "Connecting";
+
+    private IEnumerable<LobbyDisplay> FilteredLobbies => _lobbies
+        .Where(l => string.IsNullOrEmpty(_searchFilter) || l.Name.Contains(_searchFilter, StringComparison.OrdinalIgnoreCase))
+        .Where(l => string.IsNullOrEmpty(_gameTypeFilter) || l.GameType == _gameTypeFilter)
+        .Where(l => !_hideFullLobbies || !l.IsFull);
+
+    private bool CanStartGame => _players.Count >= 2 && _players.All(p => p.IsReady || p.IsHost);
+
+    protected override async Task OnInitializedAsync()
+    {
+        _availableFactions = new List<FactionOption>
+        {
+            new() { Id = "federation", Name = "Federation", Emblem = "🖖" },
+            new() { Id = "klingon", Name = "Klingon Empire", Emblem = "⚔️" },
+            new() { Id = "romulan", Name = "Romulan Star Empire", Emblem = "🦅" },
+            new() { Id = "cardassian", Name = "Cardassian Union", Emblem = "🔷" },
+            new() { Id = "ferengi", Name = "Ferengi Alliance", Emblem = "💰" },
+            new() { Id = "dominion", Name = "Dominion", Emblem = "👁️" }
+        };
+
+        if (LobbyId.HasValue)
+        {
+            await JoinLobby(new LobbyDisplay { Id = LobbyId.Value });
+        }
+        else
+        {
+            await RefreshLobbies();
+        }
+
+        _connectionStatus = "Connected";
+    }
+
+    private async Task RefreshLobbies()
+    {
+        _loading = true;
+        await Task.Delay(500);
+
+        _lobbies = new List<LobbyDisplay>
+        {
+            new() { Id = Guid.NewGuid(), Name = "Galactic Conquest", HostName = "Captain_Kirk", GameType = "standard", GalaxySize = "Large", CurrentPlayers = 2, MaxPlayers = 4, Ping = 45 },
+            new() { Id = Guid.NewGuid(), Name = "Federation vs Empire", HostName = "Picard2024", GameType = "conquest", GalaxySize = "Medium", CurrentPlayers = 4, MaxPlayers = 4, Ping = 78 },
+            new() { Id = Guid.NewGuid(), Name = "Beginners Welcome", HostName = "NewPlayer123", GameType = "standard", GalaxySize = "Small", CurrentPlayers = 1, MaxPlayers = 2, Ping = 23 },
+            new() { Id = Guid.NewGuid(), Name = "Crisis Challenge", HostName = "BorgSlayer", GameType = "crisis", GalaxySize = "Huge", CurrentPlayers = 3, MaxPlayers = 6, Ping = 112, HasPassword = true }
+        };
+
+        _loading = false;
+    }
+
+    private void GoBack() => Nav.NavigateTo("/");
+
+    private void ShowCreateLobby()
+    {
+        _newLobby = new CreateLobbyModel();
+        _currentView = "create";
+    }
+
+    private async Task CreateLobby()
+    {
+        _currentLobby = new LobbyDisplay
+        {
+            Id = Guid.NewGuid(),
+            Name = _newLobby.Name,
+            GameType = _newLobby.GameType,
+            GalaxySize = _newLobby.GalaxySize,
+            MaxPlayers = _newLobby.MaxPlayers,
+            TurnTimer = _newLobby.TurnTimer,
+            CurrentPlayers = 1
+        };
+
+        _isHost = true;
+        _players = new List<PlayerDisplay>
+        {
+            new() { Id = _myPlayerId, Name = "You", IsHost = true, IsReady = true }
+        };
+
+        _chatMessages.Add(new ChatMessageDisplay { IsSystem = true, Text = "Game lobby created" });
+        _currentView = "lobby";
+    }
+
+    private async Task JoinLobby(LobbyDisplay lobby)
+    {
+        _currentLobby = lobby;
+        _isHost = false;
+        
+        _players = new List<PlayerDisplay>
+        {
+            new() { Id = Guid.NewGuid(), Name = lobby.HostName, IsHost = true, Faction = "federation", IsReady = true },
+            new() { Id = _myPlayerId, Name = "You", IsHost = false }
+        };
+
+        _chatMessages.Add(new ChatMessageDisplay { IsSystem = true, Text = "You joined the game" });
+        _currentView = "lobby";
+    }
+
+    private async Task LeaveLobby()
+    {
+        _currentView = "browser";
+        _currentLobby = null;
+        _players.Clear();
+        _chatMessages.Clear();
+        _isReady = false;
+        _selectedFaction = "";
+    }
+
+    private void SelectFaction(string factionId)
+    {
+        var taken = _players.Any(p => p.Faction == factionId && p.Id != _myPlayerId);
+        if (taken) return;
+
+        _selectedFaction = factionId;
+        var me = _players.FirstOrDefault(p => p.Id == _myPlayerId);
+        if (me != null) me.Faction = factionId;
+    }
+
+    private void ToggleReady()
+    {
+        if (string.IsNullOrEmpty(_selectedFaction)) return;
+        
+        _isReady = !_isReady;
+        var me = _players.FirstOrDefault(p => p.Id == _myPlayerId);
+        if (me != null) me.IsReady = _isReady;
+    }
+
+    private async Task StartGame()
+    {
+        Nav.NavigateTo($"/game/galaxy?mp=true&lobby={_currentLobby?.Id}");
+    }
+
+    private void HandleChatKeyPress(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter") SendChat();
+    }
+
+    private void SendChat()
+    {
+        if (string.IsNullOrWhiteSpace(_chatInput)) return;
+
+        _chatMessages.Add(new ChatMessageDisplay
+        {
+            Sender = "You",
+            Text = _chatInput
+        });
+        _chatInput = "";
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        // Cleanup SignalR connection
+    }
+
+    public class LobbyDisplay
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; } = "";
+        public string HostName { get; set; } = "";
+        public string GameType { get; set; } = "";
+        public string GalaxySize { get; set; } = "";
+        public int CurrentPlayers { get; set; }
+        public int MaxPlayers { get; set; }
+        public int TurnTimer { get; set; }
+        public int Ping { get; set; }
+        public bool HasPassword { get; set; }
+        public bool IsFull => CurrentPlayers >= MaxPlayers;
+    }
+
+    public class PlayerDisplay
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; } = "";
+        public string? Faction { get; set; }
+        public bool IsHost { get; set; }
+        public bool IsReady { get; set; }
+    }
+
+    public class FactionOption
+    {
+        public string Id { get; set; } = "";
+        public string Name { get; set; } = "";
+        public string Emblem { get; set; } = "";
+    }
+
+    public class CreateLobbyModel
+    {
+        public string Name { get; set; } = "New Game";
+        public int MaxPlayers { get; set; } = 4;
+        public string GalaxySize { get; set; } = "medium";
+        public string GameType { get; set; } = "standard";
+        public int TurnTimer { get; set; } = 300;
+        public string Password { get; set; } = "";
+        public bool AllowSpectators { get; set; } = true;
+        public bool EnableCrisis { get; set; } = true;
+    }
+
+    public class ChatMessageDisplay
+    {
+        public string? Sender { get; set; }
+        public string Text { get; set; } = "";
+        public bool IsSystem { get; set; }
+    }
+}

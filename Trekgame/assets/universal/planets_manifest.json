@@ -1,0 +1,268 @@
+{
+  "factionName": "Federation",
+  "categoryName": "Planets",
+  "grid": {
+    "columns": 6,
+    "rows": 6,
+    "totalAssets": 36,
+    "cellSize": 360,
+    "spriteWidth": 2160,
+    "spriteHeight": 2160
+  },
+  "spriteSheetPath": "federation_planets.png",
+  "generatedAt": "2026-01-30T15:26:35.31Z",
+  "assets": [
+    {
+      "row": 0,
+      "col": 0,
+      "name": "Planet Class M Earthlike",
+      "type": "Planets",
+      "promptUsed": "MANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: Handmade spherical model made of plasticine clay. Realistic planetary texture with non-glossy, soft clay finish. High-end stop-motion animation quality (Laika/Aardman style).\nProportions: Spherical planet with appropriate features (atmosphere, clouds, terrain).\nLighting: FLAT, EVEN lighting from front - FULLY LIT planet with NO shadows, NO dark side, NO day/night terminator. The entire planet surface should be visible and evenly illuminated.\nComposition: Planet centered, slight 3/4 view showing surface features.\nBackground: Solid black background (#000000) representing space.\n\nPLANET TYPE: Class M (Earth-like). Blue oceans, green/brown continents, white clouds, visible atmosphere. Habitable, temperate climate.\n\nSubject: Planet Class M Earthlike\nStyle: Realistic sci-fi planet with claymation aesthetic\n\nCRITICAL LIGHTING: \n- FULL illumination - entire planet evenly lit\n- NO shadow on any part of the planet\n- NO day/night terminator line\n- NO dark side - we will add shadows dynamically in-game\n\n**single planet model, fully lit, no shadows, even illumination, claymation 3D style, game asset**\n--no shadows, no dark side, no terminator, no half-lit, no dramatic lighting, spaceships, stations, text, labels"
+    },
+    {
+      "row": 0,
+      "col": 1,
+      "name": "Planet Class M Ocean",
+      "type": "Planets",
+      "promptUsed": "MANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: Handmade spherical model made of plasticine clay. Realistic planetary texture with non-glossy, soft clay finish. High-end stop-motion animation quality (Laika/Aardman style).\nProportions: Spherical planet with appropriate features (atmosphere, clouds, terrain).\nLighting: FLAT, EVEN lighting from front - FULLY LIT planet with NO shadows, NO dark side, NO day/night terminator. The entire planet surface should be visible and evenly illuminated.\nComposition: Planet centered, slight 3/4 view showing surface features.\nBackground: Solid black background (#000000) representing space.\n\nPLANET TYPE: Class M (Earth-like). Blue oceans, green/brown continents, white clouds, visible atmosphere. Habitable, temperate climate.\n\nSubject: Planet Class M Ocean\nStyle: Realistic sci-fi planet with claymation aesthetic\n\nCRITICAL LIGHTING: \n- FULL illumination - entire planet evenly lit\n- NO shadow on any part of the planet\n- NO day/night terminator line\n- NO dark side - we will add shadows dynamically in-game\n\n**single planet model, fully lit, no shadows, even illumination, claymation 3D style, game asset**\n--no shadows, no dark side, no terminator, no half-lit, no dramatic lighting, spaceships, stations, text, labels"
+    },
+    {
+      "row": 0,
+      "col": 2,
+      "name": "Planet Class M Jungle",
+      "type": "Planets",
+      "promptUsed": "MANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: Handmade spherical model made of plasticine clay. Realistic planetary texture with non-glossy, soft clay finish. High-end stop-motion animation quality (Laika/Aardman style).\nProportions: Spherical planet with appropriate features (atmosphere, clouds, terrain).\nLighting: FLAT, EVEN lighting from front - FULLY LIT planet with NO shadows, NO dark side, NO day/night terminator. The entire planet surface should be visible and evenly illuminated.\nComposition: Planet centered, slight 3/4 view showing surface features.\nBackground: Solid black background (#000000) representing space.\n\nPLANET TYPE: Class M (Earth-like). Blue oceans, green/brown continents, white clouds, visible atmosphere. Habitable, temperate climate.\n\nSubject: Planet Class M Jungle\nStyle: Realistic sci-fi planet with claymation aesthetic\n\nCRITICAL LIGHTING: \n- FULL illumination - entire planet evenly lit\n- NO shadow on any part of the planet\n- NO day/night terminator line\n- NO dark side - we will add shadows dynamically in-game\n\n**single planet model, fully lit, no shadows, even illumination, claymation 3D style, game asset**\n--no shadows, no dark side, no terminator, no half-lit, no dramatic lighting, spaceships, stations, text, labels"
+    },
+    {
+      "row": 0,
+      "col": 3,
+      "name": "Planet Class M Arctic",
+      "type": "Planets",
+      "promptUsed": "MANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: Handmade spherical model made of plasticine clay. Realistic planetary texture with non-glossy, soft clay finish. High-end stop-motion animation quality (Laika/Aardman style).\nProportions: Spherical planet with appropriate features (atmosphere, clouds, terrain).\nLighting: FLAT, EVEN lighting from front - FULLY LIT planet with NO shadows, NO dark side, NO day/night terminator. The entire planet surface should be visible and evenly illuminated.\nComposition: Planet centered, slight 3/4 view showing surface features.\nBackground: Solid black background (#000000) representing space.\n\nPLANET TYPE: Class M (Earth-like). Blue oceans, green/brown continents, white clouds, visible atmosphere. Habitable, temperate climate.\n\nSubject: Planet Class M Arctic\nStyle: Realistic sci-fi planet with claymation aesthetic\n\nCRITICAL LIGHTING: \n- FULL illumination - entire planet evenly lit\n- NO shadow on any part of the planet\n- NO day/night terminator line\n- NO dark side - we will add shadows dynamically in-game\n\n**single planet model, fully lit, no shadows, even illumination, claymation 3D style, game asset**\n--no shadows, no dark side, no terminator, no half-lit, no dramatic lighting, spaceships, stations, text, labels"
+    },
+    {
+      "row": 0,
+      "col": 4,
+      "name": "Planet Class M Desert",
+      "type": "Planets",
+      "promptUsed": "MANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: Handmade spherical model made of plasticine clay. Realistic planetary texture with non-glossy, soft clay finish. High-end stop-motion animation quality (Laika/Aardman style).\nProportions: Spherical planet with appropriate features (atmosphere, clouds, terrain).\nLighting: FLAT, EVEN lighting from front - FULLY LIT planet with NO shadows, NO dark side, NO day/night terminator. The entire planet surface should be visible and evenly illuminated.\nComposition: Planet centered, slight 3/4 view showing surface features.\nBackground: Solid black background (#000000) representing space.\n\nPLANET TYPE: Class M (Earth-like). Blue oceans, green/brown continents, white clouds, visible atmosphere. Habitable, temperate climate.\n\nSubject: Planet Class M Desert\nStyle: Realistic sci-fi planet with claymation aesthetic\n\nCRITICAL LIGHTING: \n- FULL illumination - entire planet evenly lit\n- NO shadow on any part of the planet\n- NO day/night terminator line\n- NO dark side - we will add shadows dynamically in-game\n\n**single planet model, fully lit, no shadows, even illumination, claymation 3D style, game asset**\n--no shadows, no dark side, no terminator, no half-lit, no dramatic lighting, spaceships, stations, text, labels"
+    },
+    {
+      "row": 0,
+      "col": 5,
+      "name": "Planet Class L Marginal",
+      "type": "Planets",
+      "promptUsed": "MANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: Handmade spherical model made of plasticine clay. Realistic planetary texture with non-glossy, soft clay finish. High-end stop-motion animation quality (Laika/Aardman style).\nProportions: Spherical planet with appropriate features (atmosphere, clouds, terrain).\nLighting: FLAT, EVEN lighting from front - FULLY LIT planet with NO shadows, NO dark side, NO day/night terminator. The entire planet surface should be visible and evenly illuminated.\nComposition: Planet centered, slight 3/4 view showing surface features.\nBackground: Solid black background (#000000) representing space.\n\nPLANET TYPE: Standard planetary body with appropriate surface features for its classification.\n\nSubject: Planet Class L Marginal\nStyle: Realistic sci-fi planet with claymation aesthetic\n\nCRITICAL LIGHTING: \n- FULL illumination - entire planet evenly lit\n- NO shadow on any part of the planet\n- NO day/night terminator line\n- NO dark side - we will add shadows dynamically in-game\n\n**single planet model, fully lit, no shadows, even illumination, claymation 3D style, game asset**\n--no shadows, no dark side, no terminator, no half-lit, no dramatic lighting, spaceships, stations, text, labels"
+    },
+    {
+      "row": 1,
+      "col": 0,
+      "name": "Planet Gas Giant Blue",
+      "type": "Planets",
+      "promptUsed": "MANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: Handmade spherical model made of plasticine clay. Realistic planetary texture with non-glossy, soft clay finish. High-end stop-motion animation quality (Laika/Aardman style).\nProportions: Spherical planet with appropriate features (atmosphere, clouds, terrain).\nLighting: FLAT, EVEN lighting from front - FULLY LIT planet with NO shadows, NO dark side, NO day/night terminator. The entire planet surface should be visible and evenly illuminated.\nComposition: Planet centered, slight 3/4 view showing surface features.\nBackground: Solid black background (#000000) representing space.\n\nPLANET TYPE: Gas Giant. Massive planet with banded cloud layers. No solid surface. Swirling storms. Jupiter or Saturn-like.\n\nSubject: Planet Gas Giant Blue\nStyle: Realistic sci-fi planet with claymation aesthetic\n\nCRITICAL LIGHTING: \n- FULL illumination - entire planet evenly lit\n- NO shadow on any part of the planet\n- NO day/night terminator line\n- NO dark side - we will add shadows dynamically in-game\n\n**single planet model, fully lit, no shadows, even illumination, claymation 3D style, game asset**\n--no shadows, no dark side, no terminator, no half-lit, no dramatic lighting, spaceships, stations, text, labels"
+    },
+    {
+      "row": 1,
+      "col": 1,
+      "name": "Planet Gas Giant Orange",
+      "type": "Planets",
+      "promptUsed": "MANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: Handmade spherical model made of plasticine clay. Realistic planetary texture with non-glossy, soft clay finish. High-end stop-motion animation quality (Laika/Aardman style).\nProportions: Spherical planet with appropriate features (atmosphere, clouds, terrain).\nLighting: FLAT, EVEN lighting from front - FULLY LIT planet with NO shadows, NO dark side, NO day/night terminator. The entire planet surface should be visible and evenly illuminated.\nComposition: Planet centered, slight 3/4 view showing surface features.\nBackground: Solid black background (#000000) representing space.\n\nPLANET TYPE: Gas Giant. Massive planet with banded cloud layers. No solid surface. Swirling storms. Jupiter or Saturn-like.\n\nSubject: Planet Gas Giant Orange\nStyle: Realistic sci-fi planet with claymation aesthetic\n\nCRITICAL LIGHTING: \n- FULL illumination - entire planet evenly lit\n- NO shadow on any part of the planet\n- NO day/night terminator line\n- NO dark side - we will add shadows dynamically in-game\n\n**single planet model, fully lit, no shadows, even illumination, claymation 3D style, game asset**\n--no shadows, no dark side, no terminator, no half-lit, no dramatic lighting, spaceships, stations, text, labels"
+    },
+    {
+      "row": 1,
+      "col": 2,
+      "name": "Planet Gas Giant Banded",
+      "type": "Planets",
+      "promptUsed": "MANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: Handmade spherical model made of plasticine clay. Realistic planetary texture with non-glossy, soft clay finish. High-end stop-motion animation quality (Laika/Aardman style).\nProportions: Spherical planet with appropriate features (atmosphere, clouds, terrain).\nLighting: FLAT, EVEN lighting from front - FULLY LIT planet with NO shadows, NO dark side, NO day/night terminator. The entire planet surface should be visible and evenly illuminated.\nComposition: Planet centered, slight 3/4 view showing surface features.\nBackground: Solid black background (#000000) representing space.\n\nPLANET TYPE: Gas Giant. Massive planet with banded cloud layers. No solid surface. Swirling storms. Jupiter or Saturn-like.\n\nSubject: Planet Gas Giant Banded\nStyle: Realistic sci-fi planet with claymation aesthetic\n\nCRITICAL LIGHTING: \n- FULL illumination - entire planet evenly lit\n- NO shadow on any part of the planet\n- NO day/night terminator line\n- NO dark side - we will add shadows dynamically in-game\n\n**single planet model, fully lit, no shadows, even illumination, claymation 3D style, game asset**\n--no shadows, no dark side, no terminator, no half-lit, no dramatic lighting, spaceships, stations, text, labels"
+    },
+    {
+      "row": 1,
+      "col": 3,
+      "name": "Planet Gas Giant Ringed",
+      "type": "Planets",
+      "promptUsed": "MANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: Handmade spherical model made of plasticine clay. Realistic planetary texture with non-glossy, soft clay finish. High-end stop-motion animation quality (Laika/Aardman style).\nProportions: Spherical planet with appropriate features (atmosphere, clouds, terrain).\nLighting: FLAT, EVEN lighting from front - FULLY LIT planet with NO shadows, NO dark side, NO day/night terminator. The entire planet surface should be visible and evenly illuminated.\nComposition: Planet centered, slight 3/4 view showing surface features.\nBackground: Solid black background (#000000) representing space.\n\nPLANET TYPE: Gas Giant. Massive planet with banded cloud layers. No solid surface. Swirling storms. Jupiter or Saturn-like.\n\nSubject: Planet Gas Giant Ringed\nStyle: Realistic sci-fi planet with claymation aesthetic\n\nCRITICAL LIGHTING: \n- FULL illumination - entire planet evenly lit\n- NO shadow on any part of the planet\n- NO day/night terminator line\n- NO dark side - we will add shadows dynamically in-game\n\n**single planet model, fully lit, no shadows, even illumination, claymation 3D style, game asset**\n--no shadows, no dark side, no terminator, no half-lit, no dramatic lighting, spaceships, stations, text, labels"
+    },
+    {
+      "row": 1,
+      "col": 4,
+      "name": "Planet Gas Giant Storm",
+      "type": "Planets",
+      "promptUsed": "MANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: Handmade spherical model made of plasticine clay. Realistic planetary texture with non-glossy, soft clay finish. High-end stop-motion animation quality (Laika/Aardman style).\nProportions: Spherical planet with appropriate features (atmosphere, clouds, terrain).\nLighting: FLAT, EVEN lighting from front - FULLY LIT planet with NO shadows, NO dark side, NO day/night terminator. The entire planet surface should be visible and evenly illuminated.\nComposition: Planet centered, slight 3/4 view showing surface features.\nBackground: Solid black background (#000000) representing space.\n\nPLANET TYPE: Gas Giant. Massive planet with banded cloud layers. No solid surface. Swirling storms. Jupiter or Saturn-like.\n\nSubject: Planet Gas Giant Storm\nStyle: Realistic sci-fi planet with claymation aesthetic\n\nCRITICAL LIGHTING: \n- FULL illumination - entire planet evenly lit\n- NO shadow on any part of the planet\n- NO day/night terminator line\n- NO dark side - we will add shadows dynamically in-game\n\n**single planet model, fully lit, no shadows, even illumination, claymation 3D style, game asset**\n--no shadows, no dark side, no terminator, no half-lit, no dramatic lighting, spaceships, stations, text, labels"
+    },
+    {
+      "row": 1,
+      "col": 5,
+      "name": "Planet Gas Giant Small",
+      "type": "Planets",
+      "promptUsed": "MANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: Handmade spherical model made of plasticine clay. Realistic planetary texture with non-glossy, soft clay finish. High-end stop-motion animation quality (Laika/Aardman style).\nProportions: Spherical planet with appropriate features (atmosphere, clouds, terrain).\nLighting: FLAT, EVEN lighting from front - FULLY LIT planet with NO shadows, NO dark side, NO day/night terminator. The entire planet surface should be visible and evenly illuminated.\nComposition: Planet centered, slight 3/4 view showing surface features.\nBackground: Solid black background (#000000) representing space.\n\nPLANET TYPE: Gas Giant. Massive planet with banded cloud layers. No solid surface. Swirling storms. Jupiter or Saturn-like.\n\nSubject: Planet Gas Giant Small\nStyle: Realistic sci-fi planet with claymation aesthetic\n\nCRITICAL LIGHTING: \n- FULL illumination - entire planet evenly lit\n- NO shadow on any part of the planet\n- NO day/night terminator line\n- NO dark side - we will add shadows dynamically in-game\n\n**single planet model, fully lit, no shadows, even illumination, claymation 3D style, game asset**\n--no shadows, no dark side, no terminator, no half-lit, no dramatic lighting, spaceships, stations, text, labels"
+    },
+    {
+      "row": 2,
+      "col": 0,
+      "name": "Planet Class D Barren",
+      "type": "Planets",
+      "promptUsed": "MANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: Handmade spherical model made of plasticine clay. Realistic planetary texture with non-glossy, soft clay finish. High-end stop-motion animation quality (Laika/Aardman style).\nProportions: Spherical planet with appropriate features (atmosphere, clouds, terrain).\nLighting: FLAT, EVEN lighting from front - FULLY LIT planet with NO shadows, NO dark side, NO day/night terminator. The entire planet surface should be visible and evenly illuminated.\nComposition: Planet centered, slight 3/4 view showing surface features.\nBackground: Solid black background (#000000) representing space.\n\nPLANET TYPE: Barren Rocky World. Grey, cratered surface like the Moon. No atmosphere. Dead and lifeless.\n\nSubject: Planet Class D Barren\nStyle: Realistic sci-fi planet with claymation aesthetic\n\nCRITICAL LIGHTING: \n- FULL illumination - entire planet evenly lit\n- NO shadow on any part of the planet\n- NO day/night terminator line\n- NO dark side - we will add shadows dynamically in-game\n\n**single planet model, fully lit, no shadows, even illumination, claymation 3D style, game asset**\n--no shadows, no dark side, no terminator, no half-lit, no dramatic lighting, spaceships, stations, text, labels"
+    },
+    {
+      "row": 2,
+      "col": 1,
+      "name": "Planet Class H Desert",
+      "type": "Planets",
+      "promptUsed": "MANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: Handmade spherical model made of plasticine clay. Realistic planetary texture with non-glossy, soft clay finish. High-end stop-motion animation quality (Laika/Aardman style).\nProportions: Spherical planet with appropriate features (atmosphere, clouds, terrain).\nLighting: FLAT, EVEN lighting from front - FULLY LIT planet with NO shadows, NO dark side, NO day/night terminator. The entire planet surface should be visible and evenly illuminated.\nComposition: Planet centered, slight 3/4 view showing surface features.\nBackground: Solid black background (#000000) representing space.\n\nPLANET TYPE: Desert World. Tan, orange, brown surface. Minimal water. Sparse clouds. Arid climate.\n\nSubject: Planet Class H Desert\nStyle: Realistic sci-fi planet with claymation aesthetic\n\nCRITICAL LIGHTING: \n- FULL illumination - entire planet evenly lit\n- NO shadow on any part of the planet\n- NO day/night terminator line\n- NO dark side - we will add shadows dynamically in-game\n\n**single planet model, fully lit, no shadows, even illumination, claymation 3D style, game asset**\n--no shadows, no dark side, no terminator, no half-lit, no dramatic lighting, spaceships, stations, text, labels"
+    },
+    {
+      "row": 2,
+      "col": 2,
+      "name": "Planet Class Y Demon",
+      "type": "Planets",
+      "promptUsed": "MANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: Handmade spherical model made of plasticine clay. Realistic planetary texture with non-glossy, soft clay finish. High-end stop-motion animation quality (Laika/Aardman style).\nProportions: Spherical planet with appropriate features (atmosphere, clouds, terrain).\nLighting: FLAT, EVEN lighting from front - FULLY LIT planet with NO shadows, NO dark side, NO day/night terminator. The entire planet surface should be visible and evenly illuminated.\nComposition: Planet centered, slight 3/4 view showing surface features.\nBackground: Solid black background (#000000) representing space.\n\nPLANET TYPE: Demon Class. Extremely hostile. Toxic atmosphere, extreme temperatures. Bizarre surface colors. Deadly.\n\nSubject: Planet Class Y Demon\nStyle: Realistic sci-fi planet with claymation aesthetic\n\nCRITICAL LIGHTING: \n- FULL illumination - entire planet evenly lit\n- NO shadow on any part of the planet\n- NO day/night terminator line\n- NO dark side - we will add shadows dynamically in-game\n\n**single planet model, fully lit, no shadows, even illumination, claymation 3D style, game asset**\n--no shadows, no dark side, no terminator, no half-lit, no dramatic lighting, spaceships, stations, text, labels"
+    },
+    {
+      "row": 2,
+      "col": 3,
+      "name": "Planet Rocky Cratered",
+      "type": "Planets",
+      "promptUsed": "MANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: Handmade spherical model made of plasticine clay. Realistic planetary texture with non-glossy, soft clay finish. High-end stop-motion animation quality (Laika/Aardman style).\nProportions: Spherical planet with appropriate features (atmosphere, clouds, terrain).\nLighting: FLAT, EVEN lighting from front - FULLY LIT planet with NO shadows, NO dark side, NO day/night terminator. The entire planet surface should be visible and evenly illuminated.\nComposition: Planet centered, slight 3/4 view showing surface features.\nBackground: Solid black background (#000000) representing space.\n\nPLANET TYPE: Barren Rocky World. Grey, cratered surface like the Moon. No atmosphere. Dead and lifeless.\n\nSubject: Planet Rocky Cratered\nStyle: Realistic sci-fi planet with claymation aesthetic\n\nCRITICAL LIGHTING: \n- FULL illumination - entire planet evenly lit\n- NO shadow on any part of the planet\n- NO day/night terminator line\n- NO dark side - we will add shadows dynamically in-game\n\n**single planet model, fully lit, no shadows, even illumination, claymation 3D style, game asset**\n--no shadows, no dark side, no terminator, no half-lit, no dramatic lighting, spaceships, stations, text, labels"
+    },
+    {
+      "row": 2,
+      "col": 4,
+      "name": "Planet Rocky Volcanic",
+      "type": "Planets",
+      "promptUsed": "MANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: Handmade spherical model made of plasticine clay. Realistic planetary texture with non-glossy, soft clay finish. High-end stop-motion animation quality (Laika/Aardman style).\nProportions: Spherical planet with appropriate features (atmosphere, clouds, terrain).\nLighting: FLAT, EVEN lighting from front - FULLY LIT planet with NO shadows, NO dark side, NO day/night terminator. The entire planet surface should be visible and evenly illuminated.\nComposition: Planet centered, slight 3/4 view showing surface features.\nBackground: Solid black background (#000000) representing space.\n\nPLANET TYPE: Volcanic World. Dark surface with glowing lava rivers and eruptions. Smoke and ash in atmosphere. Hellish.\n\nSubject: Planet Rocky Volcanic\nStyle: Realistic sci-fi planet with claymation aesthetic\n\nCRITICAL LIGHTING: \n- FULL illumination - entire planet evenly lit\n- NO shadow on any part of the planet\n- NO day/night terminator line\n- NO dark side - we will add shadows dynamically in-game\n\n**single planet model, fully lit, no shadows, even illumination, claymation 3D style, game asset**\n--no shadows, no dark side, no terminator, no half-lit, no dramatic lighting, spaceships, stations, text, labels"
+    },
+    {
+      "row": 2,
+      "col": 5,
+      "name": "Planet Asteroid Large",
+      "type": "Planets",
+      "promptUsed": "MANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: Handmade spherical model made of plasticine clay. Realistic planetary texture with non-glossy, soft clay finish. High-end stop-motion animation quality (Laika/Aardman style).\nProportions: Spherical planet with appropriate features (atmosphere, clouds, terrain).\nLighting: FLAT, EVEN lighting from front - FULLY LIT planet with NO shadows, NO dark side, NO day/night terminator. The entire planet surface should be visible and evenly illuminated.\nComposition: Planet centered, slight 3/4 view showing surface features.\nBackground: Solid black background (#000000) representing space.\n\nPLANET TYPE: Standard planetary body with appropriate surface features for its classification.\n\nSubject: Planet Asteroid Large\nStyle: Realistic sci-fi planet with claymation aesthetic\n\nCRITICAL LIGHTING: \n- FULL illumination - entire planet evenly lit\n- NO shadow on any part of the planet\n- NO day/night terminator line\n- NO dark side - we will add shadows dynamically in-game\n\n**single planet model, fully lit, no shadows, even illumination, claymation 3D style, game asset**\n--no shadows, no dark side, no terminator, no half-lit, no dramatic lighting, spaceships, stations, text, labels"
+    },
+    {
+      "row": 3,
+      "col": 0,
+      "name": "Planet Class P Ice",
+      "type": "Planets",
+      "promptUsed": "MANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: Handmade spherical model made of plasticine clay. Realistic planetary texture with non-glossy, soft clay finish. High-end stop-motion animation quality (Laika/Aardman style).\nProportions: Spherical planet with appropriate features (atmosphere, clouds, terrain).\nLighting: FLAT, EVEN lighting from front - FULLY LIT planet with NO shadows, NO dark side, NO day/night terminator. The entire planet surface should be visible and evenly illuminated.\nComposition: Planet centered, slight 3/4 view showing surface features.\nBackground: Solid black background (#000000) representing space.\n\nPLANET TYPE: Ice World. White and light blue surface. Frozen oceans, glaciers. Thin wisps of clouds.\n\nSubject: Planet Class P Ice\nStyle: Realistic sci-fi planet with claymation aesthetic\n\nCRITICAL LIGHTING: \n- FULL illumination - entire planet evenly lit\n- NO shadow on any part of the planet\n- NO day/night terminator line\n- NO dark side - we will add shadows dynamically in-game\n\n**single planet model, fully lit, no shadows, even illumination, claymation 3D style, game asset**\n--no shadows, no dark side, no terminator, no half-lit, no dramatic lighting, spaceships, stations, text, labels"
+    },
+    {
+      "row": 3,
+      "col": 1,
+      "name": "Planet Frozen Ocean",
+      "type": "Planets",
+      "promptUsed": "MANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: Handmade spherical model made of plasticine clay. Realistic planetary texture with non-glossy, soft clay finish. High-end stop-motion animation quality (Laika/Aardman style).\nProportions: Spherical planet with appropriate features (atmosphere, clouds, terrain).\nLighting: FLAT, EVEN lighting from front - FULLY LIT planet with NO shadows, NO dark side, NO day/night terminator. The entire planet surface should be visible and evenly illuminated.\nComposition: Planet centered, slight 3/4 view showing surface features.\nBackground: Solid black background (#000000) representing space.\n\nPLANET TYPE: Ocean World. Almost entirely covered in deep blue water. Small island chains. Heavy cloud cover.\n\nSubject: Planet Frozen Ocean\nStyle: Realistic sci-fi planet with claymation aesthetic\n\nCRITICAL LIGHTING: \n- FULL illumination - entire planet evenly lit\n- NO shadow on any part of the planet\n- NO day/night terminator line\n- NO dark side - we will add shadows dynamically in-game\n\n**single planet model, fully lit, no shadows, even illumination, claymation 3D style, game asset**\n--no shadows, no dark side, no terminator, no half-lit, no dramatic lighting, spaceships, stations, text, labels"
+    },
+    {
+      "row": 3,
+      "col": 2,
+      "name": "Planet Ice Rings",
+      "type": "Planets",
+      "promptUsed": "MANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: Handmade spherical model made of plasticine clay. Realistic planetary texture with non-glossy, soft clay finish. High-end stop-motion animation quality (Laika/Aardman style).\nProportions: Spherical planet with appropriate features (atmosphere, clouds, terrain).\nLighting: FLAT, EVEN lighting from front - FULLY LIT planet with NO shadows, NO dark side, NO day/night terminator. The entire planet surface should be visible and evenly illuminated.\nComposition: Planet centered, slight 3/4 view showing surface features.\nBackground: Solid black background (#000000) representing space.\n\nPLANET TYPE: Ice World. White and light blue surface. Frozen oceans, glaciers. Thin wisps of clouds.\n\nSubject: Planet Ice Rings\nStyle: Realistic sci-fi planet with claymation aesthetic\n\nCRITICAL LIGHTING: \n- FULL illumination - entire planet evenly lit\n- NO shadow on any part of the planet\n- NO day/night terminator line\n- NO dark side - we will add shadows dynamically in-game\n\n**single planet model, fully lit, no shadows, even illumination, claymation 3D style, game asset**\n--no shadows, no dark side, no terminator, no half-lit, no dramatic lighting, spaceships, stations, text, labels"
+    },
+    {
+      "row": 3,
+      "col": 3,
+      "name": "Planet Snowball",
+      "type": "Planets",
+      "promptUsed": "MANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: Handmade spherical model made of plasticine clay. Realistic planetary texture with non-glossy, soft clay finish. High-end stop-motion animation quality (Laika/Aardman style).\nProportions: Spherical planet with appropriate features (atmosphere, clouds, terrain).\nLighting: FLAT, EVEN lighting from front - FULLY LIT planet with NO shadows, NO dark side, NO day/night terminator. The entire planet surface should be visible and evenly illuminated.\nComposition: Planet centered, slight 3/4 view showing surface features.\nBackground: Solid black background (#000000) representing space.\n\nPLANET TYPE: Standard planetary body with appropriate surface features for its classification.\n\nSubject: Planet Snowball\nStyle: Realistic sci-fi planet with claymation aesthetic\n\nCRITICAL LIGHTING: \n- FULL illumination - entire planet evenly lit\n- NO shadow on any part of the planet\n- NO day/night terminator line\n- NO dark side - we will add shadows dynamically in-game\n\n**single planet model, fully lit, no shadows, even illumination, claymation 3D style, game asset**\n--no shadows, no dark side, no terminator, no half-lit, no dramatic lighting, spaceships, stations, text, labels"
+    },
+    {
+      "row": 3,
+      "col": 4,
+      "name": "Planet Cryo Volcanic",
+      "type": "Planets",
+      "promptUsed": "MANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: Handmade spherical model made of plasticine clay. Realistic planetary texture with non-glossy, soft clay finish. High-end stop-motion animation quality (Laika/Aardman style).\nProportions: Spherical planet with appropriate features (atmosphere, clouds, terrain).\nLighting: FLAT, EVEN lighting from front - FULLY LIT planet with NO shadows, NO dark side, NO day/night terminator. The entire planet surface should be visible and evenly illuminated.\nComposition: Planet centered, slight 3/4 view showing surface features.\nBackground: Solid black background (#000000) representing space.\n\nPLANET TYPE: Volcanic World. Dark surface with glowing lava rivers and eruptions. Smoke and ash in atmosphere. Hellish.\n\nSubject: Planet Cryo Volcanic\nStyle: Realistic sci-fi planet with claymation aesthetic\n\nCRITICAL LIGHTING: \n- FULL illumination - entire planet evenly lit\n- NO shadow on any part of the planet\n- NO day/night terminator line\n- NO dark side - we will add shadows dynamically in-game\n\n**single planet model, fully lit, no shadows, even illumination, claymation 3D style, game asset**\n--no shadows, no dark side, no terminator, no half-lit, no dramatic lighting, spaceships, stations, text, labels"
+    },
+    {
+      "row": 3,
+      "col": 5,
+      "name": "Planet Comet Large",
+      "type": "Planets",
+      "promptUsed": "MANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: Handmade spherical model made of plasticine clay. Realistic planetary texture with non-glossy, soft clay finish. High-end stop-motion animation quality (Laika/Aardman style).\nProportions: Spherical planet with appropriate features (atmosphere, clouds, terrain).\nLighting: FLAT, EVEN lighting from front - FULLY LIT planet with NO shadows, NO dark side, NO day/night terminator. The entire planet surface should be visible and evenly illuminated.\nComposition: Planet centered, slight 3/4 view showing surface features.\nBackground: Solid black background (#000000) representing space.\n\nPLANET TYPE: Standard planetary body with appropriate surface features for its classification.\n\nSubject: Planet Comet Large\nStyle: Realistic sci-fi planet with claymation aesthetic\n\nCRITICAL LIGHTING: \n- FULL illumination - entire planet evenly lit\n- NO shadow on any part of the planet\n- NO day/night terminator line\n- NO dark side - we will add shadows dynamically in-game\n\n**single planet model, fully lit, no shadows, even illumination, claymation 3D style, game asset**\n--no shadows, no dark side, no terminator, no half-lit, no dramatic lighting, spaceships, stations, text, labels"
+    },
+    {
+      "row": 4,
+      "col": 0,
+      "name": "Planet Class J Super Giant",
+      "type": "Planets",
+      "promptUsed": "MANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: Handmade spherical model made of plasticine clay. Realistic planetary texture with non-glossy, soft clay finish. High-end stop-motion animation quality (Laika/Aardman style).\nProportions: Spherical planet with appropriate features (atmosphere, clouds, terrain).\nLighting: FLAT, EVEN lighting from front - FULLY LIT planet with NO shadows, NO dark side, NO day/night terminator. The entire planet surface should be visible and evenly illuminated.\nComposition: Planet centered, slight 3/4 view showing surface features.\nBackground: Solid black background (#000000) representing space.\n\nPLANET TYPE: Standard planetary body with appropriate surface features for its classification.\n\nSubject: Planet Class J Super Giant\nStyle: Realistic sci-fi planet with claymation aesthetic\n\nCRITICAL LIGHTING: \n- FULL illumination - entire planet evenly lit\n- NO shadow on any part of the planet\n- NO day/night terminator line\n- NO dark side - we will add shadows dynamically in-game\n\n**single planet model, fully lit, no shadows, even illumination, claymation 3D style, game asset**\n--no shadows, no dark side, no terminator, no half-lit, no dramatic lighting, spaceships, stations, text, labels"
+    },
+    {
+      "row": 4,
+      "col": 1,
+      "name": "Planet Rogue Dark",
+      "type": "Planets",
+      "promptUsed": "MANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: Handmade spherical model made of plasticine clay. Realistic planetary texture with non-glossy, soft clay finish. High-end stop-motion animation quality (Laika/Aardman style).\nProportions: Spherical planet with appropriate features (atmosphere, clouds, terrain).\nLighting: FLAT, EVEN lighting from front - FULLY LIT planet with NO shadows, NO dark side, NO day/night terminator. The entire planet surface should be visible and evenly illuminated.\nComposition: Planet centered, slight 3/4 view showing surface features.\nBackground: Solid black background (#000000) representing space.\n\nPLANET TYPE: Standard planetary body with appropriate surface features for its classification.\n\nSubject: Planet Rogue Dark\nStyle: Realistic sci-fi planet with claymation aesthetic\n\nCRITICAL LIGHTING: \n- FULL illumination - entire planet evenly lit\n- NO shadow on any part of the planet\n- NO day/night terminator line\n- NO dark side - we will add shadows dynamically in-game\n\n**single planet model, fully lit, no shadows, even illumination, claymation 3D style, game asset**\n--no shadows, no dark side, no terminator, no half-lit, no dramatic lighting, spaceships, stations, text, labels"
+    },
+    {
+      "row": 4,
+      "col": 2,
+      "name": "Planet Crystalline",
+      "type": "Planets",
+      "promptUsed": "MANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: Handmade spherical model made of plasticine clay. Realistic planetary texture with non-glossy, soft clay finish. High-end stop-motion animation quality (Laika/Aardman style).\nProportions: Spherical planet with appropriate features (atmosphere, clouds, terrain).\nLighting: FLAT, EVEN lighting from front - FULLY LIT planet with NO shadows, NO dark side, NO day/night terminator. The entire planet surface should be visible and evenly illuminated.\nComposition: Planet centered, slight 3/4 view showing surface features.\nBackground: Solid black background (#000000) representing space.\n\nPLANET TYPE: Crystalline World. Surface covered in crystal formations. Refracts light in rainbow colors. Alien and beautiful.\n\nSubject: Planet Crystalline\nStyle: Realistic sci-fi planet with claymation aesthetic\n\nCRITICAL LIGHTING: \n- FULL illumination - entire planet evenly lit\n- NO shadow on any part of the planet\n- NO day/night terminator line\n- NO dark side - we will add shadows dynamically in-game\n\n**single planet model, fully lit, no shadows, even illumination, claymation 3D style, game asset**\n--no shadows, no dark side, no terminator, no half-lit, no dramatic lighting, spaceships, stations, text, labels"
+    },
+    {
+      "row": 4,
+      "col": 3,
+      "name": "Planet Artificial Dyson",
+      "type": "Planets",
+      "promptUsed": "MANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: Handmade spherical model made of plasticine clay. Realistic planetary texture with non-glossy, soft clay finish. High-end stop-motion animation quality (Laika/Aardman style).\nProportions: Spherical planet with appropriate features (atmosphere, clouds, terrain).\nLighting: FLAT, EVEN lighting from front - FULLY LIT planet with NO shadows, NO dark side, NO day/night terminator. The entire planet surface should be visible and evenly illuminated.\nComposition: Planet centered, slight 3/4 view showing surface features.\nBackground: Solid black background (#000000) representing space.\n\nPLANET TYPE: Standard planetary body with appropriate surface features for its classification.\n\nSubject: Planet Artificial Dyson\nStyle: Realistic sci-fi planet with claymation aesthetic\n\nCRITICAL LIGHTING: \n- FULL illumination - entire planet evenly lit\n- NO shadow on any part of the planet\n- NO day/night terminator line\n- NO dark side - we will add shadows dynamically in-game\n\n**single planet model, fully lit, no shadows, even illumination, claymation 3D style, game asset**\n--no shadows, no dark side, no terminator, no half-lit, no dramatic lighting, spaceships, stations, text, labels"
+    },
+    {
+      "row": 4,
+      "col": 4,
+      "name": "Planet Hollow",
+      "type": "Planets",
+      "promptUsed": "MANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: Handmade spherical model made of plasticine clay. Realistic planetary texture with non-glossy, soft clay finish. High-end stop-motion animation quality (Laika/Aardman style).\nProportions: Spherical planet with appropriate features (atmosphere, clouds, terrain).\nLighting: FLAT, EVEN lighting from front - FULLY LIT planet with NO shadows, NO dark side, NO day/night terminator. The entire planet surface should be visible and evenly illuminated.\nComposition: Planet centered, slight 3/4 view showing surface features.\nBackground: Solid black background (#000000) representing space.\n\nPLANET TYPE: Standard planetary body with appropriate surface features for its classification.\n\nSubject: Planet Hollow\nStyle: Realistic sci-fi planet with claymation aesthetic\n\nCRITICAL LIGHTING: \n- FULL illumination - entire planet evenly lit\n- NO shadow on any part of the planet\n- NO day/night terminator line\n- NO dark side - we will add shadows dynamically in-game\n\n**single planet model, fully lit, no shadows, even illumination, claymation 3D style, game asset**\n--no shadows, no dark side, no terminator, no half-lit, no dramatic lighting, spaceships, stations, text, labels"
+    },
+    {
+      "row": 4,
+      "col": 5,
+      "name": "Planet Ring World Section",
+      "type": "Planets",
+      "promptUsed": "MANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: Handmade spherical model made of plasticine clay. Realistic planetary texture with non-glossy, soft clay finish. High-end stop-motion animation quality (Laika/Aardman style).\nProportions: Spherical planet with appropriate features (atmosphere, clouds, terrain).\nLighting: FLAT, EVEN lighting from front - FULLY LIT planet with NO shadows, NO dark side, NO day/night terminator. The entire planet surface should be visible and evenly illuminated.\nComposition: Planet centered, slight 3/4 view showing surface features.\nBackground: Solid black background (#000000) representing space.\n\nPLANET TYPE: Standard planetary body with appropriate surface features for its classification.\n\nSubject: Planet Ring World Section\nStyle: Realistic sci-fi planet with claymation aesthetic\n\nCRITICAL LIGHTING: \n- FULL illumination - entire planet evenly lit\n- NO shadow on any part of the planet\n- NO day/night terminator line\n- NO dark side - we will add shadows dynamically in-game\n\n**single planet model, fully lit, no shadows, even illumination, claymation 3D style, game asset**\n--no shadows, no dark side, no terminator, no half-lit, no dramatic lighting, spaceships, stations, text, labels"
+    },
+    {
+      "row": 5,
+      "col": 0,
+      "name": "Planet Borg Assimilated",
+      "type": "Planets",
+      "promptUsed": "MANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: Handmade spherical model made of plasticine clay. Realistic planetary texture with non-glossy, soft clay finish. High-end stop-motion animation quality (Laika/Aardman style).\nProportions: Spherical planet with appropriate features (atmosphere, clouds, terrain).\nLighting: FLAT, EVEN lighting from front - FULLY LIT planet with NO shadows, NO dark side, NO day/night terminator. The entire planet surface should be visible and evenly illuminated.\nComposition: Planet centered, slight 3/4 view showing surface features.\nBackground: Solid black background (#000000) representing space.\n\nPLANET TYPE: Borg Assimilated. Surface covered in geometric Borg structures. Green glow. Technology replacing nature.\n\nSubject: Planet Borg Assimilated\nStyle: Realistic sci-fi planet with claymation aesthetic\n\nCRITICAL LIGHTING: \n- FULL illumination - entire planet evenly lit\n- NO shadow on any part of the planet\n- NO day/night terminator line\n- NO dark side - we will add shadows dynamically in-game\n\n**single planet model, fully lit, no shadows, even illumination, claymation 3D style, game asset**\n--no shadows, no dark side, no terminator, no half-lit, no dramatic lighting, spaceships, stations, text, labels"
+    },
+    {
+      "row": 5,
+      "col": 1,
+      "name": "Planet Destroyed Half",
+      "type": "Planets",
+      "promptUsed": "MANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: Handmade spherical model made of plasticine clay. Realistic planetary texture with non-glossy, soft clay finish. High-end stop-motion animation quality (Laika/Aardman style).\nProportions: Spherical planet with appropriate features (atmosphere, clouds, terrain).\nLighting: FLAT, EVEN lighting from front - FULLY LIT planet with NO shadows, NO dark side, NO day/night terminator. The entire planet surface should be visible and evenly illuminated.\nComposition: Planet centered, slight 3/4 view showing surface features.\nBackground: Solid black background (#000000) representing space.\n\nPLANET TYPE: Destroyed Planet. Half the planet missing, debris field. Glowing core visible. Catastrophic damage.\n\nSubject: Planet Destroyed Half\nStyle: Realistic sci-fi planet with claymation aesthetic\n\nCRITICAL LIGHTING: \n- FULL illumination - entire planet evenly lit\n- NO shadow on any part of the planet\n- NO day/night terminator line\n- NO dark side - we will add shadows dynamically in-game\n\n**single planet model, fully lit, no shadows, even illumination, claymation 3D style, game asset**\n--no shadows, no dark side, no terminator, no half-lit, no dramatic lighting, spaceships, stations, text, labels"
+    },
+    {
+      "row": 5,
+      "col": 2,
+      "name": "Planet Under Attack",
+      "type": "Planets",
+      "promptUsed": "MANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: Handmade spherical model made of plasticine clay. Realistic planetary texture with non-glossy, soft clay finish. High-end stop-motion animation quality (Laika/Aardman style).\nProportions: Spherical planet with appropriate features (atmosphere, clouds, terrain).\nLighting: FLAT, EVEN lighting from front - FULLY LIT planet with NO shadows, NO dark side, NO day/night terminator. The entire planet surface should be visible and evenly illuminated.\nComposition: Planet centered, slight 3/4 view showing surface features.\nBackground: Solid black background (#000000) representing space.\n\nPLANET TYPE: Standard planetary body with appropriate surface features for its classification.\n\nSubject: Planet Under Attack\nStyle: Realistic sci-fi planet with claymation aesthetic\n\nCRITICAL LIGHTING: \n- FULL illumination - entire planet evenly lit\n- NO shadow on any part of the planet\n- NO day/night terminator line\n- NO dark side - we will add shadows dynamically in-game\n\n**single planet model, fully lit, no shadows, even illumination, claymation 3D style, game asset**\n--no shadows, no dark side, no terminator, no half-lit, no dramatic lighting, spaceships, stations, text, labels"
+    },
+    {
+      "row": 5,
+      "col": 3,
+      "name": "Planet Shielded",
+      "type": "Planets",
+      "promptUsed": "MANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: Handmade spherical model made of plasticine clay. Realistic planetary texture with non-glossy, soft clay finish. High-end stop-motion animation quality (Laika/Aardman style).\nProportions: Spherical planet with appropriate features (atmosphere, clouds, terrain).\nLighting: FLAT, EVEN lighting from front - FULLY LIT planet with NO shadows, NO dark side, NO day/night terminator. The entire planet surface should be visible and evenly illuminated.\nComposition: Planet centered, slight 3/4 view showing surface features.\nBackground: Solid black background (#000000) representing space.\n\nPLANET TYPE: Standard planetary body with appropriate surface features for its classification.\n\nSubject: Planet Shielded\nStyle: Realistic sci-fi planet with claymation aesthetic\n\nCRITICAL LIGHTING: \n- FULL illumination - entire planet evenly lit\n- NO shadow on any part of the planet\n- NO day/night terminator line\n- NO dark side - we will add shadows dynamically in-game\n\n**single planet model, fully lit, no shadows, even illumination, claymation 3D style, game asset**\n--no shadows, no dark side, no terminator, no half-lit, no dramatic lighting, spaceships, stations, text, labels"
+    },
+    {
+      "row": 5,
+      "col": 4,
+      "name": "Planet Terraforming",
+      "type": "Planets",
+      "promptUsed": "MANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: Handmade spherical model made of plasticine clay. Realistic planetary texture with non-glossy, soft clay finish. High-end stop-motion animation quality (Laika/Aardman style).\nProportions: Spherical planet with appropriate features (atmosphere, clouds, terrain).\nLighting: FLAT, EVEN lighting from front - FULLY LIT planet with NO shadows, NO dark side, NO day/night terminator. The entire planet surface should be visible and evenly illuminated.\nComposition: Planet centered, slight 3/4 view showing surface features.\nBackground: Solid black background (#000000) representing space.\n\nPLANET TYPE: Standard planetary body with appropriate surface features for its classification.\n\nSubject: Planet Terraforming\nStyle: Realistic sci-fi planet with claymation aesthetic\n\nCRITICAL LIGHTING: \n- FULL illumination - entire planet evenly lit\n- NO shadow on any part of the planet\n- NO day/night terminator line\n- NO dark side - we will add shadows dynamically in-game\n\n**single planet model, fully lit, no shadows, even illumination, claymation 3D style, game asset**\n--no shadows, no dark side, no terminator, no half-lit, no dramatic lighting, spaceships, stations, text, labels"
+    },
+    {
+      "row": 5,
+      "col": 5,
+      "name": "Planet Ancient Ruins",
+      "type": "Planets",
+      "promptUsed": "MANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: Handmade spherical model made of plasticine clay. Realistic planetary texture with non-glossy, soft clay finish. High-end stop-motion animation quality (Laika/Aardman style).\nProportions: Spherical planet with appropriate features (atmosphere, clouds, terrain).\nLighting: FLAT, EVEN lighting from front - FULLY LIT planet with NO shadows, NO dark side, NO day/night terminator. The entire planet surface should be visible and evenly illuminated.\nComposition: Planet centered, slight 3/4 view showing surface features.\nBackground: Solid black background (#000000) representing space.\n\nPLANET TYPE: Standard planetary body with appropriate surface features for its classification.\n\nSubject: Planet Ancient Ruins\nStyle: Realistic sci-fi planet with claymation aesthetic\n\nCRITICAL LIGHTING: \n- FULL illumination - entire planet evenly lit\n- NO shadow on any part of the planet\n- NO day/night terminator line\n- NO dark side - we will add shadows dynamically in-game\n\n**single planet model, fully lit, no shadows, even illumination, claymation 3D style, game asset**\n--no shadows, no dark side, no terminator, no half-lit, no dramatic lighting, spaceships, stations, text, labels"
+    }
+  ]
+}

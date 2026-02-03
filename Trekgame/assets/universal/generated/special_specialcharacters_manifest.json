@@ -1,0 +1,128 @@
+{
+  "factionName": "Special",
+  "categoryName": "SpecialCharacters",
+  "grid": {
+    "columns": 4,
+    "rows": 4,
+    "totalAssets": 16,
+    "cellSize": 360,
+    "spriteWidth": 1440,
+    "spriteHeight": 1440
+  },
+  "spriteSheetPath": "special_specialcharacters.png",
+  "generatedAt": "2026-02-01T22:20:44.973Z",
+  "assets": [
+    {
+      "row": 0,
+      "col": 0,
+      "name": "Q Classic Smirk Starfleet",
+      "type": "SpecialCharacters",
+      "promptUsed": "ICONIC STAR TREK CHARACTER PORTRAIT\n\nQ (THE Q):\n- Human male, middle-aged, distinguished\n- Brown hair, slightly receding\n- SMUG, MISCHIEVOUS SMIRK (signature!)\n- Starfleet captain uniform (red/black TNG era)\n- Raised eyebrow, about to say something clever\n- Air of omnipotent superiority\n- \u0027Mon capitaine!\u0027 energy\n\nMANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: The character must look like a handmade physical model made of plasticine clay. Realistic skin/surface texture with non-glossy, soft clay finish. High-end stop-motion animation quality (Laika/Aardman style).\nProportions: Stylized but recognizable. Must be IDENTIFIABLE as the character.\nLighting: Soft, cinematic studio lighting. Subsurface scattering on skin.\nComposition: Medium shot portrait, 3/4 view, looking at camera.\nBackground: Solid black background (#000000).\n\nCRITICAL - RECOGNIZABILITY:\n- This is an ICONIC character - must be recognizable\n- Key features that define the character must be present\n- Expression and pose should capture their personality\n\n**medium shot character portrait, claymation 3D style, iconic Star Trek character, game asset**\n--no funny, no thumbprints, no generic, no wrong features, no text, no labels"
+    },
+    {
+      "row": 0,
+      "col": 1,
+      "name": "Q Judge Robes Tribunal",
+      "type": "SpecialCharacters",
+      "promptUsed": "ICONIC STAR TREK CHARACTER PORTRAIT\n\nQ AS JUDGE:\n- Same Q appearance (middle-aged human male)\n- Elaborate RED/BLACK judge robes\n- White powdered wig (18th century style)\n- Stern, judging expression\n- \u0027Humanity on trial\u0027 pose\n- Gavel optional\n\nMANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: The character must look like a handmade physical model made of plasticine clay. Realistic skin/surface texture with non-glossy, soft clay finish. High-end stop-motion animation quality (Laika/Aardman style).\nProportions: Stylized but recognizable. Must be IDENTIFIABLE as the character.\nLighting: Soft, cinematic studio lighting. Subsurface scattering on skin.\nComposition: Medium shot portrait, 3/4 view, looking at camera.\nBackground: Solid black background (#000000).\n\nCRITICAL - RECOGNIZABILITY:\n- This is an ICONIC character - must be recognizable\n- Key features that define the character must be present\n- Expression and pose should capture their personality\n\n**medium shot character portrait, claymation 3D style, iconic Star Trek character, game asset**\n--no funny, no thumbprints, no generic, no wrong features, no text, no labels"
+    },
+    {
+      "row": 0,
+      "col": 2,
+      "name": "Q Mariachi Snapping Fingers",
+      "type": "SpecialCharacters",
+      "promptUsed": "ICONIC STAR TREK CHARACTER PORTRAIT\n\nQ IN MARIACHI OUTFIT:\n- Same Q appearance\n- Full mariachi costume with sombrero\n- Playing or holding guitar\n- Amused, playful expression\n- Snapping fingers pose\n- Classic Q humor moment\n\nMANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: The character must look like a handmade physical model made of plasticine clay. Realistic skin/surface texture with non-glossy, soft clay finish. High-end stop-motion animation quality (Laika/Aardman style).\nProportions: Stylized but recognizable. Must be IDENTIFIABLE as the character.\nLighting: Soft, cinematic studio lighting. Subsurface scattering on skin.\nComposition: Medium shot portrait, 3/4 view, looking at camera.\nBackground: Solid black background (#000000).\n\nCRITICAL - RECOGNIZABILITY:\n- This is an ICONIC character - must be recognizable\n- Key features that define the character must be present\n- Expression and pose should capture their personality\n\n**medium shot character portrait, claymation 3D style, iconic Star Trek character, game asset**\n--no funny, no thumbprints, no generic, no wrong features, no text, no labels"
+    },
+    {
+      "row": 0,
+      "col": 3,
+      "name": "Data Yellow Eyes Curious",
+      "type": "SpecialCharacters",
+      "promptUsed": "ICONIC STAR TREK CHARACTER PORTRAIT\n\nDATA:\n- Android with PALE YELLOWISH skin\n- Slicked back BLACK hair\n- YELLOW/GOLD EYES (distinctive!)\n- Starfleet uniform (gold/operations, TNG era)\n- Head tilted slightly, CURIOUS expression\n- Trying to understand humans\n- Perfectly symmetrical features\n\nMANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: The character must look like a handmade physical model made of plasticine clay. Realistic skin/surface texture with non-glossy, soft clay finish. High-end stop-motion animation quality (Laika/Aardman style).\nProportions: Stylized but recognizable. Must be IDENTIFIABLE as the character.\nLighting: Soft, cinematic studio lighting. Subsurface scattering on skin.\nComposition: Medium shot portrait, 3/4 view, looking at camera.\nBackground: Solid black background (#000000).\n\nCRITICAL - RECOGNIZABILITY:\n- This is an ICONIC character - must be recognizable\n- Key features that define the character must be present\n- Expression and pose should capture their personality\n\n**medium shot character portrait, claymation 3D style, iconic Star Trek character, game asset**\n--no funny, no thumbprints, no generic, no wrong features, no text, no labels"
+    },
+    {
+      "row": 1,
+      "col": 0,
+      "name": "Data Emotion Chip Smiling",
+      "type": "SpecialCharacters",
+      "promptUsed": "ICONIC STAR TREK CHARACTER PORTRAIT\n\nDATA WITH EMOTION CHIP:\n- Same Data appearance (pale yellow skin, gold eyes)\n- Starfleet uniform\n- SMILING genuinely (rare for Data!)\n- Experiencing emotions\n- Joyful, slightly overwhelmed expression\n\nMANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: The character must look like a handmade physical model made of plasticine clay. Realistic skin/surface texture with non-glossy, soft clay finish. High-end stop-motion animation quality (Laika/Aardman style).\nProportions: Stylized but recognizable. Must be IDENTIFIABLE as the character.\nLighting: Soft, cinematic studio lighting. Subsurface scattering on skin.\nComposition: Medium shot portrait, 3/4 view, looking at camera.\nBackground: Solid black background (#000000).\n\nCRITICAL - RECOGNIZABILITY:\n- This is an ICONIC character - must be recognizable\n- Key features that define the character must be present\n- Expression and pose should capture their personality\n\n**medium shot character portrait, claymation 3D style, iconic Star Trek character, game asset**\n--no funny, no thumbprints, no generic, no wrong features, no text, no labels"
+    },
+    {
+      "row": 1,
+      "col": 1,
+      "name": "Lore Evil Twin Smirk",
+      "type": "SpecialCharacters",
+      "promptUsed": "ICONIC STAR TREK CHARACTER PORTRAIT\n\nLORE (Data\u0027s Evil Twin):\n- IDENTICAL to Data (pale yellow skin, gold eyes)\n- But with CRUEL SMILE, malevolent expression\n- More expressive, confident than Data\n- Arrogant posture\n- Civilian clothes or Starfleet uniform\n- Evil intelligence in eyes\n\nMANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: The character must look like a handmade physical model made of plasticine clay. Realistic skin/surface texture with non-glossy, soft clay finish. High-end stop-motion animation quality (Laika/Aardman style).\nProportions: Stylized but recognizable. Must be IDENTIFIABLE as the character.\nLighting: Soft, cinematic studio lighting. Subsurface scattering on skin.\nComposition: Medium shot portrait, 3/4 view, looking at camera.\nBackground: Solid black background (#000000).\n\nCRITICAL - RECOGNIZABILITY:\n- This is an ICONIC character - must be recognizable\n- Key features that define the character must be present\n- Expression and pose should capture their personality\n\n**medium shot character portrait, claymation 3D style, iconic Star Trek character, game asset**\n--no funny, no thumbprints, no generic, no wrong features, no text, no labels"
+    },
+    {
+      "row": 1,
+      "col": 2,
+      "name": "Khan Classic Vengeful",
+      "type": "SpecialCharacters",
+      "promptUsed": "ICONIC STAR TREK CHARACTER PORTRAIT\n\nKHAN NOONIEN SINGH (Classic):\n- South Asian features, powerful build\n- Long grey/white hair, swept back\n- Open chest showing muscular physique\n- VENGEFUL, intense expression\n- \u0027FROM HELL\u0027S HEART I STAB AT THEE\u0027 energy\n- 20th century superman, exiled ruler\n\nMANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: The character must look like a handmade physical model made of plasticine clay. Realistic skin/surface texture with non-glossy, soft clay finish. High-end stop-motion animation quality (Laika/Aardman style).\nProportions: Stylized but recognizable. Must be IDENTIFIABLE as the character.\nLighting: Soft, cinematic studio lighting. Subsurface scattering on skin.\nComposition: Medium shot portrait, 3/4 view, looking at camera.\nBackground: Solid black background (#000000).\n\nCRITICAL - RECOGNIZABILITY:\n- This is an ICONIC character - must be recognizable\n- Key features that define the character must be present\n- Expression and pose should capture their personality\n\n**medium shot character portrait, claymation 3D style, iconic Star Trek character, game asset**\n--no funny, no thumbprints, no generic, no wrong features, no text, no labels"
+    },
+    {
+      "row": 1,
+      "col": 3,
+      "name": "Khan Young Calculating",
+      "type": "SpecialCharacters",
+      "promptUsed": "ICONIC STAR TREK CHARACTER PORTRAIT\n\nKHAN (Young/Modern):\n- Pale skin, dark slicked hair\n- Sharp, angular features\n- Intense, cold eyes\n- Starfleet or dark civilian clothes\n- Calculating, dangerous expression\n- Superior intellect visible in gaze\n\nMANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: The character must look like a handmade physical model made of plasticine clay. Realistic skin/surface texture with non-glossy, soft clay finish. High-end stop-motion animation quality (Laika/Aardman style).\nProportions: Stylized but recognizable. Must be IDENTIFIABLE as the character.\nLighting: Soft, cinematic studio lighting. Subsurface scattering on skin.\nComposition: Medium shot portrait, 3/4 view, looking at camera.\nBackground: Solid black background (#000000).\n\nCRITICAL - RECOGNIZABILITY:\n- This is an ICONIC character - must be recognizable\n- Key features that define the character must be present\n- Expression and pose should capture their personality\n\n**medium shot character portrait, claymation 3D style, iconic Star Trek character, game asset**\n--no funny, no thumbprints, no generic, no wrong features, no text, no labels"
+    },
+    {
+      "row": 2,
+      "col": 0,
+      "name": "Augment Soldier Elite",
+      "type": "SpecialCharacters",
+      "promptUsed": "ICONIC STAR TREK CHARACTER PORTRAIT\n\nAUGMENT SUPER SOLDIER:\n- Genetically enhanced human\n- Perfect physique, intense expression\n- Any ethnicity\n- Military bearing\n- Superior, arrogant body language\n- Enhanced human, not quite Khan-level\n\nMANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: The character must look like a handmade physical model made of plasticine clay. Realistic skin/surface texture with non-glossy, soft clay finish. High-end stop-motion animation quality (Laika/Aardman style).\nProportions: Stylized but recognizable. Must be IDENTIFIABLE as the character.\nLighting: Soft, cinematic studio lighting. Subsurface scattering on skin.\nComposition: Medium shot portrait, 3/4 view, looking at camera.\nBackground: Solid black background (#000000).\n\nCRITICAL - RECOGNIZABILITY:\n- This is an ICONIC character - must be recognizable\n- Key features that define the character must be present\n- Expression and pose should capture their personality\n\n**medium shot character portrait, claymation 3D style, iconic Star Trek character, game asset**\n--no funny, no thumbprints, no generic, no wrong features, no text, no labels"
+    },
+    {
+      "row": 2,
+      "col": 1,
+      "name": "Guinan Wise Bartender",
+      "type": "SpecialCharacters",
+      "promptUsed": "ICONIC STAR TREK CHARACTER PORTRAIT\n\nGUINAN:\n- Dark-skinned female, ageless appearance\n- Elaborate HAT/HEADPIECE (signature!)\n- Wise, knowing smile\n- Ten Forward bartender attire (purple/burgundy)\n- \u0027I know things\u0027 mysterious expression\n- El-Aurian wisdom in eyes\n\nMANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: The character must look like a handmade physical model made of plasticine clay. Realistic skin/surface texture with non-glossy, soft clay finish. High-end stop-motion animation quality (Laika/Aardman style).\nProportions: Stylized but recognizable. Must be IDENTIFIABLE as the character.\nLighting: Soft, cinematic studio lighting. Subsurface scattering on skin.\nComposition: Medium shot portrait, 3/4 view, looking at camera.\nBackground: Solid black background (#000000).\n\nCRITICAL - RECOGNIZABILITY:\n- This is an ICONIC character - must be recognizable\n- Key features that define the character must be present\n- Expression and pose should capture their personality\n\n**medium shot character portrait, claymation 3D style, iconic Star Trek character, game asset**\n--no funny, no thumbprints, no generic, no wrong features, no text, no labels"
+    },
+    {
+      "row": 2,
+      "col": 2,
+      "name": "Borg Queen Seductive",
+      "type": "SpecialCharacters",
+      "promptUsed": "ICONIC STAR TREK CHARACTER PORTRAIT\n\nBORG QUEEN:\n- Pale grey skin, bald head\n- Extensive cybernetic implants\n- One eye organic, one cybernetic\n- Mechanical spine/shoulder assembly\n- Seductive yet terrifying smile\n- Dark lips, intense gaze\n- \u0027I am the Borg\u0027 confidence\n\nMANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: The character must look like a handmade physical model made of plasticine clay. Realistic skin/surface texture with non-glossy, soft clay finish. High-end stop-motion animation quality (Laika/Aardman style).\nProportions: Stylized but recognizable. Must be IDENTIFIABLE as the character.\nLighting: Soft, cinematic studio lighting. Subsurface scattering on skin.\nComposition: Medium shot portrait, 3/4 view, looking at camera.\nBackground: Solid black background (#000000).\n\nCRITICAL - RECOGNIZABILITY:\n- This is an ICONIC character - must be recognizable\n- Key features that define the character must be present\n- Expression and pose should capture their personality\n\n**medium shot character portrait, claymation 3D style, iconic Star Trek character, game asset**\n--no funny, no thumbprints, no generic, no wrong features, no text, no labels"
+    },
+    {
+      "row": 2,
+      "col": 3,
+      "name": "Odo Grumpy Constable",
+      "type": "SpecialCharacters",
+      "promptUsed": "ICONIC STAR TREK CHARACTER PORTRAIT\n\nODO:\n- Smooth, undefined features\n- Orange-brown skin, waxy texture\n- Slicked back \u0027hair\u0027 (part of form)\n- DS9 security uniform (tan/brown)\n- GRUMPY, suspicious expression\n- Arms behind back (signature pose)\n- Constable energy\n\nMANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: The character must look like a handmade physical model made of plasticine clay. Realistic skin/surface texture with non-glossy, soft clay finish. High-end stop-motion animation quality (Laika/Aardman style).\nProportions: Stylized but recognizable. Must be IDENTIFIABLE as the character.\nLighting: Soft, cinematic studio lighting. Subsurface scattering on skin.\nComposition: Medium shot portrait, 3/4 view, looking at camera.\nBackground: Solid black background (#000000).\n\nCRITICAL - RECOGNIZABILITY:\n- This is an ICONIC character - must be recognizable\n- Key features that define the character must be present\n- Expression and pose should capture their personality\n\n**medium shot character portrait, claymation 3D style, iconic Star Trek character, game asset**\n--no funny, no thumbprints, no generic, no wrong features, no text, no labels"
+    },
+    {
+      "row": 3,
+      "col": 0,
+      "name": "Mirror Spock Goatee",
+      "type": "SpecialCharacters",
+      "promptUsed": "ICONIC STAR TREK CHARACTER PORTRAIT\n\nMIRROR SPOCK:\n- Vulcan male, pointed ears\n- GOATEE BEARD (signature!)\n- Raised eyebrow\n- Terran Empire uniform with gold sash\n- Calculating but not entirely evil\n- Sword-through-Earth insignia visible\n\nMANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: The character must look like a handmade physical model made of plasticine clay. Realistic skin/surface texture with non-glossy, soft clay finish. High-end stop-motion animation quality (Laika/Aardman style).\nProportions: Stylized but recognizable. Must be IDENTIFIABLE as the character.\nLighting: Soft, cinematic studio lighting. Subsurface scattering on skin.\nComposition: Medium shot portrait, 3/4 view, looking at camera.\nBackground: Solid black background (#000000).\n\nCRITICAL - RECOGNIZABILITY:\n- This is an ICONIC character - must be recognizable\n- Key features that define the character must be present\n- Expression and pose should capture their personality\n\n**medium shot character portrait, claymation 3D style, iconic Star Trek character, game asset**\n--no funny, no thumbprints, no generic, no wrong features, no text, no labels"
+    },
+    {
+      "row": 3,
+      "col": 1,
+      "name": "Holographic Doctor EMH",
+      "type": "SpecialCharacters",
+      "promptUsed": "ICONIC STAR TREK CHARACTER PORTRAIT\n\nTHE DOCTOR (EMH):\n- Balding human male\n- Slightly pudgy, middle-aged\n- Starfleet medical uniform (blue, Voyager era)\n- Mobile emitter on arm\n- Exasperated or professional expression\n- \u0027Please state the nature...\u0027 energy\n- Self-important but caring\n\nMANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: The character must look like a handmade physical model made of plasticine clay. Realistic skin/surface texture with non-glossy, soft clay finish. High-end stop-motion animation quality (Laika/Aardman style).\nProportions: Stylized but recognizable. Must be IDENTIFIABLE as the character.\nLighting: Soft, cinematic studio lighting. Subsurface scattering on skin.\nComposition: Medium shot portrait, 3/4 view, looking at camera.\nBackground: Solid black background (#000000).\n\nCRITICAL - RECOGNIZABILITY:\n- This is an ICONIC character - must be recognizable\n- Key features that define the character must be present\n- Expression and pose should capture their personality\n\n**medium shot character portrait, claymation 3D style, iconic Star Trek character, game asset**\n--no funny, no thumbprints, no generic, no wrong features, no text, no labels"
+    },
+    {
+      "row": 3,
+      "col": 2,
+      "name": "Special SpecialCharacters Variant 1",
+      "type": "SpecialCharacters",
+      "promptUsed": "ICONIC STAR TREK CHARACTER PORTRAIT\n\nICONIC STAR TREK CHARACTER:\n- Recognizable character from the franchise\n- Distinctive features that identify them\n- Appropriate costume/uniform\n- Expression matching their personality\n\nMANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: The character must look like a handmade physical model made of plasticine clay. Realistic skin/surface texture with non-glossy, soft clay finish. High-end stop-motion animation quality (Laika/Aardman style).\nProportions: Stylized but recognizable. Must be IDENTIFIABLE as the character.\nLighting: Soft, cinematic studio lighting. Subsurface scattering on skin.\nComposition: Medium shot portrait, 3/4 view, looking at camera.\nBackground: Solid black background (#000000).\n\nCRITICAL - RECOGNIZABILITY:\n- This is an ICONIC character - must be recognizable\n- Key features that define the character must be present\n- Expression and pose should capture their personality\n\n**medium shot character portrait, claymation 3D style, iconic Star Trek character, game asset**\n--no funny, no thumbprints, no generic, no wrong features, no text, no labels"
+    },
+    {
+      "row": 3,
+      "col": 3,
+      "name": "Special SpecialCharacters Variant 2",
+      "type": "SpecialCharacters",
+      "promptUsed": "ICONIC STAR TREK CHARACTER PORTRAIT\n\nICONIC STAR TREK CHARACTER:\n- Recognizable character from the franchise\n- Distinctive features that identify them\n- Appropriate costume/uniform\n- Expression matching their personality\n\nMANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: The character must look like a handmade physical model made of plasticine clay. Realistic skin/surface texture with non-glossy, soft clay finish. High-end stop-motion animation quality (Laika/Aardman style).\nProportions: Stylized but recognizable. Must be IDENTIFIABLE as the character.\nLighting: Soft, cinematic studio lighting. Subsurface scattering on skin.\nComposition: Medium shot portrait, 3/4 view, looking at camera.\nBackground: Solid black background (#000000).\n\nCRITICAL - RECOGNIZABILITY:\n- This is an ICONIC character - must be recognizable\n- Key features that define the character must be present\n- Expression and pose should capture their personality\n\n**medium shot character portrait, claymation 3D style, iconic Star Trek character, game asset**\n--no funny, no thumbprints, no generic, no wrong features, no text, no labels"
+    }
+  ]
+}

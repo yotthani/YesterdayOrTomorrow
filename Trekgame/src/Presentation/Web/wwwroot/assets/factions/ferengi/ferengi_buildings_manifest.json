@@ -1,0 +1,121 @@
+{
+  "factionName": "Ferengi",
+  "categoryName": "Buildings",
+  "architectureStyle": {
+    "description": "Ostentatious commercial architecture - designed to display wealth, attract customers, and generate profit",
+    "keyElements": [
+      "GOLD, ORANGE, BRONZE everywhere - wealth must be displayed",
+      "Neon signs and holographic advertisements",
+      "Large ear motifs in architecture (Ferengi have large ears)",
+      "Vault doors and secure storage visible - protecting latinum",
+      "Grand entrances to attract customers",
+      "Price displays and promotional banners",
+      "Luxurious materials for wealthy clients, cheap materials hidden",
+      "Dabo tables and gaming areas visible",
+      "Rules of Acquisition displayed on walls",
+      "NO military features - profit over warfare",
+      "Comfortable for customers, cramped for employees",
+      "Every space monetized - even bathrooms cost latinum"
+    ],
+    "colors": "Gold, orange, bronze, copper, with garish neon accents (pink, green, blue)",
+    "materials": "Gold plating (often fake), glass display cases, holographic projectors, latinum-colored trim"
+  },
+  "buildings": [
+    {
+      "name": "Tower of Commerce",
+      "description": "Ferengi Commerce Authority headquarters. Tallest building, gold-plated, symbol of Ferengi economic power."
+    },
+    {
+      "name": "Grand Nagus Palace",
+      "description": "Residence of the Grand Nagus. Obscenely luxurious, vault of legendary size, throne room for audiences."
+    },
+    {
+      "name": "Ferengi Trade Mission",
+      "description": "Commercial embassy. Negotiation rooms, contract offices, bribery is expected."
+    },
+    {
+      "name": "Latinum Depository",
+      "description": "Bank vault facility. Massive security, stores gold-pressed latinum for wealthy clients."
+    },
+    {
+      "name": "Auction House",
+      "description": "Where valuable items are sold. Grand hall, bidding platforms, display cases."
+    },
+    {
+      "name": "Casino Complex",
+      "description": "Gambling establishment. Dabo wheels, tongo tables, rigged games, hosted by attractive Dabo girls."
+    },
+    {
+      "name": "Marketplace Grand Hall",
+      "description": "Massive indoor market. Hundreds of vendors, everything for sale, constant haggling."
+    },
+    {
+      "name": "Holosuite Entertainment",
+      "description": "Pay-per-use holosuites. Various programs available, premium pricing for premium experiences."
+    },
+    {
+      "name": "Bar and Grill",
+      "description": "Quark's-style establishment. Bar, food, entertainment, gambling, information brokering."
+    },
+    {
+      "name": "Cargo Warehouse",
+      "description": "Storage facility. Secure storage for rent, smuggling compartments available (for a fee)."
+    },
+    {
+      "name": "Shipping Office",
+      "description": "Coordinates trade shipments. Insurance, tracking, customs 'facilitation'."
+    },
+    {
+      "name": "Luxury Hotel",
+      "description": "Accommodation for wealthy visitors. Suites priced by the hour, every amenity costs extra."
+    },
+    {
+      "name": "Salvage Dealership",
+      "description": "Buys and sells salvaged goods. No questions asked about origins."
+    },
+    {
+      "name": "Information Brokerage",
+      "description": "Sells secrets and data. Privacy costs extra, everything has a price."
+    },
+    {
+      "name": "Contract Arbitration",
+      "description": "Resolves business disputes. Whoever pays more usually wins."
+    },
+    {
+      "name": "Investment Firm",
+      "description": "Manages wealth for clients. Promises high returns, charges high fees."
+    },
+    {
+      "name": "Insurance Office",
+      "description": "Sells protection and coverage. Many exclusions in fine print."
+    },
+    {
+      "name": "Apprentice Academy",
+      "description": "Trains young Ferengi in commerce. Rules of Acquisition memorization, negotiation practice."
+    },
+    {
+      "name": "Medical Clinic",
+      "description": "Healthcare for profit. Treatment quality depends on payment. Organ sales in back."
+    },
+    {
+      "name": "Communications Hub",
+      "description": "Subspace messaging for a fee. Private channels cost more. May record conversations."
+    },
+    {
+      "name": "Advertising Agency",
+      "description": "Creates promotional content. Holographic ads, subspace commercials, subliminal messaging."
+    },
+    {
+      "name": "Labor Exchange",
+      "description": "Hires out workers. Takes commission from both employer and employee."
+    },
+    {
+      "name": "Synthehol Brewery",
+      "description": "Produces beverages. Cheap ingredients, premium pricing, addictive additives."
+    },
+    {
+      "name": "Residential Tower",
+      "description": "Housing units for rent. Size and quality based on how much you pay. Females live separately (traditionally)."
+    }
+  ]
+}

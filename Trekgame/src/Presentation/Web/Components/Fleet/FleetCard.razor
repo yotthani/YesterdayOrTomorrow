@@ -1,0 +1,265 @@
+@namespace StarTrekGame.Web.Components.Fleet
+
+<div class="fleet-card @(IsSelected ? "selected" : "") @(IsEnemy ? "enemy" : "")" 
+     @onclick="HandleClick"
+     @onclick:stopPropagation="true">
+    
+    <div class="fleet-header">
+        <div class="fleet-icon" style="border-color: @IconColor">
+            <span class="ship-symbol">▲</span>
+        </div>
+        <div class="fleet-info">
+            <span class="fleet-name">@Name</span>
+            <span class="fleet-location">@LocationName</span>
+        </div>
+        <div class="fleet-status" style="background: @StatusColor">
+            @StatusText
+        </div>
+    </div>
+    
+    <div class="fleet-details">
+        <div class="detail-item">
+            <span class="detail-label">Ships</span>
+            <span class="detail-value">@ShipCount</span>
+        </div>
+        @if (ShowStrength)
+        {
+            <div class="detail-item">
+                <span class="detail-label">Strength</span>
+                <span class="detail-value">@CombatStrength</span>
+            </div>
+        }
+        @if (Experience > 0)
+        {
+            <div class="detail-item">
+                <span class="detail-label">Exp</span>
+                <span class="detail-value exp-@ExperienceLevel">@ExperienceLevelText</span>
+            </div>
+        }
+    </div>
+    
+    @if (IsMoving && !string.IsNullOrEmpty(DestinationName))
+    {
+        <div class="movement-info">
+            <span class="movement-arrow">→</span>
+            <span class="destination">@DestinationName</span>
+            @if (TurnsToArrival > 0)
+            {
+                <span class="eta">(@TurnsToArrival turns)</span>
+            }
+        </div>
+    }
+    
+    @if (ShowActions && !IsEnemy)
+    {
+        <div class="fleet-actions">
+            @if (ChildContent != null)
+            {
+                @ChildContent
+            }
+        </div>
+    }
+</div>
+
+<style>
+    .fleet-card {
+        background: rgba(30, 30, 60, 0.8);
+        border: 1px solid #334;
+        border-radius: 10px;
+        padding: 12px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .fleet-card:hover {
+        border-color: #ff9900;
+        background: rgba(40, 40, 70, 0.9);
+    }
+    
+    .fleet-card.selected {
+        border-color: #ffcc00;
+        background: rgba(255, 200, 0, 0.1);
+        box-shadow: 0 0 10px rgba(255, 200, 0, 0.2);
+    }
+    
+    .fleet-card.enemy {
+        border-left: 3px solid #ff4444;
+    }
+    
+    .fleet-card.enemy:not(.selected) {
+        background: rgba(60, 30, 30, 0.8);
+    }
+    
+    .fleet-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+    
+    .fleet-icon {
+        width: 36px;
+        height: 36px;
+        border: 2px solid #ffaa00;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 170, 0, 0.1);
+    }
+    
+    .ship-symbol {
+        color: #ffaa00;
+        font-size: 16px;
+    }
+    
+    .enemy .fleet-icon {
+        border-color: #ff6666;
+        background: rgba(255, 100, 100, 0.1);
+    }
+    
+    .enemy .ship-symbol {
+        color: #ff6666;
+    }
+    
+    .fleet-info {
+        flex: 1;
+        min-width: 0;
+    }
+    
+    .fleet-name {
+        display: block;
+        color: #ffcc00;
+        font-weight: 600;
+        font-size: 14px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .fleet-location {
+        display: block;
+        color: #888;
+        font-size: 11px;
+    }
+    
+    .fleet-status {
+        padding: 3px 8px;
+        border-radius: 4px;
+        font-size: 9px;
+        font-weight: 700;
+        color: #000;
+        letter-spacing: 0.5px;
+        flex-shrink: 0;
+    }
+    
+    .fleet-details {
+        display: flex;
+        gap: 16px;
+        padding: 8px 0;
+        border-top: 1px solid rgba(255, 153, 0, 0.2);
+        border-bottom: 1px solid rgba(255, 153, 0, 0.2);
+    }
+    
+    .detail-item {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+    
+    .detail-label {
+        font-size: 9px;
+        color: #888;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .detail-value {
+        font-size: 14px;
+        color: #99ccff;
+        font-weight: 600;
+        font-family: 'Consolas', monospace;
+    }
+    
+    .detail-value.exp-green { color: #44ff44; }
+    .detail-value.exp-regular { color: #99ccff; }
+    .detail-value.exp-veteran { color: #ffaa00; }
+    .detail-value.exp-elite { color: #ff66ff; }
+    
+    .movement-info {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 8px;
+        padding: 6px 8px;
+        background: rgba(255, 170, 0, 0.1);
+        border-radius: 6px;
+    }
+    
+    .movement-arrow {
+        color: #ffaa00;
+        font-weight: bold;
+    }
+    
+    .destination {
+        color: #ffcc00;
+        font-weight: 600;
+        font-size: 12px;
+    }
+    
+    .eta {
+        color: #888;
+        font-size: 11px;
+        margin-left: auto;
+    }
+    
+    .fleet-actions {
+        margin-top: 10px;
+        display: flex;
+        gap: 8px;
+    }
+</style>
+
+@code {
+    [Parameter] public Guid FleetId { get; set; }
+    [Parameter] public string Name { get; set; } = "";
+    [Parameter] public string LocationName { get; set; } = "";
+    [Parameter] public int ShipCount { get; set; }
+    [Parameter] public int CombatStrength { get; set; }
+    [Parameter] public int Experience { get; set; }
+    [Parameter] public bool IsMoving { get; set; }
+    [Parameter] public string? DestinationName { get; set; }
+    [Parameter] public int TurnsToArrival { get; set; }
+    [Parameter] public bool IsSelected { get; set; }
+    [Parameter] public bool IsEnemy { get; set; }
+    [Parameter] public bool ShowStrength { get; set; } = true;
+    [Parameter] public bool ShowActions { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    
+    [Parameter] public EventCallback<Guid> OnClick { get; set; }
+    
+    private string StatusText => IsMoving ? "MOVING" : "IDLE";
+    private string StatusColor => IsMoving ? "#ffaa00" : "#44ff44";
+    private string IconColor => IsEnemy ? "#ff6666" : "#ffaa00";
+    
+    private string ExperienceLevel => Experience switch
+    {
+        >= 75 => "elite",
+        >= 50 => "veteran",
+        >= 25 => "regular",
+        _ => "green"
+    };
+    
+    private string ExperienceLevelText => Experience switch
+    {
+        >= 75 => "Elite",
+        >= 50 => "Veteran",
+        >= 25 => "Regular",
+        _ => "Green"
+    };
+    
+    private async Task HandleClick()
+    {
+        await OnClick.InvokeAsync(FleetId);
+    }
+}

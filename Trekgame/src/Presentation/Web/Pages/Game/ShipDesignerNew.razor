@@ -1,0 +1,96 @@
+@page "/game/ship-designer-new"
+@page "/game/ship-designer"
+@page "/game/designer"
+@layout StellarisLayout
+<PageTitle>Ship Designer - Galactic Strategy</PageTitle>
+<div class="stellaris-layout">
+    <header class="st-topbar"><div class="st-empire-badge"><div class="st-empire-flag">🌐</div><div class="st-empire-info"><span class="st-empire-name">Starfleet Engineering</span><span class="st-empire-type">Ship Design Bureau</span></div></div><div class="st-resources"><div class="st-resource"><span class="st-resource-icon">🔩</span><div class="st-resource-values"><span class="st-resource-current">340</span></div></div><div class="st-resource"><span class="st-resource-icon">⚡</span><div class="st-resource-values"><span class="st-resource-current">1,250</span></div></div></div><div class="st-game-controls"><button class="st-end-turn-btn">END TURN</button></div></header>
+    <div class="st-main">
+        <aside class="st-sidebar-left"><nav class="st-nav"><a href="/game/galaxy" class="st-nav-btn"><span class="st-nav-icon">🌌</span><span class="st-nav-label">Galaxy</span></a><a href="/game/military" class="st-nav-btn"><span class="st-nav-icon">🚀</span><span class="st-nav-label">Fleets</span></a><a href="/game/designer" class="st-nav-btn active"><span class="st-nav-icon">🔧</span><span class="st-nav-label">Designer</span></a></nav></aside>
+        <div class="designer-content">
+            <div class="designer-header"><h1>SHIP DESIGNER</h1><div class="header-actions"><button class="st-btn" @onclick="NewDesign">+ NEW DESIGN</button><button class="st-btn">SAVE</button></div></div>
+            <div class="designer-layout">
+                <div class="designs-panel">
+                    <div class="panel-header">SHIP DESIGNS (@_designs.Count)</div>
+                    <div class="designs-list">
+                        @foreach(var d in _designs){<div class="design-item @(_selected?.Id==d.Id?"selected":"")" @onclick="()=>_selected=d"><div class="design-icon @d.Hull.ToLower()"></div><div class="design-info"><span class="design-name">@d.Name</span><span class="design-class">@d.Hull Class</span></div><div class="design-stats"><span>⚔@d.Firepower</span><span>🛡@d.Hull</span></div></div>}
+                    </div>
+                </div>
+                <div class="ship-preview">
+                    @if(_selected!=null){
+                    <div class="preview-header"><input type="text" class="name-input" @bind="_selected.Name"/><span class="hull-class">@_selected.Hull CLASS</span></div>
+                    <div class="preview-visual"><div class="ship-model @_selected.Hull.ToLower()"><div class="ship-body"></div><div class="ship-nacelle left"></div><div class="ship-nacelle right"></div></div></div>
+                    <div class="preview-stats">
+                        <div class="stat-row"><span class="stat-label">Firepower</span><div class="stat-bar"><div class="bar-fill attack" style="width:@(_selected.Firepower/10)%"></div></div><span class="stat-val">@_selected.Firepower</span></div>
+                        <div class="stat-row"><span class="stat-label">Hull</span><div class="stat-bar"><div class="bar-fill hull" style="width:@(_selected.HullPoints/20)%"></div></div><span class="stat-val">@_selected.HullPoints</span></div>
+                        <div class="stat-row"><span class="stat-label">Shields</span><div class="stat-bar"><div class="bar-fill shield" style="width:@(_selected.Shields/15)%"></div></div><span class="stat-val">@_selected.Shields</span></div>
+                        <div class="stat-row"><span class="stat-label">Speed</span><div class="stat-bar"><div class="bar-fill speed" style="width:@(_selected.Speed*10)%"></div></div><span class="stat-val">Warp @_selected.Speed</span></div>
+                    </div>
+                    <div class="cost-display"><span class="cost-label">BUILD COST</span><span class="cost-val">🔩 @_selected.Cost | ⚡ @(_selected.Cost/2)</span></div>
+                    }
+                </div>
+                <div class="components-panel">
+                    <div class="panel-header">COMPONENTS</div>
+                    <div class="component-tabs"><button class="tab-btn active">WEAPONS</button><button class="tab-btn">DEFENSE</button><button class="tab-btn">UTILITY</button></div>
+                    <div class="components-grid">
+                        @foreach(var c in _components){<div class="component-card" @onclick="()=>AddComponent(c)"><div class="comp-icon">@c.Icon</div><div class="comp-name">@c.Name</div><div class="comp-stats">@c.StatBonus</div></div>}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+.designer-content{flex:1;display:flex;flex-direction:column;background:linear-gradient(180deg,#080c14,#040608)}
+.designer-header{padding:16px 24px;background:rgba(10,15,25,0.9);border-bottom:1px solid var(--st-border-dark);display:flex;align-items:center;justify-content:space-between}
+.designer-header h1{font-family:var(--st-font-display);font-size:18px;color:var(--st-text-white);letter-spacing:2px;margin:0}
+.header-actions{display:flex;gap:8px}
+.designer-layout{flex:1;display:flex;gap:16px;padding:16px;overflow:hidden}
+.designs-panel{width:280px;background:var(--st-gradient-panel);border:1px solid var(--st-border-dark);border-radius:8px;display:flex;flex-direction:column}
+.panel-header{padding:12px 16px;background:rgba(0,0,0,0.2);border-bottom:1px solid var(--st-border-dark);font-size:12px;color:var(--st-text-muted);font-weight:600}
+.designs-list{flex:1;overflow-y:auto;padding:8px}
+.design-item{display:flex;gap:10px;padding:10px;margin-bottom:6px;background:var(--st-bg-medium);border-radius:6px;cursor:pointer;border-left:3px solid transparent;transition:all 0.15s}
+.design-item:hover{background:var(--st-bg-light)}.design-item.selected{border-left-color:var(--st-accent-blue);background:rgba(74,158,255,0.15)}
+.design-icon{width:40px;height:40px;background:var(--st-bg-darker);border-radius:6px;display:flex;align-items:center;justify-content:center}
+.design-icon.frigate{background:linear-gradient(135deg,#2a4a6a,#1a2a3a)}.design-icon.cruiser{background:linear-gradient(135deg,#4a3a6a,#2a1a3a)}.design-icon.battleship{background:linear-gradient(135deg,#6a4a3a,#3a2a1a)}
+.design-info{flex:1}.design-name{display:block;font-size:12px;font-weight:500;color:var(--st-text-white)}.design-class{font-size:10px;color:var(--st-text-dim)}
+.design-stats{font-size:10px;color:var(--st-text-muted)}
+.ship-preview{flex:1;background:var(--st-gradient-panel);border:1px solid var(--st-border-dark);border-radius:8px;display:flex;flex-direction:column}
+.preview-header{padding:16px 20px;border-bottom:1px solid var(--st-border-dark);display:flex;align-items:center;gap:12px}
+.name-input{background:transparent;border:none;font-family:var(--st-font-display);font-size:20px;color:var(--st-text-white);flex:1}.name-input:focus{outline:none;border-bottom:1px solid var(--st-accent-blue)}
+.hull-class{font-size:11px;color:var(--st-text-dim);letter-spacing:1px}
+.preview-visual{flex:1;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,rgba(30,50,80,0.3) 0%,transparent 70%)}
+.ship-model{position:relative;width:200px;height:120px}
+.ship-body{position:absolute;top:30px;left:50px;width:100px;height:60px;background:linear-gradient(180deg,#4a6a8a,#2a4a6a);border-radius:50px 50px 30px 30px;box-shadow:0 0 30px rgba(74,158,255,0.3)}
+.ship-nacelle{position:absolute;width:60px;height:20px;background:linear-gradient(90deg,#6a8aaa,#4a6a8a);border-radius:10px;box-shadow:0 0 15px rgba(100,200,255,0.5)}
+.ship-nacelle.left{top:20px;left:0}.ship-nacelle.right{top:80px;left:0}
+.ship-model.cruiser .ship-body{width:120px;height:70px;left:40px}.ship-model.battleship .ship-body{width:140px;height:80px;left:30px;top:20px}
+.preview-stats{padding:20px;border-top:1px solid var(--st-border-dark)}
+.stat-row{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.stat-label{width:80px;font-size:11px;color:var(--st-text-dim)}
+.stat-bar{flex:1;height:8px;background:rgba(0,0,0,0.4);border-radius:4px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px}.bar-fill.attack{background:linear-gradient(90deg,#ff6644,#ff4422)}.bar-fill.hull{background:linear-gradient(90deg,#6688aa,#4466aa)}.bar-fill.shield{background:linear-gradient(90deg,#44aaff,#2288ff)}.bar-fill.speed{background:linear-gradient(90deg,#44ff88,#22dd66)}
+.stat-val{width:60px;font-family:var(--st-font-display);font-size:12px;color:var(--st-text-bright);text-align:right}
+.cost-display{padding:16px 20px;background:rgba(0,0,0,0.2);border-top:1px solid var(--st-border-dark);display:flex;justify-content:space-between}
+.cost-label{font-size:11px;color:var(--st-text-dim);letter-spacing:1px}.cost-val{font-family:var(--st-font-display);font-size:14px;color:var(--st-accent-gold)}
+.components-panel{width:280px;background:var(--st-gradient-panel);border:1px solid var(--st-border-dark);border-radius:8px;display:flex;flex-direction:column}
+.component-tabs{display:flex;border-bottom:1px solid var(--st-border-dark)}
+.tab-btn{flex:1;padding:10px;background:transparent;border:none;color:var(--st-text-dim);font-size:10px;cursor:pointer;border-bottom:2px solid transparent}
+.tab-btn.active{color:var(--st-accent-blue);border-bottom-color:var(--st-accent-blue)}
+.components-grid{flex:1;overflow-y:auto;padding:8px;display:grid;grid-template-columns:repeat(2,1fr);gap:8px;align-content:start}
+.component-card{padding:12px;background:var(--st-bg-medium);border:1px solid var(--st-border-dark);border-radius:6px;cursor:pointer;text-align:center;transition:all 0.15s}
+.component-card:hover{border-color:var(--st-accent-blue);background:rgba(74,158,255,0.1)}
+.comp-icon{font-size:24px;margin-bottom:6px}.comp-name{font-size:10px;color:var(--st-text-bright);margin-bottom:4px}.comp-stats{font-size:9px;color:var(--st-accent-green)}
+</style>
+@code{
+    List<ShipDesign> _designs=new();ShipDesign? _selected;List<Component> _components=new();
+    protected override void OnInitialized(){
+        _designs=new(){new(){Id=1,Name="Constitution",Hull="Cruiser",Firepower=450,HullPoints=800,Shields=400,Speed=6,Cost=180},new(){Id=2,Name="Defiant",Hull="Frigate",Firepower=600,HullPoints=400,Shields=300,Speed=8,Cost=120},new(){Id=3,Name="Galaxy",Hull="Battleship",Firepower=700,HullPoints=1500,Shields=800,Speed=5,Cost=350}};
+        _components=new(){new(){Icon="🔫",Name="Phaser Array",StatBonus="+50 Attack"},new(){Icon="💥",Name="Torpedo Bay",StatBonus="+80 Attack"},new(){Icon="🛡",Name="Shield Gen",StatBonus="+100 Shield"},new(){Icon="🔋",Name="Aux Power",StatBonus="+50 Shield"},new(){Icon="⚡",Name="Impulse Engine",StatBonus="+1 Speed"},new(){Icon="🌀",Name="Warp Core",StatBonus="+2 Speed"}};
+        _selected=_designs.FirstOrDefault();
+    }
+    void NewDesign()=>_designs.Add(new(){Id=_designs.Count+1,Name="New Design",Hull="Frigate",Firepower=100,HullPoints=200,Shields=100,Speed=5,Cost=80});
+    void AddComponent(Component c){}
+    class ShipDesign{public int Id;public string Name="";public string Hull="";public int Firepower;public int HullPoints;public int Shields;public int Speed;public int Cost;}
+    class Component{public string Icon="";public string Name="";public string StatBonus="";}
+}

@@ -1,0 +1,312 @@
+@* RacePortraitV2.razor - Race portrait component using the 3D rendered style *@
+
+<div class="@GetContainerClasses()">
+    <div class="@GetPortraitClasses()" @onclick="HandleClick" title="@GetTooltip()">
+        @if (ShowOverlay && IsSelected)
+        {
+            <div class="portrait-overlay">
+                <span class="selection-check">✓</span>
+            </div>
+        }
+    </div>
+    @if (ShowNameplate)
+    {
+        <div class="nameplate">
+            <span class="race-name">@GetDisplayName()</span>
+            <span class="faction-emblem">@GetFactionIcon()</span>
+        </div>
+    }
+</div>
+
+<style>
+    .portrait-container-v2 {
+        display: inline-flex;
+        flex-direction: column;
+        background: linear-gradient(180deg, #2d2d2d 0%, #1a1a1a 100%);
+        border: 1px solid #3a3a3a;
+        border-radius: 6px;
+        overflow: hidden;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+        transition: all 0.2s;
+    }
+    
+    .portrait-container-v2:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+    }
+    
+    .portrait-container-v2.clickable {
+        cursor: pointer;
+    }
+    
+    .portrait-container-v2.selected {
+        border-color: #fbbf24;
+        box-shadow: 0 0 20px rgba(251, 191, 36, 0.3);
+    }
+    
+    .portrait-container-v2.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+    
+    .portrait-overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .selection-check {
+        width: 32px;
+        height: 32px;
+        background: #22c55e;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 18px;
+        font-weight: bold;
+    }
+    
+    .nameplate {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 12px;
+        background: linear-gradient(180deg, #c9a861 0%, #8b7355 50%, #6b5a45 100%);
+        border-top: 1px solid #d4b872;
+    }
+    
+    .nameplate .race-name {
+        font-size: 11px;
+        font-weight: 700;
+        color: #1a1510;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+    }
+    
+    .nameplate .faction-emblem {
+        width: 24px;
+        height: 24px;
+        background: linear-gradient(180deg, #d4b872 0%, #a08050 100%);
+        border: 2px solid #6b5a45;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    }
+</style>
+
+@code {
+    /// <summary>
+    /// The race to display. Valid values:
+    /// Row 1: klingon, vulcan, andorian, ferengi, cardassian, borg
+    /// Row 2: trill, bajoran, romulan, gorn, orion, betazoid
+    /// Row 3: tellarite, bolian, jemhadar, q, human-male/federation, human-female/human
+    /// </summary>
+    [Parameter] public string Race { get; set; } = "human";
+    
+    /// <summary>
+    /// Size variant: "thumb" (56px), "small" (83px), "medium" (166px), "large" (333px)
+    /// </summary>
+    [Parameter] public string Size { get; set; } = "medium";
+    
+    /// <summary>
+    /// Whether to show the bronze nameplate with race name and emblem
+    /// </summary>
+    [Parameter] public bool ShowNameplate { get; set; } = false;
+    
+    /// <summary>
+    /// Whether this portrait is currently selected
+    /// </summary>
+    [Parameter] public bool IsSelected { get; set; } = false;
+    
+    /// <summary>
+    /// Whether this portrait is disabled
+    /// </summary>
+    [Parameter] public bool IsDisabled { get; set; } = false;
+    
+    /// <summary>
+    /// Whether to show overlay effects (selection indicator)
+    /// </summary>
+    [Parameter] public bool ShowOverlay { get; set; } = true;
+    
+    /// <summary>
+    /// Custom display name (overrides default)
+    /// </summary>
+    [Parameter] public string? DisplayName { get; set; }
+    
+    /// <summary>
+    /// Click event callback
+    /// </summary>
+    [Parameter] public EventCallback<string> OnClick { get; set; }
+    
+    /// <summary>
+    /// Additional CSS classes
+    /// </summary>
+    [Parameter] public string? CssClass { get; set; }
+
+    private string GetContainerClasses()
+    {
+        var classes = new List<string> { "portrait-container-v2" };
+        if (IsSelected) classes.Add("selected");
+        if (IsDisabled) classes.Add("disabled");
+        if (OnClick.HasDelegate && !IsDisabled) classes.Add("clickable");
+        if (!string.IsNullOrEmpty(CssClass)) classes.Add(CssClass);
+        return string.Join(" ", classes);
+    }
+
+    private string GetPortraitClasses()
+    {
+        var classes = new List<string> { "race-portrait-v2", Race.ToLowerInvariant() };
+        if (!string.IsNullOrEmpty(Size)) classes.Add(Size);
+        return string.Join(" ", classes);
+    }
+
+    private async Task HandleClick()
+    {
+        if (!IsDisabled && OnClick.HasDelegate)
+        {
+            await OnClick.InvokeAsync(Race);
+        }
+    }
+
+    private string GetDisplayName()
+    {
+        if (!string.IsNullOrEmpty(DisplayName)) return DisplayName;
+        return Race.ToLowerInvariant() switch
+        {
+            "klingon" => "Klingon",
+            "vulcan" => "Vulcan",
+            "andorian" => "Andorian",
+            "ferengi" => "Ferengi",
+            "cardassian" => "Cardassian",
+            "borg" => "Borg",
+            "trill" => "Trill",
+            "bajoran" => "Bajoran",
+            "romulan" => "Romulan",
+            "gorn" => "Gorn",
+            "orion" => "Orion",
+            "betazoid" => "Betazoid",
+            "tellarite" => "Tellarite",
+            "bolian" => "Bolian",
+            "jemhadar" => "Jem'Hadar",
+            "q" => "Q",
+            "human-male" or "federation" => "Federation",
+            "human-female" or "human" => "Human",
+            _ => Race
+        };
+    }
+
+    private string GetFactionIcon()
+    {
+        return Race.ToLowerInvariant() switch
+        {
+            "klingon" => "⚔️",
+            "vulcan" => "🖖",
+            "andorian" => "❄️",
+            "ferengi" => "💰",
+            "cardassian" => "🔱",
+            "borg" => "🔲",
+            "trill" => "🔵",
+            "bajoran" => "✨",
+            "romulan" => "🦅",
+            "gorn" => "🦎",
+            "orion" => "💚",
+            "betazoid" => "🌸",
+            "tellarite" => "🐗",
+            "bolian" => "🔵",
+            "jemhadar" => "⚔️",
+            "q" => "❓",
+            "human-male" or "federation" or "human-female" or "human" => "🌟",
+            _ => "●"
+        };
+    }
+
+    private string GetTooltip()
+    {
+        return GetDisplayName();
+    }
+
+    /// <summary>
+    /// All available races in the portrait sheet
+    /// </summary>
+    public static readonly string[] AllRaces = new[]
+    {
+        "klingon", "vulcan", "andorian", "ferengi", "cardassian", "borg",
+        "trill", "bajoran", "romulan", "gorn", "orion", "betazoid",
+        "tellarite", "bolian", "jemhadar", "q", "human-male", "human-female"
+    };
+
+    /// <summary>
+    /// Races grouped by faction
+    /// </summary>
+    public static readonly Dictionary<string, string[]> RacesByFaction = new()
+    {
+        ["Federation"] = new[] { "human-male", "human-female", "vulcan", "andorian", "tellarite", "trill", "betazoid", "bolian", "bajoran" },
+        ["Klingon"] = new[] { "klingon" },
+        ["Romulan"] = new[] { "romulan" },
+        ["Cardassian"] = new[] { "cardassian" },
+        ["Ferengi"] = new[] { "ferengi" },
+        ["Borg"] = new[] { "borg" },
+        ["Dominion"] = new[] { "jemhadar" },
+        ["Gorn"] = new[] { "gorn" },
+        ["Orion"] = new[] { "orion" },
+        ["Special"] = new[] { "q" }
+    };
+
+    /// <summary>
+    /// Major playable factions
+    /// </summary>
+    public static readonly string[] MajorFactions = new[]
+    {
+        "Federation", "Klingon", "Romulan", "Cardassian", "Ferengi", "Borg", "Dominion"
+    };
+
+    /// <summary>
+    /// Minor factions
+    /// </summary>
+    public static readonly string[] MinorFactions = new[]
+    {
+        "Gorn", "Orion", "Bajoran"
+    };
+
+    /// <summary>
+    /// Get a representative race portrait for a faction
+    /// </summary>
+    public static string GetFactionRepresentative(string faction)
+    {
+        return faction switch
+        {
+            "Federation" => "human-male",
+            "Klingon" => "klingon",
+            "Romulan" => "romulan",
+            "Cardassian" => "cardassian",
+            "Ferengi" => "ferengi",
+            "Borg" => "borg",
+            "Dominion" => "jemhadar",
+            "Gorn" => "gorn",
+            "Orion" => "orion",
+            _ => "human-male"
+        };
+    }
+
+    /// <summary>
+    /// Get the faction a race belongs to
+    /// </summary>
+    public static string GetFactionForRace(string race)
+    {
+        foreach (var kvp in RacesByFaction)
+        {
+            if (kvp.Value.Contains(race.ToLowerInvariant()))
+                return kvp.Key;
+        }
+        return "Unknown";
+    }
+}

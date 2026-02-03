@@ -1,0 +1,200 @@
+{
+  "category": "FactionSymbols",
+  "description": "Official faction emblems/logos - flat 2D graphics for flags, buildings, UI",
+  "assets": [
+    { 
+      "id": "federation", 
+      "name": "Symbol Federation UFP", 
+      "match": ["federation", "ufp", "starfleet"], 
+      "prompt": { 
+        "description": "Circle emblem with a STARBURST/SUN in the center with pointed rays radiating outward, surrounded by LAUREL WREATH branches on left and right sides, small STARS scattered around",
+        "shape": "Circular seal",
+        "colors": "Blue background, white/silver symbol" 
+      }
+    },
+    { 
+      "id": "klingon", 
+      "name": "Symbol Klingon Empire", 
+      "match": ["klingon"], 
+      "prompt": { 
+        "description": "TREFOIL shape - THREE POINTED BLADES arranged vertically: one central blade pointing UP, two curved blades on sides pointing DOWN and OUTWARD like a stylized trident or triple-blade weapon",
+        "shape": "Vertical trefoil/triquetra",
+        "colors": "Red symbol on black, or black symbol on red" 
+      }
+    },
+    { 
+      "id": "romulan", 
+      "name": "Symbol Romulan Star Empire", 
+      "match": ["romulan"], 
+      "prompt": { 
+        "description": "BIRD OF PREY viewed from FRONT with WINGS SPREAD WIDE, the bird is GRIPPING TWO CIRCULAR PLANETS (Romulus and Remus) in its TALONS, predatory eagle/raptor design",
+        "shape": "Winged bird holding two spheres",
+        "colors": "Green bird on darker green or black background" 
+      }
+    },
+    { 
+      "id": "cardassian", 
+      "name": "Symbol Cardassian Union", 
+      "match": ["cardassian"], 
+      "prompt": { 
+        "description": "Vertical POINTED OVAL or EYE shape, like an almond or marquise, with internal geometric lines forming a stylized face or abstract pattern inside, militaristic angular design",
+        "shape": "Vertical pointed oval/eye",
+        "colors": "Brown/tan symbol, gray accents" 
+      }
+    },
+    { 
+      "id": "ferengi", 
+      "name": "Symbol Ferengi Alliance", 
+      "match": ["ferengi"], 
+      "prompt": { 
+        "description": "Stylized FERENGI HEAD in PROFILE (side view) showing the distinctive LARGE EAR prominently, bald head silhouette facing left or right",
+        "shape": "Head profile silhouette with big ear",
+        "colors": "Gold/orange symbol, darker background" 
+      }
+    },
+    { 
+      "id": "dominion", 
+      "name": "Symbol Dominion", 
+      "match": ["dominion"], 
+      "prompt": { 
+        "description": "Abstract ORGANIC SWIRL or SPIRAL shape, flowing curved lines that suggest liquid or morphing, like a stylized comma or paisley, smooth elegant curves",
+        "shape": "Organic spiral/swirl",
+        "colors": "Purple/violet symbol" 
+      }
+    },
+    { 
+      "id": "borg", 
+      "name": "Symbol Borg Collective", 
+      "match": ["borg"], 
+      "prompt": { 
+        "description": "Geometric OCTAGON or HEXAGON shape with internal CIRCUIT-LIKE PATTERNS, technological grid lines, possibly a central circular 'eye' node, mechanical/cybernetic aesthetic",
+        "shape": "Geometric octagon with circuits",
+        "colors": "Black/dark gray with green glowing accents" 
+      }
+    },
+    { 
+      "id": "breen", 
+      "name": "Symbol Breen Confederacy", 
+      "match": ["breen"], 
+      "prompt": { 
+        "description": "Abstract angular shape suggesting their HELMET - vertical elongated form with geometric patterns, cold crystalline aesthetic, mysterious alien geometry",
+        "shape": "Angular helmet-like geometric form",
+        "colors": "Ice blue and white/silver" 
+      }
+    },
+    { 
+      "id": "gorn", 
+      "name": "Symbol Gorn Hegemony", 
+      "match": ["gorn"], 
+      "prompt": { 
+        "description": "DIAMOND or RHOMBUS shape (square rotated 45 degrees), aggressive angular design, possibly with reptilian claw or fang motifs inside",
+        "shape": "Diamond/rhombus",
+        "colors": "Green and bronze/brown" 
+      }
+    },
+    { 
+      "id": "andorian", 
+      "name": "Symbol Andorian Empire", 
+      "match": ["andorian"], 
+      "prompt": { 
+        "description": "Design suggesting TWIN ANTENNAE - two curved lines meeting at top like a stylized 'V' or antenna pair, elegant symmetrical curves spreading outward, ice crystal aesthetic",
+        "shape": "Twin curved antennae/wings spreading",
+        "colors": "Blue and white/silver" 
+      }
+    },
+    { 
+      "id": "vulcan", 
+      "name": "Symbol Vulcan", 
+      "match": ["vulcan"], 
+      "prompt": { 
+        "description": "IDIC symbol: a TRIANGLE pointing DOWN with a CIRCLE or GEM inside it, or overlapping geometric shapes representing Infinite Diversity in Infinite Combinations",
+        "shape": "Triangle with circle (IDIC)",
+        "colors": "Bronze/copper and gold" 
+      }
+    },
+    { 
+      "id": "bajoran", 
+      "name": "Symbol Bajoran", 
+      "match": ["bajoran", "bajor"], 
+      "prompt": { 
+        "description": "Flowing SPIRAL or FLAME shape, curved organic lines suggesting the Prophets' celestial nature, like a stylized flame or curved teardrop with internal swirls",
+        "shape": "Spiral/flame curve",
+        "colors": "Gold and orange/bronze" 
+      }
+    },
+    { 
+      "id": "tholian", 
+      "name": "Symbol Tholian Assembly", 
+      "match": ["tholian"], 
+      "prompt": { 
+        "description": "CRYSTALLINE WEB pattern - interconnected TRIANGLES forming a larger geometric shape, like a faceted crystal or spider web made of straight lines",
+        "shape": "Crystalline triangle web",
+        "colors": "Orange and amber/yellow" 
+      }
+    },
+    { 
+      "id": "orion", 
+      "name": "Symbol Orion Syndicate", 
+      "match": ["orion"], 
+      "prompt": { 
+        "description": "Curved WING or CRESCENT shape, like spread bird wings or a curved blade, suggesting piracy and danger, flowing elegant but threatening curves",
+        "shape": "Curved wings/crescent",
+        "colors": "Green with gold accents" 
+      }
+    },
+    { 
+      "id": "trill", 
+      "name": "Symbol Trill", 
+      "match": ["trill"], 
+      "prompt": { 
+        "description": "CIRCULAR design with SPOTS pattern - dots or circles arranged within a larger circle, representing the symbiont spots, organic cellular appearance",
+        "shape": "Circle with spots/dots pattern",
+        "colors": "Blue and teal" 
+      }
+    },
+    { 
+      "id": "terran", 
+      "name": "Symbol Terran Empire", 
+      "match": ["terran", "mirror"], 
+      "prompt": { 
+        "description": "EARTH GLOBE with a SWORD or DAGGER piercing THROUGH it vertically, aggressive imperial imagery showing conquest of Earth",
+        "shape": "Globe pierced by sword",
+        "colors": "Gold globe, silver sword, red/black accents" 
+      }
+    },
+    { 
+      "id": "maquis", 
+      "name": "Symbol Maquis", 
+      "match": ["maquis"], 
+      "prompt": { 
+        "description": "Simple angular RESISTANCE symbol - possibly a stylized 'M' or arrow shape, rough guerrilla fighter aesthetic, grassroots rebellion design",
+        "shape": "Angular M or arrow",
+        "colors": "Earth tones - brown, tan, muted" 
+      }
+    },
+    { 
+      "id": "species8472", 
+      "name": "Symbol Species 8472", 
+      "match": ["species 8472", "8472"], 
+      "prompt": { 
+        "description": "ORGANIC TRIPOD shape - three curved appendages radiating from center like their bio-ships, alien biological aesthetic",
+        "shape": "Organic tripod/three appendages",
+        "colors": "Orange and yellow" 
+      }
+    }
+  ],
+  "styleGuide": {
+    "material": "FLAT 2D graphic symbol - absolutely NO 3D effects, NO metallic shine, NO depth",
+    "quality": "Clean vector-style art with solid color fills, crisp edges",
+    "lighting": "NONE - flat colors only, no shadows, no highlights, no gradients",
+    "composition": "Symbol perfectly centered, fills 80-90% of square frame",
+    "background": "Solid black (#000000)",
+    "critical": [
+      "FLAT 2D GRAPHIC ONLY - like a flag emblem or logo",
+      "NO 3D rendering, NO perspective, NO depth",
+      "Simple bold shapes that read well at small sizes",
+      "Maximum 2-3 solid colors per symbol",
+      "Clean outlines, solid fills, no texture"
+    ]
+  }
+}

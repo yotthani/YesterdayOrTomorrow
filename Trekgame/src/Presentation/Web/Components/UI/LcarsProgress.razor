@@ -1,0 +1,97 @@
+@namespace StarTrekGame.Web.Components.UI
+
+@if (Segmented)
+{
+    <div class="lcars-progress lcars-progress--segmented" style="height: @(Height)px; @Style">
+        @for (int i = 0; i < Segments; i++)
+        {
+            var isActive = (i + 1) <= (int)Math.Ceiling(Value / 100.0 * Segments);
+            <div class="segment @(isActive ? "active" : "")" 
+                 style="@(isActive ? $"background: {GetSegmentColor(i)};" : "")"></div>
+        }
+    </div>
+}
+else
+{
+    <div class="lcars-progress @(Glow ? "glow-box" : "")" style="height: @(Height)px; @Style">
+        <div class="lcars-progress__fill @AnimationClass" 
+             style="width: @Value%; background: @GradientStyle;"></div>
+    </div>
+}
+
+@if (ShowLabel)
+{
+    <div class="lcars-progress__label">
+        @if (!string.IsNullOrEmpty(Label))
+        {
+            <span>@Label</span>
+        }
+        <span class="lcars-progress__value">@Value.ToString("0")%</span>
+    </div>
+}
+
+@code {
+    [Parameter] public double Value { get; set; } = 0; // 0-100
+    [Parameter] public string? Label { get; set; }
+    [Parameter] public bool ShowLabel { get; set; } = false;
+    [Parameter] public int Height { get; set; } = 8;
+    [Parameter] public bool Segmented { get; set; } = false;
+    [Parameter] public int Segments { get; set; } = 10;
+    [Parameter] public bool Glow { get; set; } = false;
+    [Parameter] public bool Animated { get; set; } = false;
+    [Parameter] public string Color { get; set; } = "primary"; // primary, success, warning, danger, or custom hex
+    [Parameter] public string? Style { get; set; }
+
+    private string AnimationClass => Animated ? "effect-holographic" : "";
+
+    private string GradientStyle
+    {
+        get
+        {
+            var baseColor = Color switch
+            {
+                "primary" => "var(--ui-primary)",
+                "success" => "var(--ui-success)",
+                "warning" => "var(--ui-warning)",
+                "danger" => "var(--ui-danger)",
+                _ => Color
+            };
+
+            return $"linear-gradient(90deg, {baseColor}, var(--ui-accent))";
+        }
+    }
+
+    private string GetSegmentColor(int index)
+    {
+        var progress = (double)index / Segments;
+        
+        if (Color == "gradient" || Color == "primary")
+        {
+            // Gradient from primary to accent
+            return $"color-mix(in srgb, var(--ui-primary) {100 - (int)(progress * 100)}%, var(--ui-accent))";
+        }
+        
+        return Color switch
+        {
+            "success" => "var(--ui-success)",
+            "warning" => "var(--ui-warning)",
+            "danger" => "var(--ui-danger)",
+            _ => "var(--ui-primary)"
+        };
+    }
+}
+
+<style>
+    .lcars-progress__label {
+        display: flex;
+        justify-content: space-between;
+        font-size: 11px;
+        color: var(--ui-text-dim);
+        margin-top: 4px;
+    }
+
+    .lcars-progress__value {
+        font-family: 'Orbitron', monospace;
+        color: var(--ui-text-normal);
+    }
+</style>

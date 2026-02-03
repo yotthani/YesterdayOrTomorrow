@@ -1,0 +1,120 @@
+{
+  "factionName": "Romulan",
+  "categoryName": "Buildings",
+  "architectureStyle": {
+    "description": "Elegant but intimidating - classical Roman/Imperial aesthetic with hidden depths and surveillance",
+    "keyElements": [
+      "Classical columns and grand facades hiding advanced technology",
+      "Green marble and polished dark stone",
+      "Bird of prey motifs in architecture - wings, talons, predatory shapes",
+      "Hidden rooms, secret passages, surveillance systems everywhere",
+      "Grand entrances designed to impress and intimidate visitors",
+      "Romulan Star Empire eagle emblems prominently displayed",
+      "Symmetrical, imposing designs suggesting order and power",
+      "Bronze and copper metallic accents",
+      "Cloaking device aesthetic - things are not what they seem",
+      "Senate chamber style - tiered, dramatic, theatrical",
+      "NO bright colors, NO transparency - secrets are kept"
+    ],
+    "colors": "Deep green marble, dark gray stone, bronze/copper accents, silver trim, emerald lighting",
+    "materials": "Polished stone, marble columns, bronze statues, concealed sensor grids"
+  },
+  "buildings": [
+    {
+      "name": "Senate Chamber",
+      "description": "Where the Romulan Senate meets. Tiered seating, dramatic central podium, eagle emblems, imposing columns."
+    },
+    {
+      "name": "Tal Shiar Headquarters",
+      "description": "Secret police command center. Appears normal outside, hidden interrogation chambers and surveillance within."
+    },
+    {
+      "name": "Praetor's Palace",
+      "description": "Residence and office of the Praetor. Grand, imposing, heavily guarded, symbol of absolute power."
+    },
+    {
+      "name": "Imperial War College",
+      "description": "Officer training academy. Classical architecture, tactical simulation chambers, graduation arena."
+    },
+    {
+      "name": "Cloaking Research Facility",
+      "description": "Where cloaking technology is developed. Nondescript exterior hiding advanced laboratories."
+    },
+    {
+      "name": "Subspace Monitoring Station",
+      "description": "Intelligence gathering facility. Massive sensor arrays, data analysis centers, always watching."
+    },
+    {
+      "name": "Reunification Underground",
+      "description": "Hidden meeting place for Vulcan-Romulan reunification supporters. Concealed entrance, secret chambers."
+    },
+    {
+      "name": "Military Command",
+      "description": "Fleet coordination center. Tactical displays, communication arrays, war room."
+    },
+    {
+      "name": "Singularity Power Plant",
+      "description": "Artificial quantum singularity power generation. Unique Romulan technology, heavily shielded."
+    },
+    {
+      "name": "Shipyard Administration",
+      "description": "Oversees warbird construction. Offices overlooking classified construction facilities."
+    },
+    {
+      "name": "Detention Facility",
+      "description": "Political prison. Clean exterior, harsh conditions within. Interrogation and re-education."
+    },
+    {
+      "name": "Embassy",
+      "description": "Diplomatic facility filled with hidden surveillance. Every room monitored, every conversation recorded."
+    },
+    {
+      "name": "Archaeological Institute",
+      "description": "Studies ancient Vulcan/Romulan artifacts. Also covers for intelligence gathering."
+    },
+    {
+      "name": "Medical Research Center",
+      "description": "Advanced medical facility. Also conducts classified biological research."
+    },
+    {
+      "name": "Communications Hub",
+      "description": "Subspace relay station. Intercepts as much as it transmits."
+    },
+    {
+      "name": "Trade Bureau",
+      "description": "Controls commerce. Every transaction monitored for intelligence value."
+    },
+    {
+      "name": "Noble House Estate",
+      "description": "Senator's residence. Grand, classical, filled with political intrigue."
+    },
+    {
+      "name": "Temple of State",
+      "description": "Quasi-religious site promoting loyalty to the Empire. Propaganda center."
+    },
+    {
+      "name": "Weapons Development",
+      "description": "Plasma torpedo and disruptor research. High security, classified projects."
+    },
+    {
+      "name": "Population Registry",
+      "description": "Tracks all citizens. Central database, identification systems, movement monitoring."
+    },
+    {
+      "name": "Agricultural Management",
+      "description": "Controls food production. Efficiency over aesthetics, state controlled."
+    },
+    {
+      "name": "Defense Battery",
+      "description": "Planetary defense weapons. Plasma torpedo launchers, disruptor arrays, cloaked until activated."
+    },
+    {
+      "name": "Mining Administration",
+      "description": "Oversees resource extraction. Often using Reman labor."
+    },
+    {
+      "name": "Cultural Center",
+      "description": "Promotes Romulan culture and superiority. Art, music, propaganda."
+    }
+  ]
+}

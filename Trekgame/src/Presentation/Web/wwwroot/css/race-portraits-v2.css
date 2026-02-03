@@ -1,0 +1,535 @@
+/* ==============================================
+   GALACTIC STRATEGY - Race Portraits v2
+   3D Rendered Style with Nameplates
+   
+   Source: race_portraits_v2.png
+   Dimensions: 2000 x 1103 px
+   Grid: 6 columns x 3 rows
+   Cell Size: ~333 x 368 px
+   ============================================== */
+
+:root {
+    /* Portrait sheet dimensions */
+    --portrait-v2-width: 2000px;
+    --portrait-v2-height: 1103px;
+    --portrait-v2-cols: 6;
+    --portrait-v2-rows: 3;
+    --portrait-v2-cell-width: 333px;
+    --portrait-v2-cell-height: 368px;
+}
+
+/* ==============================================
+   Base Portrait Component
+   ============================================== */
+
+.race-portrait-v2 {
+    width: 166px;
+    height: 184px;
+    background-image: url('/images/portraits/race_portraits_v2.png');
+    background-size: 1000px 552px; /* 50% scale */
+    background-repeat: no-repeat;
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 
+        0 4px 12px rgba(0, 0, 0, 0.5),
+        inset 0 0 20px rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+}
+
+.race-portrait-v2:hover {
+    transform: scale(1.03);
+    box-shadow: 
+        0 6px 20px rgba(0, 0, 0, 0.6),
+        inset 0 0 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Size Variants */
+.race-portrait-v2.thumb {
+    width: 56px;
+    height: 61px;
+    background-size: 333px 184px; /* ~16.7% scale */
+    border-radius: 3px;
+}
+
+.race-portrait-v2.small {
+    width: 83px;
+    height: 92px;
+    background-size: 500px 276px; /* 25% scale */
+    border-radius: 3px;
+}
+
+.race-portrait-v2.medium {
+    width: 166px;
+    height: 184px;
+    background-size: 1000px 552px; /* 50% scale */
+}
+
+.race-portrait-v2.large {
+    width: 333px;
+    height: 368px;
+    background-size: 2000px 1103px; /* 100% scale */
+    border-radius: 6px;
+}
+
+/* ==============================================
+   Portrait Positions - Row 1
+   Klingon, Vulcan, Andorian, Ferengi, Cardassian, Borg
+   ============================================== */
+
+/* Medium size (default - 50% scale) */
+.race-portrait-v2.klingon    { background-position: 0 0; }
+.race-portrait-v2.vulcan     { background-position: -166px 0; }
+.race-portrait-v2.andorian   { background-position: -333px 0; }
+.race-portrait-v2.ferengi    { background-position: -500px 0; }
+.race-portrait-v2.cardassian { background-position: -666px 0; }
+.race-portrait-v2.borg       { background-position: -833px 0; }
+
+/* ==============================================
+   Portrait Positions - Row 2
+   Trill, Bajoran, Romulan, Gorn, Orion, Betazoid
+   ============================================== */
+
+.race-portrait-v2.trill      { background-position: 0 -184px; }
+.race-portrait-v2.bajoran    { background-position: -166px -184px; }
+.race-portrait-v2.romulan    { background-position: -333px -184px; }
+.race-portrait-v2.gorn       { background-position: -500px -184px; }
+.race-portrait-v2.orion      { background-position: -666px -184px; }
+.race-portrait-v2.betazoid   { background-position: -833px -184px; }
+
+/* ==============================================
+   Portrait Positions - Row 3
+   Tellarite, Bolian, Jem'Hadar, Q, Federation/Human, Human Female
+   ============================================== */
+
+.race-portrait-v2.tellarite  { background-position: 0 -368px; }
+.race-portrait-v2.bolian     { background-position: -166px -368px; }
+.race-portrait-v2.jemhadar   { background-position: -333px -368px; }
+.race-portrait-v2.q          { background-position: -500px -368px; }
+.race-portrait-v2.human-male,
+.race-portrait-v2.federation { background-position: -666px -368px; }
+.race-portrait-v2.human-female,
+.race-portrait-v2.human      { background-position: -833px -368px; }
+
+/* ==============================================
+   Large Size Positions (100% scale)
+   ============================================== */
+
+.race-portrait-v2.large.klingon    { background-position: 0 0; }
+.race-portrait-v2.large.vulcan     { background-position: -333px 0; }
+.race-portrait-v2.large.andorian   { background-position: -666px 0; }
+.race-portrait-v2.large.ferengi    { background-position: -1000px 0; }
+.race-portrait-v2.large.cardassian { background-position: -1333px 0; }
+.race-portrait-v2.large.borg       { background-position: -1666px 0; }
+
+.race-portrait-v2.large.trill      { background-position: 0 -368px; }
+.race-portrait-v2.large.bajoran    { background-position: -333px -368px; }
+.race-portrait-v2.large.romulan    { background-position: -666px -368px; }
+.race-portrait-v2.large.gorn       { background-position: -1000px -368px; }
+.race-portrait-v2.large.orion      { background-position: -1333px -368px; }
+.race-portrait-v2.large.betazoid   { background-position: -1666px -368px; }
+
+.race-portrait-v2.large.tellarite  { background-position: 0 -736px; }
+.race-portrait-v2.large.bolian     { background-position: -333px -736px; }
+.race-portrait-v2.large.jemhadar   { background-position: -666px -736px; }
+.race-portrait-v2.large.q          { background-position: -1000px -736px; }
+.race-portrait-v2.large.human-male,
+.race-portrait-v2.large.federation { background-position: -1333px -736px; }
+.race-portrait-v2.large.human-female,
+.race-portrait-v2.large.human      { background-position: -1666px -736px; }
+
+/* ==============================================
+   Small Size Positions (25% scale)
+   ============================================== */
+
+.race-portrait-v2.small.klingon    { background-position: 0 0; }
+.race-portrait-v2.small.vulcan     { background-position: -83px 0; }
+.race-portrait-v2.small.andorian   { background-position: -166px 0; }
+.race-portrait-v2.small.ferengi    { background-position: -250px 0; }
+.race-portrait-v2.small.cardassian { background-position: -333px 0; }
+.race-portrait-v2.small.borg       { background-position: -416px 0; }
+
+.race-portrait-v2.small.trill      { background-position: 0 -92px; }
+.race-portrait-v2.small.bajoran    { background-position: -83px -92px; }
+.race-portrait-v2.small.romulan    { background-position: -166px -92px; }
+.race-portrait-v2.small.gorn       { background-position: -250px -92px; }
+.race-portrait-v2.small.orion      { background-position: -333px -92px; }
+.race-portrait-v2.small.betazoid   { background-position: -416px -92px; }
+
+.race-portrait-v2.small.tellarite  { background-position: 0 -184px; }
+.race-portrait-v2.small.bolian     { background-position: -83px -184px; }
+.race-portrait-v2.small.jemhadar   { background-position: -166px -184px; }
+.race-portrait-v2.small.q          { background-position: -250px -184px; }
+.race-portrait-v2.small.human-male,
+.race-portrait-v2.small.federation { background-position: -333px -184px; }
+.race-portrait-v2.small.human-female,
+.race-portrait-v2.small.human      { background-position: -416px -184px; }
+
+/* ==============================================
+   Thumbnail Size Positions (~16.7% scale)
+   ============================================== */
+
+.race-portrait-v2.thumb.klingon    { background-position: 0 0; }
+.race-portrait-v2.thumb.vulcan     { background-position: -56px 0; }
+.race-portrait-v2.thumb.andorian   { background-position: -111px 0; }
+.race-portrait-v2.thumb.ferengi    { background-position: -167px 0; }
+.race-portrait-v2.thumb.cardassian { background-position: -222px 0; }
+.race-portrait-v2.thumb.borg       { background-position: -278px 0; }
+
+.race-portrait-v2.thumb.trill      { background-position: 0 -61px; }
+.race-portrait-v2.thumb.bajoran    { background-position: -56px -61px; }
+.race-portrait-v2.thumb.romulan    { background-position: -111px -61px; }
+.race-portrait-v2.thumb.gorn       { background-position: -167px -61px; }
+.race-portrait-v2.thumb.orion      { background-position: -222px -61px; }
+.race-portrait-v2.thumb.betazoid   { background-position: -278px -61px; }
+
+.race-portrait-v2.thumb.tellarite  { background-position: 0 -123px; }
+.race-portrait-v2.thumb.bolian     { background-position: -56px -123px; }
+.race-portrait-v2.thumb.jemhadar   { background-position: -111px -123px; }
+.race-portrait-v2.thumb.q          { background-position: -167px -123px; }
+.race-portrait-v2.thumb.human-male,
+.race-portrait-v2.thumb.federation { background-position: -222px -123px; }
+.race-portrait-v2.thumb.human-female,
+.race-portrait-v2.thumb.human      { background-position: -278px -123px; }
+
+/* ==============================================
+   Portrait Frame Styles
+   ============================================== */
+
+.portrait-frame-v2 {
+    display: inline-block;
+    padding: 3px;
+    background: linear-gradient(180deg, #3a3a3a 0%, #1a1a1a 100%);
+    border: 1px solid #4a4a4a;
+    border-radius: 6px;
+    box-shadow: 
+        0 4px 12px rgba(0, 0, 0, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* Faction-colored frames with glow */
+.portrait-frame-v2.federation {
+    border-color: rgba(59, 130, 246, 0.6);
+    box-shadow: 
+        0 4px 12px rgba(0, 0, 0, 0.5),
+        0 0 20px rgba(59, 130, 246, 0.3);
+}
+
+.portrait-frame-v2.klingon {
+    border-color: rgba(220, 38, 38, 0.6);
+    box-shadow: 
+        0 4px 12px rgba(0, 0, 0, 0.5),
+        0 0 20px rgba(220, 38, 38, 0.3);
+}
+
+.portrait-frame-v2.romulan {
+    border-color: rgba(16, 185, 129, 0.6);
+    box-shadow: 
+        0 4px 12px rgba(0, 0, 0, 0.5),
+        0 0 20px rgba(16, 185, 129, 0.3);
+}
+
+.portrait-frame-v2.cardassian {
+    border-color: rgba(217, 119, 6, 0.6);
+    box-shadow: 
+        0 4px 12px rgba(0, 0, 0, 0.5),
+        0 0 20px rgba(217, 119, 6, 0.3);
+}
+
+.portrait-frame-v2.ferengi {
+    border-color: rgba(234, 179, 8, 0.6);
+    box-shadow: 
+        0 4px 12px rgba(0, 0, 0, 0.5),
+        0 0 20px rgba(234, 179, 8, 0.3);
+}
+
+.portrait-frame-v2.borg {
+    border-color: rgba(34, 197, 94, 0.6);
+    box-shadow: 
+        0 4px 12px rgba(0, 0, 0, 0.5),
+        0 0 20px rgba(34, 197, 94, 0.3);
+}
+
+.portrait-frame-v2.dominion {
+    border-color: rgba(124, 58, 237, 0.6);
+    box-shadow: 
+        0 4px 12px rgba(0, 0, 0, 0.5),
+        0 0 20px rgba(124, 58, 237, 0.3);
+}
+
+/* ==============================================
+   Portrait Card Component
+   Mimics the nameplate style from the image
+   ============================================== */
+
+.portrait-card-v2 {
+    display: inline-flex;
+    flex-direction: column;
+    background: linear-gradient(180deg, #2d2d2d 0%, #1a1a1a 100%);
+    border: 1px solid #3a3a3a;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+    transition: all 0.2s;
+}
+
+.portrait-card-v2:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+}
+
+.portrait-card-v2.selected {
+    border-color: #fbbf24;
+    box-shadow: 0 0 20px rgba(251, 191, 36, 0.3);
+}
+
+.portrait-card-v2 .portrait-image {
+    width: 166px;
+    height: 150px; /* Crop to show just the face, not nameplate */
+    background-image: url('/images/portraits/race_portraits_v2.png');
+    background-size: 1000px 552px;
+    background-repeat: no-repeat;
+}
+
+/* Nameplate bar (matching the bronze bar in the image) */
+.portrait-card-v2 .nameplate {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background: linear-gradient(180deg, #c9a861 0%, #8b7355 50%, #6b5a45 100%);
+    border-top: 1px solid #d4b872;
+}
+
+.portrait-card-v2 .nameplate .race-name {
+    font-size: 12px;
+    font-weight: 700;
+    color: #1a1510;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.portrait-card-v2 .nameplate .faction-emblem {
+    width: 28px;
+    height: 28px;
+    background: linear-gradient(180deg, #d4b872 0%, #a08050 100%);
+    border: 2px solid #6b5a45;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* ==============================================
+   Race Selection Grid
+   ============================================== */
+
+.race-selection-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 16px;
+    padding: 16px;
+}
+
+.race-selection-item {
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.race-selection-item:hover {
+    transform: scale(1.02);
+}
+
+.race-selection-item.selected .portrait-card-v2 {
+    border-color: #fbbf24;
+    box-shadow: 0 0 25px rgba(251, 191, 36, 0.4);
+}
+
+.race-selection-item.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.race-selection-item.disabled:hover {
+    transform: none;
+}
+
+/* ==============================================
+   Diplomatic Contact with Portrait
+   ============================================== */
+
+.diplomatic-contact-v2 {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background: linear-gradient(180deg, rgba(30, 35, 45, 0.95) 0%, rgba(20, 25, 32, 0.98) 100%);
+    border: 1px solid rgba(100, 120, 160, 0.3);
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+.diplomatic-contact-v2:hover {
+    border-color: rgba(140, 160, 200, 0.4);
+    background: linear-gradient(180deg, rgba(35, 42, 55, 0.95) 0%, rgba(25, 30, 40, 0.98) 100%);
+}
+
+.diplomatic-contact-v2 .contact-portrait {
+    flex-shrink: 0;
+}
+
+.diplomatic-contact-v2 .contact-info {
+    flex: 1;
+}
+
+.diplomatic-contact-v2 .contact-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 4px;
+}
+
+.diplomatic-contact-v2 .contact-title {
+    font-size: 12px;
+    color: rgba(200, 212, 232, 0.7);
+    margin-bottom: 8px;
+}
+
+.diplomatic-contact-v2 .contact-status {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.diplomatic-contact-v2 .contact-status.allied {
+    background: rgba(34, 197, 94, 0.2);
+    color: #4ade80;
+    border: 1px solid rgba(34, 197, 94, 0.4);
+}
+
+.diplomatic-contact-v2 .contact-status.friendly {
+    background: rgba(59, 130, 246, 0.2);
+    color: #60a5fa;
+    border: 1px solid rgba(59, 130, 246, 0.4);
+}
+
+.diplomatic-contact-v2 .contact-status.neutral {
+    background: rgba(234, 179, 8, 0.2);
+    color: #fbbf24;
+    border: 1px solid rgba(234, 179, 8, 0.4);
+}
+
+.diplomatic-contact-v2 .contact-status.hostile {
+    background: rgba(239, 68, 68, 0.2);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
+.diplomatic-contact-v2 .contact-status.war {
+    background: rgba(220, 38, 38, 0.3);
+    color: #fca5a5;
+    border: 1px solid rgba(220, 38, 38, 0.5);
+}
+
+/* ==============================================
+   Animations
+   ============================================== */
+
+@keyframes portrait-pulse {
+    0%, 100% { box-shadow: 0 0 15px rgba(251, 191, 36, 0.3); }
+    50% { box-shadow: 0 0 25px rgba(251, 191, 36, 0.5); }
+}
+
+.race-portrait-v2.highlight {
+    animation: portrait-pulse 2s ease-in-out infinite;
+}
+
+@keyframes portrait-appear {
+    0% { opacity: 0; transform: scale(0.9); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+.race-portrait-v2.animate-in {
+    animation: portrait-appear 0.3s ease-out;
+}
+
+/* ==============================================
+   Utility: Race to Faction Mapping
+   (CSS classes for automatic faction styling)
+   ============================================== */
+
+/* Federation species */
+.race-portrait-v2.human,
+.race-portrait-v2.human-male,
+.race-portrait-v2.human-female,
+.race-portrait-v2.vulcan,
+.race-portrait-v2.andorian,
+.race-portrait-v2.tellarite,
+.race-portrait-v2.trill,
+.race-portrait-v2.betazoid,
+.race-portrait-v2.bolian,
+.race-portrait-v2.bajoran {
+    --faction-color: #3b82f6;
+    --faction-glow: rgba(59, 130, 246, 0.4);
+}
+
+/* Klingon */
+.race-portrait-v2.klingon {
+    --faction-color: #dc2626;
+    --faction-glow: rgba(220, 38, 38, 0.4);
+}
+
+/* Romulan */
+.race-portrait-v2.romulan {
+    --faction-color: #059669;
+    --faction-glow: rgba(16, 185, 129, 0.4);
+}
+
+/* Cardassian */
+.race-portrait-v2.cardassian {
+    --faction-color: #d97706;
+    --faction-glow: rgba(217, 119, 6, 0.4);
+}
+
+/* Ferengi */
+.race-portrait-v2.ferengi {
+    --faction-color: #eab308;
+    --faction-glow: rgba(234, 179, 8, 0.4);
+}
+
+/* Borg */
+.race-portrait-v2.borg {
+    --faction-color: #22c55e;
+    --faction-glow: rgba(34, 197, 94, 0.4);
+}
+
+/* Dominion */
+.race-portrait-v2.jemhadar {
+    --faction-color: #7c3aed;
+    --faction-glow: rgba(124, 58, 237, 0.4);
+}
+
+/* Gorn */
+.race-portrait-v2.gorn {
+    --faction-color: #65a30d;
+    --faction-glow: rgba(101, 163, 13, 0.4);
+}
+
+/* Orion */
+.race-portrait-v2.orion {
+    --faction-color: #14b8a6;
+    --faction-glow: rgba(20, 184, 166, 0.4);
+}
+
+/* Q (special/neutral) */
+.race-portrait-v2.q {
+    --faction-color: #f59e0b;
+    --faction-glow: rgba(245, 158, 11, 0.4);
+}

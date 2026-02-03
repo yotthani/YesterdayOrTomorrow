@@ -1,0 +1,232 @@
+@* RacePortrait.razor - Reusable component for displaying race portraits *@
+
+<div class="@GetPortraitClasses()" @onclick="OnClick" title="@Title">
+    @if (ShowOverlay)
+    {
+        <div class="portrait-overlay">
+            @if (!string.IsNullOrEmpty(OverlayText))
+            {
+                <span class="overlay-text">@OverlayText</span>
+            }
+            @if (ShowSelectionIndicator && IsSelected)
+            {
+                <div class="selection-indicator">✓</div>
+            }
+        </div>
+    }
+</div>
+
+@if (ShowLabel)
+{
+    <div class="portrait-label">
+        <span class="portrait-name">@Name</span>
+        @if (!string.IsNullOrEmpty(Subtitle))
+        {
+            <span class="portrait-subtitle">@Subtitle</span>
+        }
+    </div>
+}
+
+<style>
+    .portrait-container {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .portrait-overlay {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0, 0, 0, 0.4);
+        opacity: 0;
+        transition: opacity 0.2s;
+        border-radius: inherit;
+    }
+    
+    .race-portrait:hover .portrait-overlay {
+        opacity: 1;
+    }
+    
+    .overlay-text {
+        padding: 6px 12px;
+        background: rgba(0, 0, 0, 0.7);
+        border-radius: 4px;
+        font-size: 11px;
+        color: #fff;
+        font-weight: 600;
+    }
+    
+    .selection-indicator {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        width: 24px;
+        height: 24px;
+        background: #22c55e;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 14px;
+        font-weight: bold;
+    }
+    
+    .portrait-label {
+        margin-top: 8px;
+        text-align: center;
+    }
+    
+    .portrait-name {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        color: #fff;
+    }
+    
+    .portrait-subtitle {
+        display: block;
+        font-size: 10px;
+        color: rgba(200, 212, 232, 0.6);
+    }
+    
+    /* Interactive states */
+    .race-portrait.clickable {
+        cursor: pointer;
+    }
+    
+    .race-portrait.selected {
+        outline: 3px solid #fbbf24;
+        outline-offset: 2px;
+    }
+    
+    .race-portrait.disabled {
+        opacity: 0.5;
+        filter: grayscale(0.5);
+        cursor: not-allowed;
+    }
+</style>
+
+@code {
+    /// <summary>
+    /// The race/character type to display
+    /// </summary>
+    [Parameter] public string Race { get; set; } = "human-captain";
+    
+    /// <summary>
+    /// Size variant: "thumbnail", "small", "medium" (default), "large"
+    /// </summary>
+    [Parameter] public string Size { get; set; } = "";
+    
+    /// <summary>
+    /// Display name for the portrait
+    /// </summary>
+    [Parameter] public string Name { get; set; } = "";
+    
+    /// <summary>
+    /// Subtitle text (role, title, etc.)
+    /// </summary>
+    [Parameter] public string Subtitle { get; set; } = "";
+    
+    /// <summary>
+    /// Tooltip text
+    /// </summary>
+    [Parameter] public string Title { get; set; } = "";
+    
+    /// <summary>
+    /// Faction for frame styling
+    /// </summary>
+    [Parameter] public string Faction { get; set; } = "";
+    
+    /// <summary>
+    /// Whether this portrait is selected
+    /// </summary>
+    [Parameter] public bool IsSelected { get; set; }
+    
+    /// <summary>
+    /// Whether this portrait is disabled
+    /// </summary>
+    [Parameter] public bool IsDisabled { get; set; }
+    
+    /// <summary>
+    /// Whether to show the name label
+    /// </summary>
+    [Parameter] public bool ShowLabel { get; set; }
+    
+    /// <summary>
+    /// Whether to show overlay on hover
+    /// </summary>
+    [Parameter] public bool ShowOverlay { get; set; }
+    
+    /// <summary>
+    /// Text to show in overlay
+    /// </summary>
+    [Parameter] public string OverlayText { get; set; } = "";
+    
+    /// <summary>
+    /// Whether to show selection checkmark
+    /// </summary>
+    [Parameter] public bool ShowSelectionIndicator { get; set; }
+    
+    /// <summary>
+    /// Click callback
+    /// </summary>
+    [Parameter] public EventCallback OnClick { get; set; }
+    
+    /// <summary>
+    /// Additional CSS classes
+    /// </summary>
+    [Parameter] public string AdditionalClasses { get; set; } = "";
+
+    private string GetPortraitClasses()
+    {
+        var classes = new List<string> { "race-portrait", Race };
+        
+        if (!string.IsNullOrEmpty(Size))
+            classes.Add(Size);
+            
+        if (IsSelected)
+            classes.Add("selected");
+            
+        if (IsDisabled)
+            classes.Add("disabled");
+            
+        if (OnClick.HasDelegate)
+            classes.Add("clickable");
+            
+        if (!string.IsNullOrEmpty(AdditionalClasses))
+            classes.Add(AdditionalClasses);
+            
+        return string.Join(" ", classes);
+    }
+    
+    /// <summary>
+    /// Available portrait types mapped to races
+    /// </summary>
+    public static readonly Dictionary<string, string[]> PortraitsByRace = new()
+    {
+        ["Federation"] = new[] { "human-captain", "human-admiral", "vulcan-elder", "andorian-commander", "andorian-engineer", "trill-officer", "betazoid-diplomat" },
+        ["Klingon"] = new[] { "klingon-warrior" },
+        ["Romulan"] = new[] { "romulan-commander", "romulan-tal-shiar" },
+        ["Cardassian"] = new[] { "cardassian-gul", "bajoran-civilian" },
+        ["Ferengi"] = new[] { "ferengi-merchant" },
+        ["Borg"] = new[] { "borg-drone" },
+        ["Dominion"] = new[] { "jem-hadar-soldier" },
+        ["Gorn"] = new[] { "gorn-warrior" }
+    };
+    
+    /// <summary>
+    /// Get a random portrait for a given faction
+    /// </summary>
+    public static string GetRandomPortrait(string faction)
+    {
+        if (PortraitsByRace.TryGetValue(faction, out var portraits) && portraits.Length > 0)
+        {
+            return portraits[Random.Shared.Next(portraits.Length)];
+        }
+        return "human-captain";
+    }
+}

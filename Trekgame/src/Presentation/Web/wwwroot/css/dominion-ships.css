@@ -1,0 +1,193 @@
+/* ==============================================
+   GALACTIC STRATEGY - Dominion Ships
+   3D Rendered Style with Nameplates
+   
+   Two sprite sheets:
+   - military_ships.png: Jem'Hadar warships
+   - civilian_ships.png: Support vessels
+   
+   Both: ~2000 x 1103 px, 4 columns x 4 rows
+   ============================================== */
+
+/* ==============================================
+   Base Dominion Ship Component
+   ============================================== */
+
+.ship-card.dominion {
+    background-repeat: no-repeat;
+    background-size: 1000px 552px; /* 50% scale default */
+}
+
+/* ==============================================
+   DOMINION MILITARY SHIPS
+   Sheet: dominion/military_ships.png
+   
+   Row 1: Fighter, Attack Ship, Heavy Attack, Escort
+   Row 2: Light Battlecruiser, Battlecruiser, Heavy Battlecruiser, Strike Cruiser
+   Row 3: Battleship, Dreadnought, Carrier, Command Ship
+   Row 4: Patrol Craft, Scout, Troop Transport, Weapon Platform
+   ============================================== */
+
+.ship-card.dominion.military {
+    background-image: url('/images/ships/dominion/military_ships.png');
+}
+
+/* Row 1 - Light Combat */
+.ship-card.dominion.fighter              { background-position: 0 0; }
+.ship-card.dominion.attack-ship          { background-position: -250px 0; }
+.ship-card.dominion.heavy-attack         { background-position: -500px 0; }
+.ship-card.dominion.escort               { background-position: -750px 0; }
+
+/* Row 2 - Cruisers */
+.ship-card.dominion.light-battlecruiser  { background-position: 0 -138px; }
+.ship-card.dominion.battlecruiser        { background-position: -250px -138px; }
+.ship-card.dominion.heavy-battlecruiser  { background-position: -500px -138px; }
+.ship-card.dominion.strike-cruiser       { background-position: -750px -138px; }
+
+/* Row 3 - Capital */
+.ship-card.dominion.battleship           { background-position: 0 -276px; }
+.ship-card.dominion.dreadnought          { background-position: -250px -276px; }
+.ship-card.dominion.carrier              { background-position: -500px -276px; }
+.ship-card.dominion.command-ship         { background-position: -750px -276px; }
+
+/* Row 4 - Support/Special */
+.ship-card.dominion.patrol               { background-position: 0 -414px; }
+.ship-card.dominion.scout                { background-position: -250px -414px; }
+.ship-card.dominion.troop-transport      { background-position: -500px -414px; }
+.ship-card.dominion.weapon-platform      { background-position: -750px -414px; }
+
+/* ==============================================
+   DOMINION CIVILIAN SHIPS
+   Sheet: dominion/civilian_ships.png
+   
+   Row 1: Freighter, Cargo Tender, Transport, Convoy Escort
+   Row 2: Mining Barge, Refinery Ship, Harvester, Construction Ship
+   Row 3: Science Vessel, Survey Ship, Repair Ship, Colony Transport
+   Row 4: Shuttle, Courier, Workbee, Diplomatic
+   ============================================== */
+
+.ship-card.dominion.civilian {
+    background-image: url('/images/ships/dominion/civilian_ships.png');
+}
+
+/* Row 1 */
+.ship-card.dominion.freighter            { background-position: 0 0; }
+.ship-card.dominion.cargo-tender         { background-position: -250px 0; }
+.ship-card.dominion.transport            { background-position: -500px 0; }
+.ship-card.dominion.convoy-escort        { background-position: -750px 0; }
+
+/* Row 2 */
+.ship-card.dominion.mining-barge         { background-position: 0 -138px; }
+.ship-card.dominion.refinery             { background-position: -250px -138px; }
+.ship-card.dominion.harvester            { background-position: -500px -138px; }
+.ship-card.dominion.construction         { background-position: -750px -138px; }
+
+/* Row 3 */
+.ship-card.dominion.science              { background-position: 0 -276px; }
+.ship-card.dominion.survey               { background-position: -250px -276px; }
+.ship-card.dominion.repair               { background-position: -500px -276px; }
+.ship-card.dominion.colony-transport     { background-position: -750px -276px; }
+
+/* Row 4 */
+.ship-card.dominion.shuttle              { background-position: 0 -414px; }
+.ship-card.dominion.courier              { background-position: -250px -414px; }
+.ship-card.dominion.workbee              { background-position: -500px -414px; }
+.ship-card.dominion.diplomatic           { background-position: -750px -414px; }
+
+/* ==============================================
+   Large Size Positions (100% scale)
+   ============================================== */
+
+.ship-card.dominion.large {
+    background-size: 2000px 1103px;
+}
+
+/* Military Large */
+.ship-card.dominion.large.fighter              { background-position: 0 0; }
+.ship-card.dominion.large.attack-ship          { background-position: -500px 0; }
+.ship-card.dominion.large.heavy-attack         { background-position: -1000px 0; }
+.ship-card.dominion.large.escort               { background-position: -1500px 0; }
+
+.ship-card.dominion.large.light-battlecruiser  { background-position: 0 -276px; }
+.ship-card.dominion.large.battlecruiser        { background-position: -500px -276px; }
+.ship-card.dominion.large.heavy-battlecruiser  { background-position: -1000px -276px; }
+.ship-card.dominion.large.strike-cruiser       { background-position: -1500px -276px; }
+
+.ship-card.dominion.large.battleship           { background-position: 0 -552px; }
+.ship-card.dominion.large.dreadnought          { background-position: -500px -552px; }
+.ship-card.dominion.large.carrier              { background-position: -1000px -552px; }
+.ship-card.dominion.large.command-ship         { background-position: -1500px -552px; }
+
+.ship-card.dominion.large.patrol               { background-position: 0 -828px; }
+.ship-card.dominion.large.scout                { background-position: -500px -828px; }
+.ship-card.dominion.large.troop-transport      { background-position: -1000px -828px; }
+.ship-card.dominion.large.weapon-platform      { background-position: -1500px -828px; }
+
+/* ==============================================
+   Small Size Positions (25% scale)
+   ============================================== */
+
+.ship-card.dominion.small {
+    background-size: 500px 276px;
+}
+
+.ship-card.dominion.small.fighter              { background-position: 0 0; }
+.ship-card.dominion.small.attack-ship          { background-position: -125px 0; }
+.ship-card.dominion.small.heavy-attack         { background-position: -250px 0; }
+.ship-card.dominion.small.escort               { background-position: -375px 0; }
+
+.ship-card.dominion.small.light-battlecruiser  { background-position: 0 -69px; }
+.ship-card.dominion.small.battlecruiser        { background-position: -125px -69px; }
+.ship-card.dominion.small.heavy-battlecruiser  { background-position: -250px -69px; }
+.ship-card.dominion.small.strike-cruiser       { background-position: -375px -69px; }
+
+/* ==============================================
+   Dominion Frame Style (Purple Glow)
+   ============================================== */
+
+.ship-frame.dominion {
+    border-color: rgba(124, 58, 237, 0.6);
+    box-shadow: 
+        0 4px 12px rgba(0, 0, 0, 0.5),
+        0 0 20px rgba(124, 58, 237, 0.3);
+}
+
+.ship-frame.dominion.selected {
+    border-color: #a78bfa;
+    box-shadow: 
+        0 4px 12px rgba(0, 0, 0, 0.5),
+        0 0 25px rgba(167, 139, 250, 0.5);
+}
+
+/* ==============================================
+   Dominion Ship Effects
+   ============================================== */
+
+@keyframes dominion-ship-glow {
+    0%, 100% { box-shadow: 0 0 15px rgba(124, 58, 237, 0.4); }
+    50% { box-shadow: 0 0 25px rgba(124, 58, 237, 0.6); }
+}
+
+.ship-card.dominion.selected {
+    animation: dominion-ship-glow 2s ease-in-out infinite;
+}
+
+/* Ketracel-white boost effect */
+@keyframes ketracel-boost {
+    0%, 100% { filter: brightness(1); }
+    50% { filter: brightness(1.3) saturate(1.2); }
+}
+
+.ship-card.dominion.boosted {
+    animation: ketracel-boost 0.5s ease-in-out infinite;
+}
+
+/* Polaron beam charge */
+@keyframes polaron-charge {
+    0% { box-shadow: 0 0 5px rgba(124, 58, 237, 0.3); }
+    100% { box-shadow: 0 0 30px rgba(124, 58, 237, 0.8); }
+}
+
+.ship-card.dominion.charging {
+    animation: polaron-charge 1s ease-in forwards;
+}

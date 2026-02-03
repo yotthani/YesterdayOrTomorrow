@@ -1,0 +1,173 @@
+@* Faction Emblem Component - Displays race/faction emblem with optional styling *@
+
+<div class="faction-emblem @SizeClass" style="@StyleString">
+    @if (!string.IsNullOrEmpty(EmblemPath))
+    {
+        <img src="@EmblemPath" alt="@FactionName emblem" class="emblem-image" />
+    }
+    else
+    {
+        <div class="emblem-fallback">@GetFallbackIcon()</div>
+    }
+    @if (ShowName)
+    {
+        <span class="emblem-name">@FactionName</span>
+    }
+</div>
+
+@code {
+    [Parameter] public string? RaceId { get; set; }
+    [Parameter] public string? FactionName { get; set; }
+    [Parameter] public string Size { get; set; } = "medium"; // small, medium, large, xlarge
+    [Parameter] public bool ShowName { get; set; } = false;
+    [Parameter] public string? CustomStyle { get; set; }
+    [Parameter] public string Variant { get; set; } = "standard"; // standard, patch, flat
+
+    private string EmblemPath => GetEmblemPath();
+    private string SizeClass => $"emblem-{Size}";
+    private string StyleString => CustomStyle ?? "";
+
+    // Emblem variant suffixes: standard = main file, patch = _patch, flat = _flat
+    // Standard: 3D with glow — HUD, menus, loading screens, space backgrounds
+    // Patch: Embroidered/stitched — flags, uniforms, fabric backgrounds
+    // Flat: Simple solid — icons, minimaps, small UI overlays, print
+    private static readonly Dictionary<string, Dictionary<string, string>> RaceEmblemVariants = new()
+    {
+        { "federation", new() {
+            { "standard", "assets/universal/symbols/federation.svg" },
+            { "patch", "assets/universal/symbols/federation_patch.svg" },
+            { "flat", "assets/universal/symbols/federation_flat.svg" },
+        }},
+        { "klingon", new() {
+            { "standard", "assets/universal/symbols/klingon.svg" },
+            { "patch", "assets/universal/symbols/klingon_patch.svg" },
+            { "flat", "assets/universal/symbols/klingon_flat.svg" },
+        }},
+    };
+
+    // Use hand-crafted SVG symbols where available, fall back to PNG extracts
+    private static readonly Dictionary<string, string> RaceEmblems = new()
+    {
+        // SVG versions — hand-crafted or potrace-traced
+        { "federation", "assets/universal/symbols/federation.svg" },
+        { "klingon", "assets/universal/symbols/klingon.svg" },
+        { "romulan", "assets/universal/symbols/romulan.svg" },
+        { "cardassian", "assets/universal/symbols/cardassian.svg" },
+        { "borg", "assets/universal/symbols/borg.svg" },
+        { "ferengi", "assets/universal/symbols/ferengi.svg" },
+        { "dominion", "assets/universal/symbols/dominion.svg" },
+        { "breen", "assets/universal/symbols/breen.svg" },
+        { "gorn", "assets/universal/symbols/gorn.svg" },
+        { "andorian", "assets/universal/symbols/andorian.svg" },
+        { "vulcan", "assets/universal/symbols/vulcan.svg" },
+        // PNG fallbacks (non-game factions, extracted from reference)
+        { "terran", "assets/universal/symbols/terran.png" },
+        { "bajoran", "assets/universal/symbols/bajoran.png" },
+        { "trill", "assets/universal/symbols/trill.png" },
+        { "orion", "assets/universal/symbols/orion.png" },
+        { "maquis", "assets/universal/symbols/maquis.png" },
+        { "species8472", "assets/universal/symbols/species8472.png" },
+    };
+
+    private static readonly Dictionary<string, string> RaceIcons = new()
+    {
+        { "federation", "🌟" },
+        { "terran", "🌍" },
+        { "vulcan", "🖖" },
+        { "andorian", "❄️" },
+        { "klingon", "⚔️" },
+        { "romulan", "🦅" },
+        { "cardassian", "🔶" },
+        { "ferengi", "💰" },
+        { "borg", "🔲" },
+        { "dominion", "👁️" },
+        { "breen", "🥶" },
+        { "tholian", "🔺" },
+        { "gorn", "🦎" },
+        { "bajoran", "🙏" },
+        { "trill", "🔵" },
+        { "orion", "💚" },
+    };
+
+    private string GetEmblemPath()
+    {
+        if (string.IsNullOrEmpty(RaceId)) return "";
+        var key = RaceId.ToLowerInvariant();
+        var variant = Variant?.ToLowerInvariant() ?? "standard";
+        
+        // Check for variant-specific emblem first
+        if (RaceEmblemVariants.TryGetValue(key, out var variants) 
+            && variants.TryGetValue(variant, out var variantPath))
+        {
+            return variantPath;
+        }
+        
+        // Fall back to default emblem
+        return RaceEmblems.TryGetValue(key, out var path) ? path : "";
+    }
+
+    private string GetFallbackIcon()
+    {
+        if (string.IsNullOrEmpty(RaceId)) return "🌌";
+        var key = RaceId.ToLowerInvariant();
+        return RaceIcons.TryGetValue(key, out var icon) ? icon : "🌌";
+    }
+}
+
+<style>
+    .faction-emblem {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .emblem-image {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+    .emblem-fallback {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 50%;
+        border: 2px solid var(--theme-primary, #ff9900);
+    }
+
+    .emblem-name {
+        margin-top: 4px;
+        font-size: 0.75em;
+        color: var(--theme-text-dim, #aaa);
+        text-align: center;
+    }
+
+    /* Size variants */
+    .emblem-small {
+        width: 32px;
+        height: 32px;
+    }
+    .emblem-small .emblem-fallback { font-size: 16px; }
+
+    .emblem-medium {
+        width: 48px;
+        height: 48px;
+    }
+    .emblem-medium .emblem-fallback { font-size: 24px; }
+
+    .emblem-large {
+        width: 72px;
+        height: 72px;
+    }
+    .emblem-large .emblem-fallback { font-size: 36px; }
+
+    .emblem-xlarge {
+        width: 120px;
+        height: 120px;
+    }
+    .emblem-xlarge .emblem-fallback { font-size: 60px; }
+</style>

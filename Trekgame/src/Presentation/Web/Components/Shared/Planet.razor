@@ -1,0 +1,206 @@
+@namespace StarTrekGame.Web.Components.Shared
+
+<svg class="planet-svg" viewBox="-70 -70 140 140" width="@Size" height="@Size">
+    <defs>
+        <!-- Planet gradient based on type -->
+        <radialGradient id="planet-grad-@_uniqueId" cx="35%" cy="35%">
+            <stop offset="0%" stop-color="@_lightColor"/>
+            <stop offset="40%" stop-color="@_midColor"/>
+            <stop offset="100%" stop-color="@_darkColor"/>
+        </radialGradient>
+        
+        <!-- Atmosphere glow -->
+        <filter id="atmo-@_uniqueId" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="3" result="blur"/>
+            <feMerge>
+                <feMergeNode in="blur"/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
+        
+        <!-- Shadow -->
+        <filter id="shadow-@_uniqueId">
+            <feDropShadow dx="3" dy="3" stdDeviation="2" flood-opacity="0.4"/>
+        </filter>
+        
+        @if (Type == "GasGiant" || Type == "gasgiant")
+        {
+            <pattern id="bands-@_uniqueId" patternUnits="userSpaceOnUse" width="140" height="20">
+                <rect y="0" width="140" height="6" fill="@_midColor" opacity="0.4"/>
+                <rect y="8" width="140" height="5" fill="@_darkColor" opacity="0.3"/>
+                <rect y="14" width="140" height="5" fill="@_lightColor" opacity="0.2"/>
+            </pattern>
+        }
+    </defs>
+    
+    <!-- Atmosphere ring for habitable planets -->
+    @if (IsHabitable)
+    {
+        <circle r="@(_radius + 4)" fill="none" stroke="@_atmosphereColor" stroke-width="3" opacity="0.25"/>
+    }
+    
+    <!-- Planet body -->
+    <circle r="@_radius" fill="url(#planet-grad-@_uniqueId)" filter="url(#shadow-@_uniqueId)"/>
+    
+    <!-- Surface features based on type -->
+    @switch (Type?.ToLower())
+    {
+        case "terran":
+        case "class-m":
+            <!-- Continents -->
+            <ellipse cx="-10" cy="5" rx="20" ry="10" fill="#44aa44" opacity="0.6"/>
+            <ellipse cx="15" cy="-15" rx="12" ry="8" fill="#55bb55" opacity="0.5"/>
+            <ellipse cx="-5" cy="25" rx="15" ry="6" fill="#338833" opacity="0.4"/>
+            <!-- Clouds -->
+            <ellipse cx="20" cy="10" rx="18" ry="5" fill="rgba(255,255,255,0.3)"/>
+            <ellipse cx="-15" cy="-20" rx="12" ry="4" fill="rgba(255,255,255,0.25)"/>
+            break;
+            
+        case "desert":
+        case "class-h":
+            <!-- Dunes/features -->
+            <ellipse cx="10" cy="0" rx="25" ry="12" fill="#aa6622" opacity="0.4"/>
+            <ellipse cx="-15" cy="15" rx="15" ry="7" fill="#996633" opacity="0.3"/>
+            break;
+            
+        case "arctic":
+        case "class-p":
+            <!-- Ice caps -->
+            <ellipse cx="0" cy="-30" rx="40" ry="18" fill="rgba(255,255,255,0.6)"/>
+            <ellipse cx="0" cy="30" rx="35" ry="15" fill="rgba(255,255,255,0.5)"/>
+            break;
+            
+        case "volcanic":
+        case "class-y":
+            <!-- Lava flows -->
+            <circle cx="12" cy="8" r="8" fill="#ffaa00" opacity="0.7"/>
+            <circle cx="-18" cy="-12" r="5" fill="#ff8800" opacity="0.6"/>
+            <circle cx="-8" cy="20" r="6" fill="#ffcc00" opacity="0.5"/>
+            <path d="M-5,5 Q5,-10 15,5 Q25,20 10,15" stroke="#ffcc00" stroke-width="2" fill="none" opacity="0.4"/>
+            break;
+            
+        case "oceanic":
+        case "class-o":
+            <!-- Small islands -->
+            <ellipse cx="15" cy="10" rx="8" ry="4" fill="#338855" opacity="0.5"/>
+            <ellipse cx="-20" cy="-5" rx="5" ry="3" fill="#44aa66" opacity="0.4"/>
+            break;
+            
+        case "jungle":
+        case "class-l":
+            <!-- Dense vegetation patterns -->
+            <ellipse cx="0" cy="0" rx="35" ry="20" fill="#227722" opacity="0.4"/>
+            <ellipse cx="-15" cy="15" rx="20" ry="10" fill="#33aa33" opacity="0.3"/>
+            break;
+            
+        case "barren":
+        case "class-d":
+            <!-- Craters -->
+            <circle cx="-15" cy="-10" r="10" fill="#555" stroke="#444" stroke-width="1"/>
+            <circle cx="18" cy="12" r="7" fill="#555" stroke="#444" stroke-width="1"/>
+            <circle cx="5" cy="-20" r="5" fill="#555" stroke="#444" stroke-width="1"/>
+            <circle cx="-8" cy="20" r="6" fill="#555" stroke="#444" stroke-width="1"/>
+            break;
+            
+        case "gasgiant":
+        case "class-j":
+            <!-- Bands -->
+            <circle r="@_radius" fill="url(#bands-@_uniqueId)" opacity="0.6"/>
+            <!-- Great spot -->
+            <ellipse cx="-15" cy="10" rx="12" ry="8" fill="#cc6633" opacity="0.5"/>
+            break;
+            
+        case "toxic":
+        case "class-k":
+            <!-- Toxic clouds -->
+            <ellipse cx="5" cy="0" rx="30" ry="15" fill="#aacc44" opacity="0.3"/>
+            <ellipse cx="-10" cy="-15" rx="18" ry="8" fill="#99bb33" opacity="0.25"/>
+            break;
+    }
+    
+    <!-- Highlight/shine -->
+    <ellipse cx="@(-_radius * 0.3)" cy="@(-_radius * 0.35)" rx="@(_radius * 0.15)" ry="@(_radius * 0.1)" 
+             fill="rgba(255,255,255,0.25)"/>
+    
+    <!-- Rings for ringed planets -->
+    @if (HasRings)
+    {
+        <ellipse cx="0" cy="0" rx="@(_radius * 1.8)" ry="@(_radius * 0.35)" 
+                 fill="none" stroke="@_ringColor" stroke-width="@(_radius * 0.15)" opacity="0.5"/>
+    }
+    
+    @if (ShowName && !string.IsNullOrEmpty(Name))
+    {
+        @((MarkupString)$"<text y=\"{_radius + 18}\" text-anchor=\"middle\" font-size=\"11\" fill=\"#99ccff\" font-family=\"'Segoe UI', sans-serif\">{Name}</text>")
+    }
+</svg>
+
+@code {
+    [Parameter] public string Type { get; set; } = "Terran";
+    [Parameter] public string? Name { get; set; }
+    [Parameter] public int Size { get; set; } = 100;
+    [Parameter] public bool HasRings { get; set; } = false;
+    [Parameter] public bool ShowName { get; set; } = false;
+    
+    private string _uniqueId = Guid.NewGuid().ToString("N")[..8];
+    private int _radius => Size / 3;
+    
+    private bool IsHabitable => Type?.ToLower() switch
+    {
+        "terran" or "class-m" or "oceanic" or "class-o" or "jungle" or "class-l" or "arctic" or "class-p" => true,
+        _ => false
+    };
+    
+    private string _lightColor => Type?.ToLower() switch
+    {
+        "terran" or "class-m" => "#88ccff",
+        "desert" or "class-h" => "#ffdd99",
+        "arctic" or "class-p" => "#ffffff",
+        "volcanic" or "class-y" => "#ffaa44",
+        "oceanic" or "class-o" => "#66bbff",
+        "jungle" or "class-l" => "#88dd66",
+        "barren" or "class-d" => "#999999",
+        "gasgiant" or "class-j" => "#ffddaa",
+        "toxic" or "class-k" => "#ccdd88",
+        _ => "#aaaaaa"
+    };
+    
+    private string _midColor => Type?.ToLower() switch
+    {
+        "terran" or "class-m" => "#4488cc",
+        "desert" or "class-h" => "#cc9944",
+        "arctic" or "class-p" => "#88ccee",
+        "volcanic" or "class-y" => "#ff6622",
+        "oceanic" or "class-o" => "#2288dd",
+        "jungle" or "class-l" => "#44aa33",
+        "barren" or "class-d" => "#666666",
+        "gasgiant" or "class-j" => "#ddaa77",
+        "toxic" or "class-k" => "#99aa55",
+        _ => "#777777"
+    };
+    
+    private string _darkColor => Type?.ToLower() switch
+    {
+        "terran" or "class-m" => "#113355",
+        "desert" or "class-h" => "#664422",
+        "arctic" or "class-p" => "#446688",
+        "volcanic" or "class-y" => "#661100",
+        "oceanic" or "class-o" => "#003366",
+        "jungle" or "class-l" => "#114411",
+        "barren" or "class-d" => "#222222",
+        "gasgiant" or "class-j" => "#664422",
+        "toxic" or "class-k" => "#334411",
+        _ => "#333333"
+    };
+    
+    private string _atmosphereColor => Type?.ToLower() switch
+    {
+        "terran" or "class-m" => "#88ccff",
+        "oceanic" or "class-o" => "#66bbff",
+        "jungle" or "class-l" => "#88ff88",
+        "arctic" or "class-p" => "#aaddff",
+        _ => "#88aacc"
+    };
+    
+    private string _ringColor => "#ccaa77";
+}

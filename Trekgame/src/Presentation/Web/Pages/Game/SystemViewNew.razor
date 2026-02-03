@@ -1,0 +1,560 @@
+@page "/game/system-new/{SystemId:guid}"
+@page "/game/system/{SystemId:guid}"
+@page "/game/system-view/{SystemId:guid}"
+@layout StellarisLayout
+@using StarTrekGame.Web.Services
+@inject IGameApiClient Api
+@inject NavigationManager Nav
+
+<PageTitle>System View - TrekGame</PageTitle>
+
+<div class="stellaris-layout">
+    <header class="st-topbar">
+        <div class="st-empire-badge">
+            <div class="st-empire-flag">🌐</div>
+            <div class="st-empire-info">
+                <span class="st-empire-name">@(_system?.Name ?? "Unknown") System</span>
+                <span class="st-empire-type">Stellar Cartography</span>
+            </div>
+        </div>
+        <div class="st-game-controls">
+            <button class="st-btn" @onclick='() => Nav.NavigateTo("/game/galaxy")'>← BACK TO GALAXY</button>
+        </div>
+    </header>
+    
+    <div class="st-main">
+        <aside class="st-sidebar-left">
+            <nav class="st-nav">
+                <a href="/game/galaxy" class="st-nav-btn"><span class="st-nav-icon">🌌</span><span class="st-nav-label">Galaxy</span></a>
+                <a href="/game/colonies" class="st-nav-btn"><span class="st-nav-icon">🏠</span><span class="st-nav-label">Colonies</span></a>
+            </nav>
+        </aside>
+        
+        <div class="system-content">
+            <div class="system-view">
+                <!-- Star -->
+                <div class="star-container">
+                    <div class="star @_starType.ToLower()">
+                        <div class="star-corona"></div>
+                    </div>
+                    <span class="star-label">@(_system?.Name ?? "Star") • @_starType Star</span>
+                </div>
+                
+                <!-- Orbits and Planets -->
+                <div class="orbits-container">
+                    @for (int i = 0; i < _planets.Count; i++)
+                    {
+                        var planet = _planets[i];
+                        var idx = i;
+                        var orbitWidth = 180 + idx * 90;
+                        var orbitHeight = (int)(orbitWidth * 0.35);
+                        var duration = 20 + idx * 10;
+                        var startAngle = (idx * 73 + idx * idx * 31) % 360;
+                        var delay = -(startAngle / 360.0) * duration;
+                        
+                        <div class="orbit-ring" style="width: @(orbitWidth * 2)px; height: @(orbitHeight * 2)px;">
+                            <div class="planet-orbit-path" style="animation-duration: @(duration)s; animation-delay: @(delay)s;">
+                                <div class="planet @planet.Type.ToLower() @(_selectedPlanet?.Id == planet.Id ? "selected" : "")" 
+                                     @onclick="() => SelectPlanet(idx)">
+                                    @if (planet.HasColony)
+                                    {
+                                        <div class="colony-marker">🏠</div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+                
+                <!-- Fleets -->
+                <div class="fleets-in-system">
+                    @foreach (var fleet in _fleets)
+                    {
+                        <div class="fleet-marker">
+                            <span class="fleet-icon">▲</span>
+                            <span class="fleet-name">@fleet.Name</span>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+        
+        <aside class="st-sidebar-right" style="width: 320px;">
+            <div class="st-outliner">
+                <div class="st-outliner-header">
+                    <span class="st-outliner-title">SYSTEM INFO</span>
+                </div>
+                
+                @if (_selectedPlanet != null)
+                {
+                    <div class="planet-detail">
+                        <div class="detail-header @_selectedPlanet.Type.ToLower()">
+                            <div class="planet-preview">
+                                <div class="planet-sphere @_selectedPlanet.Type.ToLower()"></div>
+                            </div>
+                            <div class="planet-title">
+                                <h3>@_selectedPlanet.Name</h3>
+                                <span>@_selectedPlanet.Type World</span>
+                            </div>
+                        </div>
+                        <div class="detail-body">
+                            <div class="info-section">
+                                <h4>CHARACTERISTICS</h4>
+                                <div class="info-row"><span>Size</span><span>@_selectedPlanet.Size</span></div>
+                                <div class="info-row"><span>Climate</span><span>@_selectedPlanet.Climate</span></div>
+                                <div class="info-row">
+                                    <span>Habitability</span>
+                                    <span class="@GetHabitabilityClass(_selectedPlanet.Habitability)">@_selectedPlanet.Habitability%</span>
+                                </div>
+                            </div>
+                            <div class="info-section">
+                                <h4>RESOURCES</h4>
+                                <div class="resource-grid">
+                                    @foreach (var r in _selectedPlanet.Resources)
+                                    {
+                                        <div class="resource-item">
+                                            <span class="res-icon">@r.Icon</span>
+                                            <span class="res-val">@r.Value</span>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                            @if (_selectedPlanet.HasColony)
+                            {
+                                <div class="info-section">
+                                    <h4>COLONY</h4>
+                                    <div class="info-row"><span>Population</span><span>@_selectedPlanet.Population.ToString("N0")</span></div>
+                                    <button class="st-btn primary" style="width:100%;margin-top:12px;" @onclick="ManageColony">MANAGE COLONY</button>
+                                </div>
+                            }
+                            else if (_selectedPlanet.Habitability >= 50)
+                            {
+                                <button class="st-btn success" style="width:100%;margin-top:16px;">COLONIZE PLANET</button>
+                            }
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="system-overview">
+                        <div class="info-section">
+                            <h4>SYSTEM DATA</h4>
+                            <div class="info-row"><span>Star Type</span><span>@_starType</span></div>
+                            <div class="info-row"><span>Planets</span><span>@_planets.Count</span></div>
+                            <div class="info-row"><span>Habitable</span><span>@_planets.Count(p => p.Habitability >= 50)</span></div>
+                            <div class="info-row"><span>Colonies</span><span>@_planets.Count(p => p.HasColony)</span></div>
+                        </div>
+                        <div class="info-section">
+                            <h4>FLEETS</h4>
+                            @foreach (var f in _fleets)
+                            {
+                                <div class="fleet-item">
+                                    <span>▲ @f.Name</span>
+                                    <span>@f.Ships ships</span>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        </aside>
+    </div>
+</div>
+
+<style>
+    .system-content {
+        flex: 1;
+        position: relative;
+        background: radial-gradient(ellipse at 25% 50%, #0a1428 0%, #040810 100%);
+        overflow: hidden;
+    }
+    
+    .system-view {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .star-container {
+        position: absolute;
+        left: 25%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        z-index: 10;
+    }
+    
+    .star {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        position: relative;
+    }
+    
+    .star.yellow {
+        background: radial-gradient(circle, #fff 0%, #ffee88 30%, #ffaa00 70%, #ff6600 100%);
+        box-shadow: 0 0 60px #ffaa00, 0 0 120px rgba(255, 170, 0, 0.5);
+    }
+    
+    .star.red {
+        background: radial-gradient(circle, #ffcccc 0%, #ff6666 30%, #cc0000 100%);
+        box-shadow: 0 0 60px #cc0000;
+    }
+    
+    .star.blue {
+        background: radial-gradient(circle, #fff 0%, #aaddff 30%, #4488ff 100%);
+        box-shadow: 0 0 60px #4488ff;
+    }
+    
+    .star.orange {
+        background: radial-gradient(circle, #fff 0%, #ffcc88 30%, #ff8800 100%);
+        box-shadow: 0 0 60px #ff8800;
+    }
+    
+    .star.white {
+        background: radial-gradient(circle, #fff 0%, #eeeeff 50%, #aabbcc 100%);
+        box-shadow: 0 0 60px #ffffff;
+    }
+    
+    .star-corona {
+        position: absolute;
+        inset: -30px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(255, 200, 100, 0.3) 0%, transparent 70%);
+        animation: pulse 4s ease-in-out infinite;
+    }
+    
+    .star-label {
+        display: block;
+        margin-top: 20px;
+        font-size: 12px;
+        color: rgba(200, 220, 255, 0.7);
+    }
+    
+    .orbits-container {
+        position: absolute;
+        left: 25%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+    }
+    
+    .orbit-ring {
+        position: absolute;
+        border: 1px solid rgba(100, 150, 200, 0.2);
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+    }
+    
+    .planet-orbit-path {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        animation: orbit linear infinite;
+    }
+    
+    .planet {
+        position: absolute;
+        top: -16px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 0 0 10px rgba(100, 150, 200, 0.3);
+    }
+    
+    .planet:hover {
+        transform: translateX(-50%) scale(1.4);
+        box-shadow: 0 0 25px rgba(100, 180, 255, 0.6);
+        z-index: 100;
+    }
+    
+    .planet.selected {
+        transform: translateX(-50%) scale(1.3);
+        box-shadow: 0 0 25px rgba(255, 200, 100, 0.8);
+        z-index: 100;
+    }
+    
+    .planet.terran { background: radial-gradient(circle at 30% 30%, #6a9a6a, #3a6a3a, #1a3a1a); }
+    .planet.desert { background: radial-gradient(circle at 30% 30%, #c4a060, #8a6a40, #5a4020); }
+    .planet.arctic { background: radial-gradient(circle at 30% 30%, #e8f0ff, #a0c0e0, #6090c0); }
+    .planet.oceanic { background: radial-gradient(circle at 30% 30%, #4080c0, #2060a0, #104080); }
+    .planet.barren { background: radial-gradient(circle at 30% 30%, #8a8a8a, #5a5a5a, #3a3a3a); }
+    .planet.volcanic { background: radial-gradient(circle at 30% 30%, #c04020, #802010, #400808); }
+    
+    .colony-marker {
+        position: absolute;
+        top: -10px;
+        right: -10px;
+        font-size: 14px;
+    }
+    
+    .fleets-in-system {
+        position: absolute;
+        right: 30px;
+        top: 50%;
+        transform: translateY(-50%);
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .fleet-marker {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 14px;
+        background: rgba(20, 30, 50, 0.85);
+        border: 1px solid rgba(100, 150, 200, 0.3);
+        border-radius: 6px;
+    }
+    
+    .fleet-icon { color: #ffcc00; font-size: 14px; }
+    .fleet-name { font-size: 12px; color: #fff; }
+    
+    /* Detail Panel */
+    .planet-detail { }
+    
+    .detail-header {
+        display: flex;
+        gap: 16px;
+        padding: 16px;
+        border-bottom: 1px solid rgba(100, 150, 200, 0.2);
+    }
+    
+    .detail-header.terran { background: linear-gradient(180deg, rgba(74, 136, 74, 0.2), transparent); }
+    .detail-header.desert { background: linear-gradient(180deg, rgba(180, 140, 60, 0.2), transparent); }
+    .detail-header.arctic { background: linear-gradient(180deg, rgba(100, 160, 220, 0.2), transparent); }
+    .detail-header.oceanic { background: linear-gradient(180deg, rgba(40, 100, 180, 0.2), transparent); }
+    .detail-header.barren { background: linear-gradient(180deg, rgba(100, 100, 100, 0.2), transparent); }
+    .detail-header.volcanic { background: linear-gradient(180deg, rgba(180, 60, 30, 0.2), transparent); }
+    
+    .planet-preview { width: 60px; height: 60px; }
+    
+    .planet-sphere {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+    }
+    
+    .planet-sphere.terran { background: radial-gradient(circle at 30% 30%, #6a9a6a, #3a6a3a, #1a3a1a); }
+    .planet-sphere.desert { background: radial-gradient(circle at 30% 30%, #c4a060, #8a6a40, #5a4020); }
+    .planet-sphere.arctic { background: radial-gradient(circle at 30% 30%, #e8f0ff, #a0c0e0, #6090c0); }
+    .planet-sphere.oceanic { background: radial-gradient(circle at 30% 30%, #4080c0, #2060a0, #104080); }
+    .planet-sphere.barren { background: radial-gradient(circle at 30% 30%, #8a8a8a, #5a5a5a, #3a3a3a); }
+    .planet-sphere.volcanic { background: radial-gradient(circle at 30% 30%, #c04020, #802010, #400808); }
+    
+    .planet-title h3 {
+        font-size: 16px;
+        color: #fff;
+        margin: 0 0 4px;
+    }
+    
+    .planet-title span {
+        font-size: 11px;
+        color: rgba(200, 220, 255, 0.6);
+    }
+    
+    .detail-body { padding: 16px; }
+    
+    .info-section {
+        margin-bottom: 20px;
+    }
+    
+    .info-section h4 {
+        font-size: 10px;
+        color: rgba(200, 220, 255, 0.5);
+        letter-spacing: 1px;
+        margin: 0 0 10px;
+        padding-bottom: 6px;
+        border-bottom: 1px solid rgba(100, 150, 200, 0.2);
+    }
+    
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 4px 0;
+        font-size: 12px;
+    }
+    
+    .info-row span:first-child { color: rgba(200, 220, 255, 0.6); }
+    .info-row span:last-child { color: #fff; }
+    
+    .info-row .good { color: #44dd66; }
+    .info-row .medium { color: #ffcc00; }
+    .info-row .poor { color: #ff6666; }
+    
+    .resource-grid {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+    
+    .resource-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 10px;
+        background: rgba(30, 45, 70, 0.6);
+        border-radius: 4px;
+    }
+    
+    .res-icon { font-size: 14px; }
+    .res-val { font-size: 12px; color: #fff; }
+    
+    .system-overview { padding: 16px; }
+    
+    .fleet-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px;
+        background: rgba(30, 45, 70, 0.6);
+        border-radius: 4px;
+        margin-bottom: 6px;
+        font-size: 11px;
+        color: rgba(200, 220, 255, 0.7);
+    }
+    
+    @@keyframes orbit {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+    
+    @@keyframes pulse {
+        0%, 100% { opacity: 0.5; transform: scale(1); }
+        50% { opacity: 0.8; transform: scale(1.1); }
+    }
+</style>
+
+@code {
+    [Parameter] public Guid SystemId { get; set; }
+    
+    private StarSystemDto? _system;
+    private string _starType = "Yellow";
+    private List<PlanetData> _planets = new();
+    private PlanetData? _selectedPlanet;
+    private List<FleetData> _fleets = new();
+    
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var games = await Api.GetGamesAsync();
+            var gameId = games.FirstOrDefault()?.Id ?? Guid.Empty;
+            var systems = await Api.GetKnownSystemsAsync(gameId, Guid.Empty);
+            _system = systems.FirstOrDefault(s => s.Id == SystemId) ?? systems.FirstOrDefault();
+        }
+        catch { }
+        
+        GenerateSystemData();
+    }
+    
+    private void GenerateSystemData()
+    {
+        var systemName = _system?.Name ?? "Unknown";
+        var hash = systemName.GetHashCode();
+        var random = new Random(hash);
+        
+        // Star type
+        var starTypes = new[] { "Yellow", "Red", "Blue", "Orange", "White" };
+        _starType = starTypes[Math.Abs(hash) % starTypes.Length];
+        
+        // Generate planets
+        var planetTypes = new[] { "Terran", "Desert", "Arctic", "Oceanic", "Barren", "Volcanic" };
+        var climates = new[] { "Temperate", "Arid", "Frozen", "Tropical", "Barren", "Molten" };
+        var planetCount = random.Next(3, 7);
+        
+        _planets = new List<PlanetData>();
+        for (int i = 0; i < planetCount; i++)
+        {
+            var typeIdx = random.Next(planetTypes.Length);
+            var habitability = planetTypes[typeIdx] == "Terran" ? random.Next(60, 95) :
+                               planetTypes[typeIdx] == "Oceanic" ? random.Next(50, 80) :
+                               planetTypes[typeIdx] == "Desert" ? random.Next(30, 60) :
+                               random.Next(5, 40);
+            
+            _planets.Add(new PlanetData
+            {
+                Id = Guid.NewGuid(),
+                Name = $"{systemName} {ToRoman(i + 1)}",
+                Type = planetTypes[typeIdx],
+                Size = random.Next(8, 25),
+                Climate = climates[typeIdx],
+                Habitability = habitability,
+                HasColony = i == 0 && _system?.ControllingFactionId != null,
+                Population = i == 0 && _system?.ControllingFactionId != null ? (long)random.Next(1_000_000, int.MaxValue) : 0,
+                Buildings = i == 0 ? random.Next(3, 8) : 0,
+                Resources = new List<ResourceInfo>
+                {
+                    new() { Icon = "⚙️", Value = random.Next(2, 8) },
+                    new() { Icon = "🔬", Value = random.Next(1, 5) },
+                    new() { Icon = "💎", Value = random.Next(0, 3) }
+                }
+            });
+        }
+        
+        // Sample fleets
+        _fleets = new List<FleetData>
+        {
+            new() { Name = "1st Exploration Fleet", Ships = 5 },
+            new() { Name = "Defense Squadron", Ships = 3 }
+        };
+        
+        _selectedPlanet = _planets.FirstOrDefault();
+    }
+    
+    private void SelectPlanet(int index)
+    {
+        if (index >= 0 && index < _planets.Count)
+        {
+            _selectedPlanet = _planets[index];
+        }
+    }
+    
+    private void ManageColony()
+    {
+        if (_selectedPlanet?.HasColony == true)
+        {
+            Nav.NavigateTo("/game/colonies");
+        }
+    }
+    
+    private string GetHabitabilityClass(int hab) => hab >= 70 ? "good" : hab >= 40 ? "medium" : "poor";
+    
+    private string ToRoman(int num) => num switch
+    {
+        1 => "I", 2 => "II", 3 => "III", 4 => "IV", 5 => "V",
+        6 => "VI", 7 => "VII", 8 => "VIII", 9 => "IX", 10 => "X",
+        _ => num.ToString()
+    };
+    
+    private class PlanetData
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; } = "";
+        public string Type { get; set; } = "";
+        public int Size { get; set; }
+        public string Climate { get; set; } = "";
+        public int Habitability { get; set; }
+        public bool HasColony { get; set; }
+        public long Population { get; set; }
+        public int Buildings { get; set; }
+        public List<ResourceInfo> Resources { get; set; } = new();
+    }
+    
+    private class ResourceInfo
+    {
+        public string Icon { get; set; } = "";
+        public int Value { get; set; }
+    }
+    
+    private class FleetData
+    {
+        public string Name { get; set; } = "";
+        public int Ships { get; set; }
+    }
+}

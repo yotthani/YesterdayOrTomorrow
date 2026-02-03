@@ -1,0 +1,119 @@
+{
+  "factionName": "Klingon",
+  "categoryName": "Buildings",
+  "architectureStyle": {
+    "description": "Brutal warrior fortress architecture - imposing, angular, built to intimidate and defend",
+    "keyElements": [
+      "Massive dark stone walls with metal reinforcements",
+      "Angular, aggressive shapes - pointed spires and battlements",
+      "Red accent lighting from torches and energy conduits",
+      "Klingon trefoil emblems prominently displayed",
+      "Trophy displays - enemy weapons, skulls, banners of conquered foes",
+      "Heavy blast doors and defensive positions",
+      "Training grounds and combat arenas integrated",
+      "Qo'noS volcanic/industrial aesthetic - dark, smoky, powerful",
+      "NO soft curves, NO glass domes, NO gardens - this is a WARRIOR culture",
+      "Banners and flags with House insignias"
+    ],
+    "colors": "Dark gray stone, gunmetal, red accent lights, bronze/copper trim, black iron",
+    "materials": "Volcanic stone, heavy duranium plating, iron spikes, leather banners"
+  },
+  "buildings": [
+    {
+      "name": "Great Hall of the High Council",
+      "description": "Massive fortress where the Klingon High Council meets. Towering central spire, throne room, surrounded by warrior statues."
+    },
+    {
+      "name": "Warrior Academy",
+      "description": "Training facility for young warriors. Combat arenas, weapons halls, sparring grounds. Brutal and functional."
+    },
+    {
+      "name": "House Fortress",
+      "description": "Noble House stronghold. Defensive walls, family trophy room, armory, great dining hall for feasts."
+    },
+    {
+      "name": "Weapons Forge",
+      "description": "Where bat'leths and disruptors are crafted. Furnaces, anvils, glowing metal, master smiths workspace."
+    },
+    {
+      "name": "Defense Command",
+      "description": "Military command center. Tactical displays, communications arrays, heavily fortified."
+    },
+    {
+      "name": "Disruptor Battery",
+      "description": "Planetary defense weapon emplacement. Massive disruptor cannons, targeting systems, armored bunker."
+    },
+    {
+      "name": "Shipyard Control Tower",
+      "description": "Oversees construction of warships. Industrial, functional, overlooks construction bays."
+    },
+    {
+      "name": "Prison Fortress",
+      "description": "Where enemies and dishonored warriors are held. Cells carved into rock, guard towers, execution grounds."
+    },
+    {
+      "name": "Hall of Warriors",
+      "description": "Memorial to fallen heroes. Statues of legendary warriors, walls inscribed with battle honors."
+    },
+    {
+      "name": "Bloodwine Distillery",
+      "description": "Where bloodwine is brewed. Industrial vats, storage barrels, tasting hall."
+    },
+    {
+      "name": "Targ Breeding Facility",
+      "description": "Where targs are raised for food and hunting. Pens, feeding areas, processing facility."
+    },
+    {
+      "name": "Opera House",
+      "description": "Klingon opera performance hall. Acoustically designed, dramatic architecture, seating for warriors."
+    },
+    {
+      "name": "Medical Facility",
+      "description": "Spartan medical center. Warriors prefer to die in battle, but injuries must be treated. Functional, no comfort."
+    },
+    {
+      "name": "Intelligence Outpost",
+      "description": "Klingon Intelligence headquarters. Hidden entrances, surveillance equipment, interrogation rooms."
+    },
+    {
+      "name": "Recruitment Center",
+      "description": "Where young Klingons enlist for military service. Testing grounds, evaluation chambers."
+    },
+    {
+      "name": "Energy Plant",
+      "description": "Power generation facility. Geothermal or fusion based, industrial, functional."
+    },
+    {
+      "name": "Communications Array",
+      "description": "Subspace communication hub. Antenna towers, relay stations, heavily guarded."
+    },
+    {
+      "name": "Trading Post",
+      "description": "Where merchants trade goods. Less honorable but necessary. Rough, utilitarian market."
+    },
+    {
+      "name": "Monastery of Kahless",
+      "description": "Religious site dedicated to Kahless the Unforgettable. Sacred scrolls, meditation chambers, clerics."
+    },
+    {
+      "name": "Arena of Combat",
+      "description": "Public combat arena for trials, entertainment, and honor duels. Tiered seating, blood-stained floor."
+    },
+    {
+      "name": "Barracks",
+      "description": "Warrior housing. Spartan sleeping quarters, weapons racks, communal eating area."
+    },
+    {
+      "name": "Armory",
+      "description": "Weapons storage and distribution. Racks of bat'leths, disruptors, armor. Heavily secured."
+    },
+    {
+      "name": "Garrison Fortress",
+      "description": "Military base for planetary defense forces. Walls, watchtowers, troop quarters."
+    },
+    {
+      "name": "Embassy",
+      "description": "Diplomatic facility - still imposing and fortress-like. Klingon diplomacy is backed by strength."
+    }
+  ]
+}

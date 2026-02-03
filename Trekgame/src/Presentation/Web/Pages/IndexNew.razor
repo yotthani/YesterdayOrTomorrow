@@ -1,0 +1,926 @@
+@page "/"
+@page "/menu"
+@page "/main-menu"
+@layout StellarisLayout
+@using MudBlazor
+@using StarTrekGame.Web.Services
+@using Blazored.LocalStorage
+@inject IGameApiClient Api
+@inject NavigationManager Navigation
+@inject ILocalStorageService LocalStorage
+@inject ISnackbar Snackbar
+
+<PageTitle>TrekGame - The Final Strategy Frontier</PageTitle>
+
+<div class="main-menu">
+    <div class="menu-background">
+        <div class="stars-layer"></div>
+        <div class="nebula-layer"></div>
+    </div>
+    
+    <div class="menu-content">
+        <header class="menu-header">
+            <div class="lcars-header">
+                <div class="lcars-cap left">LCARS</div>
+                <div class="lcars-bar">
+                    <span class="lcars-segment orange"></span>
+                    <span class="lcars-segment tan"></span>
+                    <span class="lcars-segment peach"></span>
+                </div>
+                <div class="lcars-cap right">47</div>
+            </div>
+            <div class="game-title">
+                <h1 class="trek-font">TrekGame</h1>
+                <p class="subtitle">The Final Strategy Frontier</p>
+                <p class="community-tag">A <span class="yot-highlight">YOT</span> Community Project</p>
+            </div>
+        </header>
+
+        <main class="menu-main">
+            <aside class="menu-sidebar">
+                <div class="lcars-sidebar-cap">MAIN MENU</div>
+                
+                <nav class="menu-nav">
+                    @if (_hasExistingGame)
+                    {
+                        <button class="menu-nav-item primary" @onclick="ContinueGame">
+                            <span class="nav-icon">▶</span>
+                            <span class="nav-label">CONTINUE</span>
+                        </button>
+                    }
+                    
+                    <button class="menu-nav-item" @onclick="() => _showNewGame = true">
+                        <span class="nav-icon">✦</span>
+                        <span class="nav-label">NEW GAME</span>
+                    </button>
+                    
+                    <button class="menu-nav-item" @onclick="GoToSaveLoad">
+                        <span class="nav-icon">◉</span>
+                        <span class="nav-label">LOAD GAME</span>
+                    </button>
+                    
+                    <div class="nav-spacer"></div>
+                    
+                    <button class="menu-nav-item" @onclick="GoToSettings">
+                        <span class="nav-icon">⚙</span>
+                        <span class="nav-label">SETTINGS</span>
+                    </button>
+                    
+                    <button class="menu-nav-item" @onclick="GoToTutorial">
+                        <span class="nav-icon">?</span>
+                        <span class="nav-label">TUTORIAL</span>
+                    </button>
+                    
+                    <button class="menu-nav-item" @onclick="() => _showCredits = true">
+                        <span class="nav-icon">★</span>
+                        <span class="nav-label">CREDITS</span>
+                    </button>
+                </nav>
+            </aside>
+
+            <section class="menu-panel">
+                @if (_showNewGame)
+                {
+                    <div class="panel-content new-game-panel">
+                        <div class="panel-header">
+                            <h2>NEW MISSION</h2>
+                            <button class="close-btn" @onclick="() => _showNewGame = false">✕</button>
+                        </div>
+                        
+                        <div class="faction-grid">
+                            @foreach (var faction in _factions)
+                            {
+                                <div class="faction-card @(faction.Id == _selectedFaction ? "selected" : "")" 
+                                     @onclick="() => _selectedFaction = faction.Id">
+                                    <div class="faction-emblem" style="background: @faction.Color;">
+                                        <img src="images/emblems/@(faction.Id).svg" alt="@faction.Name" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+                                        <span style="display:none;">@faction.Icon</span>
+                                    </div>
+                                    <div class="faction-info">
+                                        <h3>@faction.Name</h3>
+                                        <p>@faction.Description</p>
+                                    </div>
+                                    <div class="faction-traits">
+                                        @foreach (var trait in faction.Traits)
+                                        {
+                                            <span class="trait">@trait</span>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                        
+                        <div class="panel-actions">
+                            <button class="lcars-btn" @onclick="() => _showNewGame = false">CANCEL</button>
+                            <button class="lcars-btn primary" @onclick="StartNewGame" disabled="@(_selectedFaction == null)">
+                                ENGAGE
+                            </button>
+                        </div>
+                    </div>
+                }
+                else if (_showCredits)
+                {
+                    <div class="panel-content credits-panel">
+                        <div class="panel-header">
+                            <h2>CREDITS</h2>
+                            <button class="close-btn" @onclick="() => _showCredits = false">✕</button>
+                        </div>
+                        <div class="credits-content">
+                            <div class="credit-section">
+                                <h3 class="credit-heading">COMMUNITY</h3>
+                                <p class="credit-line highlight"><span class="yot-badge">YOT</span> Yesterday or Tomorrow</p>
+                                <p class="credit-line small">The community behind this project</p>
+                            </div>
+                            <div class="credit-divider"></div>
+                            <div class="credit-section">
+                                <h3 class="credit-heading">INSPIRED BY</h3>
+                                <p class="credit-line">Star Trek™ Universe</p>
+                                <p class="credit-line">Birth of the Federation (1999)</p>
+                                <p class="credit-line">Stellaris by Paradox Interactive</p>
+                                <p class="credit-line">Star Trek: New Horizons Mod</p>
+                            </div>
+                            <div class="credit-divider"></div>
+                            <div class="credit-section">
+                                <p class="credit-line small">Star Trek and related marks are trademarks of CBS Studios Inc.</p>
+                                <p class="credit-line small">This is a fan project for educational and entertainment purposes.</p>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="panel-content welcome-panel">
+                        <div class="starfleet-emblem">🌟</div>
+                        <h2>WELCOME, COMMANDER</h2>
+                        <p>The galaxy awaits your leadership. Choose your path and shape the future of the Alpha Quadrant.</p>
+                        
+                        @if (_hasExistingGame && _currentGame != null)
+                        {
+                            <div class="game-summary">
+                                <div class="summary-header">CURRENT MISSION</div>
+                                <div class="summary-stats">
+                                    <div class="stat">
+                                        <span class="stat-label">STARDATE</span>
+                                        <span class="stat-value">@_currentGame.Turn.ToString("0.00")</span>
+                                    </div>
+                                    <div class="stat">
+                                        <span class="stat-label">FACTIONS</span>
+                                        <span class="stat-value">@_currentGame.Factions.Count</span>
+                                    </div>
+                                    <div class="stat">
+                                        <span class="stat-label">SYSTEMS</span>
+                                        <span class="stat-value">@_currentGame.SystemCount</span>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        
+                        <div class="quick-actions">
+                            <button class="action-btn" @onclick="GoToAssets">
+                                <span class="btn-icon">🎨</span>
+                                <span>Asset Gallery</span>
+                            </button>
+                            <button class="action-btn" @onclick="GoToShowcase">
+                                <span class="btn-icon">🖼</span>
+                                <span>Showcase</span>
+                            </button>
+                        </div>
+                    </div>
+                }
+            </section>
+        </main>
+
+        <footer class="menu-footer">
+            <div class="lcars-footer-bar">
+                <span class="footer-segment"></span>
+                <span class="footer-text">UNITED FEDERATION OF PLANETS • STARFLEET COMMAND</span>
+                <span class="footer-segment"></span>
+            </div>
+            <div class="version-info">
+                <span class="version-number">v@GameVersion</span>
+                <span class="version-name">"@VersionName"</span>
+                <a href="docs/CHANGELOG.md" class="changelog-link">Changelog</a>
+                <a href="docs/DOCUMENTATION.md" class="docs-link">Documentation</a>
+            </div>
+        </footer>
+    </div>
+</div>
+
+<style>
+/* Star Trek Style Font - Antonio is a good approximation */
+@@import url('https://fonts.googleapis.com/css2?family=Antonio:wght@400;700&display=swap');
+
+/* Main Menu Container */
+.main-menu {
+    min-height: 100vh;
+    background: #000;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Animated Background */
+.menu-background {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+}
+
+.stars-layer {
+    position: absolute;
+    inset: 0;
+    background: 
+        radial-gradient(1px 1px at 20px 30px, white, transparent),
+        radial-gradient(1px 1px at 40px 70px, rgba(255,255,255,0.8), transparent),
+        radial-gradient(1px 1px at 90px 40px, rgba(255,255,255,0.6), transparent),
+        radial-gradient(2px 2px at 160px 120px, white, transparent),
+        radial-gradient(1px 1px at 230px 80px, rgba(255,255,255,0.7), transparent);
+    background-size: 300px 200px;
+    animation: stars-drift 60s linear infinite;
+}
+
+.nebula-layer {
+    position: absolute;
+    inset: 0;
+    background: 
+        radial-gradient(ellipse at 20% 50%, rgba(100, 50, 150, 0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 30%, rgba(50, 100, 150, 0.1) 0%, transparent 40%),
+        radial-gradient(ellipse at 50% 80%, rgba(150, 100, 50, 0.08) 0%, transparent 45%);
+    animation: nebula-pulse 20s ease-in-out infinite;
+}
+
+@@keyframes stars-drift {
+    from { background-position: 0 0; }
+    to { background-position: 600px 400px; }
+}
+
+@@keyframes nebula-pulse {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+}
+
+/* Content Layout */
+.menu-content {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* LCARS Header */
+.menu-header {
+    padding: 20px 40px;
+}
+
+.lcars-header {
+    display: flex;
+    align-items: center;
+    height: 40px;
+    margin-bottom: 20px;
+}
+
+.lcars-cap {
+    background: var(--lcars-orange, #ff9900);
+    padding: 8px 20px;
+    font-family: var(--st-font-display);
+    font-size: 14px;
+    font-weight: 700;
+    color: #000;
+}
+
+.lcars-cap.left { border-radius: 20px 0 0 20px; }
+.lcars-cap.right { border-radius: 0 20px 20px 0; }
+
+.lcars-bar {
+    flex: 1;
+    display: flex;
+    height: 100%;
+}
+
+.lcars-segment {
+    flex: 1;
+    margin: 0 2px;
+}
+
+.lcars-segment.orange { background: var(--lcars-orange, #ff9900); }
+.lcars-segment.tan { background: var(--lcars-tan, #cc9966); }
+.lcars-segment.peach { background: var(--lcars-peach, #ffcc99); }
+
+.game-title {
+    text-align: center;
+}
+
+.game-title h1 {
+    font-family: 'Federation', 'Antonio', var(--st-font-display), sans-serif;
+    font-size: 56px;
+    font-weight: 700;
+    color: var(--lcars-orange, #ff9900);
+    letter-spacing: 6px;
+    margin: 0;
+    text-shadow: 0 0 30px rgba(255, 153, 0, 0.5), 0 0 60px rgba(255, 153, 0, 0.3);
+    text-transform: uppercase;
+}
+
+.game-title h1.trek-font {
+    font-family: 'Federation', 'Trek', 'Antonio', var(--st-font-display), sans-serif;
+    font-style: italic;
+    letter-spacing: 4px;
+}
+
+.game-title .subtitle {
+    font-family: var(--st-font-display);
+    font-size: 16px;
+    color: var(--lcars-peach, #ffcc99);
+    letter-spacing: 6px;
+    margin-top: 8px;
+    text-transform: uppercase;
+}
+
+.game-title .community-tag {
+    font-family: var(--st-font-body);
+    font-size: 12px;
+    color: var(--lcars-lavender, #cc99ff);
+    letter-spacing: 2px;
+    margin-top: 12px;
+    opacity: 0.8;
+}
+
+.game-title .yot-highlight {
+    color: #ffcc00;
+    font-weight: 700;
+    text-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
+}
+
+/* Main Area */
+.menu-main {
+    flex: 1;
+    display: flex;
+    padding: 0 40px 40px;
+    gap: 30px;
+}
+
+/* Sidebar */
+.menu-sidebar {
+    width: 220px;
+    display: flex;
+    flex-direction: column;
+}
+
+.lcars-sidebar-cap {
+    background: var(--lcars-orange, #ff9900);
+    padding: 12px 20px;
+    border-radius: 20px 20px 0 0;
+    font-family: var(--st-font-display);
+    font-size: 12px;
+    font-weight: 700;
+    color: #000;
+    letter-spacing: 2px;
+    text-align: center;
+}
+
+.menu-nav {
+    background: linear-gradient(180deg, var(--lcars-tan, #cc9966) 0%, var(--lcars-tan, #cc9966) 100%);
+    padding: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+}
+
+.menu-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    background: #000;
+    border: none;
+    border-radius: 0;
+    font-family: var(--st-font-display);
+    font-size: 13px;
+    color: var(--lcars-orange, #ff9900);
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: left;
+}
+
+.menu-nav-item:hover {
+    background: rgba(255, 153, 0, 0.2);
+}
+
+.menu-nav-item.primary {
+    background: var(--lcars-orange, #ff9900);
+    color: #000;
+}
+
+.menu-nav-item.primary:hover {
+    background: var(--lcars-gold, #ffcc00);
+}
+
+.nav-icon {
+    font-size: 18px;
+    width: 24px;
+    text-align: center;
+}
+
+.nav-spacer {
+    height: 20px;
+    background: var(--lcars-purple, #cc99cc);
+    margin: 8px 0;
+}
+
+.lcars-sidebar-footer {
+    background: var(--lcars-peach, #ffcc99);
+    padding: 10px;
+    border-radius: 0 0 20px 20px;
+    text-align: center;
+}
+
+.version {
+    font-family: var(--st-font-display);
+    font-size: 10px;
+    color: #000;
+}
+
+/* Main Panel */
+.menu-panel {
+    flex: 1;
+    background: rgba(0, 0, 0, 0.7);
+    border: 2px solid var(--lcars-orange, #ff9900);
+    border-radius: 0 30px 30px 0;
+    overflow: hidden;
+    position: relative;
+}
+
+.menu-panel::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 30px;
+    background: linear-gradient(180deg, var(--lcars-orange, #ff9900) 0%, var(--lcars-tan, #cc9966) 50%, var(--lcars-peach, #ffcc99) 100%);
+}
+
+.panel-content {
+    padding: 30px 30px 30px 60px;
+    height: 100%;
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.panel-header h2 {
+    font-family: var(--st-font-display);
+    font-size: 24px;
+    color: var(--lcars-orange, #ff9900);
+    letter-spacing: 3px;
+    margin: 0;
+}
+
+.close-btn {
+    width: 36px;
+    height: 36px;
+    background: var(--lcars-red, #cc6666);
+    border: none;
+    border-radius: 50%;
+    color: #fff;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+/* Welcome Panel */
+.welcome-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.starfleet-emblem {
+    font-size: 80px;
+    margin-bottom: 20px;
+    animation: emblem-glow 3s ease-in-out infinite;
+}
+
+@@keyframes emblem-glow {
+    0%, 100% { filter: drop-shadow(0 0 20px rgba(255, 153, 0, 0.5)); }
+    50% { filter: drop-shadow(0 0 40px rgba(255, 153, 0, 0.8)); }
+}
+
+.welcome-panel h2 {
+    font-family: var(--st-font-display);
+    font-size: 28px;
+    color: var(--lcars-orange, #ff9900);
+    letter-spacing: 4px;
+    margin: 0 0 16px;
+}
+
+.welcome-panel p {
+    font-size: 14px;
+    color: var(--lcars-peach, #ffcc99);
+    max-width: 500px;
+    line-height: 1.6;
+}
+
+.game-summary {
+    margin-top: 30px;
+    background: rgba(255, 153, 0, 0.1);
+    border: 1px solid var(--lcars-orange, #ff9900);
+    border-radius: 10px;
+    padding: 20px;
+    width: 100%;
+    max-width: 400px;
+}
+
+.summary-header {
+    font-family: var(--st-font-display);
+    font-size: 12px;
+    color: var(--lcars-lavender, #9999cc);
+    letter-spacing: 2px;
+    margin-bottom: 16px;
+}
+
+.summary-stats {
+    display: flex;
+    justify-content: space-around;
+}
+
+.stat {
+    text-align: center;
+}
+
+.stat-label {
+    display: block;
+    font-size: 10px;
+    color: var(--lcars-tan, #cc9966);
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+}
+
+.stat-value {
+    font-family: var(--st-font-display);
+    font-size: 24px;
+    color: var(--lcars-orange, #ff9900);
+}
+
+.quick-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 30px;
+}
+
+.action-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: transparent;
+    border: 1px solid var(--lcars-tan, #cc9966);
+    border-radius: 20px;
+    color: var(--lcars-tan, #cc9966);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.action-btn:hover {
+    background: rgba(204, 153, 102, 0.2);
+    border-color: var(--lcars-orange, #ff9900);
+    color: var(--lcars-orange, #ff9900);
+}
+
+/* Faction Grid */
+.faction-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.faction-card {
+    display: flex;
+    gap: 16px;
+    padding: 16px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--lcars-tan, #cc9966);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.faction-card:hover {
+    border-color: var(--lcars-orange, #ff9900);
+    background: rgba(255, 153, 0, 0.1);
+}
+
+.faction-card.selected {
+    border-color: var(--lcars-orange, #ff9900);
+    border-width: 2px;
+    box-shadow: 0 0 20px rgba(255, 153, 0, 0.3);
+}
+
+.faction-emblem {
+    width: 60px;
+    height: 60px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    flex-shrink: 0;
+    padding: 8px;
+    box-sizing: border-box;
+}
+
+.faction-emblem img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: brightness(1.2);
+}
+
+.faction-info h3 {
+    font-family: var(--st-font-display);
+    font-size: 14px;
+    color: var(--lcars-orange, #ff9900);
+    margin: 0 0 4px;
+}
+
+.faction-info p {
+    font-size: 11px;
+    color: var(--lcars-peach, #ffcc99);
+    margin: 0;
+    line-height: 1.4;
+}
+
+.faction-traits {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 8px;
+}
+
+.trait {
+    font-size: 9px;
+    padding: 2px 8px;
+    background: rgba(153, 153, 204, 0.2);
+    border-radius: 10px;
+    color: var(--lcars-lavender, #9999cc);
+}
+
+.panel-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.lcars-btn {
+    padding: 12px 30px;
+    background: var(--lcars-tan, #cc9966);
+    border: none;
+    border-radius: 20px;
+    font-family: var(--st-font-display);
+    font-size: 14px;
+    font-weight: 600;
+    color: #000;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.lcars-btn:hover { background: var(--lcars-peach, #ffcc99); }
+.lcars-btn.primary { background: var(--lcars-orange, #ff9900); }
+.lcars-btn.primary:hover { background: var(--lcars-gold, #ffcc00); }
+.lcars-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Credits */
+.credits-content {
+    text-align: center;
+    padding: 40px;
+}
+
+.credit-section {
+    margin-bottom: 20px;
+}
+
+.credit-heading {
+    font-family: var(--st-font-display);
+    font-size: 12px;
+    color: var(--lcars-lavender, #cc99ff);
+    letter-spacing: 3px;
+    margin-bottom: 12px;
+}
+
+.credit-line {
+    font-family: var(--st-font-display);
+    font-size: 16px;
+    color: var(--lcars-orange, #ff9900);
+    margin: 12px 0;
+}
+
+.credit-line.highlight {
+    font-size: 20px;
+    color: #ffcc00;
+}
+
+.credit-line.small {
+    font-size: 11px;
+    color: var(--lcars-tan, #cc9966);
+}
+
+.yot-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #ffcc00, #ff9900);
+    color: #000;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 14px;
+    margin-right: 8px;
+    letter-spacing: 2px;
+}
+
+.credit-divider {
+    height: 2px;
+    background: var(--lcars-tan, #cc9966);
+    margin: 30px auto;
+    width: 200px;
+}
+
+/* Footer */
+.menu-footer {
+    padding: 20px 40px;
+}
+
+.lcars-footer-bar {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.footer-segment {
+    flex: 1;
+    height: 8px;
+    background: linear-gradient(90deg, var(--lcars-purple, #cc99cc), var(--lcars-lavender, #9999cc));
+    border-radius: 4px;
+}
+
+.footer-text {
+    font-family: var(--st-font-display);
+    font-size: 10px;
+    color: var(--lcars-lavender, #9999cc);
+    letter-spacing: 3px;
+    white-space: nowrap;
+}
+
+.version-info {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin-top: 15px;
+    font-size: 11px;
+}
+
+.version-number {
+    color: var(--lcars-orange, #ff9900);
+    font-family: var(--st-font-display);
+    font-weight: 700;
+}
+
+.version-name {
+    color: var(--lcars-peach, #ffcc99);
+    font-style: italic;
+}
+
+.changelog-link,
+.docs-link {
+    color: var(--lcars-blue, #99ccff);
+    text-decoration: none;
+    padding: 4px 12px;
+    border: 1px solid var(--lcars-blue, #99ccff);
+    border-radius: 12px;
+    transition: all 0.2s;
+}
+
+.changelog-link:hover,
+.docs-link:hover {
+    background: rgba(153, 204, 255, 0.2);
+    color: #fff;
+}
+</style>
+
+@code {
+    private const string GameVersion = "1.43.64";
+    private const string VersionName = "Building Blocks";
+    
+    private bool _showNewGame = false;
+    private void GoToSaveLoad() => Navigation.NavigateTo("/game/save-load");
+    private void GoToSettings() => Navigation.NavigateTo("/game/settings");
+    private void GoToTutorial() => Navigation.NavigateTo("/game/tutorial");
+    private void GoToGalaxy() => Navigation.NavigateTo("/game/galaxy");
+    private void GoToMultiplayer() => Navigation.NavigateTo("/multiplayer");
+    private void GoToAssets() => Navigation.NavigateTo("/game/assets");
+    private void GoToShowcase() => Navigation.NavigateTo("/game/showcase");
+    private bool _showCredits = false;
+    private bool _hasExistingGame = false;
+    private string? _selectedFaction = null;
+    private GameDetailDto? _currentGame;
+    
+    private List<FactionOption> _factions = new()
+    {
+        new("federation", "United Federation", "#4488ff", "🖖", "Exploration and diplomacy focused", new[] { "+Research", "+Diplomacy" }),
+        new("klingon", "Klingon Empire", "#cc2222", "⚔️", "Honor through combat", new[] { "+Combat", "+Honor" }),
+        new("romulan", "Romulan Star Empire", "#22aa66", "🦅", "Shadows and intrigue", new[] { "+Espionage", "+Cloaking" }),
+        new("cardassian", "Cardassian Union", "#cc8822", "🔱", "Order through strength", new[] { "+Production", "+Control" }),
+        new("ferengi", "Ferengi Alliance", "#ddaa22", "💎", "Profit above all", new[] { "+Trade", "+Economy" }),
+        new("borg", "Borg Collective", "#22cc44", "⬛", "Resistance is futile", new[] { "+Assimilation", "+Tech" }),
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var games = await Api.GetGamesAsync();
+            if (games.Any())
+            {
+                _currentGame = await Api.GetGameAsync(games.First().Id);
+                _hasExistingGame = true;
+            }
+        }
+        catch { }
+    }
+
+    private async Task ContinueGame()
+    {
+        // Check if we have an existing game and faction
+        var gameId = await LocalStorage.GetItemAsync<Guid?>("currentGameId");
+        var factionId = await LocalStorage.GetItemAsync<Guid?>("currentFactionId");
+        
+        if (gameId.HasValue && factionId.HasValue)
+        {
+            // Continue existing game
+            Navigation.NavigateTo("/game/galaxy");
+        }
+        else
+        {
+            // No existing game - check for any games on server
+            try 
+            {
+                var games = await Api.GetGamesAsync();
+                if (games.Any())
+                {
+                    var gameList = games.First();
+                    var game = await Api.GetGameAsync(gameList.Id);
+                    if (game != null)
+                    {
+                        var firstFaction = game.Factions.FirstOrDefault();
+                        if (firstFaction != null)
+                        {
+                            await LocalStorage.SetItemAsync("currentGameId", game.Id);
+                            await LocalStorage.SetItemAsync("currentFactionId", firstFaction.Id);
+                            Navigation.NavigateTo("/game/galaxy");
+                            return;
+                        }
+                    }
+                }
+            }
+            catch { }
+            
+            // No games available - show new game panel
+            _showNewGame = true;
+            StateHasChanged();
+        }
+    }
+
+    private async Task StartNewGame()
+    {
+        if (_selectedFaction == null) return;
+        
+        try
+        {
+            var game = await Api.CreateGameAsync("New Galaxy", 30);
+            var faction = await Api.JoinGameAsync(game.Id, "Commander", _factions.First(f => f.Id == _selectedFaction).Name, _selectedFaction);
+            
+            await LocalStorage.SetItemAsync("currentGameId", game.Id);
+            await LocalStorage.SetItemAsync("currentFactionId", faction.Id);
+            await LocalStorage.SetItemAsync("currentRaceId", _selectedFaction);
+            
+            Navigation.NavigateTo("/game/galaxy");
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Failed to create game: {ex.Message}", Severity.Error);
+        }
+    }
+
+    record FactionOption(string Id, string Name, string Color, string Icon, string Description, string[] Traits);
+}

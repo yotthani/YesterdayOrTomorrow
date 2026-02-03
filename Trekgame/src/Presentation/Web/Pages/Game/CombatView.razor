@@ -1,0 +1,474 @@
+@page "/game/combat/{CombatId:guid}"
+@page "/game/combat-legacy"
+@layout StellarisLayout
+@using MudBlazor
+@using StarTrekGame.Web.Services
+@using Blazored.LocalStorage
+@inject IGameApiClient Api
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+@inject ISoundService Sound
+@inject ILocalStorageService LocalStorage
+
+<PageTitle>Tactical Combat - Galactic Strategy</PageTitle>
+
+<div class="combat-ui">
+    <header class="combat-header">
+        <div class="combat-title">
+            <span class="alert-icon">⚔️</span>
+            <h1>TACTICAL COMBAT</h1>
+            <span class="system-name">@_systemName Sector</span>
+        </div>
+        <div class="combat-info">
+            <span class="round-indicator">Round @_currentRound</span>
+            <button class="retreat-btn" @onclick="AttemptRetreat" disabled="@(_isResolving || _combatEnded)">
+                🚀 RETREAT
+            </button>
+        </div>
+    </header>
+
+    <div class="combat-arena">
+        <!-- Left Fleet (Player) -->
+        <div class="fleet-panel left">
+            <div class="fleet-header friendly">
+                <span class="fleet-icon">🚀</span>
+                <div class="fleet-info">
+                    <span class="fleet-name">@_playerFleet.Name</span>
+                    <span class="fleet-faction">@_playerFleet.Faction</span>
+                </div>
+                <div class="fleet-power">
+                    <span class="power-value">@_playerFleet.TotalPower</span>
+                    <span class="power-label">POWER</span>
+                </div>
+            </div>
+            <div class="ships-list">
+                @foreach (var ship in _playerFleet.Ships)
+                {
+                    <div class="ship-card @(ship.IsDestroyed ? "destroyed" : "") @(ship.IsSelected ? "selected" : "")"
+                         @onclick="() => SelectShip(ship)">
+                        <div class="ship-icon">@GetShipIcon(ship.Class)</div>
+                        <div class="ship-info">
+                            <span class="ship-name">@ship.Name</span>
+                            <span class="ship-class">@ship.Class</span>
+                        </div>
+                        <div class="ship-stats">
+                            <div class="stat-bar shields">
+                                <span class="stat-label">🛡</span>
+                                <div class="bar"><div class="fill" style="width: @ship.ShieldPercent%"></div></div>
+                                <span class="stat-value">@ship.Shields</span>
+                            </div>
+                            <div class="stat-bar hull">
+                                <span class="stat-label">🔩</span>
+                                <div class="bar"><div class="fill" style="width: @ship.HullPercent%"></div></div>
+                                <span class="stat-value">@ship.Hull</span>
+                            </div>
+                        </div>
+                        @if (ship.IsDestroyed)
+                        {
+                            <div class="destroyed-overlay">DESTROYED</div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Center Battle Display -->
+        <div class="battle-display">
+            <div class="combat-visual">
+                @if (_isResolving)
+                {
+                    <div class="combat-animation">
+                        <div class="phaser-beam @(_attackDirection)"></div>
+                        <div class="explosion @(_showExplosion ? "active" : "")">💥</div>
+                    </div>
+                }
+                <div class="vs-indicator">VS</div>
+            </div>
+            
+            <div class="combat-log">
+                <div class="log-header">COMBAT LOG</div>
+                <div class="log-entries">
+                    @foreach (var entry in _combatLog.TakeLast(8))
+                    {
+                        <div class="log-entry @entry.Type">
+                            <span class="log-round">[@entry.Round]</span>
+                            <span class="log-message">@entry.Message</span>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            @if (!_combatEnded)
+            {
+                <div class="action-panel">
+                    <button class="action-btn attack" @onclick="ExecuteAttack" disabled="@(_isResolving || _selectedShip == null)">
+                        <span class="action-icon">⚔️</span>
+                        <span class="action-name">FIRE WEAPONS</span>
+                    </button>
+                    <button class="action-btn special" @onclick="ExecuteSpecial" disabled="@(_isResolving || _selectedShip == null)">
+                        <span class="action-icon">✨</span>
+                        <span class="action-name">SPECIAL</span>
+                    </button>
+                    <button class="action-btn defend" @onclick="ExecuteDefend" disabled="@_isResolving">
+                        <span class="action-icon">🛡</span>
+                        <span class="action-name">BRACE</span>
+                    </button>
+                </div>
+            }
+            else
+            {
+                <div class="combat-result @(_playerWon ? "victory" : "defeat")">
+                    <span class="result-icon">@(_playerWon ? "🏆" : "💀")</span>
+                    <span class="result-text">@(_playerWon ? "VICTORY!" : "DEFEAT")</span>
+                    <button class="continue-btn" @onclick="ExitCombat">Continue</button>
+                </div>
+            }
+        </div>
+
+        <!-- Right Fleet (Enemy) -->
+        <div class="fleet-panel right">
+            <div class="fleet-header hostile">
+                <div class="fleet-power">
+                    <span class="power-value">@_enemyFleet.TotalPower</span>
+                    <span class="power-label">POWER</span>
+                </div>
+                <div class="fleet-info">
+                    <span class="fleet-name">@_enemyFleet.Name</span>
+                    <span class="fleet-faction">@_enemyFleet.Faction</span>
+                </div>
+                <span class="fleet-icon">⚔️</span>
+            </div>
+            <div class="ships-list">
+                @foreach (var ship in _enemyFleet.Ships)
+                {
+                    <div class="ship-card enemy @(ship.IsDestroyed ? "destroyed" : "") @(_targetShip?.Id == ship.Id ? "targeted" : "")"
+                         @onclick="() => TargetShip(ship)">
+                        <div class="ship-icon">@GetShipIcon(ship.Class)</div>
+                        <div class="ship-info">
+                            <span class="ship-name">@ship.Name</span>
+                            <span class="ship-class">@ship.Class</span>
+                        </div>
+                        <div class="ship-stats">
+                            <div class="stat-bar shields">
+                                <span class="stat-label">🛡</span>
+                                <div class="bar"><div class="fill" style="width: @ship.ShieldPercent%"></div></div>
+                                <span class="stat-value">@ship.Shields</span>
+                            </div>
+                            <div class="stat-bar hull">
+                                <span class="stat-label">🔩</span>
+                                <div class="bar"><div class="fill" style="width: @ship.HullPercent%"></div></div>
+                                <span class="stat-value">@ship.Hull</span>
+                            </div>
+                        </div>
+                        @if (ship.IsDestroyed)
+                        {
+                            <div class="destroyed-overlay">DESTROYED</div>
+                        }
+                        @if (_targetShip?.Id == ship.Id)
+                        {
+                            <div class="target-indicator">🎯 TARGET</div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .combat-ui { display: flex; flex-direction: column; height: 100vh; background: linear-gradient(180deg, #0a0a15 0%, #0f1525 100%); }
+    
+    .combat-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; background: rgba(0,0,0,0.4); border-bottom: 2px solid #ff4455; }
+    .combat-title { display: flex; align-items: center; gap: 16px; }
+    .alert-icon { font-size: 32px; animation: pulse 1s infinite; }
+    @@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    .combat-title h1 { margin: 0; font-size: 24px; color: #ff4455; letter-spacing: 4px; }
+    .system-name { color: #7890a8; font-size: 14px; }
+    .combat-info { display: flex; align-items: center; gap: 16px; }
+    .round-indicator { padding: 8px 16px; background: rgba(255,68,85,0.2); border: 1px solid #ff4455; border-radius: 4px; color: #ff4455; font-weight: 600; }
+    .retreat-btn { padding: 10px 20px; background: linear-gradient(180deg, #444, #333); border: 1px solid #666; border-radius: 6px; color: #aaa; cursor: pointer; }
+    .retreat-btn:hover:not(:disabled) { background: linear-gradient(180deg, #555, #444); color: #fff; }
+    
+    .combat-arena { flex: 1; display: grid; grid-template-columns: 1fr 400px 1fr; gap: 20px; padding: 20px; }
+    
+    .fleet-panel { display: flex; flex-direction: column; gap: 12px; }
+    .fleet-header { display: flex; align-items: center; gap: 12px; padding: 16px; border-radius: 8px; }
+    .fleet-header.friendly { background: linear-gradient(180deg, rgba(68,170,255,0.2), rgba(68,170,255,0.05)); border: 1px solid rgba(68,170,255,0.5); }
+    .fleet-header.hostile { background: linear-gradient(180deg, rgba(255,68,85,0.2), rgba(255,68,85,0.05)); border: 1px solid rgba(255,68,85,0.5); flex-direction: row-reverse; }
+    .fleet-icon { font-size: 32px; }
+    .fleet-info { flex: 1; }
+    .fleet-name { display: block; font-size: 16px; font-weight: 600; color: #fff; }
+    .fleet-faction { font-size: 12px; color: #7890a8; }
+    .fleet-power { text-align: center; }
+    .power-value { display: block; font-size: 24px; font-weight: 700; color: #ffcc00; }
+    .power-label { font-size: 10px; color: #7890a8; }
+    
+    .ships-list { display: flex; flex-direction: column; gap: 8px; flex: 1; overflow-y: auto; }
+    .ship-card { position: relative; display: flex; align-items: center; gap: 12px; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(60,90,130,0.3); border-radius: 8px; cursor: pointer; transition: all 0.15s; }
+    .ship-card:hover { border-color: rgba(74,158,255,0.5); background: rgba(74,158,255,0.1); }
+    .ship-card.selected { border-color: #4a9eff; background: rgba(74,158,255,0.2); box-shadow: 0 0 20px rgba(74,158,255,0.3); }
+    .ship-card.enemy:hover { border-color: rgba(255,68,85,0.5); background: rgba(255,68,85,0.1); }
+    .ship-card.targeted { border-color: #ff4455; background: rgba(255,68,85,0.2); }
+    .ship-card.destroyed { opacity: 0.5; }
+    .ship-icon { font-size: 28px; }
+    .ship-info { flex: 1; }
+    .ship-name { display: block; font-weight: 600; color: #c8d4e8; }
+    .ship-class { font-size: 11px; color: #7890a8; }
+    .ship-stats { display: flex; flex-direction: column; gap: 4px; }
+    .stat-bar { display: flex; align-items: center; gap: 6px; }
+    .stat-label { font-size: 12px; }
+    .stat-bar .bar { width: 60px; height: 6px; background: rgba(0,0,0,0.5); border-radius: 3px; overflow: hidden; }
+    .stat-bar.shields .fill { background: linear-gradient(90deg, #4a9eff, #6abeFF); height: 100%; }
+    .stat-bar.hull .fill { background: linear-gradient(90deg, #44dd66, #66ff88); height: 100%; }
+    .stat-value { font-size: 10px; color: #7890a8; min-width: 30px; }
+    .destroyed-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.7); color: #ff4455; font-weight: 700; font-size: 14px; border-radius: 8px; }
+    .target-indicator { position: absolute; top: 4px; right: 8px; font-size: 10px; color: #ff4455; font-weight: 600; }
+    
+    .battle-display { display: flex; flex-direction: column; gap: 16px; }
+    .combat-visual { height: 200px; background: radial-gradient(ellipse at center, rgba(20,30,50,0.8), rgba(5,10,20,0.9)); border: 1px solid rgba(60,90,130,0.3); border-radius: 8px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+    .vs-indicator { font-size: 48px; font-weight: 900; color: rgba(255,255,255,0.1); }
+    .combat-animation { position: absolute; inset: 0; }
+    .phaser-beam { position: absolute; height: 4px; background: linear-gradient(90deg, transparent, #ff6600, #ffcc00, #ff6600, transparent); animation: phaser 0.3s ease-out; }
+    .phaser-beam.left { top: 50%; left: 0; right: 50%; }
+    .phaser-beam.right { top: 50%; left: 50%; right: 0; }
+    @@keyframes phaser { from { opacity: 1; transform: scaleX(0); } to { opacity: 0; transform: scaleX(1); } }
+    .explosion { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 64px; opacity: 0; }
+    .explosion.active { animation: explode 0.5s ease-out; }
+    @@keyframes explode { 0% { opacity: 1; transform: translate(-50%, -50%) scale(0.5); } 100% { opacity: 0; transform: translate(-50%, -50%) scale(2); } }
+    
+    .combat-log { background: rgba(0,0,0,0.4); border: 1px solid rgba(60,90,130,0.3); border-radius: 8px; height: 200px; overflow: hidden; }
+    .log-header { padding: 8px 12px; background: rgba(0,0,0,0.3); font-size: 11px; color: #7890a8; letter-spacing: 1px; }
+    .log-entries { padding: 8px 12px; height: calc(100% - 32px); overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
+    .log-entry { font-size: 11px; color: #7890a8; }
+    .log-entry.damage { color: #ff4455; }
+    .log-entry.shield { color: #4a9eff; }
+    .log-entry.destroy { color: #ff8800; font-weight: 600; }
+    .log-entry.critical { color: #ff00ff; }
+    .log-round { color: #506070; margin-right: 6px; }
+    
+    .action-panel { display: flex; gap: 12px; }
+    .action-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 16px; border-radius: 8px; cursor: pointer; transition: all 0.15s; }
+    .action-btn.attack { background: linear-gradient(180deg, rgba(255,68,85,0.3), rgba(255,68,85,0.1)); border: 1px solid rgba(255,68,85,0.5); }
+    .action-btn.attack:hover:not(:disabled) { background: linear-gradient(180deg, rgba(255,68,85,0.5), rgba(255,68,85,0.2)); }
+    .action-btn.special { background: linear-gradient(180deg, rgba(170,102,255,0.3), rgba(170,102,255,0.1)); border: 1px solid rgba(170,102,255,0.5); }
+    .action-btn.defend { background: linear-gradient(180deg, rgba(68,170,255,0.3), rgba(68,170,255,0.1)); border: 1px solid rgba(68,170,255,0.5); }
+    .action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .action-icon { font-size: 24px; }
+    .action-name { font-size: 11px; font-weight: 600; color: #c8d4e8; letter-spacing: 1px; }
+    
+    .combat-result { text-align: center; padding: 32px; border-radius: 8px; }
+    .combat-result.victory { background: linear-gradient(180deg, rgba(68,221,102,0.2), rgba(68,221,102,0.05)); border: 2px solid #44dd66; }
+    .combat-result.defeat { background: linear-gradient(180deg, rgba(255,68,85,0.2), rgba(255,68,85,0.05)); border: 2px solid #ff4455; }
+    .result-icon { display: block; font-size: 48px; margin-bottom: 12px; }
+    .result-text { display: block; font-size: 24px; font-weight: 700; color: #fff; margin-bottom: 16px; }
+    .continue-btn { padding: 12px 32px; background: linear-gradient(180deg, #4a9eff, #2a6ecc); border: none; border-radius: 6px; color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; }
+</style>
+
+@code {
+    [Parameter] public Guid? CombatId { get; set; }
+    
+    private string _systemName = "Alpha Centauri";
+    private int _currentRound = 1;
+    private bool _isResolving;
+    private bool _combatEnded;
+    private bool _playerWon;
+    private string _attackDirection = "left";
+    private bool _showExplosion;
+    
+    private CombatShipData? _selectedShip;
+    private CombatShipData? _targetShip;
+    
+    private FleetCombatData _playerFleet = new();
+    private FleetCombatData _enemyFleet = new();
+    private List<CombatLogEntry> _combatLog = new();
+
+    protected override void OnInitialized()
+    {
+        InitializeMockCombat();
+    }
+
+    private void InitializeMockCombat()
+    {
+        _playerFleet = new FleetCombatData
+        {
+            Name = "1st Exploration Fleet",
+            Faction = "Federation",
+            Ships = new List<CombatShipData>
+            {
+                new() { Id = Guid.NewGuid(), Name = "USS Enterprise", Class = "Cruiser", Shields = 80, MaxShields = 100, Hull = 100, MaxHull = 100 },
+                new() { Id = Guid.NewGuid(), Name = "USS Defiant", Class = "Destroyer", Shields = 60, MaxShields = 60, Hull = 80, MaxHull = 80 },
+                new() { Id = Guid.NewGuid(), Name = "USS Voyager", Class = "Cruiser", Shields = 75, MaxShields = 100, Hull = 90, MaxHull = 100 },
+            }
+        };
+
+        _enemyFleet = new FleetCombatData
+        {
+            Name = "Klingon Raiding Party",
+            Faction = "Klingon Empire",
+            Ships = new List<CombatShipData>
+            {
+                new() { Id = Guid.NewGuid(), Name = "IKS Rotarran", Class = "Battlecruiser", Shields = 50, MaxShields = 80, Hull = 120, MaxHull = 120 },
+                new() { Id = Guid.NewGuid(), Name = "IKS Ch'Tang", Class = "Destroyer", Shields = 40, MaxShields = 50, Hull = 70, MaxHull = 70 },
+            }
+        };
+
+        _combatLog.Add(new CombatLogEntry(1, "Combat initiated!", "info"));
+        _selectedShip = _playerFleet.Ships.FirstOrDefault();
+        _targetShip = _enemyFleet.Ships.FirstOrDefault();
+    }
+
+    private void SelectShip(CombatShipData ship)
+    {
+        if (!ship.IsDestroyed)
+        {
+            foreach (var s in _playerFleet.Ships) s.IsSelected = false;
+            ship.IsSelected = true;
+            _selectedShip = ship;
+        }
+    }
+
+    private void TargetShip(CombatShipData ship)
+    {
+        if (!ship.IsDestroyed)
+        {
+            _targetShip = ship;
+        }
+    }
+
+    private async Task ExecuteAttack()
+    {
+        if (_selectedShip == null || _targetShip == null || _isResolving) return;
+
+        _isResolving = true;
+        _attackDirection = "left";
+        StateHasChanged();
+        
+        await Sound.PlayPhaserAsync();
+        await Task.Delay(300);
+        
+        // Calculate damage
+        var damage = Random.Shared.Next(20, 50);
+        var shieldDamage = Math.Min(_targetShip.Shields, damage);
+        _targetShip.Shields -= shieldDamage;
+        var hullDamage = damage - shieldDamage;
+        _targetShip.Hull -= hullDamage;
+        
+        _combatLog.Add(new CombatLogEntry(_currentRound, $"{_selectedShip.Name} fires at {_targetShip.Name}! {damage} damage.", "damage"));
+        
+        if (_targetShip.Hull <= 0)
+        {
+            _targetShip.Hull = 0;
+            _targetShip.IsDestroyed = true;
+            _showExplosion = true;
+            await Sound.PlayExplosionAsync();
+            _combatLog.Add(new CombatLogEntry(_currentRound, $"{_targetShip.Name} DESTROYED!", "destroy"));
+        }
+        
+        StateHasChanged();
+        await Task.Delay(500);
+        
+        _showExplosion = false;
+        
+        // Enemy counterattack
+        await EnemyTurn();
+        
+        // Check victory conditions
+        CheckCombatEnd();
+        
+        _currentRound++;
+        _isResolving = false;
+        StateHasChanged();
+    }
+
+    private async Task EnemyTurn()
+    {
+        var activeEnemy = _enemyFleet.Ships.FirstOrDefault(s => !s.IsDestroyed);
+        var targetPlayer = _playerFleet.Ships.Where(s => !s.IsDestroyed).OrderBy(_ => Random.Shared.Next()).FirstOrDefault();
+        
+        if (activeEnemy == null || targetPlayer == null) return;
+
+        _attackDirection = "right";
+        StateHasChanged();
+        
+        await Sound.PlayPhaserAsync();
+        await Task.Delay(300);
+        
+        var damage = Random.Shared.Next(15, 40);
+        var shieldDamage = Math.Min(targetPlayer.Shields, damage);
+        targetPlayer.Shields -= shieldDamage;
+        var hullDamage = damage - shieldDamage;
+        targetPlayer.Hull -= hullDamage;
+        
+        _combatLog.Add(new CombatLogEntry(_currentRound, $"{activeEnemy.Name} fires at {targetPlayer.Name}! {damage} damage.", "damage"));
+        
+        if (targetPlayer.Hull <= 0)
+        {
+            targetPlayer.Hull = 0;
+            targetPlayer.IsDestroyed = true;
+            _showExplosion = true;
+            await Sound.PlayExplosionAsync();
+            _combatLog.Add(new CombatLogEntry(_currentRound, $"{targetPlayer.Name} DESTROYED!", "destroy"));
+        }
+        
+        StateHasChanged();
+        await Task.Delay(500);
+        _showExplosion = false;
+    }
+
+    private void CheckCombatEnd()
+    {
+        if (_enemyFleet.Ships.All(s => s.IsDestroyed))
+        {
+            _combatEnded = true;
+            _playerWon = true;
+            _combatLog.Add(new CombatLogEntry(_currentRound, "VICTORY! All enemy ships destroyed.", "info"));
+        }
+        else if (_playerFleet.Ships.All(s => s.IsDestroyed))
+        {
+            _combatEnded = true;
+            _playerWon = false;
+            _combatLog.Add(new CombatLogEntry(_currentRound, "DEFEAT! Fleet destroyed.", "info"));
+        }
+    }
+
+    private async Task ExecuteSpecial() { /* Special ability */ }
+    private async Task ExecuteDefend() { _combatLog.Add(new CombatLogEntry(_currentRound, "Fleet bracing for impact!", "shield")); }
+    private async Task AttemptRetreat() { Navigation.NavigateTo("/game/galaxy"); }
+    private void ExitCombat() { Navigation.NavigateTo("/game/galaxy"); }
+
+    private string GetShipIcon(string shipClass) => shipClass switch
+    {
+        "Scout" => "🔍",
+        "Destroyer" => "⚔️",
+        "Cruiser" => "🚀",
+        "Battleship" => "💪",
+        "Battlecruiser" => "⚔️",
+        "Carrier" => "🛸",
+        _ => "▲"
+    };
+
+    private class FleetCombatData
+    {
+        public string Name { get; set; } = "";
+        public string Faction { get; set; } = "";
+        public List<CombatShipData> Ships { get; set; } = new();
+        public int TotalPower => Ships.Where(s => !s.IsDestroyed).Sum(s => s.Hull + s.Shields);
+    }
+
+    private class CombatShipData
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; } = "";
+        public string Class { get; set; } = "";
+        public int Shields { get; set; }
+        public int MaxShields { get; set; }
+        public int Hull { get; set; }
+        public int MaxHull { get; set; }
+        public bool IsDestroyed { get; set; }
+        public bool IsSelected { get; set; }
+        public int ShieldPercent => MaxShields > 0 ? Shields * 100 / MaxShields : 0;
+        public int HullPercent => MaxHull > 0 ? Hull * 100 / MaxHull : 0;
+    }
+
+    private record CombatLogEntry(int Round, string Message, string Type);
+}

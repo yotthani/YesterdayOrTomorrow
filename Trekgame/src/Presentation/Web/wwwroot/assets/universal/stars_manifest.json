@@ -1,0 +1,128 @@
+{
+  "factionName": "Federation",
+  "categoryName": "Stars",
+  "grid": {
+    "columns": 4,
+    "rows": 4,
+    "totalAssets": 16,
+    "cellSize": 360,
+    "spriteWidth": 1440,
+    "spriteHeight": 1440
+  },
+  "spriteSheetPath": "federation_stars.png",
+  "generatedAt": "2026-01-30T17:36:50.097Z",
+  "assets": [
+    {
+      "row": 0,
+      "col": 0,
+      "name": "Star Yellow Dwarf",
+      "type": "Stars",
+      "promptUsed": "MANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: Glowing spherical model. Plasma/fire texture with internal glow. Clay-like surface detail but luminous. Visible surface details like sunspots, granulation, convection patterns.\nProportions: Spherical star with clean circular edge.\nLighting: Self-illuminating from within. Bright glowing core with subtle color gradients.\nComposition: Star centered, clean circular shape.\nBackground: Solid black background (#000000) representing space.\n\nSTAR TYPE: Yellow Dwarf (G-type like our Sun). Bright yellow-white color. Moderate corona. Stable and life-giving.\n\nSubject: Star Yellow Dwarf\nStyle: Sci-fi star with claymation aesthetic\n\nCRITICAL - NO EXTERNAL EFFECTS:\n- NO light rays extending outward\n- NO lens flares\n- NO corona extending beyond the star surface\n- NO prominences or solar flares shooting out\n- Just the SPHERE of the star itself with surface details\n- We will add glow/flare effects dynamically in-game\n\n**single star sphere, clean circular edge, no rays, no flares, no corona, glowing surface, game asset**\n--no light rays, no lens flare, no corona, no prominences, no flares, no glow extending outward, planets, spaceships, text, labels"
+    },
+    {
+      "row": 0,
+      "col": 1,
+      "name": "Star Orange Dwarf",
+      "type": "Stars",
+      "promptUsed": "MANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: Glowing spherical model. Plasma/fire texture with internal glow. Clay-like surface detail but luminous. Visible surface details like sunspots, granulation, convection patterns.\nProportions: Spherical star with clean circular edge.\nLighting: Self-illuminating from within. Bright glowing core with subtle color gradients.\nComposition: Star centered, clean circular shape.\nBackground: Solid black background (#000000) representing space.\n\nSTAR TYPE: Standard stellar body with appropriate luminosity and corona.\n\nSubject: Star Orange Dwarf\nStyle: Sci-fi star with claymation aesthetic\n\nCRITICAL - NO EXTERNAL EFFECTS:\n- NO light rays extending outward\n- NO lens flares\n- NO corona extending beyond the star surface\n- NO prominences or solar flares shooting out\n- Just the SPHERE of the star itself with surface details\n- We will add glow/flare effects dynamically in-game\n\n**single star sphere, clean circular edge, no rays, no flares, no corona, glowing surface, game asset**\n--no light rays, no lens flare, no corona, no prominences, no flares, no glow extending outward, planets, spaceships, text, labels"
+    },
+    {
+      "row": 0,
+      "col": 2,
+      "name": "Star Red Dwarf",
+      "type": "Stars",
+      "promptUsed": "MANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: Glowing spherical model. Plasma/fire texture with internal glow. Clay-like surface detail but luminous. Visible surface details like sunspots, granulation, convection patterns.\nProportions: Spherical star with clean circular edge.\nLighting: Self-illuminating from within. Bright glowing core with subtle color gradients.\nComposition: Star centered, clean circular shape.\nBackground: Solid black background (#000000) representing space.\n\nSTAR TYPE: Red Dwarf. Small, dim, reddish-orange color. Weak corona. Most common star type.\n\nSubject: Star Red Dwarf\nStyle: Sci-fi star with claymation aesthetic\n\nCRITICAL - NO EXTERNAL EFFECTS:\n- NO light rays extending outward\n- NO lens flares\n- NO corona extending beyond the star surface\n- NO prominences or solar flares shooting out\n- Just the SPHERE of the star itself with surface details\n- We will add glow/flare effects dynamically in-game\n\n**single star sphere, clean circular edge, no rays, no flares, no corona, glowing surface, game asset**\n--no light rays, no lens flare, no corona, no prominences, no flares, no glow extending outward, planets, spaceships, text, labels"
+    },
+    {
+      "row": 0,
+      "col": 3,
+      "name": "Star Blue Giant",
+      "type": "Stars",
+      "promptUsed": "MANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: Glowing spherical model. Plasma/fire texture with internal glow. Clay-like surface detail but luminous. Visible surface details like sunspots, granulation, convection patterns.\nProportions: Spherical star with clean circular edge.\nLighting: Self-illuminating from within. Bright glowing core with subtle color gradients.\nComposition: Star centered, clean circular shape.\nBackground: Solid black background (#000000) representing space.\n\nSTAR TYPE: Blue Giant/Supergiant. Extremely hot, bright blue-white. Intense radiation. Massive and short-lived.\n\nSubject: Star Blue Giant\nStyle: Sci-fi star with claymation aesthetic\n\nCRITICAL - NO EXTERNAL EFFECTS:\n- NO light rays extending outward\n- NO lens flares\n- NO corona extending beyond the star surface\n- NO prominences or solar flares shooting out\n- Just the SPHERE of the star itself with surface details\n- We will add glow/flare effects dynamically in-game\n\n**single star sphere, clean circular edge, no rays, no flares, no corona, glowing surface, game asset**\n--no light rays, no lens flare, no corona, no prominences, no flares, no glow extending outward, planets, spaceships, text, labels"
+    },
+    {
+      "row": 1,
+      "col": 0,
+      "name": "Star Red Giant",
+      "type": "Stars",
+      "promptUsed": "MANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: Glowing spherical model. Plasma/fire texture with internal glow. Clay-like surface detail but luminous. Visible surface details like sunspots, granulation, convection patterns.\nProportions: Spherical star with clean circular edge.\nLighting: Self-illuminating from within. Bright glowing core with subtle color gradients.\nComposition: Star centered, clean circular shape.\nBackground: Solid black background (#000000) representing space.\n\nSTAR TYPE: Red Giant. Enormous, bloated red-orange star. Diffuse outer layers. Dying star.\n\nSubject: Star Red Giant\nStyle: Sci-fi star with claymation aesthetic\n\nCRITICAL - NO EXTERNAL EFFECTS:\n- NO light rays extending outward\n- NO lens flares\n- NO corona extending beyond the star surface\n- NO prominences or solar flares shooting out\n- Just the SPHERE of the star itself with surface details\n- We will add glow/flare effects dynamically in-game\n\n**single star sphere, clean circular edge, no rays, no flares, no corona, glowing surface, game asset**\n--no light rays, no lens flare, no corona, no prominences, no flares, no glow extending outward, planets, spaceships, text, labels"
+    },
+    {
+      "row": 1,
+      "col": 1,
+      "name": "Star Blue Supergiant",
+      "type": "Stars",
+      "promptUsed": "MANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: Glowing spherical model. Plasma/fire texture with internal glow. Clay-like surface detail but luminous. Visible surface details like sunspots, granulation, convection patterns.\nProportions: Spherical star with clean circular edge.\nLighting: Self-illuminating from within. Bright glowing core with subtle color gradients.\nComposition: Star centered, clean circular shape.\nBackground: Solid black background (#000000) representing space.\n\nSTAR TYPE: Blue Giant/Supergiant. Extremely hot, bright blue-white. Intense radiation. Massive and short-lived.\n\nSubject: Star Blue Supergiant\nStyle: Sci-fi star with claymation aesthetic\n\nCRITICAL - NO EXTERNAL EFFECTS:\n- NO light rays extending outward\n- NO lens flares\n- NO corona extending beyond the star surface\n- NO prominences or solar flares shooting out\n- Just the SPHERE of the star itself with surface details\n- We will add glow/flare effects dynamically in-game\n\n**single star sphere, clean circular edge, no rays, no flares, no corona, glowing surface, game asset**\n--no light rays, no lens flare, no corona, no prominences, no flares, no glow extending outward, planets, spaceships, text, labels"
+    },
+    {
+      "row": 1,
+      "col": 2,
+      "name": "Star White Giant",
+      "type": "Stars",
+      "promptUsed": "MANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: Glowing spherical model. Plasma/fire texture with internal glow. Clay-like surface detail but luminous. Visible surface details like sunspots, granulation, convection patterns.\nProportions: Spherical star with clean circular edge.\nLighting: Self-illuminating from within. Bright glowing core with subtle color gradients.\nComposition: Star centered, clean circular shape.\nBackground: Solid black background (#000000) representing space.\n\nSTAR TYPE: Standard stellar body with appropriate luminosity and corona.\n\nSubject: Star White Giant\nStyle: Sci-fi star with claymation aesthetic\n\nCRITICAL - NO EXTERNAL EFFECTS:\n- NO light rays extending outward\n- NO lens flares\n- NO corona extending beyond the star surface\n- NO prominences or solar flares shooting out\n- Just the SPHERE of the star itself with surface details\n- We will add glow/flare effects dynamically in-game\n\n**single star sphere, clean circular edge, no rays, no flares, no corona, glowing surface, game asset**\n--no light rays, no lens flare, no corona, no prominences, no flares, no glow extending outward, planets, spaceships, text, labels"
+    },
+    {
+      "row": 1,
+      "col": 3,
+      "name": "Star Orange Giant",
+      "type": "Stars",
+      "promptUsed": "MANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: Glowing spherical model. Plasma/fire texture with internal glow. Clay-like surface detail but luminous. Visible surface details like sunspots, granulation, convection patterns.\nProportions: Spherical star with clean circular edge.\nLighting: Self-illuminating from within. Bright glowing core with subtle color gradients.\nComposition: Star centered, clean circular shape.\nBackground: Solid black background (#000000) representing space.\n\nSTAR TYPE: Standard stellar body with appropriate luminosity and corona.\n\nSubject: Star Orange Giant\nStyle: Sci-fi star with claymation aesthetic\n\nCRITICAL - NO EXTERNAL EFFECTS:\n- NO light rays extending outward\n- NO lens flares\n- NO corona extending beyond the star surface\n- NO prominences or solar flares shooting out\n- Just the SPHERE of the star itself with surface details\n- We will add glow/flare effects dynamically in-game\n\n**single star sphere, clean circular edge, no rays, no flares, no corona, glowing surface, game asset**\n--no light rays, no lens flare, no corona, no prominences, no flares, no glow extending outward, planets, spaceships, text, labels"
+    },
+    {
+      "row": 2,
+      "col": 0,
+      "name": "Star Neutron Pulsar",
+      "type": "Stars",
+      "promptUsed": "MANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: Glowing spherical model. Plasma/fire texture with internal glow. Clay-like surface detail but luminous. Visible surface details like sunspots, granulation, convection patterns.\nProportions: Spherical star with clean circular edge.\nLighting: Self-illuminating from within. Bright glowing core with subtle color gradients.\nComposition: Star centered, clean circular shape.\nBackground: Solid black background (#000000) representing space.\n\nSTAR TYPE: Neutron Star/Pulsar. Tiny, incredibly dense. Beams of radiation from poles. Rapid rotation implied.\n\nSubject: Star Neutron Pulsar\nStyle: Sci-fi star with claymation aesthetic\n\nCRITICAL - NO EXTERNAL EFFECTS:\n- NO light rays extending outward\n- NO lens flares\n- NO corona extending beyond the star surface\n- NO prominences or solar flares shooting out\n- Just the SPHERE of the star itself with surface details\n- We will add glow/flare effects dynamically in-game\n\n**single star sphere, clean circular edge, no rays, no flares, no corona, glowing surface, game asset**\n--no light rays, no lens flare, no corona, no prominences, no flares, no glow extending outward, planets, spaceships, text, labels"
+    },
+    {
+      "row": 2,
+      "col": 1,
+      "name": "Star Black Hole",
+      "type": "Stars",
+      "promptUsed": "MANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: Glowing spherical model. Plasma/fire texture with internal glow. Clay-like surface detail but luminous. Visible surface details like sunspots, granulation, convection patterns.\nProportions: Spherical star with clean circular edge.\nLighting: Self-illuminating from within. Bright glowing core with subtle color gradients.\nComposition: Star centered, clean circular shape.\nBackground: Solid black background (#000000) representing space.\n\nSTAR TYPE: Black Hole. Visible only by accretion disk and gravitational lensing. Warped space around event horizon. Terrifying.\n\nSubject: Star Black Hole\nStyle: Sci-fi star with claymation aesthetic\n\nCRITICAL - NO EXTERNAL EFFECTS:\n- NO light rays extending outward\n- NO lens flares\n- NO corona extending beyond the star surface\n- NO prominences or solar flares shooting out\n- Just the SPHERE of the star itself with surface details\n- We will add glow/flare effects dynamically in-game\n\n**single star sphere, clean circular edge, no rays, no flares, no corona, glowing surface, game asset**\n--no light rays, no lens flare, no corona, no prominences, no flares, no glow extending outward, planets, spaceships, text, labels"
+    },
+    {
+      "row": 2,
+      "col": 2,
+      "name": "Star White Dwarf",
+      "type": "Stars",
+      "promptUsed": "MANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: Glowing spherical model. Plasma/fire texture with internal glow. Clay-like surface detail but luminous. Visible surface details like sunspots, granulation, convection patterns.\nProportions: Spherical star with clean circular edge.\nLighting: Self-illuminating from within. Bright glowing core with subtle color gradients.\nComposition: Star centered, clean circular shape.\nBackground: Solid black background (#000000) representing space.\n\nSTAR TYPE: White Dwarf. Small, dense, dim white star. Remnant of dead star. Fading glow.\n\nSubject: Star White Dwarf\nStyle: Sci-fi star with claymation aesthetic\n\nCRITICAL - NO EXTERNAL EFFECTS:\n- NO light rays extending outward\n- NO lens flares\n- NO corona extending beyond the star surface\n- NO prominences or solar flares shooting out\n- Just the SPHERE of the star itself with surface details\n- We will add glow/flare effects dynamically in-game\n\n**single star sphere, clean circular edge, no rays, no flares, no corona, glowing surface, game asset**\n--no light rays, no lens flare, no corona, no prominences, no flares, no glow extending outward, planets, spaceships, text, labels"
+    },
+    {
+      "row": 2,
+      "col": 3,
+      "name": "Star Brown Dwarf",
+      "type": "Stars",
+      "promptUsed": "MANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: Glowing spherical model. Plasma/fire texture with internal glow. Clay-like surface detail but luminous. Visible surface details like sunspots, granulation, convection patterns.\nProportions: Spherical star with clean circular edge.\nLighting: Self-illuminating from within. Bright glowing core with subtle color gradients.\nComposition: Star centered, clean circular shape.\nBackground: Solid black background (#000000) representing space.\n\nSTAR TYPE: Standard stellar body with appropriate luminosity and corona.\n\nSubject: Star Brown Dwarf\nStyle: Sci-fi star with claymation aesthetic\n\nCRITICAL - NO EXTERNAL EFFECTS:\n- NO light rays extending outward\n- NO lens flares\n- NO corona extending beyond the star surface\n- NO prominences or solar flares shooting out\n- Just the SPHERE of the star itself with surface details\n- We will add glow/flare effects dynamically in-game\n\n**single star sphere, clean circular edge, no rays, no flares, no corona, glowing surface, game asset**\n--no light rays, no lens flare, no corona, no prominences, no flares, no glow extending outward, planets, spaceships, text, labels"
+    },
+    {
+      "row": 3,
+      "col": 0,
+      "name": "Star Binary System",
+      "type": "Stars",
+      "promptUsed": "MANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: Glowing spherical model. Plasma/fire texture with internal glow. Clay-like surface detail but luminous. Visible surface details like sunspots, granulation, convection patterns.\nProportions: Spherical star with clean circular edge.\nLighting: Self-illuminating from within. Bright glowing core with subtle color gradients.\nComposition: Star centered, clean circular shape.\nBackground: Solid black background (#000000) representing space.\n\nSTAR TYPE: Binary System. Two stars orbiting each other. Different colors possible. Material streaming between them.\n\nSubject: Star Binary System\nStyle: Sci-fi star with claymation aesthetic\n\nCRITICAL - NO EXTERNAL EFFECTS:\n- NO light rays extending outward\n- NO lens flares\n- NO corona extending beyond the star surface\n- NO prominences or solar flares shooting out\n- Just the SPHERE of the star itself with surface details\n- We will add glow/flare effects dynamically in-game\n\n**single star sphere, clean circular edge, no rays, no flares, no corona, glowing surface, game asset**\n--no light rays, no lens flare, no corona, no prominences, no flares, no glow extending outward, planets, spaceships, text, labels"
+    },
+    {
+      "row": 3,
+      "col": 1,
+      "name": "Star Trinary System",
+      "type": "Stars",
+      "promptUsed": "MANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: Glowing spherical model. Plasma/fire texture with internal glow. Clay-like surface detail but luminous. Visible surface details like sunspots, granulation, convection patterns.\nProportions: Spherical star with clean circular edge.\nLighting: Self-illuminating from within. Bright glowing core with subtle color gradients.\nComposition: Star centered, clean circular shape.\nBackground: Solid black background (#000000) representing space.\n\nSTAR TYPE: Standard stellar body with appropriate luminosity and corona.\n\nSubject: Star Trinary System\nStyle: Sci-fi star with claymation aesthetic\n\nCRITICAL - NO EXTERNAL EFFECTS:\n- NO light rays extending outward\n- NO lens flares\n- NO corona extending beyond the star surface\n- NO prominences or solar flares shooting out\n- Just the SPHERE of the star itself with surface details\n- We will add glow/flare effects dynamically in-game\n\n**single star sphere, clean circular edge, no rays, no flares, no corona, glowing surface, game asset**\n--no light rays, no lens flare, no corona, no prominences, no flares, no glow extending outward, planets, spaceships, text, labels"
+    },
+    {
+      "row": 3,
+      "col": 2,
+      "name": "Star Protostar Nebula",
+      "type": "Stars",
+      "promptUsed": "MANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: Glowing spherical model. Plasma/fire texture with internal glow. Clay-like surface detail but luminous. Visible surface details like sunspots, granulation, convection patterns.\nProportions: Spherical star with clean circular edge.\nLighting: Self-illuminating from within. Bright glowing core with subtle color gradients.\nComposition: Star centered, clean circular shape.\nBackground: Solid black background (#000000) representing space.\n\nSTAR TYPE: Standard stellar body with appropriate luminosity and corona.\n\nSubject: Star Protostar Nebula\nStyle: Sci-fi star with claymation aesthetic\n\nCRITICAL - NO EXTERNAL EFFECTS:\n- NO light rays extending outward\n- NO lens flares\n- NO corona extending beyond the star surface\n- NO prominences or solar flares shooting out\n- Just the SPHERE of the star itself with surface details\n- We will add glow/flare effects dynamically in-game\n\n**single star sphere, clean circular edge, no rays, no flares, no corona, glowing surface, game asset**\n--no light rays, no lens flare, no corona, no prominences, no flares, no glow extending outward, planets, spaceships, text, labels"
+    },
+    {
+      "row": 3,
+      "col": 3,
+      "name": "Star Supernova Remnant",
+      "type": "Stars",
+      "promptUsed": "MANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: Glowing spherical model. Plasma/fire texture with internal glow. Clay-like surface detail but luminous. Visible surface details like sunspots, granulation, convection patterns.\nProportions: Spherical star with clean circular edge.\nLighting: Self-illuminating from within. Bright glowing core with subtle color gradients.\nComposition: Star centered, clean circular shape.\nBackground: Solid black background (#000000) representing space.\n\nSTAR TYPE: Supernova Remnant. Expanding shell of glowing gas. Central neutron star or nothing. Beautiful destruction.\n\nSubject: Star Supernova Remnant\nStyle: Sci-fi star with claymation aesthetic\n\nCRITICAL - NO EXTERNAL EFFECTS:\n- NO light rays extending outward\n- NO lens flares\n- NO corona extending beyond the star surface\n- NO prominences or solar flares shooting out\n- Just the SPHERE of the star itself with surface details\n- We will add glow/flare effects dynamically in-game\n\n**single star sphere, clean circular edge, no rays, no flares, no corona, glowing surface, game asset**\n--no light rays, no lens flare, no corona, no prominences, no flares, no glow extending outward, planets, spaceships, text, labels"
+    }
+  ]
+}

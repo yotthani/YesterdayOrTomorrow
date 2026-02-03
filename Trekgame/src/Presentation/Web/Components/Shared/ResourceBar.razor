@@ -1,0 +1,90 @@
+@namespace StarTrekGame.Web.Components.Shared
+
+<div class="resource-bar @Class">
+    @foreach (var resource in Resources)
+    {
+        <div class="resource-item" title="@resource.Name">
+            <span class="resource-icon" style="color: @resource.Color">@resource.Icon</span>
+            <span class="resource-value @(resource.IsNegative ? "negative" : "")">
+                @FormatValue(resource.Value)
+            </span>
+            @if (resource.Change != 0)
+            {
+                <span class="resource-change @(resource.Change > 0 ? "positive" : "negative")">
+                    @(resource.Change > 0 ? "+" : "")@FormatValue(resource.Change)
+                </span>
+            }
+        </div>
+    }
+</div>
+
+<style>
+    .resource-bar {
+        display: flex;
+        gap: 16px;
+        padding: 8px 16px;
+        background: rgba(10, 10, 30, 0.9);
+        border-radius: 8px;
+        border: 1px solid rgba(255, 153, 0, 0.3);
+    }
+    
+    .resource-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .resource-icon {
+        font-size: 16px;
+    }
+    
+    .resource-value {
+        color: #99ccff;
+        font-weight: 600;
+        font-size: 14px;
+        font-family: 'Consolas', monospace;
+    }
+    
+    .resource-value.negative {
+        color: #ff6666;
+    }
+    
+    .resource-change {
+        font-size: 11px;
+        padding: 2px 4px;
+        border-radius: 4px;
+    }
+    
+    .resource-change.positive {
+        color: #44ff44;
+        background: rgba(68, 255, 68, 0.1);
+    }
+    
+    .resource-change.negative {
+        color: #ff4444;
+        background: rgba(255, 68, 68, 0.1);
+    }
+</style>
+
+@code {
+    [Parameter] public List<ResourceDisplay> Resources { get; set; } = new();
+    [Parameter] public string? Class { get; set; }
+    
+    private string FormatValue(double value) => value switch
+    {
+        >= 1_000_000_000 => $"{value / 1_000_000_000:F1}B",
+        >= 1_000_000 => $"{value / 1_000_000:F1}M",
+        >= 1_000 => $"{value / 1_000:F1}K",
+        _ => value.ToString("F0")
+    };
+    
+    public class ResourceDisplay
+    {
+        public string Name { get; set; } = "";
+        public string Icon { get; set; } = "●";
+        public string Color { get; set; } = "#ffcc00";
+        public double Value { get; set; }
+        public double Change { get; set; }
+        public bool IsNegative => Value < 0;
+    }
+}

@@ -1,0 +1,277 @@
+@page "/game/research-new"
+@page "/game/research"
+@page "/game/tech"
+@layout StellarisLayout
+@using MudBlazor
+@using StarTrekGame.Web.Services
+@using Blazored.LocalStorage
+@inject IGameApiClient Api
+@inject NavigationManager Navigation
+@inject ILocalStorageService LocalStorage
+
+<PageTitle>Research - Galactic Strategy</PageTitle>
+
+<div class="stellaris-layout">
+    <header class="st-topbar">
+        <div class="st-empire-badge"><div class="st-empire-flag">🌐</div><div class="st-empire-info"><span class="st-empire-name">Science Council</span><span class="st-empire-type">Research Division</span></div></div>
+        <div class="st-resources">
+            <div class="st-resource highlight"><span class="st-resource-icon">🔬</span><div class="st-resource-values"><span class="st-resource-current">@_totalResearch</span><span class="st-resource-income positive">+@_researchPerTurn/turn</span></div></div>
+        </div>
+        <div class="st-game-controls"><button class="st-end-turn-btn">END TURN</button></div>
+    </header>
+
+    <div class="st-main">
+        <aside class="st-sidebar-left">
+            <nav class="st-nav">
+                <a href="/game/galaxy" class="st-nav-btn"><span class="st-nav-icon">🌌</span><span class="st-nav-label">Galaxy</span></a>
+                <a href="/game/tech" class="st-nav-btn active"><span class="st-nav-icon">🔬</span><span class="st-nav-label">Research</span></a>
+            </nav>
+        </aside>
+
+        <div class="research-content">
+            <div class="research-header">
+                <h1>RESEARCH & DEVELOPMENT</h1>
+                <div class="research-categories">
+                    <button class="@CatBtnClass("all")" @onclick="CatAll">ALL</button>
+                    <button class="@CatBtnClass("physics") physics" @onclick="CatPhysics">⚛ PHYSICS</button>
+                    <button class="@CatBtnClass("society") society" @onclick="CatSociety">🧬 SOCIETY</button>
+                    <button class="@CatBtnClass("engineering") engineering" @onclick="CatEngineering">⚙ ENGINEERING</button>
+                </div>
+            </div>
+
+            <div class="research-layout">
+                <div class="current-research-panel">
+                    <div class="panel-title">ACTIVE RESEARCH</div>
+                    <div class="current-research-slots">
+                        @foreach (var slot in _researchSlots)
+                        {
+                            <div class="research-slot @slot.Category">
+                                <div class="slot-header"><span class="slot-icon">@GetCategoryIcon(slot.Category)</span><span class="slot-category">@slot.Category.ToUpper()</span></div>
+                                @if (slot.CurrentTech != null)
+                                {
+                                    <div class="slot-tech">
+                                        <div class="tech-icon">@slot.CurrentTech.Icon</div>
+                                        <div class="tech-info">
+                                            <span class="tech-name">@slot.CurrentTech.Name</span>
+                                            <div class="st-progress"><div class="st-progress-fill" style="width: @slot.Progress%"></div></div>
+                                            <span class="progress-text">@slot.Progress% • @slot.TurnsRemaining turns</span>
+                                        </div>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="slot-empty"><span>+ Select Research</span></div>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="available-techs-panel">
+                    <div class="panel-title">AVAILABLE TECHNOLOGIES (@FilteredTechs.Count())</div>
+                    <div class="techs-grid">
+                        @foreach (var tech in FilteredTechs)
+                        {
+                            <div class="@TechCardClass(tech)" @onclick="() => SelectTech(tech)">
+                                <div class="tech-card-header"><span class="tech-tier">T@tech.Tier</span></div>
+                                <div class="tech-card-icon">@tech.Icon</div>
+                                <div class="tech-card-name">@tech.Name</div>
+                                <div class="tech-card-cost">🔬 @tech.Cost</div>
+                                @if (tech.IsResearched) { <div class="researched-badge">✓</div> }
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <aside class="st-sidebar-right" style="width: 300px;">
+            <div class="st-outliner">
+                <div class="st-outliner-header"><span class="st-outliner-title">TECH DETAILS</span></div>
+                @if (_selectedTech != null)
+                {
+                    <div class="tech-detail-panel">
+                        <div class="tech-detail-header @_selectedTech.Category">
+                            <div class="detail-icon">@_selectedTech.Icon</div>
+                            <h3>@_selectedTech.Name</h3>
+                            <span>@_selectedTech.Category.ToUpper() • T@_selectedTech.Tier</span>
+                        </div>
+                        <div class="tech-detail-body">
+                            <p>@_selectedTech.Description</p>
+                            <div class="cost-display">🔬 @_selectedTech.Cost (~@GetTurnsNeeded(_selectedTech.Cost) turns)</div>
+                            <div class="unlocks"><h4>UNLOCKS</h4>@foreach(var u in _selectedTech.Unlocks){<span>• @u</span>}</div>
+                            @if (!_selectedTech.IsResearched && CanResearch(_selectedTech))
+                            {
+                                <button class="st-btn primary" style="width:100%;margin-top:12px;" @onclick="StartResearch">BEGIN RESEARCH</button>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        </aside>
+    </div>
+</div>
+
+<style>
+.research-content{flex:1;display:flex;flex-direction:column;background:linear-gradient(180deg,#080c14,#040608)}
+.research-header{padding:16px 24px;background:rgba(10,15,25,0.9);border-bottom:1px solid var(--st-border-dark);display:flex;align-items:center;gap:24px}
+.research-header h1{font-family:var(--st-font-display);font-size:18px;color:var(--st-text-white);letter-spacing:2px;margin:0}
+.research-categories{display:flex;gap:8px;margin-left:auto}
+.cat-btn{padding:8px 16px;background:var(--st-gradient-button);border:1px solid var(--st-border-dark);border-radius:4px;color:var(--st-text-muted);font-size:11px;font-weight:600;cursor:pointer}
+.cat-btn:hover{background:var(--st-gradient-button-hover)}.cat-btn.active{border-color:var(--st-accent-blue);color:var(--st-accent-blue)}
+.cat-btn.physics.active{border-color:#66aaff;color:#66aaff}.cat-btn.society.active{border-color:#66cc66;color:#66cc66}.cat-btn.engineering.active{border-color:#ffaa44;color:#ffaa44}
+.research-layout{flex:1;display:flex;flex-direction:column;gap:16px;padding:16px;overflow:hidden}
+.current-research-panel{background:var(--st-gradient-panel);border:1px solid var(--st-border-dark);border-radius:8px;padding:16px}
+.panel-title{font-family:var(--st-font-display);font-size:12px;color:var(--st-text-muted);letter-spacing:1px;margin-bottom:12px}
+.current-research-slots{display:flex;gap:16px}
+.research-slot{flex:1;background:var(--st-bg-medium);border:1px solid var(--st-border-dark);border-radius:6px;padding:12px}
+.research-slot.physics{border-top:3px solid #66aaff}.research-slot.society{border-top:3px solid #66cc66}.research-slot.engineering{border-top:3px solid #ffaa44}
+.slot-header{display:flex;align-items:center;gap:8px;margin-bottom:10px}.slot-icon{font-size:16px}.slot-category{font-size:10px;color:var(--st-text-dim)}
+.slot-tech{display:flex;gap:12px}.tech-icon{font-size:32px}.tech-info{flex:1}.tech-name{display:block;font-size:13px;color:var(--st-text-white);margin-bottom:8px}
+.progress-text{font-size:10px;color:var(--st-text-dim)}
+.slot-empty{display:flex;align-items:center;justify-content:center;height:50px;background:rgba(0,0,0,0.2);border:1px dashed var(--st-border-dark);border-radius:4px;color:var(--st-text-dim);cursor:pointer}
+.available-techs-panel{flex:1;background:var(--st-gradient-panel);border:1px solid var(--st-border-dark);border-radius:8px;padding:16px;overflow:hidden;display:flex;flex-direction:column}
+.techs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;overflow-y:auto}
+.tech-card{background:var(--st-bg-medium);border:1px solid var(--st-border-dark);border-radius:6px;padding:10px;cursor:pointer;position:relative;text-align:center}
+.tech-card:hover{border-color:var(--st-border-light)}.tech-card.selected{border-color:var(--st-accent-blue)}
+.tech-card.physics{border-left:3px solid #66aaff}.tech-card.society{border-left:3px solid #66cc66}.tech-card.engineering{border-left:3px solid #ffaa44}
+.tech-card.researched{opacity:0.5}.researched-badge{position:absolute;top:6px;right:6px;color:var(--st-accent-green)}
+.tech-card-header{margin-bottom:6px}.tech-tier{font-size:9px;color:var(--st-text-dim);background:rgba(0,0,0,0.3);padding:2px 6px;border-radius:3px}
+.tech-card-icon{font-size:32px;margin:6px 0}.tech-card-name{font-size:11px;color:var(--st-text-bright);margin-bottom:6px}.tech-card-cost{font-size:10px;color:var(--st-text-muted)}
+.tech-detail-panel{padding:16px}
+.tech-detail-header{text-align:center;padding-bottom:12px;border-bottom:1px solid var(--st-border-dark);margin-bottom:12px}
+.tech-detail-header.physics{background:linear-gradient(180deg,rgba(102,170,255,0.1),transparent)}
+.tech-detail-header.society{background:linear-gradient(180deg,rgba(102,204,102,0.1),transparent)}
+.tech-detail-header.engineering{background:linear-gradient(180deg,rgba(255,170,68,0.1),transparent)}
+.detail-icon{font-size:48px}.tech-detail-header h3{font-size:16px;color:var(--st-text-white);margin:8px 0 4px}.tech-detail-header span{font-size:10px;color:var(--st-text-dim)}
+.tech-detail-body p{font-size:12px;color:var(--st-text-muted);line-height:1.4;margin-bottom:12px}
+.cost-display{font-size:14px;color:var(--st-accent-cyan);margin-bottom:12px}
+.unlocks h4{font-size:10px;color:var(--st-text-dim);margin:0 0 6px}.unlocks span{display:block;font-size:11px;color:var(--st-text-muted)}
+.st-resource.highlight{background:rgba(74,158,255,0.1);border-color:var(--st-accent-blue)}
+</style>
+
+@code {
+    private string _category = "all";
+    private TechnologyDto? _selectedTech;
+    private int _totalResearch = 0;
+    private int _researchPerTurn = 0;
+    private string? _currentResearchId;
+    private int _currentProgress;
+    private Guid? _factionId;
+    private List<TechnologyDto> _technologies = new();
+    private List<string> _completedTechs = new();
+    private List<ResearchSlot> _researchSlots = new();
+
+    private IEnumerable<TechnologyDto> FilteredTechs => _technologies.Where(t => _category == "all" || t.Category == _category);
+
+    protected override async Task OnInitializedAsync()
+    {
+        _factionId = await LocalStorage.GetItemAsync<Guid?>("currentFactionId");
+        if (_factionId.HasValue)
+        {
+            await LoadResearchData();
+        }
+        else
+        {
+            LoadMockData();
+        }
+    }
+
+    private async Task LoadResearchData()
+    {
+        try
+        {
+            var status = await Api.GetResearchStatusAsync(_factionId!.Value);
+            _totalResearch = status.TotalScienceOutput * 10;
+            _researchPerTurn = status.TotalScienceOutput;
+            _currentResearchId = status.CurrentResearchId;
+            _currentProgress = status.CurrentResearchProgress;
+            _completedTechs = status.CompletedTechnologies;
+
+            var techs = await Api.GetAvailableTechnologiesAsync(_factionId!.Value);
+            _technologies = techs;
+
+            _selectedTech = _technologies.FirstOrDefault(t => !t.IsResearched && t.IsAvailable);
+            InitResearchSlots();
+        }
+        catch
+        {
+            LoadMockData();
+        }
+    }
+
+    private void LoadMockData()
+    {
+        _researchPerTurn = 85;
+        _totalResearch = 2450;
+        _technologies = new List<TechnologyDto>
+        {
+            new("basic-weapons", "Basic Weapons", "military", 1, 100, "Foundational weapons.", new(), new() { new("+10% Damage", true) }, true, true),
+            new("shield-tech", "Shield Technology", "military", 1, 120, "Energy shields.", new(), new() { new("+15% Shields", true) }, true, true),
+            new("phaser-arrays", "Phaser Arrays", "military", 2, 200, "Advanced phasers.", new() { "basic-weapons" }, new() { new("+25% Damage", true) }, false, true),
+            new("impulse-drive", "Impulse Drive", "engineering", 1, 80, "Sublight propulsion.", new(), new() { new("Base movement", true) }, true, true),
+            new("warp-drive", "Warp Drive", "engineering", 2, 300, "FTL travel.", new() { "impulse-drive" }, new() { new("+2 Warp", true) }, false, true),
+            new("sensors", "Sensor Arrays", "science", 1, 100, "Detection systems.", new(), new() { new("+1 Range", true) }, true, true),
+            new("terraforming", "Terraforming", "science", 2, 350, "Transform worlds.", new() { "sensors" }, new() { new("New colonies", true) }, false, false),
+            new("cloaking", "Cloaking Device", "espionage", 1, 400, "Invisibility tech.", new(), new() { new("Ships cloak", true) }, false, false),
+        };
+        _selectedTech = _technologies.FirstOrDefault(t => !t.IsResearched && t.IsAvailable);
+        InitResearchSlots();
+    }
+
+    private void InitResearchSlots()
+    {
+        _researchSlots = new List<ResearchSlot>
+        {
+            new() { Category = "military", CurrentTech = null, Progress = 0, TurnsRemaining = 0 },
+            new() { Category = "science", CurrentTech = null, Progress = 0, TurnsRemaining = 0 },
+            new() { Category = "engineering", CurrentTech = null, Progress = 0, TurnsRemaining = 0 }
+        };
+    }
+
+    private bool CanResearch(TechnologyDto tech) => tech.IsAvailable && !tech.IsResearched;
+
+    private async Task StartResearch()
+    {
+        if (_selectedTech != null && CanResearch(_selectedTech))
+        {
+            await StartResearchOnTech(_selectedTech);
+        }
+    }
+
+    private async Task StartResearchOnTech(TechnologyDto tech)
+    {
+        if (_factionId.HasValue && tech.IsAvailable && !tech.IsResearched)
+        {
+            try
+            {
+                await Api.StartResearchAsync(_factionId.Value, tech.Id);
+                _currentResearchId = tech.Id;
+                _currentProgress = 0;
+                StateHasChanged();
+            }
+            catch { }
+        }
+    }
+
+    private void CatAll() => _category = "all";
+    private void CatPhysics() => _category = "military";
+    private void CatSociety() => _category = "science";
+    private void CatEngineering() => _category = "engineering";
+    
+    private string CatBtnClass(string c) => "cat-btn" + (_category == c ? " active" : "");
+    private string TechCardClass(TechnologyDto t) => "tech-card " + t.Category + (t.IsResearched ? " researched" : "") + (_selectedTech?.Id == t.Id ? " selected" : "") + (!t.IsAvailable && !t.IsResearched ? " locked" : "");
+    
+    private void SelectTech(TechnologyDto tech) => _selectedTech = tech;
+    private string GetCategoryIcon(string cat) => cat switch { "military" => "⚔", "science" => "🔬", "engineering" => "⚙", "colonization" => "🌍", "espionage" => "👁", _ => "?" };
+    private int GetTurnsNeeded(int cost) => _researchPerTurn > 0 ? (int)Math.Ceiling((double)cost / _researchPerTurn) : 99;
+    private string GetTechIcon(TechnologyDto tech) => tech.Category switch { "military" => "⚔", "engineering" => "⚙", "science" => "🔬", "colonization" => "🌍", "espionage" => "👁", _ => "📡" };
+
+    public class ResearchSlot
+    {
+        public string Category { get; set; } = "";
+        public TechnologyDto? CurrentTech { get; set; }
+        public int Progress { get; set; }
+        public int TurnsRemaining { get; set; }
+    }
+}

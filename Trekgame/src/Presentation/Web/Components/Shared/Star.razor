@@ -1,0 +1,153 @@
+@namespace StarTrekGame.Web.Components.Shared
+
+<svg class="star-svg" viewBox="-80 -80 160 160" width="@Size" height="@Size">
+    <defs>
+        <!-- Star glow filter -->
+        <filter id="star-glow-@_uniqueId" x="-100%" y="-100%" width="300%" height="300%">
+            <feGaussianBlur stdDeviation="@(_radius * 0.25)" result="blur"/>
+            <feFlood flood-color="@_glowColor" flood-opacity="0.7"/>
+            <feComposite in2="blur" operator="in"/>
+            <feMerge>
+                <feMergeNode/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
+        
+        <!-- Star gradient -->
+        <radialGradient id="star-grad-@_uniqueId" cx="50%" cy="50%">
+            <stop offset="0%" stop-color="#ffffff"/>
+            <stop offset="30%" stop-color="@_coreColor"/>
+            <stop offset="70%" stop-color="@_midColor"/>
+            <stop offset="100%" stop-color="@_outerColor"/>
+        </radialGradient>
+        
+        <!-- Corona gradient -->
+        <radialGradient id="corona-@_uniqueId" cx="50%" cy="50%">
+            <stop offset="50%" stop-color="@_glowColor" stop-opacity="0.4"/>
+            <stop offset="100%" stop-color="@_glowColor" stop-opacity="0"/>
+        </radialGradient>
+    </defs>
+    
+    <!-- Outer corona -->
+    <circle r="@(_radius * 1.8)" fill="url(#corona-@_uniqueId)">
+        @if (Animated)
+        {
+            <animate attributeName="r" values="@(_radius * 1.7);@(_radius * 1.9);@(_radius * 1.7)" 
+                     dur="@(_animationDuration)s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.3;0.5;0.3" 
+                     dur="@(_animationDuration)s" repeatCount="indefinite"/>
+        }
+    </circle>
+    
+    <!-- Inner glow -->
+    <circle r="@(_radius * 1.3)" fill="@_glowColor" opacity="0.2">
+        @if (Animated)
+        {
+            <animate attributeName="r" values="@(_radius * 1.25);@(_radius * 1.35);@(_radius * 1.25)" 
+                     dur="@(_animationDuration * 0.8)s" repeatCount="indefinite"/>
+        }
+    </circle>
+    
+    <!-- Star body -->
+    <circle r="@_radius" fill="url(#star-grad-@_uniqueId)" filter="url(#star-glow-@_uniqueId)">
+        @if (Animated)
+        {
+            <animate attributeName="r" values="@(_radius - 2);@(_radius + 2);@(_radius - 2)" 
+                     dur="@(_animationDuration * 1.2)s" repeatCount="indefinite"/>
+        }
+    </circle>
+    
+    <!-- Surface details (solar flares/spots) -->
+    @if (ShowDetails)
+    {
+        <circle cx="@(-_radius * 0.2)" cy="@(-_radius * 0.3)" r="@(_radius * 0.15)" 
+                fill="rgba(255,255,255,0.4)"/>
+        <circle cx="@(_radius * 0.25)" cy="@(_radius * 0.15)" r="@(_radius * 0.1)" 
+                fill="rgba(255,255,255,0.3)"/>
+        
+        @if (Type?.ToLower() == "yellow" || Type?.ToLower() == "orange")
+        {
+            <!-- Sunspots for yellow/orange stars -->
+            <circle cx="@(_radius * 0.1)" cy="@(-_radius * 0.1)" r="@(_radius * 0.08)" 
+                    fill="@_outerColor" opacity="0.6"/>
+        }
+    }
+    
+    @if (ShowLabel && !string.IsNullOrEmpty(Label))
+    {
+        @((MarkupString)$"<text y=\"{_radius + 25}\" text-anchor=\"middle\" font-size=\"11\" fill=\"{_glowColor}\" font-family=\"'Segoe UI', sans-serif\">{Label}</text>")
+    }
+</svg>
+
+@code {
+    [Parameter] public string Type { get; set; } = "Yellow";
+    [Parameter] public string? Label { get; set; }
+    [Parameter] public int Size { get; set; } = 120;
+    [Parameter] public bool Animated { get; set; } = true;
+    [Parameter] public bool ShowDetails { get; set; } = true;
+    [Parameter] public bool ShowLabel { get; set; } = false;
+    
+    private string _uniqueId = Guid.NewGuid().ToString("N")[..8];
+    private int _radius => GetRadius();
+    private double _animationDuration => GetAnimationDuration();
+    
+    private int GetRadius() => Type?.ToLower() switch
+    {
+        "blue" or "o" or "b" => Size / 3 + 10,  // Blue giants are larger
+        "white" or "a" or "f" => Size / 3 + 5,
+        "yellow" or "g" => Size / 3,
+        "orange" or "k" => Size / 3 - 3,
+        "red" or "m" => Size / 3 - 8,           // Red dwarfs are smaller
+        _ => Size / 3
+    };
+    
+    private double GetAnimationDuration() => Type?.ToLower() switch
+    {
+        "blue" or "o" or "b" => 2.5,
+        "white" or "a" or "f" => 3.0,
+        "yellow" or "g" => 4.0,
+        "orange" or "k" => 4.5,
+        "red" or "m" => 5.0,
+        _ => 4.0
+    };
+    
+    private string _coreColor => Type?.ToLower() switch
+    {
+        "yellow" or "g" => "#ffee88",
+        "orange" or "k" => "#ffcc66",
+        "red" or "m" => "#ff8866",
+        "blue" or "o" or "b" => "#aaddff",
+        "white" or "a" or "f" => "#ffffff",
+        _ => "#ffee88"
+    };
+    
+    private string _midColor => Type?.ToLower() switch
+    {
+        "yellow" or "g" => "#ffdd44",
+        "orange" or "k" => "#ff9933",
+        "red" or "m" => "#ff4444",
+        "blue" or "o" or "b" => "#4499ff",
+        "white" or "a" or "f" => "#ddddff",
+        _ => "#ffdd44"
+    };
+    
+    private string _outerColor => Type?.ToLower() switch
+    {
+        "yellow" or "g" => "#cc8800",
+        "orange" or "k" => "#aa5500",
+        "red" or "m" => "#882200",
+        "blue" or "o" or "b" => "#0055aa",
+        "white" or "a" or "f" => "#8888cc",
+        _ => "#cc8800"
+    };
+    
+    private string _glowColor => Type?.ToLower() switch
+    {
+        "yellow" or "g" => "#ffdd44",
+        "orange" or "k" => "#ff8c00",
+        "red" or "m" => "#ff4444",
+        "blue" or "o" or "b" => "#4488ff",
+        "white" or "a" or "f" => "#ffffff",
+        _ => "#ffdd44"
+    };
+}

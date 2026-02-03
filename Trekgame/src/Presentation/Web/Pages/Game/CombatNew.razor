@@ -1,0 +1,110 @@
+@page "/game/combat-new"
+@page "/game/combat"
+@page "/game/battle"
+@layout StellarisLayout
+<PageTitle>Tactical Combat - Galactic Strategy</PageTitle>
+<div class="stellaris-layout">
+    <header class="st-topbar combat-header"><div class="combat-title"><span class="alert-icon">⚠</span><span>COMBAT ENGAGEMENT</span></div><div class="combat-location">Sol System • Sector 001</div><div class="combat-timer"><span class="timer-label">AUTO-RESOLVE IN</span><span class="timer-value">@_autoResolveTimer</span></div></header>
+    <div class="combat-main">
+        <div class="fleet-panel left">
+            <div class="panel-header friendly"><span class="faction-icon">🌐</span><span class="faction-name">FEDERATION FLEET</span><span class="fleet-power">⚔ @_playerPower</span></div>
+            <div class="ships-list">@foreach(var s in _playerShips){<div class="ship-row @(s.Health<=0?"destroyed":"") @(s.IsTarget?"targeted":"")"><div class="ship-icon @s.Class.ToLower()"></div><div class="ship-info"><span class="ship-name">@s.Name</span><span class="ship-class">@s.Class</span></div><div class="ship-health"><div class="health-bar"><div class="health-fill" style="width:@s.Health%"></div></div><span class="health-text">@s.Health%</span></div><div class="ship-status">@if(s.Health<=0){<span class="status destroyed">DESTROYED</span>}else if(s.Health<30){<span class="status critical">CRITICAL</span>}else{<span class="status ok">COMBAT READY</span>}</div></div>}</div>
+            <div class="panel-footer"><span>@_playerShips.Count(s=>s.Health>0) / @_playerShips.Count Ships</span><span class="morale">Morale: @_playerMorale%</span></div>
+        </div>
+        <div class="combat-arena">
+            <div class="arena-bg"><div class="star-field"></div><div class="nebula-effect"></div></div>
+            <div class="combat-log"><div class="log-header">COMBAT LOG</div><div class="log-content">@foreach(var log in _combatLog.TakeLast(8)){<div class="log-entry @log.Type"><span class="log-time">[@log.Turn]</span><span class="log-text">@log.Message</span></div>}</div></div>
+            <div class="combat-visualization">
+                <div class="fleet-vis left">@foreach(var s in _playerShips.Where(s=>s.Health>0)){<div class="ship-sprite friendly @s.Class.ToLower()"><div class="weapon-fire @(s.IsFiring?"active":"")"></div></div>}</div>
+                <div class="combat-effects">@if(_currentPhase=="combat"){<div class="weapon-beams"></div><div class="explosions"></div>}</div>
+                <div class="fleet-vis right">@foreach(var s in _enemyShips.Where(s=>s.Health>0)){<div class="ship-sprite enemy @s.Class.ToLower()"></div>}</div>
+            </div>
+            <div class="combat-controls"><button class="st-btn lg" @onclick="NextPhase" disabled="@_combatEnded">@(_currentPhase=="setup"?"BEGIN COMBAT":_currentPhase=="combat"?"NEXT ROUND":"END BATTLE")</button><button class="st-btn" @onclick="AutoResolve" disabled="@_combatEnded">AUTO-RESOLVE</button><button class="st-btn" @onclick="Retreat">RETREAT</button></div>
+        </div>
+        <div class="fleet-panel right">
+            <div class="panel-header hostile"><span class="faction-icon">⚔</span><span class="faction-name">KLINGON FLEET</span><span class="fleet-power">⚔ @_enemyPower</span></div>
+            <div class="ships-list">@foreach(var s in _enemyShips){<div class="ship-row @(s.Health<=0?"destroyed":"")"><div class="ship-icon enemy @s.Class.ToLower()"></div><div class="ship-info"><span class="ship-name">@s.Name</span><span class="ship-class">@s.Class</span></div><div class="ship-health"><div class="health-bar enemy"><div class="health-fill" style="width:@s.Health%"></div></div><span class="health-text">@s.Health%</span></div></div>}</div>
+            <div class="panel-footer"><span>@_enemyShips.Count(s=>s.Health>0) / @_enemyShips.Count Ships</span></div>
+        </div>
+    </div>
+    @if(_combatEnded){<div class="combat-result @(_playerWon?"victory":"defeat")"><div class="result-content"><h2>@(_playerWon?"VICTORY":"DEFEAT")</h2><div class="result-stats"><div class="stat"><span class="label">Ships Lost</span><span class="value">@_playerShips.Count(s=>s.Health<=0)</span></div><div class="stat"><span class="label">Enemy Destroyed</span><span class="value">@_enemyShips.Count(s=>s.Health<=0)</span></div><div class="stat"><span class="label">Rounds</span><span class="value">@_round</span></div></div><button class="st-btn lg" @onclick='()=>Nav.NavigateTo("/game/galaxy")'>RETURN TO GALAXY</button></div></div>}
+</div>
+<style>
+.combat-header{background:linear-gradient(90deg,rgba(100,20,20,0.8),rgba(40,20,60,0.8),rgba(100,20,20,0.8))!important;justify-content:center;gap:40px}
+.combat-title{display:flex;align-items:center;gap:12px;font-family:var(--st-font-display);font-size:16px;color:var(--st-accent-red);letter-spacing:2px}
+.alert-icon{font-size:20px;animation:blink 1s infinite}
+.combat-location{font-size:12px;color:var(--st-text-muted)}
+.combat-timer{text-align:right}.timer-label{display:block;font-size:9px;color:var(--st-text-dim)}.timer-value{font-family:var(--st-font-display);font-size:18px;color:var(--st-accent-gold)}
+.combat-main{flex:1;display:flex;overflow:hidden}
+.fleet-panel{width:320px;background:var(--st-gradient-panel);border:1px solid var(--st-border-dark);display:flex;flex-direction:column}
+.fleet-panel.left{border-right:none;border-radius:0}.fleet-panel.right{border-left:none}
+.panel-header{display:flex;align-items:center;gap:12px;padding:16px;border-bottom:1px solid var(--st-border-dark)}
+.panel-header.friendly{background:linear-gradient(90deg,rgba(74,158,255,0.2),transparent)}.panel-header.hostile{background:linear-gradient(270deg,rgba(255,68,68,0.2),transparent)}
+.faction-icon{font-size:24px}.faction-name{flex:1;font-family:var(--st-font-display);font-size:14px;color:var(--st-text-white);letter-spacing:1px}.fleet-power{font-size:12px;color:var(--st-accent-gold)}
+.ships-list{flex:1;overflow-y:auto;padding:8px}
+.ship-row{display:flex;align-items:center;gap:10px;padding:10px;margin-bottom:6px;background:var(--st-bg-medium);border-radius:6px;transition:all 0.2s}
+.ship-row.destroyed{opacity:0.4}.ship-row.targeted{border:1px solid var(--st-accent-red);box-shadow:0 0 10px rgba(255,68,68,0.3)}
+.ship-icon{width:36px;height:36px;background:var(--st-accent-blue);clip-path:polygon(50% 0%,100% 100%,0% 100%);transition:all 0.2s}
+.ship-icon.cruiser{clip-path:polygon(50% 0%,85% 25%,100% 100%,0% 100%,15% 25%)}.ship-icon.battleship{width:42px;height:42px}
+.ship-icon.enemy{background:var(--st-accent-red)}
+.ship-info{flex:1;min-width:0}.ship-name{display:block;font-size:12px;font-weight:500;color:var(--st-text-white)}.ship-class{font-size:10px;color:var(--st-text-dim)}
+.ship-health{width:80px}.health-bar{height:6px;background:rgba(0,0,0,0.4);border-radius:3px;overflow:hidden;margin-bottom:2px}
+.health-fill{height:100%;background:linear-gradient(90deg,var(--st-accent-green),#66ff66);transition:width 0.3s}
+.health-bar.enemy .health-fill{background:linear-gradient(90deg,var(--st-accent-red),#ff6666)}
+.health-text{font-size:10px;color:var(--st-text-dim)}
+.ship-status .status{font-size:9px;padding:2px 6px;border-radius:3px}
+.status.ok{background:rgba(68,221,102,0.2);color:var(--st-accent-green)}.status.critical{background:rgba(255,170,68,0.2);color:var(--st-accent-orange)}.status.destroyed{background:rgba(255,68,68,0.2);color:var(--st-accent-red)}
+.panel-footer{padding:12px 16px;background:rgba(0,0,0,0.2);border-top:1px solid var(--st-border-dark);display:flex;justify-content:space-between;font-size:11px;color:var(--st-text-muted)}
+.morale{color:var(--st-accent-green)}
+.combat-arena{flex:1;position:relative;display:flex;flex-direction:column}
+.arena-bg{position:absolute;inset:0;background:linear-gradient(180deg,#0a0a1a,#050510);overflow:hidden}
+.star-field{position:absolute;inset:0;background-image:radial-gradient(2px 2px at 20px 30px,#fff,transparent),radial-gradient(2px 2px at 40px 70px,rgba(255,255,255,0.8),transparent),radial-gradient(1px 1px at 90px 40px,#fff,transparent),radial-gradient(2px 2px at 130px 80px,rgba(255,255,255,0.6),transparent);background-size:200px 100px}
+.nebula-effect{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,rgba(100,50,150,0.1) 0%,transparent 50%)}
+.combat-log{position:absolute;top:16px;left:50%;transform:translateX(-50%);width:400px;background:rgba(10,15,25,0.9);border:1px solid var(--st-border-dark);border-radius:8px;z-index:10}
+.log-header{padding:8px 12px;background:rgba(0,0,0,0.3);font-size:10px;color:var(--st-text-dim);letter-spacing:1px;border-bottom:1px solid var(--st-border-dark)}
+.log-content{padding:8px;max-height:150px;overflow-y:auto}
+.log-entry{padding:4px 8px;font-size:11px;margin-bottom:2px;border-radius:3px}
+.log-entry.damage{background:rgba(255,68,68,0.1);color:var(--st-accent-red)}.log-entry.hit{color:var(--st-text-muted)}.log-entry.destroy{background:rgba(255,170,68,0.1);color:var(--st-accent-orange)}.log-entry.info{color:var(--st-text-dim)}
+.log-time{color:var(--st-text-dim);margin-right:8px}
+.combat-visualization{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:80%;height:200px;display:flex;align-items:center;justify-content:space-between}
+.fleet-vis{display:flex;flex-direction:column;gap:12px}
+.ship-sprite{width:50px;height:50px;position:relative}
+.ship-sprite.friendly{background:var(--st-accent-blue);clip-path:polygon(100% 50%,0% 0%,0% 100%)}.ship-sprite.enemy{background:var(--st-accent-red);clip-path:polygon(0% 50%,100% 0%,100% 100%)}
+.weapon-fire{position:absolute;right:-30px;top:50%;width:30px;height:2px;background:linear-gradient(90deg,var(--st-accent-blue),transparent);opacity:0;transition:opacity 0.1s}.weapon-fire.active{opacity:1;animation:fire 0.2s}
+.combat-controls{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);display:flex;gap:12px;z-index:10}
+.combat-result{position:fixed;inset:0;background:rgba(0,0,0,0.9);display:flex;align-items:center;justify-content:center;z-index:100}
+.result-content{text-align:center;padding:40px;background:var(--st-gradient-panel);border:1px solid var(--st-border-bright);border-radius:12px}
+.combat-result.victory .result-content{border-color:var(--st-accent-green);box-shadow:0 0 40px rgba(68,221,102,0.3)}
+.combat-result.defeat .result-content{border-color:var(--st-accent-red);box-shadow:0 0 40px rgba(255,68,68,0.3)}
+.result-content h2{font-family:var(--st-font-display);font-size:36px;letter-spacing:4px;margin:0 0 24px}
+.victory h2{color:var(--st-accent-green)}.defeat h2{color:var(--st-accent-red)}
+.result-stats{display:flex;gap:32px;margin-bottom:32px}.result-stats .stat{text-align:center}.stat .label{display:block;font-size:11px;color:var(--st-text-dim);margin-bottom:4px}.stat .value{font-family:var(--st-font-display);font-size:24px;color:var(--st-text-bright)}
+@@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+@@keyframes fire{0%{width:0}100%{width:100px}}
+</style>
+@inject NavigationManager Nav
+@code{
+    List<ShipState> _playerShips=new();List<ShipState> _enemyShips=new();List<LogEntry> _combatLog=new();
+    int _playerPower=2400;int _enemyPower=2100;int _playerMorale=100;int _round=0;string _currentPhase="setup";bool _combatEnded;bool _playerWon;string _autoResolveTimer="0:30";
+    protected override void OnInitialized(){
+        _playerShips=new(){new(){Name="USS Enterprise",Class="Cruiser",Health=100},new(){Name="USS Defiant",Class="Frigate",Health=100},new(){Name="USS Voyager",Class="Cruiser",Health=100},new(){Name="USS Reliant",Class="Frigate",Health=100}};
+        _enemyShips=new(){new(){Name="IKS Rotarran",Class="Cruiser",Health=100},new(){Name="IKS Negh'Var",Class="Battleship",Health=100},new(){Name="IKS Pagh",Class="Frigate",Health=100}};
+        _combatLog.Add(new(){Turn=0,Type="info",Message="Combat engagement initiated"});
+    }
+    void NextPhase(){
+        if(_currentPhase=="setup"){_currentPhase="combat";_combatLog.Add(new(){Turn=1,Type="info",Message="Combat phase begins"});return;}
+        _round++;SimulateCombatRound();
+        if(_enemyShips.All(s=>s.Health<=0)){_combatEnded=true;_playerWon=true;return;}
+        if(_playerShips.All(s=>s.Health<=0)){_combatEnded=true;_playerWon=false;return;}
+    }
+    void SimulateCombatRound(){
+        var rnd=new Random();
+        foreach(var s in _playerShips.Where(s=>s.Health>0)){var target=_enemyShips.Where(e=>e.Health>0).OrderBy(_=>rnd.Next()).FirstOrDefault();if(target!=null){var dmg=rnd.Next(15,35);target.Health=Math.Max(0,target.Health-dmg);s.IsFiring=true;_combatLog.Add(new(){Turn=_round,Type="damage",Message=$"{s.Name} hits {target.Name} for {dmg} damage"});if(target.Health<=0)_combatLog.Add(new(){Turn=_round,Type="destroy",Message=$"{target.Name} destroyed!"});}}
+        foreach(var s in _enemyShips.Where(s=>s.Health>0)){var target=_playerShips.Where(e=>e.Health>0).OrderBy(_=>rnd.Next()).FirstOrDefault();if(target!=null){var dmg=rnd.Next(10,30);target.Health=Math.Max(0,target.Health-dmg);_combatLog.Add(new(){Turn=_round,Type="damage",Message=$"{s.Name} hits {target.Name} for {dmg} damage"});if(target.Health<=0)_combatLog.Add(new(){Turn=_round,Type="destroy",Message=$"{target.Name} destroyed!"});}}
+        StateHasChanged();
+    }
+    void AutoResolve(){while(!_combatEnded)NextPhase();}
+    void Retreat(){_combatEnded=true;_playerWon=false;_combatLog.Add(new(){Turn=_round,Type="info",Message="Fleet retreating..."});}
+    class ShipState{public string Name="";public string Class="";public int Health;public bool IsFiring;public bool IsTarget;}
+    class LogEntry{public int Turn;public string Type="";public string Message="";}
+}

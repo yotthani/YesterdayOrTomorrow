@@ -1,0 +1,226 @@
+@* Game Event Toast Component - Shows important in-game events *@
+@using System.Timers
+@implements IDisposable
+
+<div class="event-toast-container">
+    @foreach (var toast in _toasts)
+    {
+        <div class="event-toast @toast.Severity @(toast.IsExiting ? "exiting" : "")" @key="toast.Id">
+            <div class="toast-icon">@GetIcon(toast.Severity)</div>
+            <div class="toast-content">
+                <div class="toast-title">@toast.Title</div>
+                <div class="toast-message">@toast.Message</div>
+            </div>
+            <button class="toast-close" @onclick="() => DismissToast(toast)">×</button>
+            <div class="toast-timer" style="animation-duration: @(toast.Duration)ms;"></div>
+        </div>
+    }
+</div>
+
+@code {
+    private List<ToastItem> _toasts = new();
+    private int _nextId = 0;
+
+    public void Show(string title, string message, ToastSeverity severity = ToastSeverity.Info, int duration = 5000)
+    {
+        var toast = new ToastItem
+        {
+            Id = _nextId++,
+            Title = title,
+            Message = message,
+            Severity = severity.ToString().ToLower(),
+            Duration = duration
+        };
+
+        _toasts.Add(toast);
+        StateHasChanged();
+
+        // Auto-dismiss after duration
+        var timer = new Timer(duration);
+        timer.Elapsed += (s, e) =>
+        {
+            timer.Dispose();
+            InvokeAsync(() => DismissToast(toast));
+        };
+        timer.Start();
+    }
+
+    private async Task DismissToast(ToastItem toast)
+    {
+        toast.IsExiting = true;
+        StateHasChanged();
+
+        await Task.Delay(300); // Wait for exit animation
+
+        _toasts.Remove(toast);
+        StateHasChanged();
+    }
+
+    private string GetIcon(string severity) => severity switch
+    {
+        "success" => "✓",
+        "warning" => "⚠",
+        "error" => "✕",
+        "combat" => "⚔",
+        "discovery" => "🔭",
+        "diplomacy" => "🤝",
+        "research" => "🔬",
+        "production" => "🏭",
+        _ => "ℹ"
+    };
+
+    public void Dispose() { }
+
+    private class ToastItem
+    {
+        public int Id { get; set; }
+        public string Title { get; set; } = "";
+        public string Message { get; set; } = "";
+        public string Severity { get; set; } = "info";
+        public int Duration { get; set; } = 5000;
+        public bool IsExiting { get; set; }
+    }
+
+    public enum ToastSeverity
+    {
+        Info,
+        Success,
+        Warning,
+        Error,
+        Combat,
+        Discovery,
+        Diplomacy,
+        Research,
+        Production
+    }
+}
+
+<style>
+    .event-toast-container {
+        position: fixed;
+        top: 70px;
+        right: 20px;
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        max-width: 400px;
+    }
+
+    .event-toast {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 16px;
+        background: rgba(10, 10, 30, 0.95);
+        border: 2px solid var(--toast-color, #4488ff);
+        border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 20px var(--toast-glow, rgba(68, 136, 255, 0.2));
+        animation: toast-enter 0.3s ease-out;
+        position: relative;
+        overflow: hidden;
+        backdrop-filter: blur(10px);
+    }
+
+    .event-toast.exiting {
+        animation: toast-exit 0.3s ease-in forwards;
+    }
+
+    @@keyframes toast-enter {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+
+    @@keyframes toast-exit {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(100%); opacity: 0; }
+    }
+
+    /* Severity colors */
+    .event-toast.info { --toast-color: #4488ff; --toast-glow: rgba(68, 136, 255, 0.3); }
+    .event-toast.success { --toast-color: #44ff88; --toast-glow: rgba(68, 255, 136, 0.3); }
+    .event-toast.warning { --toast-color: #ffaa00; --toast-glow: rgba(255, 170, 0, 0.3); }
+    .event-toast.error { --toast-color: #ff4444; --toast-glow: rgba(255, 68, 68, 0.3); }
+    .event-toast.combat { --toast-color: #ff4444; --toast-glow: rgba(255, 68, 68, 0.3); }
+    .event-toast.discovery { --toast-color: #88ddff; --toast-glow: rgba(136, 221, 255, 0.3); }
+    .event-toast.diplomacy { --toast-color: #cc99ff; --toast-glow: rgba(204, 153, 255, 0.3); }
+    .event-toast.research { --toast-color: #44ffff; --toast-glow: rgba(68, 255, 255, 0.3); }
+    .event-toast.production { --toast-color: #ffcc00; --toast-glow: rgba(255, 204, 0, 0.3); }
+
+    .toast-icon {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        background: var(--toast-color);
+        color: #000;
+        border-radius: 6px;
+        flex-shrink: 0;
+    }
+
+    .toast-content {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .toast-title {
+        font-weight: 700;
+        font-size: 14px;
+        color: var(--toast-color);
+        margin-bottom: 4px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .toast-message {
+        font-size: 13px;
+        color: #aabbcc;
+        line-height: 1.4;
+    }
+
+    .toast-close {
+        background: none;
+        border: none;
+        color: #666;
+        font-size: 20px;
+        cursor: pointer;
+        padding: 0;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+        transition: all 0.2s;
+    }
+
+    .toast-close:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+    }
+
+    .toast-timer {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        height: 3px;
+        background: var(--toast-color);
+        animation: timer-shrink linear forwards;
+    }
+
+    @@keyframes timer-shrink {
+        from { width: 100%; }
+        to { width: 0%; }
+    }
+
+    /* Mobile responsive */
+    @@media (max-width: 480px) {
+        .event-toast-container {
+            left: 10px;
+            right: 10px;
+            max-width: none;
+        }
+    }
+</style>

@@ -1,0 +1,848 @@
+@page "/game/saves"
+@inject HttpClient Http
+@inject NavigationManager Nav
+@inject IJSRuntime JS
+
+<div class="saveload-screen">
+    <div class="screen-header">
+        <h1>💾 Save & Load Game</h1>
+        <div class="header-tabs">
+            <button class="tab @(_activeTab == "save" ? "active" : "")" @onclick='() => _activeTab = "save"'>
+                Save Game
+            </button>
+            <button class="tab @(_activeTab == "load" ? "active" : "")" @onclick='() => _activeTab = "load"'>
+                Load Game
+            </button>
+        </div>
+        <button class="btn-back" @onclick="GoBack">← Back to Game</button>
+    </div>
+
+    <div class="screen-content">
+        @if (_activeTab == "save")
+        {
+            <!-- SAVE TAB -->
+            <div class="save-section">
+                <div class="new-save">
+                    <h2>Create New Save</h2>
+                    <div class="save-form">
+                        <div class="input-group">
+                            <label>Save Name</label>
+                            <input type="text" @bind="_newSaveName" placeholder="My Save Game" maxlength="50" />
+                        </div>
+                        <div class="input-group">
+                            <label>Description (optional)</label>
+                            <textarea @bind="_newSaveDescription" placeholder="Notes about this save..." maxlength="200"></textarea>
+                        </div>
+                        <div class="save-actions">
+                            <button class="btn-save" @onclick="SaveGame" disabled="@(string.IsNullOrWhiteSpace(_newSaveName))">
+                                💾 Save Game
+                            </button>
+                            <button class="btn-quicksave" @onclick="QuickSave">
+                                ⚡ Quick Save
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="current-info">
+                    <h3>Current Game</h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="label">Turn</span>
+                            <span class="value">@_currentTurn</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="label">Faction</span>
+                            <span class="value">@_playerFaction</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="label">Play Time</span>
+                            <span class="value">@_playTime</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="label">Colonies</span>
+                            <span class="value">@_colonyCount</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <!-- LOAD TAB -->
+            <div class="load-section">
+                <div class="load-filters">
+                    <input type="text" @bind="_searchFilter" @bind:event="oninput" 
+                           placeholder="Search saves..." class="search-input" />
+                    <select @bind="_sortBy">
+                        <option value="date">Sort by Date</option>
+                        <option value="name">Sort by Name</option>
+                        <option value="turn">Sort by Turn</option>
+                    </select>
+                    <button class="btn-import" @onclick="ImportSave">
+                        📥 Import
+                    </button>
+                </div>
+            </div>
+        }
+
+        <!-- SAVE LIST (shown in both tabs) -->
+        <div class="saves-list">
+            <h2>@(_activeTab == "save" ? "Overwrite Existing Save" : "Select Save to Load")</h2>
+            
+            @if (_loading)
+            {
+                <div class="loading">Loading saves...</div>
+            }
+            else if (!_filteredSaves.Any())
+            {
+                <div class="no-saves">
+                    <span class="icon">📁</span>
+                    <p>No save games found</p>
+                </div>
+            }
+            else
+            {
+                <div class="saves-grid">
+                    @foreach (var save in _filteredSaves)
+                    {
+                        <div class="save-card @(save.IsQuickSave ? "quicksave" : "") @(save.IsAutoSave ? "autosave" : "") @(_selectedSave?.Id == save.Id ? "selected" : "")"
+                             @onclick="() => SelectSave(save)">
+                            
+                            <div class="save-thumbnail">
+                                @if (save.IsQuickSave)
+                                {
+                                    <span class="badge quicksave">⚡ Quick</span>
+                                }
+                                else if (save.IsAutoSave)
+                                {
+                                    <span class="badge autosave">🔄 Auto</span>
+                                }
+                                <div class="thumbnail-placeholder">🌌</div>
+                            </div>
+
+                            <div class="save-info">
+                                <h3 class="save-name">@save.SaveName</h3>
+                                <p class="save-desc">@(save.Description ?? "No description")</p>
+                                
+                                <div class="save-meta">
+                                    <span class="meta-item">
+                                        <span class="icon">📅</span>
+                                        @save.SavedAt.ToString("MMM dd, yyyy HH:mm")
+                                    </span>
+                                    <span class="meta-item">
+                                        <span class="icon">🔄</span>
+                                        Turn @save.GameTurn
+                                    </span>
+                                    <span class="meta-item">
+                                        <span class="icon">⏱️</span>
+                                        @FormatPlayTime(save.PlayTime)
+                                    </span>
+                                    <span class="meta-item">
+                                        <span class="icon">💾</span>
+                                        @save.FileSizeKb KB
+                                    </span>
+                                </div>
+
+                                @if (!string.IsNullOrEmpty(save.Metadata))
+                                {
+                                    <div class="save-metadata">
+                                        @{
+                                            var meta = ParseMetadata(save.Metadata);
+                                        }
+                                        <span>@meta.PlayerFaction</span>
+                                        <span>@meta.TotalColonies colonies</span>
+                                        @if (!string.IsNullOrEmpty(meta.ActiveCrisis))
+                                        {
+                                            <span class="crisis">⚠️ @meta.ActiveCrisis</span>
+                                        }
+                                    </div>
+                                }
+                            </div>
+
+                            <div class="save-actions">
+                                @if (_activeTab == "load")
+                                {
+                                    <button class="btn-load" @onclick="() => LoadSave(save)" @onclick:stopPropagation="true">
+                                        📂 Load
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button class="btn-overwrite" @onclick="() => OverwriteSave(save)" @onclick:stopPropagation="true">
+                                        💾 Overwrite
+                                    </button>
+                                }
+                                <button class="btn-export" @onclick="() => ExportSave(save)" @onclick:stopPropagation="true">
+                                    📤
+                                </button>
+                                <button class="btn-delete" @onclick="() => ConfirmDelete(save)" @onclick:stopPropagation="true">
+                                    🗑️
+                                </button>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    @if (_showConfirmModal)
+    {
+        <div class="modal-overlay" @onclick="CloseConfirmModal">
+            <div class="modal confirm-modal" @onclick:stopPropagation="true">
+                <h2>@_confirmTitle</h2>
+                <p>@_confirmMessage</p>
+                <div class="modal-buttons">
+                    <button class="btn-confirm" @onclick="ExecuteConfirmedAction">@_confirmButtonText</button>
+                    <button class="btn-cancel" @onclick="CloseConfirmModal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Status Message -->
+    @if (!string.IsNullOrEmpty(_statusMessage))
+    {
+        <div class="status-toast @_statusType">
+            <span>@_statusMessage</span>
+            <button @onclick='() => _statusMessage = ""'>✕</button>
+        </div>
+    }
+</div>
+
+<style>
+    .saveload-screen {
+        min-height: 100vh;
+        padding: 20px;
+        background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3a 100%);
+        color: white;
+    }
+
+    .screen-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .screen-header h1 { margin: 0; }
+
+    .header-tabs {
+        display: flex;
+        gap: 5px;
+        background: rgba(0,0,0,0.3);
+        padding: 5px;
+        border-radius: 25px;
+    }
+
+    .tab {
+        padding: 10px 25px;
+        border: none;
+        border-radius: 20px;
+        background: transparent;
+        color: #888;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .tab.active {
+        background: #3498db;
+        color: white;
+    }
+
+    .screen-content {
+        display: grid;
+        grid-template-columns: 350px 1fr;
+        gap: 25px;
+    }
+
+    .save-section, .load-section {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .new-save, .current-info {
+        background: rgba(0,0,0,0.4);
+        border-radius: 15px;
+        padding: 20px;
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .new-save h2, .current-info h3 {
+        margin: 0 0 15px 0;
+    }
+
+    .save-form {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .input-group {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .input-group label {
+        color: #888;
+        font-size: 0.9em;
+    }
+
+    .input-group input, .input-group textarea {
+        padding: 12px;
+        border: 1px solid rgba(255,255,255,0.2);
+        border-radius: 8px;
+        background: rgba(255,255,255,0.05);
+        color: white;
+        font-size: 1em;
+    }
+
+    .input-group textarea {
+        resize: none;
+        height: 80px;
+    }
+
+    .save-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .btn-save, .btn-quicksave {
+        flex: 1;
+        padding: 12px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: all 0.2s;
+    }
+
+    .btn-save {
+        background: #27ae60;
+        color: white;
+    }
+
+    .btn-quicksave {
+        background: #f39c12;
+        color: white;
+    }
+
+    .btn-save:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+
+    .info-item {
+        display: flex;
+        flex-direction: column;
+        padding: 10px;
+        background: rgba(255,255,255,0.05);
+        border-radius: 8px;
+    }
+
+    .info-item .label {
+        color: #888;
+        font-size: 0.85em;
+    }
+
+    .info-item .value {
+        font-size: 1.2em;
+        font-weight: bold;
+    }
+
+    .load-filters {
+        display: flex;
+        gap: 15px;
+        padding: 15px;
+        background: rgba(0,0,0,0.4);
+        border-radius: 10px;
+    }
+
+    .search-input {
+        flex: 1;
+        padding: 10px 15px;
+        border: 1px solid rgba(255,255,255,0.2);
+        border-radius: 8px;
+        background: rgba(255,255,255,0.05);
+        color: white;
+    }
+
+    .load-filters select {
+        padding: 10px 15px;
+        border: 1px solid rgba(255,255,255,0.2);
+        border-radius: 8px;
+        background: rgba(255,255,255,0.1);
+        color: white;
+    }
+
+    .btn-import {
+        padding: 10px 20px;
+        background: #9b59b6;
+        border: none;
+        border-radius: 8px;
+        color: white;
+        cursor: pointer;
+    }
+
+    .saves-list {
+        background: rgba(0,0,0,0.3);
+        border-radius: 15px;
+        padding: 20px;
+    }
+
+    .saves-list h2 {
+        margin: 0 0 20px 0;
+    }
+
+    .saves-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        max-height: 600px;
+        overflow-y: auto;
+    }
+
+    .save-card {
+        display: grid;
+        grid-template-columns: 100px 1fr auto;
+        gap: 15px;
+        padding: 15px;
+        background: rgba(255,255,255,0.05);
+        border: 2px solid transparent;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .save-card:hover {
+        background: rgba(255,255,255,0.08);
+        border-color: rgba(255,255,255,0.2);
+    }
+
+    .save-card.selected {
+        border-color: #3498db;
+        background: rgba(52, 152, 219, 0.1);
+    }
+
+    .save-card.quicksave {
+        border-left: 4px solid #f39c12;
+    }
+
+    .save-card.autosave {
+        border-left: 4px solid #3498db;
+    }
+
+    .save-thumbnail {
+        position: relative;
+        width: 100px;
+        height: 75px;
+        background: rgba(0,0,0,0.3);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .thumbnail-placeholder {
+        font-size: 2em;
+    }
+
+    .badge {
+        position: absolute;
+        top: 5px;
+        left: 5px;
+        padding: 2px 8px;
+        border-radius: 10px;
+        font-size: 0.7em;
+    }
+
+    .badge.quicksave { background: #f39c12; }
+    .badge.autosave { background: #3498db; }
+
+    .save-info {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .save-name {
+        margin: 0;
+        font-size: 1.1em;
+    }
+
+    .save-desc {
+        margin: 0;
+        color: #888;
+        font-size: 0.9em;
+    }
+
+    .save-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-top: 5px;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 0.85em;
+        color: #aaa;
+    }
+
+    .save-metadata {
+        display: flex;
+        gap: 15px;
+        margin-top: 5px;
+        font-size: 0.85em;
+    }
+
+    .save-metadata .crisis {
+        color: #e74c3c;
+    }
+
+    .save-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .btn-load, .btn-overwrite {
+        padding: 8px 15px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.9em;
+    }
+
+    .btn-load { background: #27ae60; color: white; }
+    .btn-overwrite { background: #3498db; color: white; }
+
+    .btn-export, .btn-delete {
+        padding: 6px 12px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        background: rgba(255,255,255,0.1);
+    }
+
+    .btn-delete:hover { background: rgba(231, 76, 60, 0.5); }
+
+    .no-saves {
+        text-align: center;
+        padding: 50px;
+        color: #888;
+    }
+
+    .no-saves .icon {
+        font-size: 3em;
+        display: block;
+        margin-bottom: 15px;
+    }
+
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+
+    .modal {
+        background: #1a1a2e;
+        border-radius: 15px;
+        padding: 25px;
+        max-width: 400px;
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .modal h2 { margin-top: 0; }
+
+    .modal-buttons {
+        display: flex;
+        gap: 15px;
+        margin-top: 20px;
+    }
+
+    .modal-buttons button {
+        flex: 1;
+        padding: 12px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+
+    .btn-confirm { background: #e74c3c; color: white; }
+    .btn-cancel { background: #7f8c8d; color: white; }
+
+    .status-toast {
+        position: fixed;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 15px 25px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        animation: slideUp 0.3s ease;
+    }
+
+    .status-toast.success { background: #27ae60; }
+    .status-toast.error { background: #e74c3c; }
+    .status-toast.info { background: #3498db; }
+
+    .status-toast button {
+        background: none;
+        border: none;
+        color: white;
+        cursor: pointer;
+        font-size: 1.2em;
+    }
+
+    @@keyframes slideUp {
+        from { transform: translateX(-50%) translateY(100px); opacity: 0; }
+        to { transform: translateX(-50%) translateY(0); opacity: 1; }
+    }
+
+    .btn-back {
+        padding: 10px 20px;
+        background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.2);
+        border-radius: 5px;
+        color: white;
+        cursor: pointer;
+    }
+
+    .loading {
+        text-align: center;
+        padding: 40px;
+        color: #888;
+    }
+
+    @@media (max-width: 900px) {
+        .screen-content {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+@code {
+    private string _activeTab = "save";
+    private bool _loading = true;
+    private List<SaveGameInfoDisplay> _saves = new();
+    private SaveGameInfoDisplay? _selectedSave;
+
+    // Save form
+    private string _newSaveName = "";
+    private string _newSaveDescription = "";
+
+    // Filters
+    private string _searchFilter = "";
+    private string _sortBy = "date";
+
+    // Current game info
+    private int _currentTurn = 47;
+    private string _playerFaction = "United Federation of Planets";
+    private string _playTime = "2h 34m";
+    private int _colonyCount = 12;
+
+    // Confirmation modal
+    private bool _showConfirmModal = false;
+    private string _confirmTitle = "";
+    private string _confirmMessage = "";
+    private string _confirmButtonText = "";
+    private Action? _confirmAction;
+
+    // Status message
+    private string _statusMessage = "";
+    private string _statusType = "info";
+
+    private IEnumerable<SaveGameInfoDisplay> _filteredSaves => _saves
+        .Where(s => string.IsNullOrEmpty(_searchFilter) || 
+                   s.SaveName.Contains(_searchFilter, StringComparison.OrdinalIgnoreCase))
+        .OrderByDescending(s => _sortBy switch
+        {
+            "name" => 0,
+            "turn" => s.GameTurn,
+            _ => (int)(s.SavedAt - DateTime.MinValue).TotalSeconds
+        })
+        .ThenBy(s => _sortBy == "name" ? s.SaveName : "");
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadSaves();
+    }
+
+    private async Task LoadSaves()
+    {
+        _loading = true;
+        await Task.Delay(300); // Simulated load
+
+        _saves = new List<SaveGameInfoDisplay>
+        {
+            new() { Id = Guid.NewGuid(), SaveName = "Before Borg Attack", Description = "Preparing defenses", SavedAt = DateTime.Now.AddHours(-2), GameTurn = 45, PlayTime = TimeSpan.FromHours(2.5), FileSizeKb = 1240 },
+            new() { Id = Guid.NewGuid(), SaveName = "Quick Save", IsQuickSave = true, SavedAt = DateTime.Now.AddMinutes(-30), GameTurn = 47, PlayTime = TimeSpan.FromHours(2.8), FileSizeKb = 1280 },
+            new() { Id = Guid.NewGuid(), SaveName = "Auto Save", IsAutoSave = true, SavedAt = DateTime.Now.AddMinutes(-5), GameTurn = 47, PlayTime = TimeSpan.FromHours(2.9), FileSizeKb = 1285 },
+            new() { Id = Guid.NewGuid(), SaveName = "Alliance Formed", Description = "Klingon alliance complete", SavedAt = DateTime.Now.AddDays(-1), GameTurn = 38, PlayTime = TimeSpan.FromHours(1.8), FileSizeKb = 980, Metadata = "{\"PlayerFaction\":\"Federation\",\"TotalColonies\":8,\"ActiveCrisis\":null}" },
+            new() { Id = Guid.NewGuid(), SaveName = "Early Game", SavedAt = DateTime.Now.AddDays(-3), GameTurn = 15, PlayTime = TimeSpan.FromMinutes(45), FileSizeKb = 520 }
+        };
+
+        _loading = false;
+    }
+
+    private void GoBack() => Nav.NavigateTo("/game/galaxy");
+
+    private void SelectSave(SaveGameInfoDisplay save) => _selectedSave = save;
+
+    private string FormatPlayTime(TimeSpan time)
+    {
+        if (time.TotalHours >= 1)
+            return $"{(int)time.TotalHours}h {time.Minutes}m";
+        return $"{time.Minutes}m";
+    }
+
+    private SaveMetadataDisplay ParseMetadata(string? json)
+    {
+        if (string.IsNullOrEmpty(json)) return new SaveMetadataDisplay();
+        try
+        {
+            return System.Text.Json.JsonSerializer.Deserialize<SaveMetadataDisplay>(json) ?? new();
+        }
+        catch { return new SaveMetadataDisplay(); }
+    }
+
+    private async Task SaveGame()
+    {
+        ShowStatus("Saving game...", "info");
+        await Task.Delay(1000);
+        ShowStatus("Game saved successfully!", "success");
+        _newSaveName = "";
+        _newSaveDescription = "";
+        await LoadSaves();
+    }
+
+    private async Task QuickSave()
+    {
+        ShowStatus("Quick saving...", "info");
+        await Task.Delay(500);
+        ShowStatus("Quick save complete!", "success");
+        await LoadSaves();
+    }
+
+    private async Task LoadSave(SaveGameInfoDisplay save)
+    {
+        ShowStatus($"Loading {save.SaveName}...", "info");
+        await Task.Delay(1500);
+        Nav.NavigateTo("/game/galaxy");
+    }
+
+    private void OverwriteSave(SaveGameInfoDisplay save)
+    {
+        _confirmTitle = "Overwrite Save?";
+        _confirmMessage = $"Are you sure you want to overwrite '{save.SaveName}'? This cannot be undone.";
+        _confirmButtonText = "Overwrite";
+        _confirmAction = async () => 
+        {
+            ShowStatus("Saving...", "info");
+            await Task.Delay(1000);
+            ShowStatus("Save overwritten!", "success");
+        };
+        _showConfirmModal = true;
+    }
+
+    private void ConfirmDelete(SaveGameInfoDisplay save)
+    {
+        _confirmTitle = "Delete Save?";
+        _confirmMessage = $"Are you sure you want to delete '{save.SaveName}'? This cannot be undone.";
+        _confirmButtonText = "Delete";
+        _confirmAction = async () =>
+        {
+            _saves.Remove(save);
+            ShowStatus("Save deleted", "success");
+        };
+        _showConfirmModal = true;
+    }
+
+    private async Task ExportSave(SaveGameInfoDisplay save)
+    {
+        ShowStatus("Exporting save...", "info");
+        await Task.Delay(500);
+        // Would trigger file download
+        ShowStatus("Save exported!", "success");
+    }
+
+    private async Task ImportSave()
+    {
+        ShowStatus("Select a save file to import", "info");
+        // Would open file picker
+    }
+
+    private void CloseConfirmModal()
+    {
+        _showConfirmModal = false;
+        _confirmAction = null;
+    }
+
+    private async Task ExecuteConfirmedAction()
+    {
+        CloseConfirmModal();
+        if (_confirmAction != null)
+        {
+            await Task.Run(() => _confirmAction());
+        }
+    }
+
+    private void ShowStatus(string message, string type)
+    {
+        _statusMessage = message;
+        _statusType = type;
+        StateHasChanged();
+
+        // Auto-hide after 3 seconds
+        _ = Task.Delay(3000).ContinueWith(_ =>
+        {
+            _statusMessage = "";
+            InvokeAsync(StateHasChanged);
+        });
+    }
+
+    public class SaveGameInfoDisplay
+    {
+        public Guid Id { get; set; }
+        public string SaveName { get; set; } = "";
+        public string? Description { get; set; }
+        public DateTime SavedAt { get; set; }
+        public int GameTurn { get; set; }
+        public TimeSpan PlayTime { get; set; }
+        public bool IsQuickSave { get; set; }
+        public bool IsAutoSave { get; set; }
+        public string? Metadata { get; set; }
+        public int FileSizeKb { get; set; }
+    }
+
+    public class SaveMetadataDisplay
+    {
+        public string PlayerFaction { get; set; } = "Unknown";
+        public int TotalColonies { get; set; }
+        public string? ActiveCrisis { get; set; }
+    }
+}

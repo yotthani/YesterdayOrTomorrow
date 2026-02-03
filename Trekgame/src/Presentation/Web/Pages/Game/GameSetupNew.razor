@@ -1,0 +1,89 @@
+@page "/game/setup-new"
+@page "/game/new"
+@page "/game/setup/{GameId:guid}"
+@page "/game/new-game"
+@layout StellarisLayout
+@inject NavigationManager Nav
+<PageTitle>New Game - Galactic Strategy</PageTitle>
+<div class="setup-page">
+    <div class="setup-bg"><div class="stars"></div></div>
+    <div class="setup-content">
+        <h1>NEW GAME SETUP</h1>
+        <div class="setup-layout">
+            <div class="setup-section faction-select">
+                <h2>SELECT YOUR EMPIRE</h2>
+                <div class="factions-grid">
+                    @foreach(var f in _factions){<div class="faction-option @(_selectedFaction==f.Id?"selected":"")" @onclick="()=>_selectedFaction=f.Id"><div class="faction-banner @f.Id"><div class="faction-emblem">@f.Icon</div></div><div class="faction-info"><span class="faction-name">@f.Name</span><span class="faction-trait">@f.Trait</span></div><div class="faction-stats"><span>⚔ @f.Military</span><span>🔬 @f.Science</span><span>💰 @f.Economy</span></div></div>}
+                </div>
+            </div>
+            <div class="setup-section galaxy-settings">
+                <h2>GALAXY SETTINGS</h2>
+                <div class="setting-row"><span class="setting-label">Galaxy Size</span><div class="setting-options">@foreach(var s in new[]{"Small","Medium","Large","Huge"}){<button class="option-btn @(_galaxySize==s?"active":"")" @onclick="()=>_galaxySize=s">@s</button>}</div></div>
+                <div class="setting-row"><span class="setting-label">Star Density</span><div class="setting-options">@foreach(var s in new[]{"Sparse","Normal","Dense"}){<button class="option-btn @(_starDensity==s?"active":"")" @onclick="()=>_starDensity=s">@s</button>}</div></div>
+                <div class="setting-row"><span class="setting-label">AI Empires</span><div class="setting-options">@for(int i=2;i<=8;i+=2){var n=i;<button class="option-btn @(_aiCount==n?"active":"")" @onclick="()=>_aiCount=n">@n</button>}</div></div>
+                <div class="setting-row"><span class="setting-label">Difficulty</span><div class="setting-options">@foreach(var s in new[]{"Cadet","Captain","Admiral"}){<button class="option-btn @(_difficulty==s?"active":"")" @onclick="()=>_difficulty=s">@s</button>}</div></div>
+                <div class="setting-row"><span class="setting-label">Victory Conditions</span><div class="victory-checks"><label><input type="checkbox" checked /> Conquest</label><label><input type="checkbox" checked /> Diplomacy</label><label><input type="checkbox" checked /> Technology</label><label><input type="checkbox" /> Score</label></div></div>
+            </div>
+            <div class="setup-section empire-preview">
+                <h2>EMPIRE PREVIEW</h2>
+                @{var sel=_factions.FirstOrDefault(f=>f.Id==_selectedFaction);}
+                @if(sel!=null){
+                <div class="preview-card @sel.Id">
+                    <div class="preview-header"><div class="preview-emblem">@sel.Icon</div><div class="preview-title"><h3>@sel.Name</h3><span>@sel.Government</span></div></div>
+                    <div class="preview-body">
+                        <p class="preview-desc">@sel.Description</p>
+                        <div class="preview-traits"><h4>EMPIRE TRAITS</h4>@foreach(var t in sel.Traits){<span class="trait-tag @(t.StartsWith("-")?"negative":"positive")">@t</span>}</div>
+                        <div class="preview-stats"><div class="pstat"><span class="pstat-label">Starting Systems</span><span class="pstat-val">3</span></div><div class="pstat"><span class="pstat-label">Starting Ships</span><span class="pstat-val">5</span></div><div class="pstat"><span class="pstat-label">Home World</span><span class="pstat-val">@sel.Homeworld</span></div></div>
+                    </div>
+                </div>}
+            </div>
+        </div>
+        <div class="setup-actions"><button class="st-btn lg" @onclick='()=>Nav.NavigateTo("/menu")'>← BACK</button><button class="st-btn lg primary" @onclick="StartGame">START GAME →</button></div>
+    </div>
+</div>
+<style>
+.setup-page{position:fixed;inset:0;background:#040608;overflow:hidden}
+.setup-bg{position:absolute;inset:0}.stars{position:absolute;inset:0;background-image:radial-gradient(1px 1px at 50px 30px,#fff,transparent),radial-gradient(1px 1px at 150px 80px,rgba(255,255,255,0.6),transparent);background-size:200px 150px}
+.setup-content{position:relative;z-index:10;max-width:1400px;margin:0 auto;padding:40px;height:100%;display:flex;flex-direction:column}
+.setup-content h1{font-family:var(--st-font-display);font-size:28px;color:var(--st-text-white);letter-spacing:4px;margin:0 0 32px;text-align:center}
+.setup-layout{flex:1;display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px;overflow:hidden}
+.setup-section{background:var(--st-gradient-panel);border:1px solid var(--st-border-dark);border-radius:8px;padding:20px;overflow-y:auto}
+.setup-section h2{font-family:var(--st-font-display);font-size:14px;color:var(--st-text-muted);letter-spacing:2px;margin:0 0 20px;padding-bottom:12px;border-bottom:1px solid var(--st-border-dark)}
+.factions-grid{display:flex;flex-direction:column;gap:12px}
+.faction-option{display:flex;gap:12px;padding:12px;background:var(--st-bg-medium);border:2px solid transparent;border-radius:8px;cursor:pointer;transition:all 0.2s}
+.faction-option:hover{background:var(--st-bg-light)}.faction-option.selected{border-color:var(--st-accent-blue);background:rgba(74,158,255,0.1)}
+.faction-banner{width:60px;height:60px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:28px}
+.faction-banner.federation{background:linear-gradient(135deg,#1a4a8c,#0a2a5c)}.faction-banner.klingon{background:linear-gradient(135deg,#8c1a1a,#5c0a0a)}.faction-banner.romulan{background:linear-gradient(135deg,#1a5c3c,#0a3c2c)}.faction-banner.cardassian{background:linear-gradient(135deg,#8c6a1a,#5c4a0a)}.faction-banner.ferengi{background:linear-gradient(135deg,#8c8a1a,#5c5a0a)}.faction-banner.borg{background:linear-gradient(135deg,#1a3c1a,#0a2a0a)}
+.faction-info{flex:1}.faction-name{display:block;font-family:var(--st-font-display);font-size:14px;color:var(--st-text-white)}.faction-trait{font-size:11px;color:var(--st-text-dim)}
+.faction-stats{display:flex;flex-direction:column;gap:4px;font-size:11px;color:var(--st-text-muted)}
+.setting-row{margin-bottom:20px}.setting-label{display:block;font-size:12px;color:var(--st-text-muted);margin-bottom:10px}
+.setting-options{display:flex;gap:8px}.option-btn{padding:8px 16px;background:var(--st-gradient-button);border:1px solid var(--st-border-dark);border-radius:4px;color:var(--st-text-muted);font-size:12px;cursor:pointer;transition:all 0.15s}
+.option-btn:hover{background:var(--st-gradient-button-hover)}.option-btn.active{background:var(--st-accent-blue);border-color:var(--st-accent-blue);color:#fff}
+.victory-checks{display:flex;flex-wrap:wrap;gap:12px}.victory-checks label{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--st-text-muted);cursor:pointer}
+.preview-card{border-radius:8px;overflow:hidden}
+.preview-header{display:flex;gap:16px;padding:20px;background:rgba(0,0,0,0.3)}
+.preview-card.federation .preview-header{background:linear-gradient(135deg,rgba(26,74,140,0.5),transparent)}
+.preview-card.klingon .preview-header{background:linear-gradient(135deg,rgba(140,26,26,0.5),transparent)}
+.preview-emblem{width:64px;height:64px;background:rgba(0,0,0,0.3);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:36px}
+.preview-title h3{font-family:var(--st-font-display);font-size:20px;color:var(--st-text-white);margin:0 0 4px}.preview-title span{font-size:12px;color:var(--st-text-dim)}
+.preview-body{padding:20px}.preview-desc{font-size:12px;color:var(--st-text-muted);line-height:1.5;margin-bottom:20px}
+.preview-traits h4{font-size:11px;color:var(--st-text-dim);letter-spacing:1px;margin:0 0 10px}
+.trait-tag{display:inline-block;padding:4px 10px;margin:0 6px 6px 0;border-radius:4px;font-size:11px}
+.trait-tag.positive{background:rgba(68,221,102,0.2);color:var(--st-accent-green)}.trait-tag.negative{background:rgba(255,68,68,0.2);color:var(--st-accent-red)}
+.preview-stats{display:flex;gap:16px;margin-top:20px;padding-top:16px;border-top:1px solid var(--st-border-dark)}
+.pstat{flex:1;text-align:center}.pstat-label{display:block;font-size:10px;color:var(--st-text-dim);margin-bottom:4px}.pstat-val{font-family:var(--st-font-display);font-size:18px;color:var(--st-text-bright)}
+.setup-actions{display:flex;justify-content:space-between;margin-top:24px}
+</style>
+@code{
+    string _selectedFaction="federation";string _galaxySize="Medium";string _starDensity="Normal";int _aiCount=4;string _difficulty="Captain";
+    List<FactionInfo> _factions=new(){
+        new(){Id="federation",Name="United Federation",Icon="🌐",Trait="Explorers",Government="Democratic Republic",Military=3,Science=5,Economy=4,Homeworld="Earth",Description="A peaceful alliance of diverse species dedicated to exploration and diplomacy.",Traits=new[]{"+20% Research","+10 Opinion","Diplomatic Focus","-10% Military"}},
+        new(){Id="klingon",Name="Klingon Empire",Icon="⚔",Trait="Warriors",Government="Military Empire",Military=5,Science=2,Economy=3,Homeworld="Qo'noS",Description="A proud warrior culture that values honor and combat prowess above all.",Traits=new[]{"+25% Ship Damage","+15% Army Damage","Honor Bound","-15% Research"}},
+        new(){Id="romulan",Name="Romulan Star Empire",Icon="🦅",Trait="Schemers",Government="Oligarchy",Military=4,Science=4,Economy=3,Homeworld="Romulus",Description="Masters of deception and espionage with advanced cloaking technology.",Traits=new[]{"Cloaking Tech","+20% Espionage","Secretive","-10 Opinion"}},
+        new(){Id="cardassian",Name="Cardassian Union",Icon="🐍",Trait="Industrialists",Government="Totalitarian",Military=4,Science=3,Economy=5,Homeworld="Cardassia Prime",Description="An efficient military state focused on expansion and resource extraction.",Traits=new[]{"+20% Production","+15% Mining","Ruthless","-20 Opinion"}},
+        new(){Id="ferengi",Name="Ferengi Alliance",Icon="💰",Trait="Traders",Government="Corporate",Military=2,Science=3,Economy=6,Homeworld="Ferenginar",Description="Profit-driven merchants who see the galaxy as one big marketplace.",Traits=new[]{"+30% Trade","+20% Credits","Rules of Acquisition","-20% Military"}},
+        new(){Id="borg",Name="Borg Collective",Icon="🔲",Trait="Assimilators",Government="Hive Mind",Military=5,Science=5,Economy=4,Homeworld="Unimatrix 01",Description="A cybernetic collective seeking perfection through assimilation.",Traits=new[]{"Assimilation","Adaptive Tech","No Diplomacy","-100 Opinion"}}
+    };
+    void StartGame()=>Nav.NavigateTo("/game/galaxy");
+    class FactionInfo{public string Id="";public string Name="";public string Icon="";public string Trait="";public string Government="";public int Military;public int Science;public int Economy;public string Homeworld="";public string Description="";public string[] Traits=Array.Empty<string>();}
+}

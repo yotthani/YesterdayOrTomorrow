@@ -1,0 +1,105 @@
+{
+  "category": "Structures",
+  "description": "Orbital and space structures for all factions",
+  "factionStyles": {
+    "federation": {
+      "military": {
+        "aesthetic": "Starbase design, mushroom/wheel shapes",
+        "colors": "Light gray, red docking lights, blue deflectors",
+        "features": ["Multiple docking bays", "Shield generators", "Phaser arrays"]
+      },
+      "civilian": {
+        "aesthetic": "Open, welcoming space stations",
+        "colors": "White, transparent sections, green parks visible",
+        "features": ["Arboretums", "Promenades", "Commercial areas"]
+      }
+    },
+    "klingon": {
+      "military": {
+        "aesthetic": "Aggressive, fortified stations",
+        "colors": "Dark metal, red warning lights",
+        "features": ["Weapons platforms", "Tractor beams", "Honor halls"]
+      },
+      "civilian": {
+        "aesthetic": "Trading posts, warrior rest areas",
+        "colors": "Dark industrial",
+        "features": ["Combat arenas", "Bloodwine bars", "Targ pens"]
+      }
+    },
+    "romulan": {
+      "military": {
+        "aesthetic": "Hidden, cloakable stations",
+        "colors": "Green, bronze, bird motifs",
+        "features": ["Cloaking generators", "Sensor arrays", "Prison cells"]
+      },
+      "civilian": {
+        "aesthetic": "Secretive trading posts",
+        "colors": "Muted greens",
+        "features": ["Hidden docking bays", "Surveillance", "Tal Shiar offices"]
+      }
+    },
+    "cardassian": {
+      "military": {
+        "aesthetic": "Terok Nor style, industrial",
+        "colors": "Brown/tan metal, yellow lights",
+        "features": ["Ore processing", "Holding cells", "Command tower"]
+      },
+      "civilian": {
+        "aesthetic": "Mining/processing stations",
+        "colors": "Industrial brown",
+        "features": ["Cargo bays", "Worker quarters", "Ore refineries"]
+      }
+    },
+    "borg": {
+      "military": {
+        "aesthetic": "Geometric, cube-based structures",
+        "colors": "Black, green glow",
+        "features": ["Assimilation chambers", "Vinculum", "No crew quarters"]
+      },
+      "civilian": {
+        "note": "Borg do not have civilian structures"
+      }
+    },
+    "dominion": {
+      "military": {
+        "aesthetic": "Organic, insectoid stations",
+        "colors": "Purple, bioluminescent",
+        "features": ["Ketracel-white production", "Jem'Hadar barracks", "Vorta quarters"]
+      },
+      "civilian": {
+        "aesthetic": "Administrative hubs",
+        "colors": "Purple/lavender",
+        "features": ["Founder worship areas", "Diplomatic chambers"]
+      }
+    }
+  },
+  "structureTypes": {
+    "military": [
+      { "id": "starbase", "name": "Starbase Defense", "size": "huge", "role": "Major military installation" },
+      { "id": "outpost", "name": "Outpost Border", "size": "medium", "role": "Border monitoring" },
+      { "id": "weapons_platform", "name": "Weapons Platform Orbital", "size": "small", "role": "Defense grid" },
+      { "id": "shipyard_orbital", "name": "Shipyard Orbital Construction", "size": "huge", "role": "Ship building" },
+      { "id": "sensor_array", "name": "Sensor Array Long Range", "size": "medium", "role": "Deep space monitoring" }
+    ],
+    "civilian": [
+      { "id": "trading_post", "name": "Trading Post Commercial", "size": "medium", "role": "Commerce hub" },
+      { "id": "refinery", "name": "Refinery Ore Processing", "size": "large", "role": "Resource processing" },
+      { "id": "relay_station", "name": "Relay Station Communications", "size": "small", "role": "Subspace relay" },
+      { "id": "research_station", "name": "Research Station Science", "size": "medium", "role": "Scientific research" },
+      { "id": "habitat", "name": "Habitat Civilian Living", "size": "large", "role": "Population housing" }
+    ]
+  },
+  "styleGuide": {
+    "material": "Claymation 3D style, detailed hull textures",
+    "quality": "High-end stop-motion animation quality",
+    "lighting": "Space lighting with station lights",
+    "composition": "3/4 view in space, stars background",
+    "background": "Solid black (#000000) - space",
+    "critical": [
+      "Each faction has DISTINCT station design",
+      "Military structures have visible weapons",
+      "Civilian structures must NOT have weapons",
+      "Scale should convey size appropriately"
+    ]
+  }
+}

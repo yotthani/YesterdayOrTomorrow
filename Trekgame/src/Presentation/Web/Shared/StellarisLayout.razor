@@ -1,0 +1,18 @@
+@inherits LayoutComponentBase
+@using MudBlazor
+
+<MudThemeProvider IsDarkMode="true" />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<div class="stellaris-app">
+    @Body
+</div>
+
+<style>
+    .stellaris-app {
+        min-height: 100vh;
+        background: #040608;
+    }
+</style>

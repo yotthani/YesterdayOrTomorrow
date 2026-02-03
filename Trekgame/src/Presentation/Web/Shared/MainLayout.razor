@@ -1,0 +1,481 @@
+@inherits LayoutComponentBase
+@using MudBlazor
+@using Microsoft.JSInterop
+@using Blazored.LocalStorage
+@using StarTrekGame.Web.Services
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+@inject ThemeService ThemeService
+@inject ILocalStorageService LocalStorage
+
+<MudThemeProvider Theme="_theme" IsDarkMode="true" />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout>
+    <MudAppBar Elevation="1" Dense="true" Color="Color.Dark">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" 
+                       Edge="Edge.Start" OnClick="ToggleDrawer" />
+        
+        <MudText Typo="Typo.h6" Class="ml-2 d-none d-sm-flex" Style="color: var(--mud-palette-warning); cursor: pointer"
+                 @onclick="@(() => Navigation.NavigateTo("/"))">
+            GALACTIC STRATEGY
+        </MudText>
+
+        <MudSpacer />
+
+        @* Only show in-game navigation when actually in a game *@
+        @if (_isInGame)
+        {
+            <MudButtonGroup Variant="Variant.Text" Color="Color.Inherit" Class="d-none d-md-flex">
+                <MudButton Href="/game/map" StartIcon="@Icons.Material.Filled.Map">Map</MudButton>
+                <MudButton Href="/game/fleets" StartIcon="@Icons.Material.Filled.RocketLaunch">Fleets</MudButton>
+                <MudButton Href="/game/colonies" StartIcon="@Icons.Material.Filled.LocationCity">Colonies</MudButton>
+                <MudButton Href="/game/research" StartIcon="@Icons.Material.Filled.Science">Research</MudButton>
+                <MudButton Href="/game/diplomacy" StartIcon="@Icons.Material.Filled.Handshake">Diplomacy</MudButton>
+            </MudButtonGroup>
+        }
+        
+        @* Theme Selector *@
+        <MudMenu Icon="@Icons.Material.Filled.Palette" Color="Color.Inherit" 
+                 Title="UI Theme" Dense="true" AnchorOrigin="Origin.BottomRight">
+            @foreach (var theme in ThemeService.GetAvailableThemes())
+            {
+                <MudMenuItem OnClick="@(() => SetTheme(theme.Id))">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <div style="width: 12px; height: 12px; border-radius: 2px; background: @theme.PrimaryColor;"></div>
+                        <span>@theme.Name</span>
+                    </div>
+                </MudMenuItem>
+            }
+        </MudMenu>
+        
+        <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Inherit" 
+                       Href="/game/settings" Title="Settings" />
+    </MudAppBar>
+
+    <MudDrawer @bind-Open="_drawerOpen" Elevation="2" ClipMode="DrawerClipMode.Always">
+        <MudDrawerHeader>
+            <MudText Typo="Typo.h6" Color="Color.Warning">Navigation</MudText>
+        </MudDrawerHeader>
+        
+        <MudNavMenu>
+            <MudNavLink Href="/" Icon="@Icons.Material.Filled.Home" Match="NavLinkMatch.All">Main Menu</MudNavLink>
+            
+            @if (_isInGame)
+            {
+                <MudText Typo="Typo.overline" Class="px-4 mt-4" Style="color: #ff9900;">IN GAME</MudText>
+                <MudNavGroup Title="Empire" Expanded="true" Icon="@Icons.Material.Filled.Public">
+                    <MudNavLink Href="/game/overview" Icon="@Icons.Material.Filled.Dashboard">Overview</MudNavLink>
+                    <MudNavLink Href="/game/map" Icon="@Icons.Material.Filled.Map">Galaxy Map</MudNavLink>
+                    <MudNavLink Href="/game/fleets" Icon="@Icons.Material.Filled.RocketLaunch">Fleets</MudNavLink>
+                    <MudNavLink Href="/game/colonies" Icon="@Icons.Material.Filled.LocationCity">Colonies</MudNavLink>
+                    <MudNavLink Href="/game/research" Icon="@Icons.Material.Filled.Science">Research</MudNavLink>
+                    <MudNavLink Href="/game/diplomacy" Icon="@Icons.Material.Filled.Handshake">Diplomacy</MudNavLink>
+                </MudNavGroup>
+
+                <MudNavGroup Title="Tools" Icon="@Icons.Material.Filled.Build">
+                    <MudNavLink Href="/game/ship-designer" Icon="@Icons.Material.Filled.Engineering">Ship Designer</MudNavLink>
+                    <MudNavLink Href="/game/save-load" Icon="@Icons.Material.Filled.Save">Save/Load</MudNavLink>
+                </MudNavGroup>
+                
+                <MudDivider Class="my-2" />
+                
+                <MudNavLink @onclick="LeaveGame" Icon="@Icons.Material.Filled.ExitToApp" 
+                            Style="color: #ff6666;">Leave Game</MudNavLink>
+            }
+            else
+            {
+                <MudText Typo="Typo.overline" Class="px-4 mt-4" Style="color: #99ccff;">START PLAYING</MudText>
+                <MudNavGroup Title="Play" Expanded="true" Icon="@Icons.Material.Filled.PlayArrow">
+                    <MudNavLink Href="/game/new" Icon="@Icons.Material.Filled.Add">New Game</MudNavLink>
+                    <MudNavLink Href="/" Icon="@Icons.Material.Filled.People">Join Game</MudNavLink>
+                </MudNavGroup>
+            }
+            
+            <MudText Typo="Typo.overline" Class="px-4 mt-4" Style="color: #888;">OPTIONS</MudText>
+            <MudNavLink Href="/game/tutorial" Icon="@Icons.Material.Filled.Help">Tutorial</MudNavLink>
+            <MudNavLink Href="/game/settings" Icon="@Icons.Material.Filled.Settings">Settings</MudNavLink>
+        </MudNavMenu>
+    </MudDrawer>
+
+    <MudMainContent Class="@(_showDisclaimer ? "pt-14 pb-16" : "pt-14")">
+        @Body
+    </MudMainContent>
+</MudLayout>
+
+@* Disclaimer Banner *@
+@if (_showDisclaimer)
+{
+    <StarTrekGame.Web.Components.Shared.DisclaimerBanner OnDismiss="DismissDisclaimer" />
+}
+
+@* Global keyboard handler *@
+<script suppress-error="BL9992">
+    document.addEventListener('keydown', function(e) {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) return;
+        if (e.ctrlKey || e.altKey || e.metaKey) return;
+        
+        let url = null;
+        switch(e.key.toLowerCase()) {
+            case 'm': url = '/game/map'; break;
+            case 'f': url = '/game/fleets'; break;
+            case 'c': url = '/game/colonies'; break;
+            case 'r': url = '/game/research'; break;
+            case 'd': url = '/game/diplomacy'; break;
+            case 'o': url = '/game/overview'; break;
+            case 's': url = '/game/settings'; break;
+            case 'escape': history.back(); return;
+        }
+        if (url) {
+            e.preventDefault();
+            window.location.href = url;
+        }
+    });
+    
+    // === GAME SOUNDS SYSTEM ===
+    window.GameSounds = {
+        ctx: null,
+        enabled: true,
+        masterVolume: 0.8,
+        
+        init() {
+            if (!this.ctx) {
+                this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            return this.ctx;
+        },
+        
+        play(type, volume = 1.0) {
+            if (!this.enabled) return;
+            try {
+                const ctx = this.init();
+                const vol = volume * this.masterVolume;
+                this['play_' + type]?.(ctx, vol);
+            } catch(e) { console.log('Sound error:', e); }
+        },
+        
+        // Combat Sounds
+        play_phaser(ctx, vol) {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(2000, ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(400, ctx.currentTime + 0.3);
+            gain.gain.setValueAtTime(vol * 0.4, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+            osc.connect(gain).connect(ctx.destination);
+            osc.start(); osc.stop(ctx.currentTime + 0.4);
+        },
+        
+        play_torpedo(ctx, vol) {
+            const osc1 = ctx.createOscillator();
+            const osc2 = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc1.type = 'sine'; osc1.frequency.setValueAtTime(80, ctx.currentTime);
+            osc2.type = 'sine'; osc2.frequency.setValueAtTime(800, ctx.currentTime);
+            osc2.frequency.exponentialRampToValueAtTime(200, ctx.currentTime + 0.3);
+            gain.gain.setValueAtTime(vol * 0.5, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6);
+            osc1.connect(gain); osc2.connect(gain); gain.connect(ctx.destination);
+            osc1.start(); osc2.start(); osc1.stop(ctx.currentTime + 0.7); osc2.stop(ctx.currentTime + 0.4);
+        },
+        
+        play_explosion(ctx, vol) {
+            const bufferSize = ctx.sampleRate * 0.8;
+            const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.15));
+            const noise = ctx.createBufferSource(); noise.buffer = buffer;
+            const filter = ctx.createBiquadFilter(); filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(1000, ctx.currentTime);
+            filter.frequency.exponentialRampToValueAtTime(100, ctx.currentTime + 0.5);
+            const gain = ctx.createGain();
+            gain.gain.setValueAtTime(vol * 0.7, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.8);
+            noise.connect(filter).connect(gain).connect(ctx.destination);
+            noise.start();
+        },
+        
+        play_shield_hit(ctx, vol) {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'square'; osc.frequency.setValueAtTime(150, ctx.currentTime);
+            for (let i = 0; i < 10; i++) osc.frequency.setValueAtTime(100 + Math.random() * 200, ctx.currentTime + i * 0.02);
+            gain.gain.setValueAtTime(vol * 0.3, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+            osc.connect(gain).connect(ctx.destination);
+            osc.start(); osc.stop(ctx.currentTime + 0.3);
+        },
+        
+        play_hull_hit(ctx, vol) {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'triangle'; osc.frequency.setValueAtTime(300, ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(50, ctx.currentTime + 0.15);
+            gain.gain.setValueAtTime(vol * 0.5, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2);
+            osc.connect(gain).connect(ctx.destination);
+            osc.start(); osc.stop(ctx.currentTime + 0.25);
+        },
+        
+        play_critical(ctx, vol) {
+            this.play_explosion(ctx, vol);
+            setTimeout(() => {
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'square'; osc.frequency.value = 880;
+                gain.gain.setValueAtTime(vol * 0.3, ctx.currentTime);
+                gain.gain.setValueAtTime(0, ctx.currentTime + 0.1);
+                gain.gain.setValueAtTime(vol * 0.3, ctx.currentTime + 0.15);
+                osc.connect(gain).connect(ctx.destination);
+                osc.start(); osc.stop(ctx.currentTime + 0.3);
+            }, 200);
+        },
+        
+        // UI Sounds
+        play_click(ctx, vol) {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine'; osc.frequency.value = 600;
+            gain.gain.setValueAtTime(vol * 0.2, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
+            osc.connect(gain).connect(ctx.destination);
+            osc.start(); osc.stop(ctx.currentTime + 0.06);
+        },
+        
+        play_select(ctx, vol) {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(500, ctx.currentTime);
+            osc.frequency.setValueAtTime(700, ctx.currentTime + 0.05);
+            gain.gain.setValueAtTime(vol * 0.25, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
+            osc.connect(gain).connect(ctx.destination);
+            osc.start(); osc.stop(ctx.currentTime + 0.15);
+        },
+        
+        play_error(ctx, vol) {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(200, ctx.currentTime);
+            osc.frequency.setValueAtTime(150, ctx.currentTime + 0.1);
+            gain.gain.setValueAtTime(vol * 0.3, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+            osc.connect(gain).connect(ctx.destination);
+            osc.start(); osc.stop(ctx.currentTime + 0.3);
+        },
+        
+        play_success(ctx, vol) {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(400, ctx.currentTime);
+            osc.frequency.setValueAtTime(600, ctx.currentTime + 0.08);
+            osc.frequency.setValueAtTime(800, ctx.currentTime + 0.16);
+            gain.gain.setValueAtTime(vol * 0.25, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+            osc.connect(gain).connect(ctx.destination);
+            osc.start(); osc.stop(ctx.currentTime + 0.35);
+        },
+        
+        play_notification(ctx, vol) {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(880, ctx.currentTime);
+            osc.frequency.setValueAtTime(1100, ctx.currentTime + 0.08);
+            gain.gain.setValueAtTime(vol * 0.2, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2);
+            osc.connect(gain).connect(ctx.destination);
+            osc.start(); osc.stop(ctx.currentTime + 0.25);
+        },
+        
+        play_turn_end(ctx, vol) {
+            [0, 0.12, 0.24].forEach((delay, i) => {
+                setTimeout(() => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sine'; osc.frequency.value = 600 + i * 100;
+                    gain.gain.setValueAtTime(vol * 0.25, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+                    osc.connect(gain).connect(ctx.destination);
+                    osc.start(); osc.stop(ctx.currentTime + 0.12);
+                }, delay * 1000);
+            });
+        },
+        
+        // Ambient Sounds
+        play_warp(ctx, vol) {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(50, ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(200, ctx.currentTime + 0.5);
+            osc.frequency.exponentialRampToValueAtTime(80, ctx.currentTime + 1.5);
+            gain.gain.setValueAtTime(0.001, ctx.currentTime);
+            gain.gain.linearRampToValueAtTime(vol * 0.4, ctx.currentTime + 0.3);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 2.0);
+            osc.connect(gain).connect(ctx.destination);
+            osc.start(); osc.stop(ctx.currentTime + 2.5);
+        },
+        
+        play_scan(ctx, vol) {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(1000, ctx.currentTime);
+            osc.frequency.linearRampToValueAtTime(3000, ctx.currentTime + 0.5);
+            osc.frequency.linearRampToValueAtTime(1000, ctx.currentTime + 1.0);
+            gain.gain.setValueAtTime(vol * 0.15, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.2);
+            osc.connect(gain).connect(ctx.destination);
+            osc.start(); osc.stop(ctx.currentTime + 1.3);
+        },
+        
+        play_alert(ctx, vol) {
+            const playKlaxon = (startTime) => {
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(400, startTime);
+                osc.frequency.linearRampToValueAtTime(600, startTime + 0.25);
+                gain.gain.setValueAtTime(vol * 0.3, startTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.5);
+                osc.connect(gain).connect(ctx.destination);
+                osc.start(startTime); osc.stop(startTime + 0.55);
+            };
+            playKlaxon(ctx.currentTime);
+            playKlaxon(ctx.currentTime + 0.6);
+        },
+        
+        play_build_complete(ctx, vol) {
+            [523, 659, 784, 1047].forEach((freq, i) => {
+                setTimeout(() => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sine'; osc.frequency.value = freq;
+                    gain.gain.setValueAtTime(vol * 0.2, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2);
+                    osc.connect(gain).connect(ctx.destination);
+                    osc.start(); osc.stop(ctx.currentTime + 0.25);
+                }, i * 100);
+            });
+        },
+        
+        setEnabled(enabled) { this.enabled = enabled; },
+        setVolume(vol) { this.masterVolume = Math.max(0, Math.min(1, vol)); }
+    };
+</script>
+
+@code {
+    private bool _drawerOpen = false;
+    private bool _showDisclaimer = true;
+    private bool _isInGame = false;
+
+    private readonly MudTheme _theme = new()
+    {
+        PaletteLight = new PaletteLight()
+        {
+            Primary = "#ff9900",
+            Secondary = "#99ccff", 
+            Tertiary = "#66ff99",
+            Background = "#ffffff",
+            Surface = "#f5f5f5",
+            AppbarBackground = "#1a1a2e",
+            AppbarText = "#ffffff",
+            TextPrimary = "#000000",
+            TextSecondary = "#666666",
+            ActionDefault = "#666666",
+            Warning = "#ff9900",
+            Error = "#ff4444",
+            Success = "#66ff99",
+            Info = "#4488ff"
+        },
+        PaletteDark = new PaletteDark()
+        {
+            Primary = "#ff9900",
+            Secondary = "#99ccff", 
+            Tertiary = "#66ff99",
+            Background = "#000000",
+            Surface = "#1a1a2e",
+            DrawerBackground = "#0d0d1a",
+            AppbarBackground = "#0d0d1a",
+            AppbarText = "#ffffff",
+            TextPrimary = "#ffffff",
+            TextSecondary = "#aaaacc",
+            ActionDefault = "#aaaacc",
+            Warning = "#ff9900",
+            Error = "#ff4444",
+            Success = "#66ff99",
+            Info = "#4488ff"
+        }
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Initialize theme
+        await ThemeService.InitializeAsync();
+        
+        // Check if player is in a game
+        await CheckGameState();
+        
+        // Check if disclaimer was dismissed
+        try
+        {
+            _showDisclaimer = !await LocalStorage.GetItemAsync<bool>("disclaimer-dismissed");
+        }
+        catch
+        {
+            _showDisclaimer = true;
+        }
+        
+        // Listen for navigation changes to update game state
+        Navigation.LocationChanged += async (s, e) => await OnLocationChanged();
+    }
+    
+    private async Task CheckGameState()
+    {
+        try
+        {
+            var factionId = await LocalStorage.GetItemAsync<Guid?>("currentFactionId");
+            var gameId = await LocalStorage.GetItemAsync<Guid?>("currentGameId");
+            _isInGame = factionId.HasValue && gameId.HasValue;
+        }
+        catch
+        {
+            _isInGame = false;
+        }
+    }
+    
+    private async Task OnLocationChanged()
+    {
+        await CheckGameState();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private void ToggleDrawer() => _drawerOpen = !_drawerOpen;
+    
+    private async Task SetTheme(string themeId)
+    {
+        await ThemeService.SetThemeAsync(themeId);
+    }
+    
+    private async Task LeaveGame()
+    {
+        await LocalStorage.RemoveItemAsync("currentFactionId");
+        await LocalStorage.RemoveItemAsync("currentGameId");
+        await LocalStorage.RemoveItemAsync("currentPlayerName");
+        _isInGame = false;
+        Navigation.NavigateTo("/");
+    }
+    
+    private async Task DismissDisclaimer()
+    {
+        _showDisclaimer = false;
+        await LocalStorage.SetItemAsync("disclaimer-dismissed", true);
+    }
+}

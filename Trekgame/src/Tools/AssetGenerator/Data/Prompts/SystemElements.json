@@ -1,0 +1,27 @@
+{
+  "category": "SystemElements",
+  "description": "Solar system view elements - moons, stations, asteroid fields",
+  "assets": [
+    { "id": "moon_barren", "name": "Moon Barren Cratered", "match": ["moon barren", "cratered"], "prompt": { "type": "Barren Moon", "features": ["Gray rocky surface", "Impact craters", "No atmosphere"], "size": "small planetary body" }},
+    { "id": "moon_ice", "name": "Moon Ice Frozen", "match": ["moon ice", "frozen"], "prompt": { "type": "Ice Moon", "features": ["White/blue surface", "Frozen water", "Possible subsurface ocean"], "reference": "Europa-style" }},
+    { "id": "moon_volcanic", "name": "Moon Volcanic Active", "match": ["moon volcanic", "active"], "prompt": { "type": "Volcanic Moon", "features": ["Active volcanoes", "Lava flows", "Sulfurous surface"], "reference": "Io-style" }},
+    { "id": "station_starbase", "name": "Station Starbase Large", "match": ["starbase", "large station"], "prompt": { "type": "Starbase", "features": ["Large mushroom or wheel shape", "Multiple docking ports", "Federation style"], "reference": "Deep Space stations" }},
+    { "id": "station_outpost", "name": "Station Outpost Small", "match": ["outpost", "small station"], "prompt": { "type": "Outpost", "features": ["Compact design", "Basic facilities", "Remote location"], "size": "small" }},
+    { "id": "station_mining", "name": "Station Mining Industrial", "match": ["mining station", "industrial"], "prompt": { "type": "Mining Station", "features": ["Industrial design", "Ore processing", "Cargo containers"], "purpose": "resource extraction" }},
+    { "id": "station_research", "name": "Station Research Science", "match": ["research station", "science"], "prompt": { "type": "Research Station", "features": ["Sensor arrays", "Laboratory modules", "Scientific equipment"], "purpose": "research" }},
+    { "id": "asteroid_large", "name": "Asteroid Large Irregular", "match": ["asteroid large", "irregular"], "prompt": { "type": "Large Asteroid", "features": ["Irregular rocky shape", "Craters", "Possible mining"], "size": "large" }},
+    { "id": "asteroid_metallic", "name": "Asteroid Metallic Valuable", "match": ["asteroid metallic", "valuable"], "prompt": { "type": "Metallic Asteroid", "features": ["Shiny metallic surface", "Valuable minerals", "Mining target"], "composition": "metal-rich" }},
+    { "id": "comet", "name": "Comet Tail Active", "match": ["comet", "tail"], "prompt": { "type": "Comet", "features": ["Icy nucleus", "Glowing tail", "Solar wind interaction"], "state": "active near star" }},
+    { "id": "debris_field", "name": "Debris Field Wreckage", "match": ["debris", "wreckage"], "prompt": { "type": "Debris Field", "features": ["Ship wreckage", "Scattered parts", "Battle aftermath"], "origin": "destroyed vessels" }},
+    { "id": "satellite_comm", "name": "Satellite Communication Array", "match": ["satellite", "communication"], "prompt": { "type": "Communication Satellite", "features": ["Antenna arrays", "Relay equipment", "Orbital position"], "purpose": "communications" }},
+    { "id": "buoy_nav", "name": "Buoy Navigation Marker", "match": ["buoy", "navigation"], "prompt": { "type": "Navigation Buoy", "features": ["Beacon light", "Warning signals", "Route marker"], "purpose": "navigation aid" }},
+    { "id": "gate_transwarp", "name": "Gate Transwarp Hub", "match": ["gate", "transwarp"], "prompt": { "type": "Transwarp Gate", "features": ["Ring or arch structure", "Energy field", "Instant travel"], "technology": "advanced" }}
+  ],
+  "styleGuide": {
+    "material": "Space objects with appropriate textures",
+    "quality": "Detailed enough for system view",
+    "lighting": "Star illumination from system's sun",
+    "composition": "Object centered, space background",
+    "background": "Solid black (#000000)"
+  }
+}

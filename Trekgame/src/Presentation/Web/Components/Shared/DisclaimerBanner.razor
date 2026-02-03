@@ -1,0 +1,100 @@
+@* Star Trek Fan Project Disclaimer *@
+
+<div class="disclaimer-banner">
+    <div class="disclaimer-content">
+        <span class="disclaimer-icon">⚠</span>
+        <p>
+            <strong>Fan Project Disclaimer:</strong>
+            Star Trek and all related marks, logos, and characters are solely owned by CBS Studios Inc. / Paramount.
+            This fan production is not endorsed by, sponsored by, nor affiliated with CBS, Paramount Pictures, 
+            or any other Star Trek franchise. This is a <strong>non-commercial fan project</strong> intended for 
+            recreational and educational use only. No commercial exhibition or distribution is permitted.
+        </p>
+        <button class="disclaimer-close" @onclick="Dismiss">×</button>
+    </div>
+</div>
+
+@code {
+    [Parameter] public EventCallback OnDismiss { get; set; }
+    
+    private async Task Dismiss()
+    {
+        await OnDismiss.InvokeAsync();
+    }
+}
+
+<style>
+    .disclaimer-banner {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(180deg, rgba(40, 20, 0, 0.98) 0%, rgba(20, 10, 0, 0.98) 100%);
+        border-top: 2px solid #ff9900;
+        padding: 12px 20px;
+        z-index: 9999;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+    }
+    
+    .disclaimer-content {
+        max-width: 1400px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+    
+    .disclaimer-icon {
+        font-size: 24px;
+        color: #ff9900;
+        flex-shrink: 0;
+    }
+    
+    .disclaimer-content p {
+        margin: 0;
+        font-size: 12px;
+        line-height: 1.5;
+        color: #ccaa88;
+    }
+    
+    .disclaimer-content strong {
+        color: #ffcc00;
+    }
+    
+    .disclaimer-close {
+        background: transparent;
+        border: 1px solid #ff9900;
+        color: #ff9900;
+        width: 32px;
+        height: 32px;
+        border-radius: 4px;
+        font-size: 20px;
+        cursor: pointer;
+        flex-shrink: 0;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .disclaimer-close:hover {
+        background: #ff9900;
+        color: #000;
+    }
+    
+    @@media (max-width: 768px) {
+        .disclaimer-content {
+            flex-direction: column;
+            text-align: center;
+            gap: 12px;
+        }
+        
+        .disclaimer-icon {
+            display: none;
+        }
+        
+        .disclaimer-content p {
+            font-size: 11px;
+        }
+    }
+</style>

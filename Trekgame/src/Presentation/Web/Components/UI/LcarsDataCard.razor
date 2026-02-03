@@ -1,0 +1,86 @@
+@namespace StarTrekGame.Web.Components.UI
+
+<div class="lcars-data-card @(Compact ? "lcars-data-card--compact" : "") @TextureClass" 
+     style="border-color: var(--ui-@Color); @Style">
+    <div class="lcars-data-card__label">@Label</div>
+    <div class="lcars-data-card__value @(Glow ? "glow-text" : "")" style="color: var(--ui-@Color);">
+        @if (Animated)
+        {
+            <span class="animated-value">@AnimatedValue</span>
+        }
+        else
+        {
+            @Value
+        }
+        @if (!string.IsNullOrEmpty(Unit))
+        {
+            <span class="lcars-data-card__unit">@Unit</span>
+        }
+    </div>
+    @if (Trend.HasValue)
+    {
+        <div class="lcars-data-card__trend lcars-data-card__trend--@(Trend > 0 ? "up" : "down")">
+            @(Trend > 0 ? "▲" : "▼") @Math.Abs(Trend.Value).ToString("F1")%
+        </div>
+    }
+    @if (!string.IsNullOrEmpty(Subtitle))
+    {
+        <div class="lcars-data-card__subtitle">@Subtitle</div>
+    }
+</div>
+
+@code {
+    [Parameter] public string Label { get; set; } = "Data";
+    [Parameter] public string Value { get; set; } = "0";
+    [Parameter] public string? Unit { get; set; }
+    [Parameter] public string? Subtitle { get; set; }
+    [Parameter] public double? Trend { get; set; }
+    [Parameter] public string Color { get; set; } = "primary";
+    [Parameter] public bool Compact { get; set; } = false;
+    [Parameter] public bool Glow { get; set; } = false;
+    [Parameter] public bool Animated { get; set; } = false;
+    [Parameter] public string Texture { get; set; } = "";
+    [Parameter] public string? Style { get; set; }
+
+    private string AnimatedValue => Value; // Could implement counting animation
+
+    private string TextureClass => Texture switch
+    {
+        "noise" => "texture-noise",
+        "scanlines" => "texture-scanlines",
+        _ => ""
+    };
+}
+
+<style>
+    .lcars-data-card--compact {
+        padding: 8px 12px;
+    }
+
+    .lcars-data-card--compact .lcars-data-card__value {
+        font-size: 18px;
+    }
+
+    .lcars-data-card__unit {
+        font-size: 0.5em;
+        opacity: 0.7;
+        margin-left: 4px;
+    }
+
+    .lcars-data-card__subtitle {
+        font-size: 10px;
+        color: var(--ui-text-dim);
+        margin-top: 4px;
+    }
+
+    .animated-value {
+        display: inline-block;
+        animation: value-pop 0.3s ease;
+    }
+
+    @@keyframes value-pop {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); }
+    }
+</style>

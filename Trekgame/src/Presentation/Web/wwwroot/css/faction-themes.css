@@ -1,0 +1,751 @@
+/* ===========================================
+   GALACTIC STRATEGY - FACTION THEME SYSTEM
+   Each faction has FUNDAMENTALLY different UI styles
+   Inspired by BOTF race-specific interfaces
+   =========================================== */
+
+/* ===== BASE THEME VARIABLES ===== */
+:root {
+    --theme-primary: #ff9900;
+    --theme-secondary: #cc99ff;
+    --theme-accent: #ffcc00;
+    --theme-text: #ffffff;
+    --theme-text-dim: #aaaacc;
+    --theme-bg: #0a0a18;
+    --theme-panel-bg: rgba(10, 10, 25, 0.95);
+    --theme-border-radius: 20px;
+    --theme-btn-radius: 12px;
+    --theme-border-width: 2px;
+}
+
+/* ===========================================
+   FEDERATION THEME - LCARS STYLE
+   Rounded, colorful, characteristic pill shapes
+   =========================================== */
+[data-theme="federation"] {
+    --theme-primary: #ff9900;
+    --theme-secondary: #cc99ff;
+    --theme-accent: #ffcc00;
+    --theme-text: #ffffff;
+    --theme-text-dim: #aaddff;
+    --theme-bg: #000010;
+    --theme-panel-bg: rgba(5, 5, 20, 0.95);
+    --theme-border-radius: 20px;
+    --theme-btn-radius: 25px;
+    --theme-border-width: 3px;
+}
+
+/* Federation LCARS Panel Style */
+[data-theme="federation"] .mud-paper,
+[data-theme="federation"] .mud-card {
+    background: linear-gradient(180deg, rgba(10, 10, 30, 0.98) 0%, rgba(5, 5, 20, 0.98) 100%) !important;
+    border: none !important;
+    border-radius: 0 !important;
+    position: relative;
+    overflow: visible !important;
+}
+
+[data-theme="federation"] .mud-paper::before,
+[data-theme="federation"] .mud-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 60px; height: 100%;
+    background: linear-gradient(180deg, #ff9900, #cc6600);
+    border-radius: 30px 0 0 30px;
+}
+
+[data-theme="federation"] .mud-paper::after,
+[data-theme="federation"] .mud-card::after {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 20px; height: 100%;
+    background: #cc99ff;
+    border-radius: 0 10px 10px 0;
+}
+
+/* Federation Buttons - Pill shaped */
+[data-theme="federation"] .mud-button-root {
+    border-radius: 25px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 2px !important;
+    font-weight: 700 !important;
+    transition: all 0.2s ease !important;
+}
+
+[data-theme="federation"] .mud-button-filled {
+    background: linear-gradient(180deg, #ff9900 0%, #cc6600 100%) !important;
+    color: #000 !important;
+    box-shadow: 0 4px 15px rgba(255, 153, 0, 0.4) !important;
+}
+
+[data-theme="federation"] .mud-button-filled:hover {
+    background: linear-gradient(180deg, #ffaa22 0%, #ff9900 100%) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 153, 0, 0.6) !important;
+}
+
+[data-theme="federation"] .mud-button-outlined {
+    border: 3px solid #ff9900 !important;
+    color: #ff9900 !important;
+    background: transparent !important;
+}
+
+[data-theme="federation"] .mud-button-outlined:hover {
+    background: rgba(255, 153, 0, 0.15) !important;
+}
+
+/* Federation AppBar */
+[data-theme="federation"] .mud-appbar {
+    background: linear-gradient(180deg, #1a1a30 0%, #0a0a18 100%) !important;
+    border-bottom: 4px solid #ff9900 !important;
+}
+
+[data-theme="federation"] .mud-appbar::after {
+    content: '';
+    position: absolute;
+    bottom: -4px; left: 0;
+    width: 100%; height: 4px;
+    background: linear-gradient(90deg, #ff9900, #cc99ff, #99ccff, #ff9900);
+}
+
+/* Federation Drawer */
+[data-theme="federation"] .mud-drawer {
+    background: linear-gradient(180deg, #0a0a1a 0%, #050510 100%) !important;
+    border-right: none !important;
+}
+
+[data-theme="federation"] .mud-drawer::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 8px; height: 100%;
+    background: linear-gradient(180deg, #ff9900, #cc99ff, #99ccff);
+}
+
+/* Federation Nav Links */
+[data-theme="federation"] .mud-nav-link {
+    border-radius: 0 25px 25px 0 !important;
+    margin: 4px 8px 4px 0 !important;
+    padding-left: 20px !important;
+}
+
+[data-theme="federation"] .mud-nav-link:hover {
+    background: rgba(255, 153, 0, 0.2) !important;
+}
+
+[data-theme="federation"] .mud-nav-link.active {
+    background: linear-gradient(90deg, #ff9900, #ffcc00) !important;
+    color: #000 !important;
+}
+
+/* Federation Inputs */
+[data-theme="federation"] .mud-input-outlined .mud-input-outlined-border {
+    border-radius: 25px !important;
+    border-width: 3px !important;
+    border-color: #334 !important;
+}
+
+[data-theme="federation"] .mud-input-outlined:hover .mud-input-outlined-border,
+[data-theme="federation"] .mud-input-outlined.mud-input-focused .mud-input-outlined-border {
+    border-color: #ff9900 !important;
+}
+
+/* ===========================================
+   KLINGON THEME - AGGRESSIVE ANGULAR
+   Sharp edges, metallic, red/black warrior style
+   =========================================== */
+[data-theme="klingon"] {
+    --theme-primary: #cc0000;
+    --theme-secondary: #ff4444;
+    --theme-accent: #ffaa00;
+    --theme-text: #ffcccc;
+    --theme-text-dim: #aa8888;
+    --theme-bg: #0a0505;
+    --theme-panel-bg: rgba(20, 8, 8, 0.98);
+    --theme-border-radius: 0;
+    --theme-btn-radius: 0;
+    --theme-border-width: 2px;
+}
+
+/* Klingon Panel - Angular with metallic border */
+[data-theme="klingon"] .mud-paper,
+[data-theme="klingon"] .mud-card {
+    background: linear-gradient(135deg, rgba(40, 15, 15, 0.98) 0%, rgba(15, 5, 5, 0.98) 100%) !important;
+    border: 2px solid #660000 !important;
+    border-radius: 0 !important;
+    clip-path: polygon(0 8px, 8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%) !important;
+    position: relative;
+}
+
+[data-theme="klingon"] .mud-paper::before,
+[data-theme="klingon"] .mud-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #cc0000, #ff4444, #cc0000, transparent);
+}
+
+/* Klingon Buttons - Sharp, aggressive */
+[data-theme="klingon"] .mud-button-root {
+    border-radius: 0 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 3px !important;
+    font-weight: 900 !important;
+    clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px) !important;
+}
+
+[data-theme="klingon"] .mud-button-filled {
+    background: linear-gradient(180deg, #cc0000 0%, #880000 100%) !important;
+    color: #fff !important;
+    border: 1px solid #ff4444 !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 4px 15px rgba(200, 0, 0, 0.5) !important;
+}
+
+[data-theme="klingon"] .mud-button-filled:hover {
+    background: linear-gradient(180deg, #ff0000 0%, #cc0000 100%) !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), 0 6px 25px rgba(255, 0, 0, 0.6) !important;
+}
+
+[data-theme="klingon"] .mud-button-outlined {
+    border: 2px solid #cc0000 !important;
+    color: #ff4444 !important;
+    background: rgba(100, 0, 0, 0.2) !important;
+}
+
+/* Klingon AppBar - Dark metallic */
+[data-theme="klingon"] .mud-appbar {
+    background: linear-gradient(180deg, #1a0808 0%, #0a0202 100%) !important;
+    border-bottom: 3px solid #880000 !important;
+}
+
+[data-theme="klingon"] .mud-appbar::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #cc0000, #ff4444, #cc0000, transparent);
+}
+
+/* Klingon Drawer */
+[data-theme="klingon"] .mud-drawer {
+    background: linear-gradient(180deg, #150505 0%, #080202 100%) !important;
+    border-right: 2px solid #550000 !important;
+}
+
+/* Klingon Nav Links - Angular */
+[data-theme="klingon"] .mud-nav-link {
+    border-radius: 0 !important;
+    margin: 2px 4px !important;
+    clip-path: polygon(4px 0, 100% 0, 100% calc(100% - 4px), calc(100% - 4px) 100%, 0 100%, 0 4px) !important;
+}
+
+[data-theme="klingon"] .mud-nav-link:hover {
+    background: rgba(200, 0, 0, 0.3) !important;
+}
+
+[data-theme="klingon"] .mud-nav-link.active {
+    background: linear-gradient(90deg, #880000, #cc0000) !important;
+    color: #fff !important;
+}
+
+/* Klingon Inputs */
+[data-theme="klingon"] .mud-input-outlined .mud-input-outlined-border {
+    border-radius: 0 !important;
+    border-color: #440000 !important;
+}
+
+[data-theme="klingon"] .mud-input-outlined:hover .mud-input-outlined-border,
+[data-theme="klingon"] .mud-input-outlined.mud-input-focused .mud-input-outlined-border {
+    border-color: #cc0000 !important;
+}
+
+/* ===========================================
+   ROMULAN THEME - SLEEK MILITARY
+   Sharp, elegant, green on dark
+   =========================================== */
+[data-theme="romulan"] {
+    --theme-primary: #00aa44;
+    --theme-secondary: #44ff88;
+    --theme-accent: #88ffaa;
+    --theme-text: #ccffdd;
+    --theme-text-dim: #88aa99;
+    --theme-bg: #020a05;
+    --theme-panel-bg: rgba(5, 20, 12, 0.98);
+    --theme-border-radius: 0;
+    --theme-btn-radius: 4px;
+    --theme-border-width: 1px;
+}
+
+/* Romulan Panel - Sleek with accent line */
+[data-theme="romulan"] .mud-paper,
+[data-theme="romulan"] .mud-card {
+    background: linear-gradient(180deg, rgba(10, 30, 20, 0.98) 0%, rgba(5, 15, 10, 0.98) 100%) !important;
+    border: 1px solid rgba(0, 170, 68, 0.4) !important;
+    border-radius: 2px !important;
+    position: relative;
+}
+
+[data-theme="romulan"] .mud-paper::before,
+[data-theme="romulan"] .mud-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 20px; right: 20px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #00aa44, #44ff88, #00aa44, transparent);
+}
+
+/* Romulan Buttons - Sleek, sharp */
+[data-theme="romulan"] .mud-button-root {
+    border-radius: 2px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 2px !important;
+    font-weight: 500 !important;
+    position: relative;
+}
+
+[data-theme="romulan"] .mud-button-filled {
+    background: linear-gradient(180deg, #00aa44 0%, #006622 100%) !important;
+    color: #fff !important;
+    border: 1px solid #44ff88 !important;
+}
+
+[data-theme="romulan"] .mud-button-filled:hover {
+    background: linear-gradient(180deg, #00cc55 0%, #00aa44 100%) !important;
+    box-shadow: 0 0 20px rgba(0, 170, 68, 0.5) !important;
+}
+
+[data-theme="romulan"] .mud-button-outlined {
+    border: 1px solid #00aa44 !important;
+    color: #44ff88 !important;
+    background: rgba(0, 50, 25, 0.3) !important;
+}
+
+/* Romulan AppBar */
+[data-theme="romulan"] .mud-appbar {
+    background: linear-gradient(180deg, #081810 0%, #040a06 100%) !important;
+    border-bottom: 1px solid #004422 !important;
+}
+
+[data-theme="romulan"] .mud-appbar::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #00aa44, transparent);
+}
+
+/* Romulan Drawer */
+[data-theme="romulan"] .mud-drawer {
+    background: linear-gradient(180deg, #061008 0%, #030804 100%) !important;
+    border-right: 1px solid #003318 !important;
+}
+
+/* Romulan Nav Links */
+[data-theme="romulan"] .mud-nav-link {
+    border-radius: 0 !important;
+    border-left: 2px solid transparent !important;
+    margin: 1px 0 !important;
+}
+
+[data-theme="romulan"] .mud-nav-link:hover {
+    background: rgba(0, 170, 68, 0.15) !important;
+    border-left-color: #00aa44 !important;
+}
+
+[data-theme="romulan"] .mud-nav-link.active {
+    background: rgba(0, 170, 68, 0.25) !important;
+    border-left-color: #44ff88 !important;
+    color: #44ff88 !important;
+}
+
+/* ===========================================
+   BORG THEME - CYBER GRID
+   Cold, technological, green grid on black
+   =========================================== */
+[data-theme="borg"] {
+    --theme-primary: #00ffaa;
+    --theme-secondary: #44ffcc;
+    --theme-accent: #88ffdd;
+    --theme-text: #aaffdd;
+    --theme-text-dim: #668877;
+    --theme-bg: #000505;
+    --theme-panel-bg: rgba(5, 15, 12, 0.98);
+    --theme-border-radius: 0;
+    --theme-btn-radius: 0;
+    --theme-border-width: 1px;
+}
+
+/* Borg Panel - Grid background */
+[data-theme="borg"] .mud-paper,
+[data-theme="borg"] .mud-card {
+    background: 
+        linear-gradient(90deg, rgba(0, 255, 170, 0.03) 1px, transparent 1px),
+        linear-gradient(rgba(0, 255, 170, 0.03) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(8, 20, 15, 0.98) 0%, rgba(3, 10, 8, 0.98) 100%) !important;
+    background-size: 20px 20px, 20px 20px, 100% 100% !important;
+    border: 1px solid rgba(0, 255, 170, 0.3) !important;
+    border-radius: 0 !important;
+}
+
+[data-theme="borg"] .mud-paper::before,
+[data-theme="borg"] .mud-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: linear-gradient(180deg, rgba(0, 255, 170, 0.05) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+/* Borg Buttons - Technical, cold */
+[data-theme="borg"] .mud-button-root {
+    border-radius: 0 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 4px !important;
+    font-weight: 400 !important;
+    font-family: 'Roboto Mono', monospace !important;
+}
+
+[data-theme="borg"] .mud-button-filled {
+    background: rgba(0, 255, 170, 0.15) !important;
+    color: #00ffaa !important;
+    border: 1px solid #00ffaa !important;
+}
+
+[data-theme="borg"] .mud-button-filled:hover {
+    background: rgba(0, 255, 170, 0.3) !important;
+    box-shadow: 0 0 30px rgba(0, 255, 170, 0.4) !important;
+}
+
+[data-theme="borg"] .mud-button-outlined {
+    border: 1px solid rgba(0, 255, 170, 0.5) !important;
+    color: #00ffaa !important;
+}
+
+/* Borg AppBar - Grid */
+[data-theme="borg"] .mud-appbar {
+    background: 
+        linear-gradient(90deg, rgba(0, 255, 170, 0.02) 1px, transparent 1px),
+        linear-gradient(rgba(0, 255, 170, 0.02) 1px, transparent 1px),
+        linear-gradient(180deg, #0a1510 0%, #050a08 100%) !important;
+    background-size: 20px 20px, 20px 20px, 100% 100% !important;
+    border-bottom: 1px solid rgba(0, 255, 170, 0.3) !important;
+}
+
+/* Borg Drawer - Grid */
+[data-theme="borg"] .mud-drawer {
+    background: 
+        linear-gradient(90deg, rgba(0, 255, 170, 0.02) 1px, transparent 1px),
+        linear-gradient(rgba(0, 255, 170, 0.02) 1px, transparent 1px),
+        linear-gradient(180deg, #081210 0%, #030806 100%) !important;
+    background-size: 20px 20px, 20px 20px, 100% 100% !important;
+    border-right: 1px solid rgba(0, 255, 170, 0.2) !important;
+}
+
+/* Borg Nav Links */
+[data-theme="borg"] .mud-nav-link {
+    border-radius: 0 !important;
+    font-family: 'Roboto Mono', monospace !important;
+    letter-spacing: 1px !important;
+}
+
+[data-theme="borg"] .mud-nav-link:hover {
+    background: rgba(0, 255, 170, 0.1) !important;
+}
+
+[data-theme="borg"] .mud-nav-link.active {
+    background: rgba(0, 255, 170, 0.2) !important;
+    color: #00ffaa !important;
+    border-left: 2px solid #00ffaa !important;
+}
+
+/* ===========================================
+   CARDASSIAN THEME - GEOMETRIC
+   Double borders, tan/brown, ornate patterns
+   =========================================== */
+[data-theme="cardassian"] {
+    --theme-primary: #aa8844;
+    --theme-secondary: #ddaa66;
+    --theme-accent: #ffcc88;
+    --theme-text: #eeddcc;
+    --theme-text-dim: #aa9988;
+    --theme-bg: #080604;
+    --theme-panel-bg: rgba(20, 15, 10, 0.98);
+    --theme-border-radius: 8px;
+    --theme-btn-radius: 4px;
+    --theme-border-width: 3px;
+}
+
+/* Cardassian Panel - Double border */
+[data-theme="cardassian"] .mud-paper,
+[data-theme="cardassian"] .mud-card {
+    background: linear-gradient(180deg, rgba(30, 22, 15, 0.98) 0%, rgba(15, 10, 5, 0.98) 100%) !important;
+    border: 3px double #886633 !important;
+    border-radius: 8px !important;
+    position: relative;
+}
+
+[data-theme="cardassian"] .mud-paper::before,
+[data-theme="cardassian"] .mud-card::before {
+    content: '';
+    position: absolute;
+    top: 4px; left: 4px; right: 4px; bottom: 4px;
+    border: 1px solid rgba(170, 136, 68, 0.3);
+    border-radius: 4px;
+    pointer-events: none;
+}
+
+/* Cardassian Buttons */
+[data-theme="cardassian"] .mud-button-root {
+    border-radius: 4px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+}
+
+[data-theme="cardassian"] .mud-button-filled {
+    background: linear-gradient(180deg, #aa8844 0%, #775522 100%) !important;
+    color: #fff !important;
+    border: 2px solid #ddaa66 !important;
+}
+
+[data-theme="cardassian"] .mud-button-filled:hover {
+    background: linear-gradient(180deg, #ccaa55 0%, #aa8844 100%) !important;
+}
+
+[data-theme="cardassian"] .mud-button-outlined {
+    border: 2px double #aa8844 !important;
+    color: #ddaa66 !important;
+}
+
+/* Cardassian AppBar */
+[data-theme="cardassian"] .mud-appbar {
+    background: linear-gradient(180deg, #1a1208 0%, #0a0804 100%) !important;
+    border-bottom: 3px double #664422 !important;
+}
+
+/* Cardassian Drawer */
+[data-theme="cardassian"] .mud-drawer {
+    background: linear-gradient(180deg, #120c06 0%, #080502 100%) !important;
+    border-right: 3px double #553311 !important;
+}
+
+/* Cardassian Nav Links */
+[data-theme="cardassian"] .mud-nav-link {
+    border-radius: 4px !important;
+    margin: 2px 6px !important;
+}
+
+[data-theme="cardassian"] .mud-nav-link:hover {
+    background: rgba(170, 136, 68, 0.2) !important;
+}
+
+[data-theme="cardassian"] .mud-nav-link.active {
+    background: linear-gradient(90deg, rgba(170, 136, 68, 0.4), rgba(170, 136, 68, 0.2)) !important;
+    border: 1px solid #aa8844 !important;
+    color: #ffcc88 !important;
+}
+
+/* ===========================================
+   FERENGI THEME - ORNATE GOLD
+   Luxurious, curved, gold/bronze
+   =========================================== */
+[data-theme="ferengi"] {
+    --theme-primary: #ddaa00;
+    --theme-secondary: #ffcc00;
+    --theme-accent: #ffee44;
+    --theme-text: #ffeecc;
+    --theme-text-dim: #aa9966;
+    --theme-bg: #0a0802;
+    --theme-panel-bg: rgba(25, 20, 8, 0.98);
+    --theme-border-radius: 16px;
+    --theme-btn-radius: 20px;
+    --theme-border-width: 2px;
+}
+
+/* Ferengi Panel - Gold trim */
+[data-theme="ferengi"] .mud-paper,
+[data-theme="ferengi"] .mud-card {
+    background: linear-gradient(180deg, rgba(35, 28, 12, 0.98) 0%, rgba(18, 14, 5, 0.98) 100%) !important;
+    border: 2px solid #aa8800 !important;
+    border-radius: 16px !important;
+    box-shadow: 
+        inset 0 1px 0 rgba(255, 220, 100, 0.2),
+        0 4px 20px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Ferengi Buttons - Gold luxury */
+[data-theme="ferengi"] .mud-button-root {
+    border-radius: 20px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    font-weight: 600 !important;
+}
+
+[data-theme="ferengi"] .mud-button-filled {
+    background: linear-gradient(180deg, #ffcc00 0%, #aa8800 100%) !important;
+    color: #000 !important;
+    border: 1px solid #ffee44 !important;
+    box-shadow: 0 4px 15px rgba(221, 170, 0, 0.4) !important;
+}
+
+[data-theme="ferengi"] .mud-button-filled:hover {
+    background: linear-gradient(180deg, #ffdd44 0%, #ddaa00 100%) !important;
+    box-shadow: 0 6px 25px rgba(255, 204, 0, 0.5) !important;
+}
+
+[data-theme="ferengi"] .mud-button-outlined {
+    border: 2px solid #ddaa00 !important;
+    color: #ffcc00 !important;
+    background: rgba(100, 80, 0, 0.2) !important;
+}
+
+/* Ferengi AppBar */
+[data-theme="ferengi"] .mud-appbar {
+    background: linear-gradient(180deg, #1a1508 0%, #0a0804 100%) !important;
+    border-bottom: 2px solid #886600 !important;
+}
+
+[data-theme="ferengi"] .mud-appbar::after {
+    content: '';
+    position: absolute;
+    bottom: -2px; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #ffcc00, #ddaa00, #ffcc00, transparent);
+}
+
+/* Ferengi Drawer */
+[data-theme="ferengi"] .mud-drawer {
+    background: linear-gradient(180deg, #141006 0%, #080602 100%) !important;
+    border-right: 2px solid #664400 !important;
+}
+
+/* Ferengi Nav Links */
+[data-theme="ferengi"] .mud-nav-link {
+    border-radius: 12px !important;
+    margin: 3px 8px !important;
+}
+
+[data-theme="ferengi"] .mud-nav-link:hover {
+    background: rgba(221, 170, 0, 0.15) !important;
+}
+
+[data-theme="ferengi"] .mud-nav-link.active {
+    background: linear-gradient(90deg, rgba(221, 170, 0, 0.4), rgba(221, 170, 0, 0.15)) !important;
+    color: #ffcc00 !important;
+}
+
+/* ===========================================
+   COMMON OVERRIDES FOR ALL THEMES
+   =========================================== */
+
+/* Table styling */
+[data-theme] .mud-table {
+    background: var(--theme-panel-bg) !important;
+}
+
+[data-theme] .mud-table-head {
+    background: rgba(0, 0, 0, 0.3) !important;
+}
+
+[data-theme] .mud-table-cell {
+    border-color: rgba(255, 255, 255, 0.1) !important;
+    color: var(--theme-text) !important;
+}
+
+[data-theme] .mud-table-row:hover {
+    background: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Dialog styling */
+[data-theme] .mud-dialog {
+    background: var(--theme-panel-bg) !important;
+    border: var(--theme-border-width) solid var(--theme-primary) !important;
+    border-radius: var(--theme-border-radius) !important;
+}
+
+/* Progress bars */
+[data-theme] .mud-progress-linear {
+    background: rgba(0, 0, 0, 0.3) !important;
+    border-radius: var(--theme-btn-radius) !important;
+}
+
+[data-theme] .mud-progress-linear-bar {
+    background: var(--theme-primary) !important;
+}
+
+/* Tabs */
+[data-theme] .mud-tabs-header {
+    background: rgba(0, 0, 0, 0.2) !important;
+}
+
+[data-theme] .mud-tab {
+    color: var(--theme-text-dim) !important;
+}
+
+[data-theme] .mud-tab.mud-tab-active {
+    color: var(--theme-primary) !important;
+}
+
+[data-theme] .mud-tab-slider {
+    background: var(--theme-primary) !important;
+}
+
+/* Chips */
+[data-theme] .mud-chip {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: var(--theme-text) !important;
+    border-radius: var(--theme-btn-radius) !important;
+}
+
+/* Snackbar */
+[data-theme] .mud-snackbar {
+    background: var(--theme-panel-bg) !important;
+    border: 1px solid var(--theme-primary) !important;
+}
+
+/* Menu/Popover */
+[data-theme] .mud-popover {
+    background: var(--theme-panel-bg) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+[data-theme] .mud-list-item:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Icons */
+[data-theme] .mud-icon-button {
+    color: var(--theme-text) !important;
+}
+
+[data-theme] .mud-icon-button:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Text colors */
+[data-theme] .mud-typography-h6,
+[data-theme] .mud-typography-subtitle1 {
+    color: var(--theme-accent) !important;
+}
+
+/* Scrollbars - Theme specific */
+[data-theme]::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+[data-theme]::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+[data-theme]::-webkit-scrollbar-thumb {
+    background: var(--theme-primary);
+    border-radius: var(--theme-btn-radius);
+}
+
+[data-theme]::-webkit-scrollbar-thumb:hover {
+    background: var(--theme-secondary);
+}

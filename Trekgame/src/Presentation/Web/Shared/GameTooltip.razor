@@ -1,0 +1,154 @@
+@using Microsoft.JSInterop
+@inject IJSRuntime JS
+
+<div class="game-tooltip @(_visible ? "visible" : "")" style="left: @(_x)px; top: @(_y)px;">
+    @if (!string.IsNullOrEmpty(_title))
+    {
+        <div class="tooltip-title">@_title</div>
+    }
+    <div class="tooltip-content">@((MarkupString)_content)</div>
+    @if (_stats.Any())
+    {
+        <div class="tooltip-stats">
+            @foreach (var stat in _stats)
+            {
+                <div class="stat-row">
+                    <span class="stat-icon">@stat.Icon</span>
+                    <span class="stat-name">@stat.Name</span>
+                    <span class="stat-value @(stat.IsPositive ? "positive" : stat.IsNegative ? "negative" : "")">
+                        @(stat.IsPositive ? "+" : "")@stat.Value
+                    </span>
+                </div>
+            }
+        </div>
+    }
+    @if (!string.IsNullOrEmpty(_hint))
+    {
+        <div class="tooltip-hint">💡 @_hint</div>
+    }
+</div>
+
+<style>
+    .game-tooltip {
+        position: fixed;
+        z-index: 10000;
+        max-width: 320px;
+        background: rgba(10, 15, 25, 0.98);
+        border: 1px solid rgba(74, 158, 255, 0.5);
+        border-radius: 8px;
+        padding: 12px 16px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+        pointer-events: none;
+        opacity: 0;
+        transform: translateY(8px);
+        transition: opacity 0.15s, transform 0.15s;
+    }
+    .game-tooltip.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    .tooltip-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: #ff9900;
+        margin-bottom: 8px;
+        padding-bottom: 6px;
+        border-bottom: 1px solid rgba(255, 153, 0, 0.3);
+    }
+    .tooltip-content {
+        font-size: 12px;
+        color: #c8d4e8;
+        line-height: 1.5;
+    }
+    .tooltip-stats {
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px solid rgba(60, 90, 130, 0.3);
+    }
+    .stat-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 3px 0;
+        font-size: 11px;
+    }
+    .stat-icon { font-size: 14px; }
+    .stat-name { flex: 1; color: #7890a8; }
+    .stat-value { font-weight: 600; color: #c8d4e8; }
+    .stat-value.positive { color: #44dd66; }
+    .stat-value.negative { color: #ff4455; }
+    .tooltip-hint {
+        margin-top: 10px;
+        padding-top: 8px;
+        border-top: 1px solid rgba(60, 90, 130, 0.3);
+        font-size: 10px;
+        color: #7890a8;
+        font-style: italic;
+    }
+</style>
+
+@code {
+    private bool _visible;
+    private double _x;
+    private double _y;
+    private string _title = "";
+    private string _content = "";
+    private string _hint = "";
+    private List<TooltipStat> _stats = new();
+
+    [JSInvokable]
+    public void Show(double x, double y, string title, string content, string hint, object[]? stats)
+    {
+        _x = x + 15;
+        _y = y + 15;
+        _title = title;
+        _content = content;
+        _hint = hint ?? "";
+        
+        _stats.Clear();
+        if (stats != null)
+        {
+            foreach (var s in stats)
+            {
+                if (s is System.Text.Json.JsonElement je)
+                {
+                    _stats.Add(new TooltipStat
+                    {
+                        Icon = je.GetProperty("icon").GetString() ?? "",
+                        Name = je.GetProperty("name").GetString() ?? "",
+                        Value = je.GetProperty("value").GetString() ?? "",
+                        IsPositive = je.TryGetProperty("positive", out var p) && p.GetBoolean(),
+                        IsNegative = je.TryGetProperty("negative", out var n) && n.GetBoolean()
+                    });
+                }
+            }
+        }
+        
+        _visible = true;
+        StateHasChanged();
+    }
+
+    [JSInvokable]
+    public void Hide()
+    {
+        _visible = false;
+        StateHasChanged();
+    }
+
+    [JSInvokable]
+    public void Move(double x, double y)
+    {
+        _x = x + 15;
+        _y = y + 15;
+        StateHasChanged();
+    }
+
+    private class TooltipStat
+    {
+        public string Icon { get; set; } = "";
+        public string Name { get; set; } = "";
+        public string Value { get; set; } = "";
+        public bool IsPositive { get; set; }
+        public bool IsNegative { get; set; }
+    }
+}

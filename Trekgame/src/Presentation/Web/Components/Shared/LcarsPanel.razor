@@ -1,0 +1,145 @@
+@namespace StarTrekGame.Web.Components.Shared
+
+<div class="lcars-panel @SizeClass @Class" style="@Style">
+    @if (!string.IsNullOrEmpty(Title))
+    {
+        <div class="panel-header" style="background: linear-gradient(90deg, @HeaderColor 0%, @HeaderColorLight 50%, @HeaderColor 100%);">
+            <span class="header-text">@Title</span>
+            @if (HeaderContent != null)
+            {
+                @HeaderContent
+            }
+            else
+            {
+                <div class="header-decoration"></div>
+            }
+            @if (ShowCloseButton)
+            {
+                <button class="close-btn" @onclick="OnClose">✕</button>
+            }
+        </div>
+    }
+    <div class="panel-body @(NoPadding ? "no-padding" : "")">
+        @ChildContent
+    </div>
+    @if (FooterContent != null)
+    {
+        <div class="panel-footer">
+            @FooterContent
+        </div>
+    }
+</div>
+
+<style>
+    .lcars-panel {
+        background: rgba(10, 10, 30, 0.95);
+        border: 2px solid var(--panel-border, #ff9900);
+        border-radius: 12px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .lcars-panel.compact {
+        border-radius: 8px;
+    }
+    
+    .lcars-panel.compact .panel-header {
+        padding: 8px 12px;
+    }
+    
+    .lcars-panel.compact .header-text {
+        font-size: 12px;
+    }
+    
+    .panel-header {
+        padding: 10px 16px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-shrink: 0;
+    }
+    
+    .header-text {
+        color: #000;
+        font-weight: 700;
+        font-size: 14px;
+        letter-spacing: 2px;
+        white-space: nowrap;
+    }
+    
+    .header-decoration {
+        flex: 1;
+        height: 8px;
+        background: #000;
+        border-radius: 4px;
+        min-width: 20px;
+    }
+    
+    .close-btn {
+        background: rgba(0, 0, 0, 0.3);
+        border: none;
+        color: #000;
+        font-size: 14px;
+        width: 24px;
+        height: 24px;
+        border-radius: 4px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+    }
+    
+    .close-btn:hover {
+        background: rgba(0, 0, 0, 0.5);
+    }
+    
+    .panel-body {
+        padding: 16px;
+        flex: 1;
+        overflow: auto;
+    }
+    
+    .panel-body.no-padding {
+        padding: 0;
+    }
+    
+    .panel-footer {
+        padding: 12px 16px;
+        border-top: 1px solid rgba(255, 153, 0, 0.3);
+        flex-shrink: 0;
+    }
+    
+    /* Scrollbar styling */
+    .panel-body::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    .panel-body::-webkit-scrollbar-track {
+        background: rgba(20, 20, 40, 0.5);
+        border-radius: 3px;
+    }
+    
+    .panel-body::-webkit-scrollbar-thumb {
+        background: var(--panel-border, #ff9900);
+        border-radius: 3px;
+    }
+</style>
+
+@code {
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public RenderFragment? HeaderContent { get; set; }
+    [Parameter] public RenderFragment? FooterContent { get; set; }
+    [Parameter] public string HeaderColor { get; set; } = "#ff9900";
+    [Parameter] public string HeaderColorLight { get; set; } = "#ffcc00";
+    [Parameter] public bool ShowCloseButton { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+    [Parameter] public bool Compact { get; set; }
+    [Parameter] public bool NoPadding { get; set; }
+    [Parameter] public string? Class { get; set; }
+    [Parameter] public string? Style { get; set; }
+    
+    private string SizeClass => Compact ? "compact" : "";
+}

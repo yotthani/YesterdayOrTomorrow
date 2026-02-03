@@ -1,0 +1,26 @@
+@inject NavigationManager Navigation
+
+<a href="@Href" class="nav-item @IsActiveClass">
+    <span class="nav-icon">@Icon</span>
+    <span class="nav-text">@Text</span>
+    @if (!string.IsNullOrEmpty(Badge))
+    {
+        <span class="nav-badge">@Badge</span>
+    }
+</a>
+
+@code {
+    [Parameter] public string Icon { get; set; } = "";
+    [Parameter] public string Text { get; set; } = "";
+    [Parameter] public string Href { get; set; } = "";
+    [Parameter] public string? Badge { get; set; }
+
+    private string IsActiveClass
+    {
+        get
+        {
+            var currentPath = "/" + Navigation.ToBaseRelativePath(Navigation.Uri);
+            return currentPath.StartsWith(Href) ? "active" : "";
+        }
+    }
+}

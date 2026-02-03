@@ -1,0 +1,268 @@
+{
+  "factionName": "Romulan",
+  "categoryName": "MilitaryShips",
+  "grid": {
+    "columns": 6,
+    "rows": 6,
+    "totalAssets": 36,
+    "cellSize": 360,
+    "spriteWidth": 2160,
+    "spriteHeight": 2160
+  },
+  "spriteSheetPath": "romulan_militaryships.png",
+  "generatedAt": "2026-01-31T23:50:14.991Z",
+  "assets": [
+    {
+      "row": 0,
+      "col": 0,
+      "name": "D\u0027deridex Warbird",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 0,
+      "col": 1,
+      "name": "Valdore Warbird",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 0,
+      "col": 2,
+      "name": "Mogai Warbird",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 0,
+      "col": 3,
+      "name": "D7 Romulan",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 0,
+      "col": 4,
+      "name": "Bird of Prey Romulan",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 0,
+      "col": 5,
+      "name": "Scimitar Dreadnought",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 1,
+      "col": 0,
+      "name": "Norexan Warbird",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 1,
+      "col": 1,
+      "name": "D\u0027ridthau Warbird",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 1,
+      "col": 2,
+      "name": "Dhael Warbird",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 1,
+      "col": 3,
+      "name": "Khenn Cruiser",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 1,
+      "col": 4,
+      "name": "Lanora Scout",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 1,
+      "col": 5,
+      "name": "Tiercel Fighter",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 2,
+      "col": 0,
+      "name": "T\u0027varo Warbird",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 2,
+      "col": 1,
+      "name": "Ha\u0027apax Warbird",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 2,
+      "col": 2,
+      "name": "Falchion Dreadnought",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 2,
+      "col": 3,
+      "name": "Dhelan Warbird",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 2,
+      "col": 4,
+      "name": "Ar\u0027kif Tactical",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 2,
+      "col": 5,
+      "name": "Ha\u0027feh Assault",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 3,
+      "col": 0,
+      "name": "Aelahl Battlecruiser",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 3,
+      "col": 1,
+      "name": "Khopesh Dreadnought",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 3,
+      "col": 2,
+      "name": "Tal Shiar Adapted",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 3,
+      "col": 3,
+      "name": "Faeht Intel",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 3,
+      "col": 4,
+      "name": "Malem Light",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 3,
+      "col": 5,
+      "name": "Hathos Warbird",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 4,
+      "col": 0,
+      "name": "Kara Advanced",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 4,
+      "col": 1,
+      "name": "Deleth Advanced",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 4,
+      "col": 2,
+      "name": "Vastam Command",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 4,
+      "col": 3,
+      "name": "Tebok Command",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 4,
+      "col": 4,
+      "name": "Valkis Dreadnought",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 4,
+      "col": 5,
+      "name": "Thrai Dreadnought",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 5,
+      "col": 0,
+      "name": "Aves Dyson",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 5,
+      "col": 1,
+      "name": "Harpia Dyson",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 5,
+      "col": 2,
+      "name": "Fleet Warbird Alpha",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 5,
+      "col": 3,
+      "name": "Fleet Warbird Beta",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 5,
+      "col": 4,
+      "name": "Fleet Warbird Gamma",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 5,
+      "col": 5,
+      "name": "Patrol Warbird",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    }
+  ]
+}

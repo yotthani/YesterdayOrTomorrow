@@ -1,0 +1,120 @@
+{
+  "factionName": "Cardassian",
+  "categoryName": "Buildings",
+  "architectureStyle": {
+    "description": "Brutalist, oppressive, functional - designed for control, surveillance, and military efficiency",
+    "keyElements": [
+      "Heavy concrete and metal construction - built to last and intimidate",
+      "Minimal windows - small, high, barred where present",
+      "Cobra/serpent head motifs echoing ship design",
+      "Ochre, brown, tan, gray colors - desert planet aesthetic",
+      "Surveillance towers and security checkpoints everywhere",
+      "Cardassian Union emblem (the stingray/manta shape) displayed",
+      "Angular, segmented architecture like insect exoskeletons",
+      "Interrogation facilities and holding cells integrated",
+      "Designed for occupation - controlling subject populations",
+      "NO comfort features, NO decoration except propaganda",
+      "Heat exchangers and environmental systems visible - Cardassia is hot"
+    ],
+    "colors": "Ochre brown, tan, concrete gray, rust orange accents, yellow warning lights",
+    "materials": "Reinforced concrete, duranium plating, heat-resistant ceramics"
+  },
+  "buildings": [
+    {
+      "name": "Central Command",
+      "description": "Military high command headquarters. Massive, imposing, the seat of Cardassian military power."
+    },
+    {
+      "name": "Obsidian Order Facility",
+      "description": "Secret police headquarters. Appears as normal government building, hides interrogation chambers."
+    },
+    {
+      "name": "Prefect's Office",
+      "description": "Colonial administrator building. From here, occupied worlds are controlled."
+    },
+    {
+      "name": "Detention Center",
+      "description": "Prison facility. Infamous for harsh conditions. Labor camps, interrogation, execution."
+    },
+    {
+      "name": "Ore Processing Facility",
+      "description": "Industrial building for processing mined resources. Uses forced labor."
+    },
+    {
+      "name": "Military Academy",
+      "description": "Officer training facility. Discipline, tactics, loyalty to Cardassia above all."
+    },
+    {
+      "name": "Security Checkpoint",
+      "description": "Controls movement between sectors. ID verification, searches, surveillance."
+    },
+    {
+      "name": "Garrison Headquarters",
+      "description": "Military base for occupation troops. Barracks, armory, vehicle depot."
+    },
+    {
+      "name": "Communications Center",
+      "description": "Controls all communications in the sector. Monitors, censors, intercepts."
+    },
+    {
+      "name": "Power Distribution Hub",
+      "description": "Energy management facility. Can cut power to rebellious sectors."
+    },
+    {
+      "name": "Food Distribution Center",
+      "description": "Controls food supply. Rations allocated based on cooperation with authorities."
+    },
+    {
+      "name": "Medical Facility",
+      "description": "Hospital - but Cardassians get priority. Subject populations receive minimal care."
+    },
+    {
+      "name": "Weapons Factory",
+      "description": "Manufacturing disruptors, phaser rifles, military equipment. Forced labor often used."
+    },
+    {
+      "name": "Shipyard Control",
+      "description": "Administers ship construction. Overlooks orbital construction facilities."
+    },
+    {
+      "name": "Propaganda Ministry",
+      "description": "Controls information, education, media. Rewrites history to favor Cardassia."
+    },
+    {
+      "name": "Labor Assignment Office",
+      "description": "Assigns workers (often forced) to various projects. No one is unemployed in Cardassia."
+    },
+    {
+      "name": "Science Division",
+      "description": "Research facility. Advanced technology development, often stolen from other races."
+    },
+    {
+      "name": "Embassy",
+      "description": "Diplomatic facility. Even diplomacy is backed by threat of military force."
+    },
+    {
+      "name": "Trade Administration",
+      "description": "Controls commerce. State-managed economy, everything monitored."
+    },
+    {
+      "name": "Tribunal Court",
+      "description": "Justice facility - but verdicts are decided before trials begin. Show trials."
+    },
+    {
+      "name": "Family Registry",
+      "description": "Tracks all citizens and their families. Used for leverage and control."
+    },
+    {
+      "name": "Defense Battery",
+      "description": "Planetary defense installation. Spiral wave disruptors, targeting systems."
+    },
+    {
+      "name": "Residential Block",
+      "description": "Housing for citizens. Uniform, monitored, minimal privacy."
+    },
+    {
+      "name": "Recreation Facility",
+      "description": "State-approved entertainment. Kanar bars, holosuites with approved programs."
+    }
+  ]
+}

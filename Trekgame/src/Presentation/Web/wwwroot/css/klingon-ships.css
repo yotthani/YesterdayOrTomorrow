@@ -1,0 +1,208 @@
+/* ==============================================
+   GALACTIC STRATEGY - Klingon Ships
+   3D Rendered Style with Nameplates
+   
+   Two sprite sheets:
+   - military_ships.png: Warships, Birds of Prey, Battlecruisers
+   - civilian_ships.png: Freighters, transports, support vessels
+   
+   Both: 2000 x 1103 px, 6 columns x 3 rows
+   Cell Size: ~333 x 368 px
+   ============================================== */
+
+/* ==============================================
+   Base Klingon Ship Component
+   ============================================== */
+
+.ship-card.klingon {
+    background-repeat: no-repeat;
+    background-size: 1000px 552px; /* 50% scale default */
+}
+
+/* ==============================================
+   KLINGON MILITARY SHIPS
+   Sheet: klingon/military_ships.png
+   
+   Row 1: B'rel, K'Vort, D7, K't'inga, Vor'cha, Raptor
+   Row 2: Vor'cha, Negh'Var, D5, Raptor, Bird-of-Prey (22c), Qang
+   Row 3: Somraw, Qugh, Jach, Ning'tao, Batlh, Bortas
+   ============================================== */
+
+.ship-card.klingon.military {
+    background-image: url('/images/ships/klingon/military_ships.png');
+}
+
+/* Row 1 */
+.ship-card.klingon.brel           { background-position: 0 0; }
+.ship-card.klingon.kvort          { background-position: -166px 0; }
+.ship-card.klingon.d7             { background-position: -333px 0; }
+.ship-card.klingon.ktinga         { background-position: -500px 0; }
+.ship-card.klingon.vorcha         { background-position: -666px 0; }
+.ship-card.klingon.raptor         { background-position: -833px 0; }
+
+/* Row 2 */
+.ship-card.klingon.vorcha-alt     { background-position: 0 -184px; }
+.ship-card.klingon.neghvar        { background-position: -166px -184px; }
+.ship-card.klingon.d5             { background-position: -333px -184px; }
+.ship-card.klingon.raptor-alt     { background-position: -500px -184px; }
+.ship-card.klingon.bird-of-prey,
+.ship-card.klingon.bop-22c        { background-position: -666px -184px; }
+.ship-card.klingon.qang           { background-position: -833px -184px; }
+
+/* Row 3 */
+.ship-card.klingon.somraw         { background-position: 0 -368px; }
+.ship-card.klingon.qugh           { background-position: -166px -368px; }
+.ship-card.klingon.jach           { background-position: -333px -368px; }
+.ship-card.klingon.ningtao        { background-position: -500px -368px; }
+.ship-card.klingon.batlh          { background-position: -666px -368px; }
+.ship-card.klingon.bortas         { background-position: -833px -368px; }
+
+/* ==============================================
+   KLINGON CIVILIAN SHIPS
+   Sheet: klingon/civilian_ships.png
+   
+   Row 1: Freighter, Transport, Cargo Ship, Mining Vessel, Science Ship, Scout
+   Row 2: Courier, Courier, Colony Ship, Klingo(?), Shuttle, Runabout  
+   Row 3: Trawler, Repair Ship, Diplomatic, Yacht, Barge, Survey Ship
+   ============================================== */
+
+.ship-card.klingon.civilian {
+    background-image: url('/images/ships/klingon/civilian_ships.png');
+}
+
+/* Row 1 */
+.ship-card.klingon.freighter      { background-position: 0 0; }
+.ship-card.klingon.transport      { background-position: -166px 0; }
+.ship-card.klingon.cargo          { background-position: -333px 0; }
+.ship-card.klingon.mining         { background-position: -500px 0; }
+.ship-card.klingon.science        { background-position: -666px 0; }
+.ship-card.klingon.scout          { background-position: -833px 0; }
+
+/* Row 2 */
+.ship-card.klingon.courier        { background-position: 0 -184px; }
+.ship-card.klingon.courier-alt    { background-position: -166px -184px; }
+.ship-card.klingon.colony         { background-position: -333px -184px; }
+.ship-card.klingon.klingo         { background-position: -500px -184px; }
+.ship-card.klingon.shuttle        { background-position: -666px -184px; }
+.ship-card.klingon.runabout       { background-position: -833px -184px; }
+
+/* Row 3 */
+.ship-card.klingon.trawler        { background-position: 0 -368px; }
+.ship-card.klingon.repair         { background-position: -166px -368px; }
+.ship-card.klingon.diplomatic     { background-position: -333px -368px; }
+.ship-card.klingon.yacht          { background-position: -500px -368px; }
+.ship-card.klingon.barge          { background-position: -666px -368px; }
+.ship-card.klingon.survey         { background-position: -833px -368px; }
+
+/* ==============================================
+   Large Size Positions (100% scale)
+   ============================================== */
+
+.ship-card.klingon.large {
+    background-size: 2000px 1103px;
+}
+
+/* Military Large */
+.ship-card.klingon.large.brel           { background-position: 0 0; }
+.ship-card.klingon.large.kvort          { background-position: -333px 0; }
+.ship-card.klingon.large.d7             { background-position: -666px 0; }
+.ship-card.klingon.large.ktinga         { background-position: -1000px 0; }
+.ship-card.klingon.large.vorcha         { background-position: -1333px 0; }
+.ship-card.klingon.large.raptor         { background-position: -1666px 0; }
+
+.ship-card.klingon.large.vorcha-alt     { background-position: 0 -368px; }
+.ship-card.klingon.large.neghvar        { background-position: -333px -368px; }
+.ship-card.klingon.large.d5             { background-position: -666px -368px; }
+.ship-card.klingon.large.raptor-alt     { background-position: -1000px -368px; }
+.ship-card.klingon.large.bird-of-prey   { background-position: -1333px -368px; }
+.ship-card.klingon.large.qang           { background-position: -1666px -368px; }
+
+.ship-card.klingon.large.somraw         { background-position: 0 -736px; }
+.ship-card.klingon.large.qugh           { background-position: -333px -736px; }
+.ship-card.klingon.large.jach           { background-position: -666px -736px; }
+.ship-card.klingon.large.ningtao        { background-position: -1000px -736px; }
+.ship-card.klingon.large.batlh          { background-position: -1333px -736px; }
+.ship-card.klingon.large.bortas         { background-position: -1666px -736px; }
+
+/* Civilian Large */
+.ship-card.klingon.large.freighter      { background-position: 0 0; }
+.ship-card.klingon.large.transport      { background-position: -333px 0; }
+.ship-card.klingon.large.cargo          { background-position: -666px 0; }
+.ship-card.klingon.large.mining         { background-position: -1000px 0; }
+.ship-card.klingon.large.science        { background-position: -1333px 0; }
+.ship-card.klingon.large.scout          { background-position: -1666px 0; }
+
+.ship-card.klingon.large.courier        { background-position: 0 -368px; }
+.ship-card.klingon.large.courier-alt    { background-position: -333px -368px; }
+.ship-card.klingon.large.colony         { background-position: -666px -368px; }
+.ship-card.klingon.large.klingo         { background-position: -1000px -368px; }
+.ship-card.klingon.large.shuttle        { background-position: -1333px -368px; }
+.ship-card.klingon.large.runabout       { background-position: -1666px -368px; }
+
+.ship-card.klingon.large.trawler        { background-position: 0 -736px; }
+.ship-card.klingon.large.repair         { background-position: -333px -736px; }
+.ship-card.klingon.large.diplomatic     { background-position: -666px -736px; }
+.ship-card.klingon.large.yacht          { background-position: -1000px -736px; }
+.ship-card.klingon.large.barge          { background-position: -1333px -736px; }
+.ship-card.klingon.large.survey         { background-position: -1666px -736px; }
+
+/* ==============================================
+   Small Size Positions (25% scale)
+   ============================================== */
+
+.ship-card.klingon.small {
+    background-size: 500px 276px;
+}
+
+/* Military Small */
+.ship-card.klingon.small.brel           { background-position: 0 0; }
+.ship-card.klingon.small.kvort          { background-position: -83px 0; }
+.ship-card.klingon.small.d7             { background-position: -166px 0; }
+.ship-card.klingon.small.ktinga         { background-position: -250px 0; }
+.ship-card.klingon.small.vorcha         { background-position: -333px 0; }
+.ship-card.klingon.small.raptor         { background-position: -416px 0; }
+
+.ship-card.klingon.small.vorcha-alt     { background-position: 0 -92px; }
+.ship-card.klingon.small.neghvar        { background-position: -83px -92px; }
+.ship-card.klingon.small.d5             { background-position: -166px -92px; }
+.ship-card.klingon.small.raptor-alt     { background-position: -250px -92px; }
+.ship-card.klingon.small.bird-of-prey   { background-position: -333px -92px; }
+.ship-card.klingon.small.qang           { background-position: -416px -92px; }
+
+.ship-card.klingon.small.somraw         { background-position: 0 -184px; }
+.ship-card.klingon.small.qugh           { background-position: -83px -184px; }
+.ship-card.klingon.small.jach           { background-position: -166px -184px; }
+.ship-card.klingon.small.ningtao        { background-position: -250px -184px; }
+.ship-card.klingon.small.batlh          { background-position: -333px -184px; }
+.ship-card.klingon.small.bortas         { background-position: -416px -184px; }
+
+/* ==============================================
+   Klingon Frame Style (Red Glow)
+   ============================================== */
+
+.ship-frame.klingon {
+    border-color: rgba(220, 38, 38, 0.6);
+    box-shadow: 
+        0 4px 12px rgba(0, 0, 0, 0.5),
+        0 0 20px rgba(220, 38, 38, 0.3);
+}
+
+.ship-frame.klingon.selected {
+    border-color: #fbbf24;
+    box-shadow: 
+        0 4px 12px rgba(0, 0, 0, 0.5),
+        0 0 25px rgba(251, 191, 36, 0.4);
+}
+
+/* ==============================================
+   Klingon Ship Selection Glow
+   ============================================== */
+
+@keyframes klingon-ship-glow {
+    0%, 100% { box-shadow: 0 0 15px rgba(220, 38, 38, 0.4); }
+    50% { box-shadow: 0 0 25px rgba(220, 38, 38, 0.6); }
+}
+
+.ship-card.klingon.selected {
+    animation: klingon-ship-glow 2s ease-in-out infinite;
+}

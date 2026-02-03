@@ -1,0 +1,182 @@
+@* KlingonShip.razor - Ship display component for Klingon vessels *@
+
+<div class="@GetContainerClasses()" @onclick="HandleClick">
+    <div class="@GetShipClasses()"></div>
+    @if (ShowNameplate)
+    {
+        <div class="ship-nameplate klingon-nameplate">
+            <span class="ship-name">@GetDisplayName()</span>
+            <span class="ship-class-icon">⚔️</span>
+        </div>
+    }
+</div>
+
+<style>
+    .ship-container.klingon-ship {
+        display: inline-flex;
+        flex-direction: column;
+        background: linear-gradient(180deg, #2d2525 0%, #1a1515 100%);
+        border: 1px solid #4a3535;
+        border-radius: 6px;
+        overflow: hidden;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+        transition: all 0.2s;
+    }
+    
+    .ship-container.klingon-ship:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+        border-color: rgba(220, 38, 38, 0.5);
+    }
+    
+    .ship-container.klingon-ship.selected {
+        border-color: #dc2626;
+        box-shadow: 0 0 20px rgba(220, 38, 38, 0.4);
+    }
+    
+    .klingon-nameplate {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 12px;
+        background: linear-gradient(180deg, #8b6b55 0%, #6b4a3a 50%, #4a3528 100%);
+        border-top: 1px solid #a07860;
+    }
+    
+    .klingon-nameplate .ship-name {
+        font-size: 10px;
+        font-weight: 700;
+        color: #1a1510;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        text-shadow: 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+    
+    .klingon-nameplate .ship-class-icon {
+        width: 22px;
+        height: 22px;
+        background: linear-gradient(180deg, #a07860 0%, #705040 100%);
+        border: 2px solid #4a3528;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+    }
+</style>
+
+@code {
+    [Parameter] public string ShipType { get; set; } = "brel";
+    [Parameter] public string Size { get; set; } = "medium";
+    [Parameter] public string Category { get; set; } = "military";
+    [Parameter] public bool ShowNameplate { get; set; } = false;
+    [Parameter] public bool IsSelected { get; set; } = false;
+    [Parameter] public string? DisplayName { get; set; }
+    [Parameter] public EventCallback<string> OnClick { get; set; }
+    [Parameter] public string? CssClass { get; set; }
+
+    private string GetContainerClasses()
+    {
+        var classes = new List<string> { "ship-container", "klingon-ship" };
+        if (IsSelected) classes.Add("selected");
+        if (OnClick.HasDelegate) classes.Add("clickable");
+        if (!string.IsNullOrEmpty(CssClass)) classes.Add(CssClass);
+        return string.Join(" ", classes);
+    }
+
+    private string GetShipClasses()
+    {
+        var classes = new List<string> { "ship-card", "klingon", Category, ShipType.ToLowerInvariant() };
+        if (!string.IsNullOrEmpty(Size)) classes.Add(Size);
+        return string.Join(" ", classes);
+    }
+
+    private async Task HandleClick()
+    {
+        if (OnClick.HasDelegate)
+            await OnClick.InvokeAsync(ShipType);
+    }
+
+    private string GetDisplayName()
+    {
+        if (!string.IsNullOrEmpty(DisplayName)) return DisplayName;
+        return ShipType.ToLowerInvariant() switch
+        {
+            // Military
+            "brel" => "B'rel",
+            "kvort" => "K'Vort",
+            "d7" => "D7",
+            "ktinga" => "K't'inga",
+            "vorcha" => "Vor'cha",
+            "raptor" => "Raptor",
+            "neghvar" => "Negh'Var",
+            "d5" => "D5",
+            "bird-of-prey" or "bop-22c" => "Bird-of-Prey",
+            "qang" => "Qang",
+            "somraw" => "Somraw",
+            "qugh" => "Qugh",
+            "jach" => "Jach",
+            "ningtao" => "Ning'tao",
+            "batlh" => "Batlh",
+            "bortas" => "Bortas",
+            // Civilian
+            "freighter" => "Freighter",
+            "transport" => "Transport",
+            "cargo" => "Cargo Ship",
+            "mining" => "Mining Vessel",
+            "science" => "Science Ship",
+            "scout" => "Scout",
+            "courier" => "Courier",
+            "colony" => "Colony Ship",
+            "shuttle" => "Shuttle",
+            "runabout" => "Runabout",
+            "trawler" => "Trawler",
+            "repair" => "Repair Ship",
+            "diplomatic" => "Diplomatic",
+            "yacht" => "Yacht",
+            "barge" => "Barge",
+            "survey" => "Survey Ship",
+            _ => ShipType
+        };
+    }
+
+    // Ship data
+    public static readonly ShipData[] MilitaryShips = new[]
+    {
+        // Birds of Prey (Light)
+        new ShipData("brel", "B'rel", "Bird of Prey", 8, 4, 1, 9),
+        new ShipData("kvort", "K'Vort", "Bird of Prey", 10, 6, 1, 8),
+        new ShipData("bird-of-prey", "Bird-of-Prey", "Bird of Prey", 7, 4, 1, 9),
+        new ShipData("raptor", "Raptor", "Raider", 9, 5, 1, 8),
+        // Battlecruisers (Medium)
+        new ShipData("d5", "D5", "Battlecruiser", 8, 7, 2, 6),
+        new ShipData("d7", "D7", "Battlecruiser", 10, 8, 2, 6),
+        new ShipData("ktinga", "K't'inga", "Battlecruiser", 12, 9, 2, 6),
+        new ShipData("somraw", "Somraw", "Raptor", 9, 6, 2, 7),
+        // Attack Cruisers (Heavy)
+        new ShipData("vorcha", "Vor'cha", "Attack Cruiser", 14, 10, 2, 6),
+        new ShipData("qang", "Qang", "Heavy Cruiser", 13, 11, 2, 5),
+        new ShipData("ningtao", "Ning'tao", "Destroyer", 11, 8, 1, 7),
+        // Flagships (Capital)
+        new ShipData("neghvar", "Negh'Var", "Warship", 18, 14, 3, 5),
+        new ShipData("bortas", "Bortas", "Flagship", 16, 12, 3, 5),
+        new ShipData("batlh", "Batlh", "Dreadnought", 15, 13, 2, 4),
+    };
+
+    public static readonly ShipData[] CivilianShips = new[]
+    {
+        new ShipData("freighter", "Freighter", "Freighter", 2, 3, 0, 4),
+        new ShipData("transport", "Transport", "Transport", 1, 2, 0, 5),
+        new ShipData("cargo", "Cargo Ship", "Freighter", 1, 2, 0, 4),
+        new ShipData("mining", "Mining Vessel", "Industrial", 2, 3, 1, 3),
+        new ShipData("science", "Science Ship", "Science", 2, 2, 4, 5),
+        new ShipData("scout", "Scout", "Scout", 3, 2, 2, 8),
+        new ShipData("courier", "Courier", "Courier", 2, 1, 0, 9),
+        new ShipData("colony", "Colony Ship", "Colonizer", 1, 4, 1, 3),
+        new ShipData("shuttle", "Shuttle", "Shuttle", 1, 1, 0, 6),
+        new ShipData("repair", "Repair Ship", "Support", 1, 3, 2, 4),
+        new ShipData("diplomatic", "Diplomatic", "Diplomatic", 2, 3, 1, 5),
+    };
+
+    public record ShipData(string Type, string Name, string Class, int Attack, int Defense, int Science, int Speed);
+}

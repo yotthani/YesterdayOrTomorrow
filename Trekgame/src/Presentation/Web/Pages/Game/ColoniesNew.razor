@@ -1,0 +1,694 @@
+@page "/game/planets"
+@page "/game/colonies"
+@page "/game/colonies-new"
+@layout StellarisLayout
+@using MudBlazor
+@using StarTrekGame.Web.Services
+@using Blazored.LocalStorage
+@inject IGameApiClient Api
+@inject NavigationManager Navigation
+@inject ILocalStorageService LocalStorage
+
+<PageTitle>Colonies - Galactic Strategy</PageTitle>
+
+<div class="stellaris-layout">
+    @* TOP BAR *@
+    <header class="st-topbar">
+        <div class="st-empire-badge">
+            <div class="st-empire-flag">🌐</div>
+            <div class="st-empire-info">
+                <span class="st-empire-name">@(_faction?.Name ?? "United Federation")</span>
+                <span class="st-empire-type">Democratic Republic</span>
+            </div>
+        </div>
+        <div class="st-resources">
+            <div class="st-resource"><span class="st-resource-icon">⚡</span><div class="st-resource-values"><span class="st-resource-current">1,250</span><span class="st-resource-income positive">+45</span></div></div>
+            <div class="st-resource"><span class="st-resource-icon">💎</span><div class="st-resource-values"><span class="st-resource-current">890</span><span class="st-resource-income positive">+32</span></div></div>
+            <div class="st-resource"><span class="st-resource-icon">🌾</span><div class="st-resource-values"><span class="st-resource-current">120</span></div></div>
+            <div class="st-resource"><span class="st-resource-icon">🔩</span><div class="st-resource-values"><span class="st-resource-current">340</span></div></div>
+            <div class="st-resource"><span class="st-resource-icon">🔬</span><div class="st-resource-values"><span class="st-resource-current">85</span></div></div>
+        </div>
+        <div class="st-game-controls">
+            <div class="st-date-display">
+                <span class="st-date-label">STARDATE</span>
+                <span class="st-date-value">24.56</span>
+            </div>
+            <button class="st-end-turn-btn">END TURN</button>
+        </div>
+    </header>
+
+    <div class="st-main">
+        @* LEFT SIDEBAR *@
+        <aside class="st-sidebar-left">
+            <nav class="st-nav">
+                <a href="/game/galaxy" class="st-nav-btn"><span class="st-nav-icon">🌌</span><span class="st-nav-label">Galaxy</span></a>
+                <a href="/game/contacts" class="st-nav-btn"><span class="st-nav-icon">👥</span><span class="st-nav-label">Contacts</span></a>
+                <a href="/game/research" class="st-nav-btn"><span class="st-nav-icon">🔬</span><span class="st-nav-label">Research</span></a>
+                <a href="/game/fleets" class="st-nav-btn"><span class="st-nav-icon">🚀</span><span class="st-nav-label">Fleets</span></a>
+                <a href="/game/planets" class="st-nav-btn active"><span class="st-nav-icon">🏠</span><span class="st-nav-label">Planets</span></a>
+            </nav>
+        </aside>
+
+        @* MAIN CONTENT *@
+        <div class="colonies-content">
+            @* Header *@
+            <div class="colonies-header">
+                <h1>PLANETARY MANAGEMENT</h1>
+                <div class="colonies-stats">
+                    <div class="stat-box">
+                        <span class="stat-value">@_colonies.Count</span>
+                        <span class="stat-label">Colonies</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-value">@_totalPopulation.ToString("N0")</span>
+                        <span class="stat-label">Population</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-value">@_totalProduction</span>
+                        <span class="stat-label">Production</span>
+                    </div>
+                </div>
+                <div class="colonies-filters">
+                    <input type="text" class="st-input" placeholder="Search colonies..." @bind="_searchText" @bind:event="oninput" style="width: 200px;" />
+                    <select class="st-input st-select" @bind="_sortBy" style="width: 150px;">
+                        <option value="name">Sort by Name</option>
+                        <option value="population">Sort by Population</option>
+                        <option value="production">Sort by Production</option>
+                    </select>
+                </div>
+            </div>
+
+            @* Colony Grid *@
+            <div class="colonies-grid">
+                @foreach (var colony in FilteredColonies)
+                {
+                    <div class="colony-card @(_selectedColony?.Id == colony.Id ? "selected" : "")" @onclick="() => SelectColony(colony)">
+                        <div class="colony-image">
+                            <div class="planet-visual @GetPlanetClass(colony)">
+                                <div class="planet-sphere"></div>
+                                <div class="planet-atmosphere"></div>
+                            </div>
+                            <div class="colony-status @(colony.IsCapital ? "capital" : "")">
+                                @if (colony.IsCapital) { <span>★ CAPITAL</span> }
+                            </div>
+                        </div>
+                        <div class="colony-info">
+                            <h3 class="colony-name">@colony.Name</h3>
+                            <div class="colony-class">@(colony.PlanetType ?? "Class M") • @colony.SystemName</div>
+                            
+                            <div class="colony-stats-row">
+                                <div class="colony-stat">
+                                    <span class="stat-icon">👥</span>
+                                    <span class="stat-val">@colony.Population.ToString("N0")</span>
+                                </div>
+                                <div class="colony-stat">
+                                    <span class="stat-icon">🏭</span>
+                                    <span class="stat-val">@colony.ProductionCapacity</span>
+                                </div>
+                                <div class="colony-stat">
+                                    <span class="stat-icon">🔬</span>
+                                    <span class="stat-val">@colony.ResearchOutput</span>
+                                </div>
+                            </div>
+                            
+                            <div class="colony-bars">
+                                <div class="bar-row">
+                                    <span class="bar-label">Growth</span>
+                                    <div class="st-progress"><div class="st-progress-fill success" style="width: @(colony.GrowthRate)%"></div></div>
+                                </div>
+                                <div class="bar-row">
+                                    <span class="bar-label">Morale</span>
+                                    <div class="st-progress"><div class="st-progress-fill @GetMoraleClass(colony.Morale)" style="width: @colony.Morale%"></div></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="colony-actions">
+                            <button class="st-btn sm" @onclick:stopPropagation="true" @onclick="() => ViewColony(colony)">MANAGE</button>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        @* RIGHT SIDEBAR - Selected Colony Details *@
+        <aside class="st-sidebar-right">
+            <div class="st-outliner">
+                <div class="st-outliner-header">
+                    <span class="st-outliner-title">COLONY DETAILS</span>
+                </div>
+                
+                @if (_selectedColony != null)
+                {
+                    <div class="colony-detail-panel">
+                        <div class="detail-header">
+                            <div class="planet-preview @GetPlanetClass(_selectedColony)">
+                                <div class="planet-sphere large"></div>
+                            </div>
+                            <div class="detail-title">
+                                <h2>@_selectedColony.Name</h2>
+                                <span class="detail-subtitle">@_selectedColony.SystemName System</span>
+                            </div>
+                        </div>
+                        
+                        <div class="detail-section">
+                            <h4>POPULATION</h4>
+                            <div class="detail-row">
+                                <span>Total</span>
+                                <span class="value">@_selectedColony.Population.ToString("N0")</span>
+                            </div>
+                            <div class="detail-row">
+                                <span>Growth Rate</span>
+                                <span class="value positive">+@_selectedColony.GrowthRate%</span>
+                            </div>
+                            <div class="detail-row">
+                                <span>Morale</span>
+                                <span class="value @GetMoraleTextClass(_selectedColony.Morale)">@_selectedColony.Morale%</span>
+                            </div>
+                        </div>
+                        
+                        <div class="detail-section">
+                            <h4>PRODUCTION</h4>
+                            <div class="detail-row">
+                                <span>⚡ Energy</span>
+                                <span class="value">+@(_selectedColony.ProductionCapacity / 3)</span>
+                            </div>
+                            <div class="detail-row">
+                                <span>💎 Minerals</span>
+                                <span class="value">+@(_selectedColony.ProductionCapacity / 2)</span>
+                            </div>
+                            <div class="detail-row">
+                                <span>🔬 Research</span>
+                                <span class="value">+@_selectedColony.ResearchOutput</span>
+                            </div>
+                        </div>
+                        
+                        <div class="detail-section">
+                            <h4>BUILDINGS (@_selectedColony.BuildingCount / @_selectedColony.MaxBuildings)</h4>
+                            <div class="buildings-grid">
+                                @for (int i = 0; i < _selectedColony.MaxBuildings; i++)
+                                {
+                                    <div class="building-slot @(i < _selectedColony.BuildingCount ? "filled" : "empty")">
+                                        @if (i < _selectedColony.BuildingCount)
+                                        {
+                                            <span>🏭</span>
+                                        }
+                                        else
+                                        {
+                                            <span>+</span>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                        
+                        <div class="detail-actions">
+                            <button class="st-btn primary" @onclick="() => ViewColony(_selectedColony)">
+                                OPEN COLONY VIEW
+                            </button>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="no-selection">
+                        <span class="no-selection-icon">🌍</span>
+                        <p>Select a colony to view details</p>
+                    </div>
+                }
+            </div>
+        </aside>
+    </div>
+
+    @* BOTTOM BAR *@
+    <footer class="st-bottombar">
+        <div class="st-notifications">
+            <div class="st-notification success">✓ Colony production complete on Earth</div>
+        </div>
+        <div class="st-bottom-actions">
+            <button class="st-btn sm" @onclick="GoToMenu">☰ MENU</button>
+        </div>
+    </footer>
+</div>
+
+<style>
+    .colonies-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        background: linear-gradient(180deg, #080c14 0%, #040608 100%);
+    }
+    
+    .colonies-header {
+        padding: 20px 24px;
+        background: rgba(10, 15, 25, 0.9);
+        border-bottom: 1px solid var(--st-border-dark);
+        display: flex;
+        align-items: center;
+        gap: 24px;
+    }
+    
+    .colonies-header h1 {
+        font-family: var(--st-font-display);
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--st-text-white);
+        letter-spacing: 2px;
+        margin: 0;
+    }
+    
+    .colonies-stats {
+        display: flex;
+        gap: 16px;
+    }
+    
+    .stat-box {
+        padding: 8px 16px;
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--st-border-dark);
+        border-radius: 4px;
+        text-align: center;
+    }
+    
+    .stat-box .stat-value {
+        display: block;
+        font-family: var(--st-font-display);
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--st-accent-cyan);
+    }
+    
+    .stat-box .stat-label {
+        font-size: 10px;
+        color: var(--st-text-dim);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    .colonies-filters {
+        margin-left: auto;
+        display: flex;
+        gap: 12px;
+    }
+    
+    .colonies-grid {
+        flex: 1;
+        overflow-y: auto;
+        padding: 20px;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 16px;
+        align-content: start;
+    }
+    
+    .colony-card {
+        background: var(--st-gradient-panel);
+        border: 1px solid var(--st-border-dark);
+        border-radius: 8px;
+        overflow: hidden;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .colony-card:hover {
+        border-color: var(--st-border-light);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    }
+    
+    .colony-card.selected {
+        border-color: var(--st-accent-blue);
+        box-shadow: 0 0 20px rgba(74, 158, 255, 0.2);
+    }
+    
+    .colony-image {
+        position: relative;
+        height: 120px;
+        background: linear-gradient(180deg, #0a1525 0%, #050a12 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+    
+    .planet-visual {
+        position: relative;
+        width: 80px;
+        height: 80px;
+    }
+    
+    .planet-sphere {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #4a8866 0%, #2a5544 50%, #1a3322 100%);
+        box-shadow: 
+            inset -15px -10px 20px rgba(0, 0, 0, 0.5),
+            inset 10px 10px 15px rgba(255, 255, 255, 0.1),
+            0 0 30px rgba(74, 136, 102, 0.3);
+    }
+    
+    .planet-atmosphere {
+        position: absolute;
+        width: 110%;
+        height: 110%;
+        left: -5%;
+        top: -5%;
+        border-radius: 50%;
+        background: radial-gradient(circle, transparent 45%, rgba(100, 180, 255, 0.1) 50%, transparent 55%);
+    }
+    
+    .planet-visual.desert .planet-sphere { background: linear-gradient(135deg, #c4a060 0%, #8a6a40 50%, #5a4020 100%); }
+    .planet-visual.arctic .planet-sphere { background: linear-gradient(135deg, #e8f0ff 0%, #a0c0e0 50%, #6090c0 100%); }
+    .planet-visual.oceanic .planet-sphere { background: linear-gradient(135deg, #4080c0 0%, #2060a0 50%, #104080 100%); }
+    .planet-visual.volcanic .planet-sphere { background: linear-gradient(135deg, #c04020 0%, #802010 50%, #400808 100%); }
+    
+    .colony-status {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        padding: 4px 8px;
+        background: rgba(0, 0, 0, 0.6);
+        border-radius: 4px;
+        font-size: 10px;
+        font-weight: 600;
+        color: var(--st-text-dim);
+    }
+    
+    .colony-status.capital {
+        background: rgba(255, 200, 68, 0.2);
+        color: var(--st-accent-gold);
+        border: 1px solid var(--st-accent-gold);
+    }
+    
+    .colony-info {
+        padding: 12px 16px;
+    }
+    
+    .colony-name {
+        font-family: var(--st-font-display);
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--st-text-white);
+        margin: 0 0 4px 0;
+    }
+    
+    .colony-class {
+        font-size: 11px;
+        color: var(--st-text-dim);
+        margin-bottom: 12px;
+    }
+    
+    .colony-stats-row {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 12px;
+    }
+    
+    .colony-stat {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+    
+    .colony-stat .stat-icon {
+        font-size: 14px;
+    }
+    
+    .colony-stat .stat-val {
+        font-family: var(--st-font-display);
+        font-size: 13px;
+        color: var(--st-text-bright);
+    }
+    
+    .colony-bars {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+    
+    .bar-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .bar-row .bar-label {
+        width: 50px;
+        font-size: 10px;
+        color: var(--st-text-dim);
+    }
+    
+    .bar-row .st-progress {
+        flex: 1;
+    }
+    
+    .colony-actions {
+        padding: 12px 16px;
+        border-top: 1px solid var(--st-border-dark);
+        display: flex;
+        justify-content: flex-end;
+    }
+    
+    /* Detail Panel */
+    .colony-detail-panel {
+        padding: 16px;
+    }
+    
+    .detail-header {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 20px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--st-border-dark);
+    }
+    
+    .planet-preview {
+        width: 64px;
+        height: 64px;
+    }
+    
+    .planet-preview .planet-sphere.large {
+        width: 64px;
+        height: 64px;
+    }
+    
+    .detail-title h2 {
+        font-family: var(--st-font-display);
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--st-text-white);
+        margin: 0 0 4px 0;
+    }
+    
+    .detail-subtitle {
+        font-size: 11px;
+        color: var(--st-text-dim);
+    }
+    
+    .detail-section {
+        margin-bottom: 20px;
+    }
+    
+    .detail-section h4 {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--st-text-muted);
+        letter-spacing: 1px;
+        margin: 0 0 10px 0;
+        padding-bottom: 6px;
+        border-bottom: 1px solid var(--st-border-dark);
+    }
+    
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 4px 0;
+        font-size: 12px;
+        color: var(--st-text-muted);
+    }
+    
+    .detail-row .value {
+        color: var(--st-text-bright);
+        font-weight: 500;
+    }
+    
+    .detail-row .value.positive { color: var(--st-accent-green); }
+    .detail-row .value.warning { color: var(--st-accent-orange); }
+    .detail-row .value.danger { color: var(--st-accent-red); }
+    
+    .buildings-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 6px;
+    }
+    
+    .building-slot {
+        aspect-ratio: 1;
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--st-border-dark);
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        color: var(--st-text-dim);
+    }
+    
+    .building-slot.filled {
+        background: rgba(74, 158, 255, 0.1);
+        border-color: var(--st-accent-blue);
+        color: var(--st-accent-blue);
+    }
+    
+    .building-slot.empty {
+        cursor: pointer;
+    }
+    
+    .building-slot.empty:hover {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: var(--st-border-light);
+    }
+    
+    .detail-actions {
+        margin-top: 20px;
+    }
+    
+    .detail-actions .st-btn {
+        width: 100%;
+    }
+    
+    .no-selection {
+        padding: 40px 20px;
+        text-align: center;
+    }
+    
+    .no-selection-icon {
+        font-size: 48px;
+        opacity: 0.3;
+    }
+    
+    .no-selection p {
+        color: var(--st-text-dim);
+        margin-top: 12px;
+    }
+</style>
+
+@code {
+    private FactionDetailDto? _faction;
+    private List<ColonyData> _colonies = new();
+    private ColonyData? _selectedColony;
+    private string _searchText = "";
+    private string _sortBy = "name";
+    private Guid? _factionId;
+    
+    private int _totalPopulation => _colonies.Sum(c => c.Population);
+    private int _totalProduction => _colonies.Sum(c => c.ProductionCapacity);
+    
+    private IEnumerable<ColonyData> FilteredColonies => _colonies
+        .Where(c => string.IsNullOrEmpty(_searchText) || c.Name.Contains(_searchText, StringComparison.OrdinalIgnoreCase))
+        .OrderBy(c => _sortBy switch {
+            "population" => -c.Population,
+            "production" => -c.ProductionCapacity,
+            _ => 0
+        })
+        .ThenBy(c => c.Name);
+    
+    protected override async Task OnInitializedAsync()
+    {
+        _factionId = await LocalStorage.GetItemAsync<Guid?>("currentFactionId");
+        await LoadData();
+    }
+    
+    private async Task LoadData()
+    {
+        if (_factionId.HasValue)
+        {
+            _faction = null; // TODO: Add GetFactionAsync
+            var apiColonies = await Api.GetColoniesAsync(_factionId.Value);
+            _colonies = apiColonies.Select((c, i) => new ColonyData
+            {
+                Id = c.Id,
+                Name = c.Name,
+                SystemName = "Alpha Centauri",
+                PlanetType = GetRandomPlanetType(i),
+                Population = (int)c.Population,
+                ProductionCapacity = c.ProductionCapacity,
+                ResearchOutput = c.ProductionCapacity / 3,
+                GrowthRate = 2 + (i % 5),
+                Morale = 70 + (i % 30),
+                BuildingCount = 3 + (i % 5),
+                MaxBuildings = 10,
+                IsCapital = i == 0
+            }).ToList();
+        }
+        
+        if (!_colonies.Any())
+        {
+            // Mock data
+            _colonies = new List<ColonyData>
+            {
+                new() { Id = Guid.NewGuid(), Name = "Earth", SystemName = "Sol", PlanetType = "Terran", Population = 8000000, ProductionCapacity = 150, ResearchOutput = 80, GrowthRate = 3, Morale = 85, BuildingCount = 8, MaxBuildings = 10, IsCapital = true },
+                new() { Id = Guid.NewGuid(), Name = "Vulcan", SystemName = "40 Eridani", PlanetType = "Desert", Population = 4500000, ProductionCapacity = 120, ResearchOutput = 120, GrowthRate = 2, Morale = 90, BuildingCount = 6, MaxBuildings = 10 },
+                new() { Id = Guid.NewGuid(), Name = "Andoria", SystemName = "Procyon", PlanetType = "Arctic", Population = 2800000, ProductionCapacity = 90, ResearchOutput = 45, GrowthRate = 4, Morale = 75, BuildingCount = 5, MaxBuildings = 10 },
+                new() { Id = Guid.NewGuid(), Name = "Tellar Prime", SystemName = "61 Cygni", PlanetType = "Oceanic", Population = 3200000, ProductionCapacity = 130, ResearchOutput = 35, GrowthRate = 3, Morale = 80, BuildingCount = 6, MaxBuildings = 10 },
+                new() { Id = Guid.NewGuid(), Name = "Alpha Centauri III", SystemName = "Alpha Centauri", PlanetType = "Terran", Population = 1500000, ProductionCapacity = 60, ResearchOutput = 30, GrowthRate = 5, Morale = 70, BuildingCount = 3, MaxBuildings = 10 },
+            };
+        }
+        
+        _selectedColony = _colonies.FirstOrDefault();
+    }
+    
+    private void SelectColony(ColonyData colony) => _selectedColony = colony;
+    private void ViewColony(ColonyData colony) => Navigation.NavigateTo($"/game/colony/{colony.Id}");
+    private void GoToMenu() => Navigation.NavigateTo("/");
+    
+    private string GetPlanetClass(ColonyData colony) => (colony.PlanetType?.ToLower()) switch
+    {
+        "desert" => "desert",
+        "arctic" => "arctic",
+        "oceanic" => "oceanic",
+        "volcanic" => "volcanic",
+        _ => "terran"
+    };
+    
+    private string GetMoraleClass(int morale) => morale switch
+    {
+        >= 80 => "success",
+        >= 50 => "warning",
+        _ => "danger"
+    };
+    
+    private string GetMoraleTextClass(int morale) => morale switch
+    {
+        >= 80 => "positive",
+        >= 50 => "warning",
+        _ => "danger"
+    };
+    
+    private string GetRandomPlanetType(int index) => (index % 5) switch
+    {
+        0 => "Terran",
+        1 => "Desert",
+        2 => "Arctic",
+        3 => "Oceanic",
+        _ => "Volcanic"
+    };
+    
+    private class ColonyData
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; } = "";
+        public string SystemName { get; set; } = "";
+        public string? PlanetType { get; set; }
+        public int Population { get; set; }
+        public int ProductionCapacity { get; set; }
+        public int ResearchOutput { get; set; }
+        public int GrowthRate { get; set; }
+        public int Morale { get; set; }
+        public int BuildingCount { get; set; }
+        public int MaxBuildings { get; set; }
+        public bool IsCapital { get; set; }
+    }
+}

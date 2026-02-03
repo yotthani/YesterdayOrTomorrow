@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs>
+    <linearGradient id="klingonRed" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#dc143c"/>
+      <stop offset="50%" stop-color="#8b0000"/>
+      <stop offset="100%" stop-color="#4a0000"/>
+    </linearGradient>
+    <linearGradient id="klingonMetal" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#c0c0c0"/>
+      <stop offset="25%" stop-color="#e8e8e8"/>
+      <stop offset="50%" stop-color="#a0a0a0"/>
+      <stop offset="75%" stop-color="#d0d0d0"/>
+      <stop offset="100%" stop-color="#808080"/>
+    </linearGradient>
+    <linearGradient id="klingonGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffd700"/>
+      <stop offset="50%" stop-color="#b8860b"/>
+      <stop offset="100%" stop-color="#8b6914"/>
+    </linearGradient>
+    <filter id="klingonGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="innerShadow">
+      <feOffset dx="2" dy="2"/>
+      <feGaussianBlur stdDeviation="2"/>
+      <feComposite in2="SourceAlpha" operator="arithmetic" k2="-1" k3="1"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.5 0"/>
+      <feBlend in2="SourceGraphic"/>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <circle cx="100" cy="100" r="95" fill="#0a0000"/>
+  
+  <!-- Outer ring with red glow -->
+  <circle cx="100" cy="100" r="92" fill="none" stroke="url(#klingonRed)" stroke-width="6" filter="url(#klingonGlow)"/>
+  
+  <!-- Inner decorative ring -->
+  <circle cx="100" cy="100" r="82" fill="none" stroke="#8b0000" stroke-width="2"/>
+  
+  <!-- THE TREFOIL - Klingon Empire Symbol -->
+  <!-- Upper blade (pointing up) -->
+  <path d="M100,18 
+           C105,18 112,25 115,35
+           L108,75 
+           C106,82 100,90 100,90
+           C100,90 94,82 92,75
+           L85,35
+           C88,25 95,18 100,18Z" 
+        fill="url(#klingonMetal)" stroke="#8b0000" stroke-width="2" filter="url(#innerShadow)"/>
+  
+  <!-- Lower-left blade -->
+  <path d="M28,145
+           C25,140 25,132 30,125
+           L70,95
+           C76,91 82,90 85,92
+           C85,92 82,100 80,105
+           L55,150
+           C48,158 38,155 28,145Z"
+        fill="url(#klingonMetal)" stroke="#8b0000" stroke-width="2" filter="url(#innerShadow)"/>
+  
+  <!-- Lower-right blade -->
+  <path d="M172,145
+           C175,140 175,132 170,125
+           L130,95
+           C124,91 118,90 115,92
+           C115,92 118,100 120,105
+           L145,150
+           C152,158 162,155 172,145Z"
+        fill="url(#klingonMetal)" stroke="#8b0000" stroke-width="2" filter="url(#innerShadow)"/>
+  
+  <!-- Center hub -->
+  <circle cx="100" cy="95" r="18" fill="url(#klingonRed)" stroke="url(#klingonGold)" stroke-width="4"/>
+  <circle cx="100" cy="95" r="10" fill="url(#klingonGold)"/>
+  <circle cx="100" cy="95" r="5" fill="#8b0000"/>
+  
+  <!-- Decorative spikes on blades -->
+  <g fill="url(#klingonGold)">
+    <polygon points="100,30 104,45 100,40 96,45"/>
+    <polygon points="50,125 60,132 55,138 48,130"/>
+    <polygon points="150,125 140,132 145,138 152,130"/>
+  </g>
+  
+  <!-- Text arc -->
+  <path id="klingonArc" d="M 35,170 Q 100,200 165,170" fill="none"/>
+  <text fill="url(#klingonRed)" font-family="Arial Black, sans-serif" font-size="12" letter-spacing="3">
+    <textPath href="#klingonArc" startOffset="50%" text-anchor="middle">KLINGON EMPIRE</textPath>
+  </text>
+</svg>

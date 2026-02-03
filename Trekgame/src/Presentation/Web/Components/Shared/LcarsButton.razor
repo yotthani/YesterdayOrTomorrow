@@ -1,0 +1,166 @@
+@namespace StarTrekGame.Web.Components.Shared
+
+<button class="lcars-btn @VariantClass @SizeClass @(FullWidth ? "full-width" : "") @(Disabled ? "disabled" : "") @Class"
+        style="@ComputedStyle"
+        disabled="@Disabled"
+        @onclick="HandleClick"
+        @attributes="AdditionalAttributes">
+    @if (!string.IsNullOrEmpty(Icon))
+    {
+        <span class="btn-icon">@Icon</span>
+    }
+    @if (ChildContent != null)
+    {
+        @ChildContent
+    }
+    else if (!string.IsNullOrEmpty(Text))
+    {
+        <span class="btn-text">@Text</span>
+    }
+</button>
+
+<style>
+    .lcars-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        background: var(--btn-bg, #ff9900);
+        color: var(--btn-color, #000);
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 12px;
+        letter-spacing: 1px;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-transform: uppercase;
+        text-decoration: none;
+    }
+    
+    .lcars-btn:hover:not(.disabled) {
+        filter: brightness(1.15);
+        transform: translateY(-1px);
+    }
+    
+    .lcars-btn:active:not(.disabled) {
+        transform: translateY(0);
+    }
+    
+    .lcars-btn.disabled {
+        background: #444 !important;
+        color: #888 !important;
+        cursor: not-allowed;
+        transform: none !important;
+    }
+    
+    .lcars-btn.full-width {
+        width: 100%;
+    }
+    
+    /* Sizes */
+    .lcars-btn.small {
+        padding: 6px 12px;
+        font-size: 11px;
+        border-radius: 6px;
+    }
+    
+    .lcars-btn.large {
+        padding: 14px 28px;
+        font-size: 14px;
+        border-radius: 10px;
+    }
+    
+    /* Variants */
+    .lcars-btn.primary {
+        --btn-bg: #44aaff;
+        --btn-color: #000;
+    }
+    
+    .lcars-btn.success {
+        --btn-bg: #44cc66;
+        --btn-color: #000;
+    }
+    
+    .lcars-btn.danger {
+        --btn-bg: #ff4466;
+        --btn-color: #fff;
+    }
+    
+    .lcars-btn.secondary {
+        --btn-bg: #9999ff;
+        --btn-color: #000;
+    }
+    
+    .lcars-btn.outline {
+        --btn-bg: transparent;
+        --btn-color: #ff9900;
+        border: 2px solid #ff9900;
+    }
+    
+    .lcars-btn.outline:hover:not(.disabled) {
+        --btn-bg: #ff9900;
+        --btn-color: #000;
+    }
+    
+    .lcars-btn.ghost {
+        --btn-bg: rgba(255, 153, 0, 0.1);
+        --btn-color: #ff9900;
+    }
+    
+    .lcars-btn.ghost:hover:not(.disabled) {
+        --btn-bg: rgba(255, 153, 0, 0.2);
+    }
+    
+    /* Icons */
+    .btn-icon {
+        font-size: 1.2em;
+    }
+</style>
+
+@code {
+    [Parameter] public string? Text { get; set; }
+    [Parameter] public string? Icon { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public ButtonVariant Variant { get; set; } = ButtonVariant.Default;
+    [Parameter] public ButtonSize Size { get; set; } = ButtonSize.Medium;
+    [Parameter] public bool FullWidth { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+    [Parameter] public string? Class { get; set; }
+    [Parameter] public string? Style { get; set; }
+    [Parameter] public EventCallback<MouseEventArgs> OnClick { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] 
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+    
+    private string VariantClass => Variant switch
+    {
+        ButtonVariant.Primary => "primary",
+        ButtonVariant.Success => "success",
+        ButtonVariant.Danger => "danger",
+        ButtonVariant.Secondary => "secondary",
+        ButtonVariant.Outline => "outline",
+        ButtonVariant.Ghost => "ghost",
+        _ => ""
+    };
+    
+    private string SizeClass => Size switch
+    {
+        ButtonSize.Small => "small",
+        ButtonSize.Large => "large",
+        _ => ""
+    };
+    
+    private string ComputedStyle => Style ?? "";
+    
+    private async Task HandleClick(MouseEventArgs args)
+    {
+        if (!Disabled)
+        {
+            await OnClick.InvokeAsync(args);
+        }
+    }
+    
+    public enum ButtonVariant { Default, Primary, Success, Danger, Secondary, Outline, Ghost }
+    public enum ButtonSize { Small, Medium, Large }
+}

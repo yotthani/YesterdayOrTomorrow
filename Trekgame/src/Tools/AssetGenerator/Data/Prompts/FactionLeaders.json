@@ -1,0 +1,396 @@
+{
+  "category": "FactionLeaders",
+  "description": "Faction leader portraits - heads of state for each major faction",
+  "assets": [
+    {
+      "id": "federation_president",
+      "name": "Leader Federation President Human Male",
+      "match": ["federation", "president"],
+      "prompt": {
+        "title": "FEDERATION PRESIDENT",
+        "gender": "male",
+        "species": "Human (or other Federation species)",
+        "appearance": [
+          "Distinguished, diplomatic appearance",
+          "Gray/white hair common, mature appearance"
+        ],
+        "clothing": [
+          "Presidential robes or formal Starfleet dress uniform",
+          "Federation insignia visible"
+        ],
+        "expression": "Calm, wise, peaceful expression",
+        "reference": "Think: seasoned diplomat, experienced statesman"
+      }
+    },
+    {
+      "id": "klingon_chancellor",
+      "name": "Leader Klingon Chancellor Male",
+      "match": ["klingon", "chancellor"],
+      "prompt": {
+        "title": "KLINGON CHANCELLOR",
+        "gender": "male",
+        "species": "Klingon",
+        "appearance": [
+          "Klingon male with prominent forehead ridges",
+          "Long dark hair, possibly with gray streaks",
+          "Battle-scarred veteran warrior"
+        ],
+        "clothing": [
+          "Ceremonial Klingon armor or Chancellor's robes",
+          "Klingon trefoil insignia visible"
+        ],
+        "expression": "Fierce but noble expression",
+        "reference": "Think: Gowron, Martok - powerful warrior-politician"
+      }
+    },
+    {
+      "id": "romulan_praetor",
+      "name": "Leader Romulan Praetor Male",
+      "match": ["romulan", "praetor"],
+      "prompt": {
+        "title": "ROMULAN PRAETOR",
+        "gender": "male",
+        "species": "Romulan",
+        "appearance": [
+          "Romulan with pointed ears, V-shaped brow ridges",
+          "Dark hair, often short or pulled back"
+        ],
+        "clothing": [
+          "Imperial Romulan robes with high collar",
+          "Green/silver color scheme in attire",
+          "Romulan bird of prey insignia"
+        ],
+        "expression": "Severe, calculating expression",
+        "reference": "Think: cunning strategist, master of intrigue"
+      }
+    },
+    {
+      "id": "cardassian_legate",
+      "name": "Leader Cardassian Legate Male",
+      "match": ["cardassian", "legate"],
+      "prompt": {
+        "title": "CARDASSIAN LEGATE",
+        "gender": "male",
+        "species": "Cardassian (NOT human, NOT Starfleet)",
+        "appearance": [
+          "GRAY SKIN with blue undertones",
+          "Distinctive NECK RIDGES: raised scales running down sides of neck",
+          "SPOON-SHAPED forehead ridge (like an inverted spoon on forehead)",
+          "Slicked back BLACK hair"
+        ],
+        "clothing": [
+          "CARDASSIAN MILITARY ARMOR (NOT Starfleet uniform!)",
+          "Dark brown/gray segmented armor plates",
+          "High collar with pointed shoulder pieces",
+          "Chest plate with Cardassian Union symbol",
+          "NO colored division stripes (that's Starfleet)"
+        ],
+        "expression": "Cold, calculating, reptilian expression",
+        "reference": "Think: Gul Dukat, ruthless military dictator",
+        "keyFeatures": "NECK RIDGES + SPOON FOREHEAD + BROWN ARMOR = Cardassian"
+      }
+    },
+    {
+      "id": "ferengi_nagus",
+      "name": "Leader Ferengi Grand Nagus Male",
+      "match": ["ferengi", "nagus"],
+      "prompt": {
+        "title": "FERENGI GRAND NAGUS",
+        "gender": "male",
+        "species": "Ferengi",
+        "appearance": [
+          "Ferengi with large ears, prominent lobes"
+        ],
+        "clothing": [
+          "Ornate gold robes and headdress",
+          "Holds or wears symbols of wealth",
+          "Gold/orange color scheme, ostentatious jewelry",
+          "Staff of the Grand Nagus optional"
+        ],
+        "expression": "Shrewd, cunning expression",
+        "reference": "Think: ultimate capitalist, master dealmaker"
+      }
+    },
+    {
+      "id": "dominion_founder",
+      "name": "Leader Dominion Female Changeling Founder",
+      "match": ["dominion", "founder", "changeling"],
+      "prompt": {
+        "title": "DOMINION FOUNDER",
+        "gender": "female",
+        "species": "Female Changeling in humanoid form",
+        "appearance": [
+          "Orange-brown waxy skin, slicked back hair appearance",
+          "Smooth, undefined facial features",
+          "Slightly liquid/morphing quality to edges"
+        ],
+        "clothing": [
+          "Simple robes"
+        ],
+        "expression": "Serene yet terrifying expression",
+        "reference": "Think: ancient god-like being, absolute ruler"
+      }
+    },
+    {
+      "id": "borg_queen",
+      "name": "Leader Borg Queen Female",
+      "match": ["borg", "queen"],
+      "prompt": {
+        "title": "BORG QUEEN",
+        "gender": "female",
+        "species": "Humanoid female with extensive cybernetic implants",
+        "appearance": [
+          "Pale gray skin, bald or minimal dark hair",
+          "One eye cybernetic, one organic",
+          "Mechanical spine and shoulder assembly"
+        ],
+        "clothing": [
+          "Dark mechanical aesthetic, green accent lights"
+        ],
+        "expression": "Seductive yet terrifying expression",
+        "reference": "Think: hive mind incarnate, perfection personified"
+      }
+    },
+    {
+      "id": "breen_thot",
+      "name": "Leader Breen Thot Armored",
+      "match": ["breen", "thot"],
+      "prompt": {
+        "title": "BREEN THOT MILITARY COMMANDER",
+        "gender": "unknown",
+        "species": "Breen (face never visible)",
+        "helmet": [
+          "Closed, technological helmet made of brown clay",
+          "Most distinctive feature: Wide HORIZONTAL VISOR glowing NEON GREEN",
+          "Below visor: ELONGATED RESPIRATOR/SNOUT protruding forward",
+          "Snout shape: Like a TRUNCATED PYRAMID (flat-topped pyramid) viewed from side",
+          "The respirator extends forward and downward from the visor",
+          "Respirator has vertical ridges/grilles along its length",
+          "Small side tubes/filters (2-3 each side) near jaw area",
+          "Helmet has horizontal layered bands/ridges on top"
+        ],
+        "clothing": [
+          "Light brown/beige TUNIC as base layer",
+          "CROSSED BANDOLIERS/STRAPS across chest in dark brown",
+          "Bandoliers have impressed woven/grid texture (basket-weave pattern)",
+          "Massive, angular SHOULDER PADS with geometric details"
+        ],
+        "colorPalette": "Brown, tan, beige, khaki (warm earth tones only)",
+        "keyFeatures": "Helmet with elongated TRAPEZOIDAL snout extending forward"
+      }
+    },
+    {
+      "id": "gorn_king",
+      "name": "Leader Gorn Hegemony King Male",
+      "match": ["gorn"],
+      "prompt": {
+        "title": "GORN HEGEMONY LEADER",
+        "gender": "male",
+        "species": "Reptilian Gorn",
+        "appearance": [
+          "Reptilian Gorn with green scaly skin",
+          "Large, powerful build",
+          "Saurian features, multi-faceted eyes"
+        ],
+        "clothing": [
+          "Ceremonial armor or royal regalia"
+        ],
+        "expression": "Fierce, predatory expression",
+        "reference": "Think: ancient reptilian king, powerful warrior"
+      }
+    },
+    {
+      "id": "andorian_chancellor",
+      "name": "Leader Andorian Chancellor Female",
+      "match": ["andorian"],
+      "genderAware": true,
+      "prompt": {
+        "title": "ANDORIAN LEADER",
+        "species": "ANDORIAN species (NOT Klingon, NOT human)",
+        "appearance": [
+          "ICE-BLUE SKIN - bright cyan/blue color",
+          "TWO ANTENNAE on TOP of forehead (flexible stalks that can move)",
+          "NO forehead ridges (unlike Klingons)",
+          "Humanoid facial structure but distinctly BLUE"
+        ],
+        "genderVariants": {
+          "female": {
+            "description": "FEMALE Andorian - feminine features, can have elegant/fierce appearance",
+            "hair": "STARK WHITE HAIR - pure white, can be long, braided, or elegantly styled",
+            "reference": "Think: Andorian women from Enterprise (Talas, Jhamel)"
+          },
+          "male": {
+            "description": "MALE Andorian - masculine features, strong jaw",
+            "hair": "STARK WHITE HAIR - pure white, often worn up or back",
+            "reference": "Think: Commander Shran from Enterprise"
+          }
+        },
+        "clothing": [
+          "Military uniform: Imperial Guard style, blue/white/silver"
+        ],
+        "expression": "Proud, passionate expression (Andorians are emotional warriors)",
+        "keyFeatures": "BLUE SKIN + WHITE HAIR + ANTENNAE = Andorian"
+      }
+    },
+    {
+      "id": "vulcan_admiral",
+      "name": "Leader Vulcan High Command Admiral Male",
+      "match": ["vulcan"],
+      "prompt": {
+        "title": "VULCAN HIGH COMMAND",
+        "gender": "male",
+        "species": "Vulcan",
+        "appearance": [
+          "Vulcan with pointed ears, arched eyebrows",
+          "Severe, logical expression - no emotion",
+          "Dignified, ancient wisdom"
+        ],
+        "clothing": [
+          "Vulcan robes or High Command uniform",
+          "Brown/rust/gold robes"
+        ],
+        "expression": "Severe, logical expression - no emotion",
+        "reference": "Think: master of logic, emotionless strategist"
+      }
+    },
+    {
+      "id": "trill_president",
+      "name": "Leader Trill Symbiosis President Female",
+      "match": ["trill"],
+      "genderAware": true,
+      "prompt": {
+        "title": "TRILL LEADER",
+        "species": "Trill",
+        "appearance": [
+          "Trill with distinctive SPOTTED PATTERN running down temples and neck",
+          "Humanoid appearance, joined with symbiont (centuries of memories)",
+          "Spots: Brown/tan spots in a line from forehead down sides of face to neck"
+        ],
+        "genderVariants": {
+          "female": {
+            "description": "FEMALE - elegant, wise feminine features",
+            "reference": "Think: Jadzia Dax, Ezri Dax - confident, experienced woman"
+          },
+          "male": {
+            "description": "MALE - distinguished masculine features",
+            "reference": "Think: distinguished Trill diplomat"
+          }
+        },
+        "clothing": [
+          "Diplomatic formal attire, refined and elegant"
+        ],
+        "expression": "Wise, serene expression (multiple lifetimes of experience)",
+        "keyFeatures": "SPOTS ON TEMPLES/NECK = Trill"
+      }
+    },
+    {
+      "id": "bajoran_kai",
+      "name": "Leader Bajoran Kai Female Religious",
+      "match": ["bajoran", "kai"],
+      "prompt": {
+        "title": "BAJORAN KAI (FEMALE)",
+        "gender": "female",
+        "species": "Bajoran",
+        "appearance": [
+          "FEMALE Bajoran spiritual leader",
+          "Bajoran with distinctive NOSE RIDGES (horizontal ridges across nose bridge)",
+          "Older, wise woman with serene yet determined expression"
+        ],
+        "clothing": [
+          "Religious ROBES and ceremonial HEADDRESS",
+          "EARRING (d'ja pagh) on RIGHT ear - important religious symbol",
+          "Orange/red/gold ceremonial robes, ornate"
+        ],
+        "expression": "Spiritual, serene yet determined expression",
+        "reference": "Think: Kai Winn, Kai Opaka - powerful religious authority",
+        "keyFeatures": "NOSE RIDGES + EARRING + ROBES = Bajoran Kai"
+      }
+    },
+    {
+      "id": "tholian_commander",
+      "name": "Leader Tholian Assembly Commander",
+      "match": ["tholian"],
+      "prompt": {
+        "title": "THOLIAN COMMANDER",
+        "gender": "unknown",
+        "species": "Crystalline/silicon-based life form",
+        "appearance": [
+          "Geometric, faceted body structure",
+          "Glowing internal light",
+          "Alien, inscrutable",
+          "Environmental suit if visible"
+        ],
+        "expression": "Alien, inscrutable",
+        "reference": "Think: incomprehensible alien intelligence"
+      }
+    },
+    {
+      "id": "orion_boss",
+      "name": "Leader Orion Syndicate Boss Female",
+      "match": ["orion"],
+      "prompt": {
+        "title": "ORION SYNDICATE BOSS (FEMALE)",
+        "gender": "female",
+        "species": "Orion",
+        "appearance": [
+          "FEMALE Orion with vivid GREEN SKIN",
+          "Alluring yet dangerous appearance",
+          "Beautiful but clearly ruthless and calculating",
+          "Dark hair, often elaborate styling"
+        ],
+        "clothing": [
+          "Luxurious clothing, gold jewelry, wealth on display"
+        ],
+        "expression": "Seductive but intimidating expression",
+        "reference": "Think: Orion slave girl who became the master, criminal queen",
+        "keyFeatures": "GREEN SKIN + FEMALE + DANGEROUS BEAUTY = Orion Boss"
+      }
+    },
+    {
+      "id": "independent_captain",
+      "name": "Leader Independent Mercenary Captain",
+      "match": ["independent", "mercenary"],
+      "prompt": {
+        "title": "INDEPENDENT MERCENARY CAPTAIN",
+        "gender": "any",
+        "species": "Any humanoid",
+        "appearance": [
+          "Rugged, experienced appearance",
+          "Battle-worn but capable"
+        ],
+        "clothing": [
+          "Practical military/tactical gear",
+          "Mixed equipment from various sources",
+          "No specific faction insignia"
+        ],
+        "expression": "Calculating, self-reliant expression",
+        "reference": "Think: freelance starship captain, survivor"
+      }
+    }
+  ],
+  "defaultPrompt": {
+    "title": "FACTION LEADER",
+    "appearance": [
+      "Distinguished appearance befitting head of state",
+      "Mature, experienced appearance"
+    ],
+    "clothing": [
+      "Formal attire appropriate to their culture",
+      "Official insignia or symbols of office"
+    ],
+    "expression": "Commanding presence, authority"
+  },
+  "styleGuide": {
+    "material": "Plasticine clay with subtle comic-like shader",
+    "quality": "High-end stop-motion animation (Laika/Aardman style)",
+    "lighting": "Soft, cinematic studio lighting",
+    "composition": "Frontal or 3/4 view, medium shot",
+    "background": "Solid black (#000000)",
+    "characteristics": [
+      "Must convey AUTHORITY and POWER",
+      "Wearing official state/military attire",
+      "Regal bearing, confident posture",
+      "Age: Mature, experienced (not young)"
+    ]
+  }
+}

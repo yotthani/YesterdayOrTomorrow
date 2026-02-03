@@ -1,0 +1,907 @@
+@namespace StarTrekGame.Web.Components.Galaxy
+@using StarTrekGame.Web.Services
+@inject IGameApiClient Api
+@inject ISnackbar Snackbar
+
+<div class="galaxy-container" @ref="_containerRef"
+     @onmousedown="OnMouseDown"
+     @onmousemove="OnMouseMove"
+     @onmouseup="OnMouseUp"
+     @onmouseleave="OnMouseUp"
+     @onwheel="OnWheel">
+    
+    @* Space Background *@
+    <div class="galaxy-background"></div>
+    
+    @* Nebula Effects *@
+    <div class="nebula-layer">
+        @foreach (var nebula in _nebulae)
+        {
+            <div class="nebula" style="@GetNebulaStyle(nebula)"></div>
+        }
+    </div>
+    
+    @* Main SVG Canvas *@
+    <svg class="galaxy-svg" 
+         viewBox="@ViewBox" 
+         preserveAspectRatio="xMidYMid meet">
+        
+        <defs>
+            @* Glow filters *@
+            <filter id="star-glow" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="3" result="blur"/>
+                <feMerge>
+                    <feMergeNode in="blur"/>
+                    <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+            </filter>
+            
+            <filter id="hyperlane-glow" x="-20%" y="-20%" width="140%" height="140%">
+                <feGaussianBlur stdDeviation="1" result="blur"/>
+                <feMerge>
+                    <feMergeNode in="blur"/>
+                    <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+            </filter>
+            
+            @* Star type gradients *@
+            <radialGradient id="star-yellow">
+                <stop offset="0%" stop-color="#ffffaa"/>
+                <stop offset="50%" stop-color="#ffdd44"/>
+                <stop offset="100%" stop-color="#cc8800"/>
+            </radialGradient>
+            <radialGradient id="star-orange">
+                <stop offset="0%" stop-color="#ffcc88"/>
+                <stop offset="50%" stop-color="#ff8c00"/>
+                <stop offset="100%" stop-color="#aa4400"/>
+            </radialGradient>
+            <radialGradient id="star-red">
+                <stop offset="0%" stop-color="#ff8888"/>
+                <stop offset="50%" stop-color="#ff4444"/>
+                <stop offset="100%" stop-color="#880000"/>
+            </radialGradient>
+            <radialGradient id="star-blue">
+                <stop offset="0%" stop-color="#aaccff"/>
+                <stop offset="50%" stop-color="#4488ff"/>
+                <stop offset="100%" stop-color="#0044aa"/>
+            </radialGradient>
+            <radialGradient id="star-white">
+                <stop offset="0%" stop-color="#ffffff"/>
+                <stop offset="50%" stop-color="#ddddff"/>
+                <stop offset="100%" stop-color="#8888aa"/>
+            </radialGradient>
+            
+            @* Fleet trail gradient *@
+            <linearGradient id="fleetTrail" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#ffcc00" stop-opacity="0.8"/>
+                <stop offset="100%" stop-color="#ffcc00" stop-opacity="0"/>
+            </linearGradient>
+            
+            @* Engine glow filter *@
+            <filter id="engine-glow" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="2" result="blur"/>
+                <feMerge>
+                    <feMergeNode in="blur"/>
+                    <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+            </filter>
+            
+            @* Faction territory patterns *@
+            @foreach (var faction in _factionColors)
+            {
+                <pattern id="territory-@faction.Key" patternUnits="userSpaceOnUse" width="20" height="20">
+                    <rect width="20" height="20" fill="@faction.Value" fill-opacity="0.1"/>
+                    <circle cx="10" cy="10" r="1" fill="@faction.Value" fill-opacity="0.3"/>
+                </pattern>
+            }
+        </defs>
+        
+        @* Territory Overlays (rendered first, behind everything) *@
+        <g class="territories-layer">
+            @foreach (var territory in _territories)
+            {
+                <path d="@territory.Path" 
+                      fill="url(#territory-@territory.FactionId)"
+                      stroke="@GetFactionColor(territory.FactionId)"
+                      stroke-width="2"
+                      stroke-opacity="0.5"
+                      class="territory-overlay"/>
+            }
+        </g>
+        
+        @* Hyperlanes *@
+        <g class="hyperlanes-layer">
+            @foreach (var lane in _hyperlanes)
+            {
+                <line x1="@lane.X1" y1="@lane.Y1" 
+                      x2="@lane.X2" y2="@lane.Y2"
+                      class="hyperlane @(IsLaneActive(lane) ? "active" : "") @(IsLaneBlocked(lane) ? "blocked" : "")"
+                      stroke="@GetHyperlaneColor(lane)"
+                      stroke-width="@GetHyperlaneWidth(lane)"
+                      filter="url(#hyperlane-glow)"/>
+            }
+        </g>
+        
+        @* Fleet Movement Paths *@
+        <g class="fleet-paths-layer">
+            @foreach (var fleet in _fleets.Where(f => f.DestinationSystemId.HasValue))
+            {
+                var fromSystem = _systems.FirstOrDefault(s => s.Id == fleet.CurrentSystemId);
+                var toSystem = _systems.FirstOrDefault(s => s.Id == fleet.DestinationSystemId);
+                @if (fromSystem != null && toSystem != null)
+                {
+                    <line x1="@fromSystem.X" y1="@fromSystem.Y"
+                          x2="@toSystem.X" y2="@toSystem.Y"
+                          class="fleet-path"
+                          stroke="#ffcc00"
+                          stroke-width="2"
+                          stroke-dasharray="8,4"/>
+                }
+            }
+        </g>
+        
+        @* Star Systems *@
+        <g class="systems-layer">
+            @foreach (var system in _systems)
+            {
+                var isSelected = system.Id == _selectedSystemId;
+                var isHovered = system.Id == _hoveredSystemId;
+                var hasColony = _colonies.Any(c => c.SystemId == system.Id);
+                var hasFleet = _fleets.Any(f => f.CurrentSystemId == system.Id);
+                
+                <g class="star-system @(isSelected ? "selected" : "") @(isHovered ? "hovered" : "")"
+                   transform="translate(@system.X, @system.Y)"
+                   @onclick="() => SelectSystem(system)"
+                   @onclick:stopPropagation="true"
+                   @onmouseenter="() => HoverSystem(system)"
+                   @onmouseleave="() => HoverSystem(null)">
+                    
+                    @* Selection ring *@
+                    @if (isSelected)
+                    {
+                        <circle r="18" fill="none" stroke="#ffcc00" stroke-width="2" opacity="0.8">
+                            <animate attributeName="r" values="16;20;16" dur="2s" repeatCount="indefinite"/>
+                        </circle>
+                    }
+                    
+                    @* Territory indicator *@
+                    @if (system.ControllingFactionId.HasValue)
+                    {
+                        <circle r="14" fill="@GetFactionColor(system.ControllingFactionId.Value)" opacity="0.2"/>
+                    }
+                    
+                    @* Star glow *@
+                    <circle r="12" fill="@GetStarGradient(system.StarType)" opacity="0.3" filter="url(#star-glow)"/>
+                    
+                    @* Star core *@
+                    <circle r="@GetStarSize(system)" fill="url(#star-@system.StarType.ToLower())" filter="url(#star-glow)"/>
+                    
+                    @* Colony indicator *@
+                    @if (hasColony)
+                    {
+                        <circle cx="8" cy="-8" r="4" fill="#44ff44" stroke="#228822" stroke-width="1"/>
+                    }
+                    
+                    @* Fleet indicator *@
+                    @if (hasFleet)
+                    {
+                        var fleetCount = _fleets.Count(f => f.CurrentSystemId == system.Id);
+                        <g transform="translate(-8, -8)">
+                            <polygon points="0,-5 4,3 -4,3" fill="#ffaa00" stroke="#cc8800" stroke-width="0.5"/>
+                            @if (fleetCount > 1)
+                            {
+                                @((MarkupString)$"<text x=\"6\" y=\"0\" font-size=\"6\" fill=\"#ffaa00\">{fleetCount}</text>")
+                            }
+                        </g>
+                    }
+                    
+                    @* System name *@
+                    @{
+                        var nameClass = $"system-name {(isSelected || isHovered ? "visible" : "")}";
+                        var nameFill = system.ControllingFactionId.HasValue ? GetFactionColor(system.ControllingFactionId.Value) : "#99ccff";
+                    }
+                    @((MarkupString)$"<text y=\"18\" text-anchor=\"middle\" class=\"{nameClass}\" fill=\"{nameFill}\" font-size=\"8\">{system.Name}</text>")
+                </g>
+            }
+        </g>
+        
+        @* Fleet Icons on Map *@
+        <g class="fleets-layer">
+            @foreach (var fleet in _fleets.Where(f => f.DestinationSystemId.HasValue))
+            {
+                var fromSystem = _systems.FirstOrDefault(s => s.Id == fleet.CurrentSystemId);
+                var toSystem = _systems.FirstOrDefault(s => s.Id == fleet.DestinationSystemId);
+                @if (fromSystem != null && toSystem != null)
+                {
+                    var progress = fleet.MovementProgress / 100.0; // Convert 0-100 to 0-1
+                    var x = fromSystem.X + (toSystem.X - fromSystem.X) * progress;
+                    var y = fromSystem.Y + (toSystem.Y - fromSystem.Y) * progress;
+                    
+                    // Calculate rotation angle
+                    var angle = Math.Atan2(toSystem.Y - fromSystem.Y, toSystem.X - fromSystem.X) * 180 / Math.PI + 90;
+                    
+                    <g transform="translate(@x.ToString("F1"), @y.ToString("F1"))" class="fleet-icon moving">
+                        @* Fleet trail effect *@
+                        <line x1="0" y1="0" x2="0" y2="12" 
+                              stroke="url(#fleetTrail)" stroke-width="3" 
+                              transform="rotate(@(angle - 180))" 
+                              opacity="0.5" class="fleet-trail"/>
+                        
+                        @* Main ship icon with rotation *@
+                        <g transform="rotate(@angle.ToString("F0"))">
+                            <polygon points="0,-8 6,6 -6,6" fill="#ffcc00" stroke="#aa8800" stroke-width="1.5" class="ship-body"/>
+                            <circle r="2" cy="-2" fill="#fff" opacity="0.8" class="engine-glow"/>
+                        </g>
+                        
+                        @* Fleet info *@
+                        @((MarkupString)$"<text x=\"12\" y=\"4\" font-size=\"9\" fill=\"#ffcc00\" class=\"fleet-label\">{fleet.ShipCount}</text>")
+                    </g>
+                }
+            }
+            
+            @* Stationary fleets at systems *@
+            @foreach (var fleet in _fleets.Where(f => !f.DestinationSystemId.HasValue))
+            {
+                var system = _systems.FirstOrDefault(s => s.Id == fleet.CurrentSystemId);
+                @if (system != null)
+                {
+                    var offsetX = 12;
+                    var offsetY = -8;
+                    <g transform="translate(@((system.X + offsetX).ToString("F1")), @((system.Y + offsetY).ToString("F1")))" class="fleet-icon stationary">
+                        <polygon points="0,-5 4,4 -4,4" fill="#44aaff" stroke="#2288cc" stroke-width="1"/>
+                        @((MarkupString)$"<text x=\"8\" y=\"3\" font-size=\"8\" fill=\"#44aaff\">{fleet.ShipCount}</text>")
+                    </g>
+                }
+            }
+        </g>
+    </svg>
+    
+    @* Tooltip *@
+    @if (_hoveredSystem != null)
+    {
+        <div class="system-tooltip" style="left: @(_tooltipX)px; top: @(_tooltipY)px;">
+            <div class="tooltip-title">@_hoveredSystem.Name</div>
+            <div class="tooltip-content">
+                <div class="tooltip-row">
+                    <span class="label">Star Type:</span>
+                    <span class="value">@_hoveredSystem.StarType</span>
+                </div>
+                @if (_hoveredSystem.ControllingFactionId.HasValue)
+                {
+                    <div class="tooltip-row">
+                        <span class="label">Controlled by:</span>
+                        <span class="value" style="color: @GetFactionColor(_hoveredSystem.ControllingFactionId.Value)">
+                            @GetFactionName(_hoveredSystem.ControllingFactionId.Value)
+                        </span>
+                    </div>
+                }
+                @{
+                    var systemColonies = _colonies.Where(c => c.SystemId == _hoveredSystem.Id).ToList();
+                    var systemFleets = _fleets.Where(f => f.CurrentSystemId == _hoveredSystem.Id).ToList();
+                }
+                @if (systemColonies.Any())
+                {
+                    <div class="tooltip-row">
+                        <span class="label">Colonies:</span>
+                        <span class="value">@systemColonies.Count</span>
+                    </div>
+                }
+                @if (systemFleets.Any())
+                {
+                    <div class="tooltip-row">
+                        <span class="label">Fleets:</span>
+                        <span class="value">@systemFleets.Count (@systemFleets.Sum(f => f.ShipCount) ships)</span>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+    
+    @* Minimap *@
+    <div class="minimap">
+        <svg viewBox="@_minimapViewBox" preserveAspectRatio="xMidYMid meet">
+            @foreach (var system in _systems)
+            {
+                <circle cx="@system.X" cy="@system.Y" r="3"
+                        fill="@(system.ControllingFactionId.HasValue ? GetFactionColor(system.ControllingFactionId.Value) : "#666")"/>
+            }
+            <rect x="@_viewportX" y="@_viewportY" 
+                  width="@_viewportWidth" height="@_viewportHeight"
+                  fill="none" stroke="#ffcc00" stroke-width="2"/>
+        </svg>
+    </div>
+    
+    @* Controls *@
+    <div class="map-controls">
+        <button class="lcars-button" @onclick="ZoomIn" title="Zoom In">+</button>
+        <button class="lcars-button" @onclick="ZoomOut" title="Zoom Out">−</button>
+        <button class="lcars-button" @onclick="ResetView" title="Reset View">⌂</button>
+    </div>
+</div>
+
+<style>
+    .galaxy-container {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        cursor: grab;
+        user-select: none;
+    }
+    
+    .galaxy-container:active {
+        cursor: grabbing;
+    }
+    
+    .galaxy-background {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: 
+            radial-gradient(ellipse at 30% 40%, rgba(60, 40, 80, 0.4) 0%, transparent 50%),
+            radial-gradient(ellipse at 70% 60%, rgba(40, 60, 80, 0.3) 0%, transparent 50%),
+            radial-gradient(ellipse at 50% 50%, rgba(20, 20, 40, 0.8) 0%, transparent 70%),
+            linear-gradient(180deg, #000008 0%, #000010 50%, #000008 100%);
+    }
+    
+    .nebula-layer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+    }
+    
+    .nebula {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(40px);
+        opacity: 0.15;
+    }
+    
+    .galaxy-svg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+    
+    .hyperlane {
+        stroke: rgba(100, 150, 255, 0.25);
+        stroke-linecap: round;
+        transition: all 0.3s ease;
+    }
+    
+    .hyperlane:hover {
+        stroke: rgba(100, 150, 255, 0.5);
+    }
+    
+    .hyperlane.active {
+        stroke: #ffcc00;
+        stroke-width: 2;
+    }
+    
+    .hyperlane.blocked {
+        stroke: rgba(255, 100, 100, 0.4);
+        stroke-dasharray: 5, 5;
+    }
+    
+    .fleet-path {
+        animation: dash 1s linear infinite;
+    }
+    
+    @@keyframes dash {
+        to { stroke-dashoffset: -12; }
+    }
+    
+    .star-system {
+        cursor: pointer;
+        transition: transform 0.2s ease;
+    }
+    
+    .star-system:hover {
+        transform: scale(1.15);
+    }
+    
+    .star-system.selected {
+        transform: scale(1.2);
+    }
+    
+    .system-name {
+        font-family: 'Segoe UI', sans-serif;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        text-shadow: 0 0 4px rgba(0, 0, 0, 0.8);
+    }
+    
+    .system-name.visible {
+        opacity: 1;
+    }
+    
+    .fleet-icon {
+        transition: all 0.3s ease;
+    }
+    
+    .fleet-icon.moving {
+        animation: fleet-pulse 1.5s ease-in-out infinite;
+    }
+    
+    @@keyframes fleet-pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+    
+    .system-tooltip {
+        position: absolute;
+        background: rgba(10, 10, 30, 0.95);
+        border: 1px solid #ff9900;
+        border-radius: 8px;
+        padding: 12px;
+        pointer-events: none;
+        z-index: 1000;
+        min-width: 180px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    }
+    
+    .tooltip-title {
+        color: #ffcc00;
+        font-weight: 600;
+        font-size: 14px;
+        margin-bottom: 8px;
+        border-bottom: 1px solid #ff9900;
+        padding-bottom: 4px;
+    }
+    
+    .tooltip-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        margin: 4px 0;
+    }
+    
+    .tooltip-row .label {
+        color: #cc99cc;
+    }
+    
+    .tooltip-row .value {
+        color: #99ccff;
+    }
+    
+    .minimap {
+        position: absolute;
+        bottom: 16px;
+        left: 16px;
+        width: 180px;
+        height: 180px;
+        background: rgba(10, 10, 30, 0.9);
+        border: 2px solid #ff9900;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+    
+    .minimap svg {
+        width: 100%;
+        height: 100%;
+    }
+    
+    .map-controls {
+        position: absolute;
+        bottom: 16px;
+        right: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .map-controls .lcars-button {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* Fleet animations */
+    .fleet-icon.moving {
+        animation: fleet-pulse 1.5s ease-in-out infinite;
+    }
+    
+    .fleet-icon.moving .ship-body {
+        filter: drop-shadow(0 0 4px #ffcc00);
+    }
+    
+    .fleet-icon.moving .engine-glow {
+        animation: engine-flicker 0.3s ease-in-out infinite;
+    }
+    
+    .fleet-icon.moving .fleet-trail {
+        animation: trail-fade 0.8s ease-out infinite;
+    }
+    
+    .fleet-icon.stationary {
+        opacity: 0.9;
+    }
+    
+    .fleet-icon.stationary:hover {
+        transform: scale(1.2);
+        cursor: pointer;
+    }
+    
+    .fleet-label {
+        font-family: 'Consolas', monospace;
+        font-weight: bold;
+    }
+    
+    @@keyframes fleet-pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.85; }
+    }
+    
+    @@keyframes engine-flicker {
+        0%, 100% { opacity: 0.8; r: 2; }
+        50% { opacity: 1; r: 3; }
+    }
+    
+    @@keyframes trail-fade {
+        0% { opacity: 0.6; }
+        100% { opacity: 0.2; }
+    }
+</style>
+
+@code {
+    [Parameter] public Guid GameId { get; set; }
+    [Parameter] public Guid? FactionId { get; set; }
+    [Parameter] public EventCallback<StarSystemDto> OnSystemSelected { get; set; }
+    
+    private ElementReference _containerRef;
+    
+    // Data
+    private List<StarSystemDto> _systems = new();
+    private List<HyperlaneData> _hyperlanes = new();
+    private List<FleetDisplayData> _fleets = new();
+    private List<ColonyDisplayData> _colonies = new();
+    private List<TerritoryData> _territories = new();
+    private List<NebulaData> _nebulae = new();
+    
+    // View state
+    private double _zoom = 1.0;
+    private double _panX = 0;
+    private double _panY = 0;
+    private bool _isPanning = false;
+    private double _lastMouseX;
+    private double _lastMouseY;
+    
+    // Selection
+    private Guid? _selectedSystemId;
+    private Guid? _hoveredSystemId;
+    private StarSystemDto? _hoveredSystem;
+    private double _tooltipX;
+    private double _tooltipY;
+    
+    // Faction colors
+    private Dictionary<Guid, string> _factionColors = new();
+    private Dictionary<Guid, string> _factionNames = new();
+    
+    // ViewBox calculation
+    private double _minX, _maxX, _minY, _maxY;
+    private string ViewBox => $"{_minX - 50 + _panX} {_minY - 50 + _panY} {(_maxX - _minX + 100) / _zoom} {(_maxY - _minY + 100) / _zoom}";
+    
+    // Minimap
+    private string _minimapViewBox => $"{_minX - 20} {_minY - 20} {_maxX - _minX + 40} {_maxY - _minY + 40}";
+    private double _viewportX => _minX + _panX;
+    private double _viewportY => _minY + _panY;
+    private double _viewportWidth => (_maxX - _minX) / _zoom;
+    private double _viewportHeight => (_maxY - _minY) / _zoom;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadMapData();
+        GenerateNebulae();
+    }
+    
+    private async Task LoadMapData()
+    {
+        try
+        {
+            // Load systems
+            _systems = await Api.GetKnownSystemsAsync(GameId, FactionId ?? Guid.Empty);
+            
+            if (_systems.Any())
+            {
+                // Calculate bounds
+                _minX = _systems.Min(s => s.X);
+                _maxX = _systems.Max(s => s.X);
+                _minY = _systems.Min(s => s.Y);
+                _maxY = _systems.Max(s => s.Y);
+                
+                // Generate hyperlanes (connect nearby systems)
+                GenerateHyperlanes();
+                
+                // Load game data for faction info
+                var game = await Api.GetGameAsync(GameId);
+                if (game != null)
+                {
+                    foreach (var faction in game.Factions)
+                    {
+                        _factionColors[faction.Id] = GetRaceColor(faction.RaceId);
+                        _factionNames[faction.Id] = faction.Name;
+                    }
+                }
+                
+                // Load player's fleets and colonies if faction specified
+                if (FactionId.HasValue)
+                {
+                    var fleets = await Api.GetFleetsAsync(FactionId.Value);
+                    _fleets = fleets.Select(f => new FleetDisplayData
+                    {
+                        Id = f.Id,
+                        Name = f.Name,
+                        CurrentSystemId = f.CurrentSystemId,
+                        DestinationSystemId = f.DestinationId,
+                        ShipCount = f.ShipGroups?.Sum(g => g.Count) ?? 0,
+                        MovementProgress = f.MovementProgress
+                    }).ToList();
+                    
+                    var colonies = await Api.GetColoniesAsync(FactionId.Value);
+                    _colonies = colonies.Select(c => new ColonyDisplayData
+                    {
+                        Id = c.Id,
+                        Name = c.Name,
+                        SystemId = c.SystemId,
+                        Population = c.Population
+                    }).ToList();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Failed to load map: {ex.Message}", Severity.Error);
+        }
+    }
+    
+    private void GenerateHyperlanes()
+    {
+        _hyperlanes.Clear();
+        var maxDistance = 120.0; // Max distance for hyperlane
+        
+        for (int i = 0; i < _systems.Count; i++)
+        {
+            for (int j = i + 1; j < _systems.Count; j++)
+            {
+                var s1 = _systems[i];
+                var s2 = _systems[j];
+                var distance = Math.Sqrt(Math.Pow(s2.X - s1.X, 2) + Math.Pow(s2.Y - s1.Y, 2));
+                
+                if (distance <= maxDistance)
+                {
+                    _hyperlanes.Add(new HyperlaneData
+                    {
+                        System1Id = s1.Id,
+                        System2Id = s2.Id,
+                        X1 = s1.X,
+                        Y1 = s1.Y,
+                        X2 = s2.X,
+                        Y2 = s2.Y,
+                        Distance = distance
+                    });
+                }
+            }
+        }
+    }
+    
+    private void GenerateNebulae()
+    {
+        var random = new Random(42);
+        _nebulae.Clear();
+        
+        for (int i = 0; i < 5; i++)
+        {
+            _nebulae.Add(new NebulaData
+            {
+                X = random.NextDouble() * 100,
+                Y = random.NextDouble() * 100,
+                Width = random.Next(200, 400),
+                Height = random.Next(150, 350),
+                Color = i switch
+                {
+                    0 => "rgba(100, 50, 150, 0.5)",
+                    1 => "rgba(50, 100, 150, 0.4)",
+                    2 => "rgba(150, 100, 50, 0.3)",
+                    3 => "rgba(50, 150, 100, 0.3)",
+                    _ => "rgba(100, 100, 150, 0.3)"
+                }
+            });
+        }
+    }
+    
+    private string GetNebulaStyle(NebulaData nebula) =>
+        $"left: {nebula.X}%; top: {nebula.Y}%; width: {nebula.Width}px; height: {nebula.Height}px; background: {nebula.Color};";
+    
+    private string GetRaceColor(string raceId) => raceId?.ToLower() switch
+    {
+        "terran" or "federation" => "#1a5fb4",
+        "warrior" or "klingon" => "#8b0000",
+        "romulan" => "#2e7d32",
+        "cardassian" => "#5d4037",
+        "ferengi" => "#f57c00",
+        "vulcan" => "#b71c1c",
+        "breen" => "#37474f",
+        "tholian" => "#ff6f00",
+        "gorn" => "#33691e",
+        "bajoran" => "#6d4c41",
+        _ => "#666666"
+    };
+    
+    private string GetFactionColor(Guid factionId) =>
+        _factionColors.TryGetValue(factionId, out var color) ? color : "#666666";
+    
+    private string GetFactionName(Guid factionId) =>
+        _factionNames.TryGetValue(factionId, out var name) ? name : "Unknown";
+    
+    private string GetStarGradient(string starType) => starType?.ToLower() switch
+    {
+        "yellow" or "g" => "#ffdd44",
+        "orange" or "k" => "#ff8c00",
+        "red" or "m" => "#ff4444",
+        "blue" or "o" or "b" => "#4488ff",
+        "white" or "a" or "f" => "#ffffff",
+        _ => "#ffdd44"
+    };
+    
+    private int GetStarSize(StarSystemDto system) => system.StarType?.ToLower() switch
+    {
+        "blue" or "o" or "b" => 8,
+        "white" or "a" or "f" => 6,
+        "yellow" or "g" => 5,
+        "orange" or "k" => 5,
+        "red" or "m" => 4,
+        _ => 5
+    };
+    
+    private string GetHyperlaneColor(HyperlaneData lane)
+    {
+        // Color based on faction control
+        var sys1 = _systems.FirstOrDefault(s => s.Id == lane.System1Id);
+        var sys2 = _systems.FirstOrDefault(s => s.Id == lane.System2Id);
+        
+        if (sys1?.ControllingFactionId == sys2?.ControllingFactionId && sys1?.ControllingFactionId.HasValue == true)
+            return GetFactionColor(sys1.ControllingFactionId!.Value);
+        
+        return "rgba(100, 150, 255, 0.3)";
+    }
+    
+    private string GetHyperlaneWidth(HyperlaneData lane) => 
+        lane.Distance < 60 ? "1.5" : "1";
+    
+    private bool IsLaneActive(HyperlaneData lane) =>
+        _selectedSystemId.HasValue && 
+        (lane.System1Id == _selectedSystemId || lane.System2Id == _selectedSystemId);
+    
+    private bool IsLaneBlocked(HyperlaneData lane)
+    {
+        // A lane is blocked if it passes through a system controlled by a hostile faction
+        // For now, check if endpoint systems are controlled by different factions
+        var system1 = _systems.FirstOrDefault(s => s.Id == lane.System1Id);
+        var system2 = _systems.FirstOrDefault(s => s.Id == lane.System2Id);
+        
+        if (system1 == null || system2 == null) return false;
+        
+        // If both systems have controlling factions that differ and neither is the player
+        var faction1 = system1.ControllingFactionId;
+        var faction2 = system2.ControllingFactionId;
+        
+        // Lane is blocked if endpoint is controlled by enemy (not us and not null)
+        if (FactionId.HasValue)
+        {
+            var isEndpointHostile = (faction2.HasValue && faction2 != FactionId && faction1 == FactionId);
+            return isEndpointHostile; // Would check actual diplomacy status here
+        }
+        
+        return false;
+    }
+    
+    private void SelectSystem(StarSystemDto system)
+    {
+        _selectedSystemId = system.Id;
+        OnSystemSelected.InvokeAsync(system);
+    }
+    
+    private void HoverSystem(StarSystemDto? system)
+    {
+        _hoveredSystemId = system?.Id;
+        _hoveredSystem = system;
+    }
+    
+    // Pan/Zoom handlers
+    private void OnMouseDown(MouseEventArgs e)
+    {
+        _isPanning = true;
+        _lastMouseX = e.ClientX;
+        _lastMouseY = e.ClientY;
+    }
+    
+    private void OnMouseMove(MouseEventArgs e)
+    {
+        // Update tooltip position
+        _tooltipX = e.ClientX + 15;
+        _tooltipY = e.ClientY + 15;
+        
+        if (_isPanning)
+        {
+            var dx = e.ClientX - _lastMouseX;
+            var dy = e.ClientY - _lastMouseY;
+            _panX -= dx / _zoom;
+            _panY -= dy / _zoom;
+            _lastMouseX = e.ClientX;
+            _lastMouseY = e.ClientY;
+            StateHasChanged();
+        }
+    }
+    
+    private void OnMouseUp(MouseEventArgs e)
+    {
+        _isPanning = false;
+    }
+    
+    private void OnWheel(WheelEventArgs e)
+    {
+        var zoomDelta = e.DeltaY > 0 ? 0.9 : 1.1;
+        _zoom = Math.Clamp(_zoom * zoomDelta, 0.3, 5.0);
+        StateHasChanged();
+    }
+    
+    private void ZoomIn() => _zoom = Math.Min(_zoom * 1.2, 5.0);
+    private void ZoomOut() => _zoom = Math.Max(_zoom / 1.2, 0.3);
+    private void ResetView() { _zoom = 1.0; _panX = 0; _panY = 0; }
+    
+    // Data classes
+    private class HyperlaneData
+    {
+        public Guid System1Id { get; set; }
+        public Guid System2Id { get; set; }
+        public double X1 { get; set; }
+        public double Y1 { get; set; }
+        public double X2 { get; set; }
+        public double Y2 { get; set; }
+        public double Distance { get; set; }
+    }
+    
+    private class FleetDisplayData
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; } = "";
+        public Guid CurrentSystemId { get; set; }
+        public Guid? DestinationSystemId { get; set; }
+        public int ShipCount { get; set; }
+        public int MovementProgress { get; set; } // 0-100
+    }
+    
+    private class ColonyDisplayData
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; } = "";
+        public Guid SystemId { get; set; }
+        public long Population { get; set; }
+    }
+    
+    private class TerritoryData
+    {
+        public Guid FactionId { get; set; }
+        public string Path { get; set; } = "";
+    }
+    
+    private class NebulaData
+    {
+        public double X { get; set; }
+        public double Y { get; set; }
+        public int Width { get; set; }
+        public int Height { get; set; }
+        public string Color { get; set; } = "";
+    }
+}

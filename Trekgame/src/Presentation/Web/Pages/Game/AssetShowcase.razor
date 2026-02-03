@@ -1,0 +1,719 @@
+@page "/game/assets"
+@page "/game/showcase"
+@using MudBlazor
+
+<PageTitle>Asset Gallery - Galactic Strategy</PageTitle>
+
+<div class="showcase-wrapper">
+    <header class="showcase-header">
+        <h1>🎨 ASSET GALLERY</h1>
+        <p>All visual assets available in Galactic Strategy</p>
+    </header>
+
+    <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" Class="mt-4">
+        @foreach (var faction in _factionAssets.Where(f => f.Value.Any()))
+        {
+            <MudTabPanel Text="@GetFactionDisplayName(faction.Key)" Icon="@GetFactionIcon(faction.Key)">
+                <div class="faction-section @faction.Key.ToLower()">
+                    <h2>@GetFactionEmoji(faction.Key) @GetFactionDisplayName(faction.Key)</h2>
+                    
+                    @foreach (var category in faction.Value)
+                    {
+                        <div class="category-section">
+                            <h3>@GetCategoryDisplayName(category.Category) <span class="asset-count">(@category.TotalAssets)</span></h3>
+                            <div class="assets-grid">
+                                @for (int i = 0; i < category.TotalAssets; i++)
+                                {
+                                    var row = i / category.Columns;
+                                    var col = i % category.Columns;
+                                    var assetName = GetAssetName(category.Names, i);
+                                    <div class="asset-card">
+                                        <div class="asset-sprite" style="@GetAssetStyle(faction.Key, category, row, col)"></div>
+                                        <div class="asset-name">@assetName</div>
+                                        <div class="hover-preview">
+                                            <div class="hover-preview-sprite" style="@GetPreviewStyle(faction.Key, category, row, col)"></div>
+                                            <span class="hover-preview-label">@assetName</span>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            </MudTabPanel>
+        }
+        
+        @* Universal Assets Tab *@
+        <MudTabPanel Text="Universal" Icon="@Icons.Material.Filled.Public">
+            <div class="faction-section universal">
+                <h2>🌌 Universal Assets</h2>
+                
+                @foreach (var category in _universalAssets)
+                {
+                    <div class="category-section">
+                        <h3>@GetCategoryDisplayName(category.Category) <span class="asset-count">(@category.TotalAssets)</span></h3>
+                        <div class="assets-grid">
+                            @for (int i = 0; i < category.TotalAssets; i++)
+                            {
+                                var row = i / category.Columns;
+                                var col = i % category.Columns;
+                                var assetName = GetAssetName(category.Names, i);
+                                <div class="asset-card">
+                                    <div class="asset-sprite" style="@GetUniversalAssetStyle(category, row, col)"></div>
+                                    <div class="asset-name">@assetName</div>
+                                    <div class="hover-preview">
+                                        <div class="hover-preview-sprite" style="@GetUniversalPreviewStyle(category, row, col)"></div>
+                                        <span class="hover-preview-label">@assetName</span>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        </MudTabPanel>
+        
+        @* Factions Tab - Symbols & Leaders *@
+        <MudTabPanel Text="Factions" Icon="@Icons.Material.Filled.Flag">
+            <div class="faction-section factions-overview">
+                <h2>🏴 Faction Symbols & Leaders</h2>
+                
+                @* Faction Symbols (SVGs) *@
+                <div class="category-section">
+                    <h3>🛡️ Faction Emblems <span class="asset-count">(@_factionSymbols.Count)</span></h3>
+                    <div class="symbols-grid">
+                        @foreach (var symbol in _factionSymbols)
+                        {
+                            <div class="symbol-card @symbol.Key.ToLower()">
+                                <div class="symbol-wrapper">
+                                    <img src="@symbol.Value" alt="@symbol.Key emblem" class="faction-symbol" />
+                                </div>
+                                <div class="symbol-name">@symbol.Key</div>
+                                <div class="hover-preview symbol-preview">
+                                    <img src="@symbol.Value" alt="@symbol.Key emblem preview" class="hover-preview-img" />
+                                    <span class="hover-preview-label">@symbol.Key</span>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+                
+                @* Faction Leaders *@
+                @if (_factionLeaders != null)
+                {
+                    <div class="category-section">
+                        <h3>👑 Faction Leaders <span class="asset-count">(@_factionLeaders.TotalAssets)</span></h3>
+                        <div class="assets-grid leaders-grid">
+                            @for (int i = 0; i < _factionLeaders.TotalAssets; i++)
+                            {
+                                var row = i / _factionLeaders.Columns;
+                                var col = i % _factionLeaders.Columns;
+                                var leaderName = GetAssetName(_factionLeaderNames, i);
+                                <div class="asset-card leader-card">
+                                    <div class="asset-sprite leader-sprite" style="@GetUniversalAssetStyle(_factionLeaders, row, col)"></div>
+                                    <div class="asset-name">@leaderName</div>
+                                    <div class="hover-preview">
+                                        <div class="hover-preview-sprite" style="@GetUniversalPreviewStyle(_factionLeaders, row, col)"></div>
+                                        <span class="hover-preview-label">@leaderName</span>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        </MudTabPanel>
+    </MudTabs>
+</div>
+
+<style>
+    .showcase-wrapper {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #0a0a18 0%, #1a1a2e 50%, #0a0a18 100%);
+        padding: 40px;
+        color: #e0e8f0;
+    }
+    
+    .showcase-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    
+    .showcase-header h1 {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 36px;
+        color: #ffcc00;
+        text-shadow: 0 0 20px rgba(255, 200, 0, 0.5);
+    }
+    
+    .showcase-header p {
+        color: rgba(200, 220, 255, 0.7);
+        font-size: 14px;
+    }
+    
+    /* Faction Sections */
+    .faction-section {
+        padding: 20px;
+    }
+    
+    .faction-section h2 {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+    
+    .faction-section.federation h2 { color: #60a5fa; }
+    .faction-section.klingon h2 { color: #f87171; }
+    .faction-section.romulan h2 { color: #34d399; }
+    .faction-section.cardassian h2 { color: #fbbf24; }
+    .faction-section.borg h2 { color: #4ade80; }
+    .faction-section.dominion h2 { color: #a78bfa; }
+    .faction-section.ferengi h2 { color: #fcd34d; }
+    .faction-section.universal h2 { color: #94a3b8; }
+    
+    /* Category Section */
+    .category-section {
+        margin-bottom: 30px;
+    }
+    
+    .category-section h3 {
+        font-size: 16px;
+        color: rgba(180, 200, 230, 0.8);
+        margin: 20px 0 15px;
+        border-bottom: 1px solid rgba(100, 140, 180, 0.3);
+        padding-bottom: 8px;
+    }
+    
+    .asset-count {
+        font-size: 12px;
+        color: rgba(150, 170, 200, 0.6);
+        font-weight: normal;
+    }
+    
+    /* Assets Grid */
+    .assets-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 12px;
+        position: relative;
+        overflow: visible;
+    }
+    
+    /* Ensure parent containers don't clip hover previews */
+    .category-section,
+    .faction-section,
+    .mud-tabs,
+    .mud-tab-panel {
+        overflow: visible !important;
+    }
+    
+    .asset-card {
+        background: rgba(15, 25, 40, 0.8);
+        border: 2px solid rgba(80, 120, 180, 0.3);
+        border-radius: 8px;
+        padding: 8px;
+        text-align: center;
+        transition: all 0.2s;
+        position: relative;
+    }
+    
+    .asset-card:hover {
+        border-color: rgba(100, 180, 255, 0.5);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        z-index: 100;
+    }
+    
+    /* Hover Preview Popup */
+    .hover-preview {
+        display: none;
+        position: absolute;
+        bottom: calc(100% + 8px);
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 10000;
+        pointer-events: none;
+        filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.8));
+    }
+    
+    .asset-card:hover .hover-preview {
+        display: block;
+    }
+    
+    /* Flip preview BELOW for first-row items so it doesn't get hidden behind tabs/header */
+    .assets-grid > .asset-card:nth-child(-n+8) .hover-preview,
+    .leaders-grid > .asset-card:nth-child(-n+8) .hover-preview {
+        bottom: auto;
+        top: calc(100% + 8px);
+    }
+    
+    .hover-preview-sprite {
+        width: 200px;
+        height: 200px;
+        background-repeat: no-repeat;
+        border-radius: 8px;
+        border: 2px solid rgba(100, 180, 255, 0.6);
+        background-color: rgba(10, 15, 30, 0.95);
+    }
+    
+    .hover-preview-label {
+        display: block;
+        text-align: center;
+        padding: 4px 8px;
+        background: rgba(0, 0, 0, 0.9);
+        color: #ccd;
+        font-size: 11px;
+        border-radius: 0 0 6px 6px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 200px;
+    }
+    
+    /* Asset Sprites */
+    .asset-sprite {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 6px;
+        background-repeat: no-repeat;
+        border-radius: 4px;
+    }
+    
+    .asset-name {
+        font-size: 9px;
+        color: rgba(200, 220, 255, 0.8);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    /* Symbols Grid for Factions Tab */
+    .symbols-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 20px;
+        margin: 20px 0;
+        overflow: visible;
+    }
+    
+    .symbol-card {
+        background: rgba(15, 25, 40, 0.9);
+        border: 2px solid rgba(80, 120, 180, 0.4);
+        border-radius: 12px;
+        padding: 20px;
+        text-align: center;
+        transition: all 0.3s;
+        position: relative;
+    }
+    
+    .symbol-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+        z-index: 100;
+    }
+    
+    .symbol-card.federation { border-color: #4a90d9; }
+    .symbol-card.federation:hover { background: rgba(74, 144, 217, 0.15); }
+    
+    .symbol-card.klingon { border-color: #c23a3a; }
+    .symbol-card.klingon:hover { background: rgba(194, 58, 58, 0.15); }
+    
+    .symbol-card.romulan { border-color: #2d8a4e; }
+    .symbol-card.romulan:hover { background: rgba(45, 138, 78, 0.15); }
+    
+    .symbol-card.cardassian { border-color: #c9a227; }
+    .symbol-card.cardassian:hover { background: rgba(201, 162, 39, 0.15); }
+    
+    .symbol-card.borg { border-color: #00ff00; }
+    .symbol-card.borg:hover { background: rgba(0, 255, 0, 0.1); }
+    
+    .symbol-card.ferengi { border-color: #d4a84b; }
+    .symbol-card.ferengi:hover { background: rgba(212, 168, 75, 0.15); }
+    
+    .symbol-card.dominion { border-color: #9966cc; }
+    .symbol-card.dominion:hover { background: rgba(153, 102, 204, 0.15); }
+    
+    .symbol-card.breen { border-color: #7799bb; }
+    .symbol-card.breen:hover { background: rgba(119, 153, 187, 0.15); }
+    
+    .symbol-card.gorn { border-color: #55aa55; }
+    .symbol-card.gorn:hover { background: rgba(85, 170, 85, 0.15); }
+    
+    .symbol-card.andorian { border-color: #6699cc; }
+    .symbol-card.andorian:hover { background: rgba(102, 153, 204, 0.15); }
+    
+    .symbol-card.vulcan { border-color: #cc7733; }
+    .symbol-card.vulcan:hover { background: rgba(204, 119, 51, 0.15); }
+    
+    /* Symbol hover preview - larger image popup */
+    .symbol-preview {
+        bottom: auto;
+        top: calc(100% + 10px);
+    }
+    
+    .symbol-card:hover .hover-preview {
+        display: block;
+    }
+    
+    .hover-preview-img {
+        width: 200px;
+        height: 200px;
+        object-fit: contain;
+        border-radius: 8px;
+        border: 2px solid rgba(100, 180, 255, 0.6);
+        background: rgba(10, 15, 30, 0.95);
+        padding: 10px;
+    }
+    
+    .symbol-wrapper {
+        width: 100px;
+        height: 100px;
+        margin: 0 auto 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .faction-symbol {
+        max-width: 100%;
+        max-height: 100%;
+        filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.5));
+    }
+    
+    .symbol-name {
+        font-size: 14px;
+        font-weight: bold;
+        color: rgba(220, 230, 255, 0.9);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    /* Leaders grid - slightly larger cards */
+    .leaders-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    }
+    
+    .leader-card {
+        padding: 12px;
+    }
+    
+    .leader-sprite {
+        width: 90px;
+        height: 90px;
+    }
+    
+    /* Factions overview section */
+    .factions-overview {
+        background: linear-gradient(135deg, rgba(20, 30, 50, 0.8), rgba(10, 15, 30, 0.9));
+    }
+</style>
+
+@code {
+    // Asset data structure
+    private record AssetCategory(string Category, string SpritePath, int Columns, int Rows, int CellSize, string[]? Names = null)
+    {
+        public int TotalAssets => Columns * Rows;
+    }
+    
+    // Available assets per faction
+    private Dictionary<string, List<AssetCategory>> _factionAssets = new();
+    private List<AssetCategory> _universalAssets = new();
+    private AssetCategory? _factionLeaders;
+    private string[]? _factionLeaderNames;
+    private Dictionary<string, string> _factionSymbols = new();
+    
+    protected override void OnInitialized()
+    {
+        // Federation - most complete
+        _factionAssets["Federation"] = new List<AssetCategory>
+        {
+            new("Military Ships", "/assets/factions/federation/federation_militaryships_spritesheet.png", 6, 6, 360, GetFederationMilitaryShipNames()),
+            new("Civilian Ships", "/assets/factions/federation/federation_civilianships_spritesheet.png", 6, 6, 360, GetFederationCivilianShipNames()),
+            new("Military Structures", "/assets/factions/federation/federation_militarystructures_spritesheet.png", 6, 6, 360),
+            new("Civilian Structures", "/assets/factions/federation/federation_civilianstructures_spritesheet.png", 6, 6, 360),
+            new("Buildings", "/assets/factions/federation/federation_buildings_spritesheet.png", 8, 6, 360),
+            new("Troops", "/assets/factions/federation/federation_troops_spritesheet.png", 6, 6, 360),
+            new("Vehicles", "/assets/factions/federation/federation_vehicles_spritesheet.png", 4, 4, 360),
+            new("Portraits", "/assets/factions/federation/federation_portraits_spritesheet.png", 6, 6, 360),
+        };
+        
+        // Klingon
+        _factionAssets["Klingon"] = new List<AssetCategory>
+        {
+            new("Military Ships", "/assets/factions/klingon/klingon_militaryships_spritesheet.png", 6, 6, 360, GetKlingonMilitaryShipNames()),
+            new("Buildings", "/assets/factions/klingon/klingon_buildings_spritesheet.png", 8, 6, 360),
+            new("Portraits", "/assets/factions/klingon/klingon_portraits_spritesheet.png", 6, 6, 360),
+        };
+        
+        // Romulan
+        _factionAssets["Romulan"] = new List<AssetCategory>
+        {
+            new("Military Ships", "/assets/factions/romulan/romulan_militaryships_spritesheet.png", 6, 6, 360, GetRomulanMilitaryShipNames()),
+            new("Buildings", "/assets/factions/romulan/romulan_buildings_spritesheet.png", 8, 6, 360),
+        };
+        
+        // Borg
+        _factionAssets["Borg"] = new List<AssetCategory>
+        {
+            new("Military Ships", "/assets/factions/borg/borg_militaryships_spritesheet.png", 6, 6, 360, GetBorgMilitaryShipNames()),
+            new("Buildings", "/assets/factions/borg/borg_buildings_spritesheet.png", 8, 6, 360),
+        };
+        
+        // Cardassian
+        _factionAssets["Cardassian"] = new List<AssetCategory>
+        {
+            new("Military Ships", "/assets/factions/cardassian/cardassian_militaryships_spritesheet.png", 6, 6, 360, GetCardassianMilitaryShipNames()),
+            new("Buildings", "/assets/factions/cardassian/cardassian_buildings_spritesheet.png", 8, 6, 360),
+        };
+        
+        // Dominion
+        _factionAssets["Dominion"] = new List<AssetCategory>
+        {
+            new("Military Ships", "/assets/factions/dominion/dominion_militaryships_spritesheet.png", 6, 6, 360, GetDominionMilitaryShipNames()),
+            new("Buildings", "/assets/factions/dominion/dominion_buildings_spritesheet.png", 8, 6, 360),
+        };
+        
+        // Ferengi
+        _factionAssets["Ferengi"] = new List<AssetCategory>
+        {
+            new("Military Ships", "/assets/factions/ferengi/ferengi_militaryships_spritesheet.png", 6, 6, 360, GetFerengiMilitaryShipNames()),
+            new("Buildings", "/assets/factions/ferengi/ferengi_buildings_spritesheet.png", 8, 6, 360),
+        };
+        
+        // Universal assets (without leaders - those go to Factions tab)
+        _universalAssets = new List<AssetCategory>
+        {
+            new("Planets", "/assets/universal/planets_spritesheet.png", 6, 6, 360),
+            new("Stars", "/assets/universal/stars_spritesheet.png", 4, 4, 360),
+            new("Special Characters", "/assets/universal/generated/special_specialcharacters_spritesheet.png", 4, 4, 360, GetSpecialCharacterNames()),
+        };
+        
+        // Faction Leaders (for Factions tab)
+        _factionLeaders = new AssetCategory("Faction Leaders", "/assets/universal/special_factionleaders_spritesheet.png", 4, 4, 360);
+        _factionLeaderNames = GetFactionLeaderNames();
+        
+        // Faction Symbols (SVGs) - all 11 game factions
+        _factionSymbols = new Dictionary<string, string>
+        {
+            ["Federation"] = "/assets/universal/symbols/federation.svg",
+            ["Klingon"] = "/assets/universal/symbols/klingon.svg",
+            ["Romulan"] = "/assets/universal/symbols/romulan.svg",
+            ["Cardassian"] = "/assets/universal/symbols/cardassian.svg",
+            ["Ferengi"] = "/assets/universal/symbols/ferengi.svg",
+            ["Borg"] = "/assets/universal/symbols/borg.svg",
+            ["Dominion"] = "/assets/universal/symbols/dominion.svg",
+            ["Breen"] = "/assets/universal/symbols/breen.svg",
+            ["Gorn"] = "/assets/universal/symbols/gorn.svg",
+            ["Andorian"] = "/assets/universal/symbols/andorian.svg",
+            ["Vulcan"] = "/assets/universal/symbols/vulcan.svg",
+        };
+    }
+    
+    private string GetAssetStyle(string faction, AssetCategory category, int row, int col)
+    {
+        var displaySize = 80;
+        var scale = (double)displaySize / category.CellSize;
+        var bgWidth = category.Columns * category.CellSize * scale;
+        var bgHeight = category.Rows * category.CellSize * scale;
+        var x = -col * category.CellSize * scale;
+        var y = -row * category.CellSize * scale;
+        
+        return $"background-image: url('{category.SpritePath}'); background-position: {x}px {y}px; background-size: {bgWidth}px {bgHeight}px;";
+    }
+    
+    private string GetUniversalAssetStyle(AssetCategory category, int row, int col)
+    {
+        var displaySize = 80;
+        var scale = (double)displaySize / category.CellSize;
+        var bgWidth = category.Columns * category.CellSize * scale;
+        var bgHeight = category.Rows * category.CellSize * scale;
+        var x = -col * category.CellSize * scale;
+        var y = -row * category.CellSize * scale;
+        
+        return $"background-image: url('{category.SpritePath}'); background-position: {x}px {y}px; background-size: {bgWidth}px {bgHeight}px;";
+    }
+    
+    private string GetAssetName(string[]? names, int index)
+    {
+        if (names != null && index < names.Length)
+            return names[index];
+        return $"Asset {index + 1}";
+    }
+    
+    private string GetFactionDisplayName(string faction) => faction switch
+    {
+        "Federation" => "Federation",
+        "Klingon" => "Klingon Empire",
+        "Romulan" => "Romulan Empire",
+        "Borg" => "Borg Collective",
+        "Cardassian" => "Cardassian Union",
+        "Dominion" => "The Dominion",
+        "Ferengi" => "Ferengi Alliance",
+        _ => faction
+    };
+    
+    private string GetPreviewStyle(string faction, AssetCategory category, int row, int col)
+    {
+        var previewSize = 200;
+        var scale = (double)previewSize / category.CellSize;
+        var bgWidth = category.Columns * category.CellSize * scale;
+        var bgHeight = category.Rows * category.CellSize * scale;
+        var x = -col * category.CellSize * scale;
+        var y = -row * category.CellSize * scale;
+        
+        return $"background-image: url('{category.SpritePath}'); background-position: {x}px {y}px; background-size: {bgWidth}px {bgHeight}px;";
+    }
+    
+    private string GetUniversalPreviewStyle(AssetCategory category, int row, int col)
+    {
+        var previewSize = 200;
+        var scale = (double)previewSize / category.CellSize;
+        var bgWidth = category.Columns * category.CellSize * scale;
+        var bgHeight = category.Rows * category.CellSize * scale;
+        var x = -col * category.CellSize * scale;
+        var y = -row * category.CellSize * scale;
+        
+        return $"background-image: url('{category.SpritePath}'); background-position: {x}px {y}px; background-size: {bgWidth}px {bgHeight}px;";
+    }
+    
+    private string[] GetSpecialCharacterNames() => new[]
+    {
+        "Q Classic Smirk", "Q Judge Robes", "Q Mariachi", "Data Curious",
+        "Data Emotion Chip", "Borg Queen", "Borg Queen Assimilating", "Female Changeling",
+        "Changeling Morphing", "Weyoun Vorta", "Mirror Kirk", "Mirror Spock",
+        "Holographic Doctor", "EMH Mark II", "Special Variant 1", "Special Variant 2"
+    };
+    
+    private string GetFactionEmoji(string faction) => faction switch
+    {
+        "Federation" => "🔵",
+        "Klingon" => "🔴",
+        "Romulan" => "🟢",
+        "Borg" => "💚",
+        "Cardassian" => "🟠",
+        "Dominion" => "💜",
+        "Ferengi" => "🟡",
+        _ => "⚪"
+    };
+    
+    private string GetFactionIcon(string faction) => faction switch
+    {
+        "Federation" => Icons.Material.Filled.RocketLaunch,
+        "Klingon" => Icons.Material.Filled.Security,
+        "Romulan" => Icons.Material.Filled.VisibilityOff,
+        "Borg" => Icons.Material.Filled.Memory,
+        "Cardassian" => Icons.Material.Filled.Shield,
+        "Dominion" => Icons.Material.Filled.Hub,
+        "Ferengi" => Icons.Material.Filled.AttachMoney,
+        _ => Icons.Material.Filled.Star
+    };
+    
+    private string GetCategoryDisplayName(string category) => category switch
+    {
+        "Military Ships" => "🚀 Military Ships",
+        "Civilian Ships" => "🚢 Civilian Ships",
+        "Military Structures" => "🛡️ Military Structures",
+        "Civilian Structures" => "🏗️ Civilian Structures",
+        "Buildings" => "🏛️ Buildings",
+        "Troops" => "⚔️ Troops",
+        "Vehicles" => "🚗 Vehicles",
+        "Portraits" => "👤 Portraits",
+        "Planets" => "🌍 Planets",
+        "Stars" => "⭐ Stars",
+        "Faction Leaders" => "👑 Faction Leaders",
+        "Special Characters" => "✨ Special Characters",
+        _ => category
+    };
+    
+    // Ship name arrays
+    private string[] GetFederationMilitaryShipNames() => new[]
+    {
+        "Constitution", "Galaxy", "Sovereign", "Defiant", "Intrepid", "Excelsior",
+        "Nebula", "Akira", "Prometheus", "Nova", "Ambassador", "Miranda",
+        "Saber", "Steamrunner", "Norway", "Olympic", "Oberth", "Sydney",
+        "Centaur", "Cheyenne", "New Orleans", "Springfield", "Niagara", "Freedom",
+        "Challenger", "Luna", "Vesta", "Inquiry", "Crossfield", "Walker",
+        "Nimitz", "Odyssey", "Ross", "Parliament", "Sutherland", "Yeager"
+    };
+    
+    private string[] GetFederationCivilianShipNames() => new[]
+    {
+        "Type 6 Shuttle", "Type 7 Shuttle", "Type 8 Shuttle", "Type 9 Shuttle", "Type 10", "Type 11",
+        "Danube Runabout", "Delta Flyer", "Argo Shuttle", "Captain's Yacht", "Work Bee", "Travel Pod",
+        "Cargo Freighter", "Colony Ship", "Hospital Ship", "Science Vessel", "Survey Ship", "Transport",
+        "Merchant", "Passenger Liner", "Mining Ship", "Tanker", "Tug", "Supply Ship",
+        "Comm Relay", "Probe Launcher", "Escape Pod", "Diplomatic Yacht", "VIP Transport", "Trainer",
+        "Civilian 1", "Civilian 2", "Civilian 3", "Civilian 4", "Civilian 5", "Civilian 6"
+    };
+    
+    private string[] GetKlingonMilitaryShipNames() => new[]
+    {
+        "B'rel Bird of Prey", "K'vort Bird of Prey", "Vor'cha Cruiser", "Negh'Var Warship", "K't'inga", "D7",
+        "Raptor Scout", "D5 Cruiser", "Rotarran Type", "Bortas Class", "Qugh Destroyer", "Hegh'ta Heavy",
+        "D12 Bird of Prey", "D4 Cruiser", "Sompek Class", "Koloth Class", "Kor Class", "Kang Class",
+        "Gorkon Class", "Martok Class", "Chang Class", "Duras Class", "Gowron Class", "Kahless Class",
+        "Kronos One", "IKS Pagh", "IKS Ning'tao", "Raider", "Carrier", "Dreadnought",
+        "Transport", "Freighter", "Mining Ship", "Colony Ship", "Patrol Vessel", "Flagship"
+    };
+    
+    private string[] GetRomulanMilitaryShipNames() => new[]
+    {
+        "D'deridex Warbird", "Valdore Warbird", "Mogai Warbird", "Scimitar", "T'Liss Light", "T'Varo Scout",
+        "Dhael Warbird", "D'ridthau", "Haakona", "Khenn Battleship", "Lanora Scout", "Makar Frigate",
+        "Norexan Warbird", "Terix Heavy", "Vastam Bird", "Vereleus", "Scout Ship", "Science Vessel",
+        "Cargo Vessel", "Transport", "Mining Ship", "Colony Ship", "Patrol Vessel", "Drone Ship",
+        "Shuttle", "Fighter", "Interceptor", "Bomber", "Carrier", "Command Ship",
+        "Flagship", "Stealth Ship", "Spy Vessel", "Diplomatic", "Variant 1", "Variant 2"
+    };
+    
+    private string[] GetBorgMilitaryShipNames() => new[]
+    {
+        "Borg Cube", "Tactical Cube", "Borg Sphere", "Borg Diamond", "Borg Probe", "Borg Scout",
+        "Interceptor", "Detector", "Assimilator", "Harvester", "Collector", "Regen Ship",
+        "Queen's Ship", "Command Cube", "Unicomplex Hub", "Transwarp Hub", "Processing Node", "Maturation",
+        "Transport Sphere", "Cargo Cube", "Mining Vessel", "Construction", "Repair Ship", "Science Vessel",
+        "Nanoprobe Ship", "Shield Ship", "Weapons Platform", "Sensor Array", "Comm Hub", "Gateway Ship",
+        "Prototype 1", "Prototype 2", "Prototype 3", "Prototype 4", "Prototype 5", "Prototype 6"
+    };
+    
+    private string[] GetCardassianMilitaryShipNames() => new[]
+    {
+        "Galor Cruiser", "Keldon Cruiser", "Hideki Patrol", "Legate Warship", "Gul Cruiser", "Hutet Battlecruiser",
+        "Rasilak Destroyer", "Groumall Freighter", "Damar Cruiser", "Dukat Flagship", "Dreadnought", "Frigate",
+        "Escort", "Scout", "Fighter", "Interceptor",
+        "Border Patrol", "Customs Enforcer", "Occupation Cruiser", "Orbital Patrol", "System Defense", "Strike Cruiser",
+        "Assault Ship", "Troop Transport", "Command Cruiser", "Fleet Carrier", "Heavy Cruiser", "Light Cruiser",
+        "Fast Attack", "Missile Cruiser", "Torpedo Ship", "Gunship", "Corvette", "Defense Ship",
+        "Obsidian Order Ship", "Intelligence Vessel"
+    };
+    
+    private string[] GetDominionMilitaryShipNames() => new[]
+    {
+        "Jem'Hadar Fighter", "Jem'Hadar Attack Ship", "Jem'Hadar Battle Cruiser", "Jem'Hadar Battleship", "Jem'Hadar Dreadnought", "Jem'Hadar Super Carrier",
+        "Jem'Hadar Strike Ship", "Jem'Hadar Heavy Escort", "Jem'Hadar Vanguard", "Jem'Hadar Recon Ship", "Dominion Battleship", "Dominion Dreadnought",
+        "Command Ship", "Flagship", "Breen Warship Ally", "Cardassian Galor Ally",
+        "Founder Vessel", "Vorta Command Ship", "Carrier", "Heavy Cruiser", "Strike Cruiser", "Patrol Ship",
+        "Border Ship", "Escort", "Frigate", "Destroyer", "Interceptor", "Scout",
+        "Probe", "Fighter Wing", "Bomber", "Assault Ship", "Troop Transport", "Siege Ship",
+        "Mine Layer", "Advanced Fighter"
+    };
+    
+    private string[] GetFerengiMilitaryShipNames() => new[]
+    {
+        "D'Kora Marauder", "Nagus Marauder", "Quark Marauder", "Raider", "Patrol", "Escort",
+        "Interceptor", "Gunship", "Frigate", "Destroyer", "Cruiser", "Battlecruiser",
+        "Dreadnought", "Acquisition Cruiser", "Profit Cruiser", "Latinum Cruiser",
+        "Commerce Raider", "Privateer", "Mercenary Ship", "Security Vessel", "Defense Ship", "Patrol Craft",
+        "Border Guard", "Customs Vessel", "Enforcement Ship", "Grand Nagus Yacht", "FCA Enforcer", "Liquidator Ship",
+        "Collector Ship", "Retrieval Vessel", "Bounty Hunter", "Repo Ship", "Asset Recovery", "Fighter",
+        "Attack Shuttle", "Armed Trader"
+    };
+    
+    private string[] GetFactionLeaderNames() => new[]
+    {
+        "Federation President", "Klingon Chancellor", "Romulan Praetor", "Cardassian Legate",
+        "Ferengi Grand Nagus", "Dominion Founder", "Borg Queen", "Breen Thot",
+        "Gorn King", "Andorian Chancellor", "Vulcan Admiral", "Trill President",
+        "Bajoran Kai", "Tholian Commander", "Orion Syndicate Boss", "Mercenary Captain"
+    };
+}

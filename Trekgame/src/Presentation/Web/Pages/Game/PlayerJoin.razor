@@ -1,0 +1,412 @@
+@page "/game/join"
+@page "/game/newplayer"
+@page "/game/start"
+@layout StellarisLayout
+@inject NavigationManager Nav
+
+<PageTitle>Join the Galaxy - TrekGame</PageTitle>
+
+<div class="join-page">
+    <div class="join-bg"><div class="stars"></div></div>
+    
+    <div class="join-content">
+        <h1>ESTABLISH YOUR HOUSE</h1>
+        <p class="subtitle">Choose your path in the galaxy</p>
+        
+        @if (_currentStep == 1)
+        {
+            <!-- Step 1: Choose Path -->
+            <div class="step-content">
+                <h2>STEP 1: CHOOSE YOUR PATH</h2>
+                
+                <div class="path-options">
+                    <div class="path-card @(_joinFaction ? "selected" : "")" @onclick="() => _joinFaction = true">
+                        <div class="path-icon">🏛️</div>
+                        <h3>JOIN A FACTION</h3>
+                        <ul class="path-benefits">
+                            <li>✓ Start near faction capital</li>
+                            <li>✓ Faction protection</li>
+                            <li>✓ Trade access</li>
+                            <li>✓ Political advancement</li>
+                            <li>○ Must follow faction rules</li>
+                        </ul>
+                        <p class="path-desc">Join an established power and rise through its ranks. Build your House within the faction's domain.</p>
+                    </div>
+                    
+                    <div class="path-card @(!_joinFaction ? "selected" : "")" @onclick="() => _joinFaction = false">
+                        <div class="path-icon">🏴‍☠️</div>
+                        <h3>STAY INDEPENDENT</h3>
+                        <ul class="path-benefits">
+                            <li>✓ Complete freedom</li>
+                            <li>✓ Diplomatic flexibility</li>
+                            <li>✓ No faction taxes</li>
+                            <li>○ Start at edge of space</li>
+                            <li>○ No protection</li>
+                        </ul>
+                        <p class="path-desc">Forge your own destiny on the frontier. Trade with anyone, ally with anyone, answer to no one.</p>
+                    </div>
+                </div>
+                
+                @if (_isAdmin)
+                {
+                    <div class="admin-option">
+                        <label>
+                            <input type="checkbox" @bind="_takeFactionLeadership" />
+                            <span>👑 Admin: Take faction leadership (if AI-controlled)</span>
+                        </label>
+                    </div>
+                }
+                
+                <div class="step-nav">
+                    <button class="st-btn" @onclick='() => Nav.NavigateTo("/menu")'>← Cancel</button>
+                    <button class="st-btn primary" @onclick="NextStep">Next →</button>
+                </div>
+            </div>
+        }
+        else if (_currentStep == 2)
+        {
+            <!-- Step 2: Select Major Faction (if joining) -->
+            <div class="step-content">
+                <h2>STEP 2: @(_joinFaction ? "SELECT YOUR FACTION" : "SELECT YOUR ORIGIN")</h2>
+                
+                <div class="faction-grid">
+                    @foreach (var faction in _majorFactions)
+                    {
+                        <div class="faction-card @(_selectedMajorFaction == faction.Type ? "selected" : "")" 
+                             @onclick="() => SelectMajorFaction(faction.Type)">
+                            <div class="faction-emblem">@faction.Icon</div>
+                            <div class="faction-name">@faction.Name</div>
+                            <div class="faction-leader-title">@faction.LeaderTitle</div>
+                            <div class="faction-status @(faction.PlayerLed ? "player" : "ai")">
+                                @(faction.PlayerLed ? "👤 Player-Led" : "🤖 AI-Controlled")
+                            </div>
+                            @if (_joinFaction)
+                            {
+                                <div class="faction-subfaction">You will be: @faction.SubFactionName</div>
+                            }
+                        </div>
+                    }
+                </div>
+                
+                <div class="step-nav">
+                    <button class="st-btn" @onclick="PrevStep">← Back</button>
+                    <button class="st-btn primary" @onclick="NextStep" disabled="@(_selectedMajorFaction == null)">Next →</button>
+                </div>
+            </div>
+        }
+        else if (_currentStep == 3)
+        {
+            <!-- Step 3: Create Your House -->
+            <div class="step-content">
+                <h2>STEP 3: CREATE YOUR @(_selectedSubFactionType)</h2>
+                
+                <div class="house-form">
+                    <div class="form-row">
+                        <label>@(_selectedSubFactionType) Name</label>
+                        <input type="text" @bind="_houseName" placeholder="e.g. House of Valor" maxlength="50" />
+                    </div>
+                    
+                    <div class="form-row">
+                        <label>Motto (optional)</label>
+                        <input type="text" @bind="_houseMotto" placeholder="e.g. Honor Above All" maxlength="100" />
+                    </div>
+                    
+                    <div class="form-row colors">
+                        <div>
+                            <label>Primary Color</label>
+                            <input type="color" @bind="_primaryColor" />
+                        </div>
+                        <div>
+                            <label>Secondary Color</label>
+                            <input type="color" @bind="_secondaryColor" />
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <label>House Emblem</label>
+                        <div class="emblem-selector">
+                            @foreach (var emblem in _availableEmblems)
+                            {
+                                <div class="emblem-option @(_selectedEmblem == emblem ? "selected" : "")"
+                                     @onclick="() => _selectedEmblem = emblem"
+                                     style="background-color: @_primaryColor; border-color: @_secondaryColor;">
+                                    @emblem
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <label>Backstory (optional)</label>
+                        <textarea @bind="_houseBackstory" placeholder="Tell the story of your house..." maxlength="500"></textarea>
+                    </div>
+                </div>
+                
+                <div class="step-nav">
+                    <button class="st-btn" @onclick="PrevStep">← Back</button>
+                    <button class="st-btn primary" @onclick="NextStep" disabled="@(string.IsNullOrWhiteSpace(_houseName))">Next →</button>
+                </div>
+            </div>
+        }
+        else if (_currentStep == 4)
+        {
+            <!-- Step 4: Confirm & Launch -->
+            <div class="step-content">
+                <h2>STEP 4: CONFIRM YOUR DESTINY</h2>
+                
+                <div class="confirmation-panel">
+                    <div class="confirm-header" style="background: linear-gradient(135deg, @_primaryColor, @_secondaryColor);">
+                        <div class="confirm-emblem">@_selectedEmblem</div>
+                        <div class="confirm-title">
+                            <h3>@_houseName</h3>
+                            <span>@_houseMotto</span>
+                        </div>
+                    </div>
+                    
+                    <div class="confirm-details">
+                        <div class="confirm-row">
+                            <span class="label">Affiliation</span>
+                            <span class="value">@(_joinFaction ? _selectedMajorFaction.ToString() : "Independent")</span>
+                        </div>
+                        <div class="confirm-row">
+                            <span class="label">Type</span>
+                            <span class="value">@_selectedSubFactionType</span>
+                        </div>
+                        <div class="confirm-row">
+                            <span class="label">Starting Location</span>
+                            <span class="value">@(_joinFaction ? "Near " + _selectedMajorFaction + " capital" : "Edge of known space")</span>
+                        </div>
+                        <div class="confirm-row">
+                            <span class="label">Starting Assets</span>
+                            <span class="value">1 Colony, 1 Ship, 10,000 Credits</span>
+                        </div>
+                        @if (_takeFactionLeadership && _joinFaction)
+                        {
+                            <div class="confirm-row leadership">
+                                <span class="label">👑 Special</span>
+                                <span class="value">Taking Faction Leadership</span>
+                            </div>
+                        }
+                    </div>
+                    
+                    @if (!string.IsNullOrWhiteSpace(_houseBackstory))
+                    {
+                        <div class="confirm-backstory">
+                            <h4>House History</h4>
+                            <p>@_houseBackstory</p>
+                        </div>
+                    }
+                </div>
+                
+                <div class="step-nav">
+                    <button class="st-btn" @onclick="PrevStep">← Back</button>
+                    <button class="st-btn primary lg" @onclick="StartGame">🚀 LAUNCH INTO THE GALAXY</button>
+                </div>
+            </div>
+        }
+        
+        <!-- Progress Indicator -->
+        <div class="step-indicator">
+            @for (int i = 1; i <= 4; i++)
+            {
+                var step = i;
+                <div class="step-dot @(step == _currentStep ? "active" : "") @(step < _currentStep ? "completed" : "")">
+                    @(step < _currentStep ? "✓" : step.ToString())
+                </div>
+                @if (i < 4)
+                {
+                    <div class="step-line @(step < _currentStep ? "completed" : "")"></div>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+.join-page { position: fixed; inset: 0; background: #040608; overflow-y: auto; }
+.join-bg { position: fixed; inset: 0; }
+.stars { position: absolute; inset: 0; background-image: radial-gradient(1px 1px at 50px 30px, #fff, transparent), radial-gradient(1px 1px at 150px 80px, rgba(255,255,255,0.6), transparent); background-size: 200px 150px; }
+.join-content { position: relative; z-index: 10; max-width: 1000px; margin: 0 auto; padding: 40px 20px; }
+.join-content h1 { font-family: var(--st-font-display, 'Orbitron', sans-serif); font-size: 32px; color: #fff; letter-spacing: 4px; text-align: center; margin: 0 0 8px; }
+.subtitle { text-align: center; color: #888; margin-bottom: 40px; }
+.step-content { background: rgba(20, 25, 35, 0.9); border: 1px solid #2a3a4a; border-radius: 12px; padding: 32px; margin-bottom: 32px; }
+.step-content h2 { font-size: 16px; color: #4a9eff; letter-spacing: 2px; margin: 0 0 24px; padding-bottom: 16px; border-bottom: 1px solid #2a3a4a; }
+
+/* Path Selection */
+.path-options { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; }
+.path-card { background: rgba(30, 40, 55, 0.8); border: 2px solid #3a4a5a; border-radius: 12px; padding: 24px; cursor: pointer; transition: all 0.2s; }
+.path-card:hover { border-color: #5a6a7a; transform: translateY(-2px); }
+.path-card.selected { border-color: #4a9eff; background: rgba(74, 158, 255, 0.1); }
+.path-icon { font-size: 48px; margin-bottom: 16px; }
+.path-card h3 { font-size: 18px; color: #fff; margin: 0 0 16px; }
+.path-benefits { list-style: none; padding: 0; margin: 0 0 16px; }
+.path-benefits li { padding: 4px 0; color: #aaa; font-size: 13px; }
+.path-desc { font-size: 12px; color: #666; line-height: 1.5; }
+
+/* Faction Grid */
+.faction-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+.faction-card { background: rgba(30, 40, 55, 0.8); border: 2px solid #3a4a5a; border-radius: 12px; padding: 16px; text-align: center; cursor: pointer; transition: all 0.2s; }
+.faction-card:hover { border-color: #5a6a7a; }
+.faction-card.selected { border-color: #4a9eff; background: rgba(74, 158, 255, 0.1); }
+.faction-emblem { font-size: 36px; margin-bottom: 8px; }
+.faction-name { font-size: 12px; color: #fff; font-weight: bold; }
+.faction-leader-title { font-size: 10px; color: #888; margin: 4px 0; }
+.faction-status { font-size: 10px; padding: 4px 8px; border-radius: 4px; margin: 8px 0; }
+.faction-status.ai { background: rgba(255, 165, 0, 0.2); color: #ffa500; }
+.faction-status.player { background: rgba(100, 200, 100, 0.2); color: #64c864; }
+.faction-subfaction { font-size: 10px; color: #4a9eff; margin-top: 8px; }
+
+/* House Form */
+.house-form { max-width: 600px; margin: 0 auto; }
+.form-row { margin-bottom: 20px; }
+.form-row label { display: block; font-size: 12px; color: #888; margin-bottom: 8px; }
+.form-row input[type="text"], .form-row textarea { width: 100%; padding: 12px; background: rgba(30, 40, 55, 0.8); border: 1px solid #3a4a5a; border-radius: 6px; color: #fff; font-size: 14px; }
+.form-row textarea { min-height: 100px; resize: vertical; }
+.form-row.colors { display: flex; gap: 24px; }
+.form-row.colors > div { flex: 1; }
+.form-row input[type="color"] { width: 60px; height: 40px; border: none; cursor: pointer; }
+.emblem-selector { display: flex; flex-wrap: wrap; gap: 12px; }
+.emblem-option { width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; font-size: 24px; border: 2px solid; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+.emblem-option.selected { box-shadow: 0 0 12px rgba(74, 158, 255, 0.5); transform: scale(1.1); }
+
+/* Confirmation */
+.confirmation-panel { background: rgba(30, 40, 55, 0.8); border-radius: 12px; overflow: hidden; }
+.confirm-header { padding: 24px; display: flex; gap: 20px; align-items: center; }
+.confirm-emblem { width: 80px; height: 80px; background: rgba(0,0,0,0.3); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 40px; }
+.confirm-title h3 { font-size: 24px; color: #fff; margin: 0 0 4px; }
+.confirm-title span { font-size: 14px; color: rgba(255,255,255,0.7); font-style: italic; }
+.confirm-details { padding: 24px; }
+.confirm-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #2a3a4a; }
+.confirm-row .label { color: #888; }
+.confirm-row .value { color: #fff; }
+.confirm-row.leadership { background: rgba(255, 215, 0, 0.1); margin: 0 -24px; padding: 12px 24px; border: none; }
+.confirm-backstory { padding: 24px; border-top: 1px solid #2a3a4a; }
+.confirm-backstory h4 { font-size: 12px; color: #888; margin: 0 0 12px; }
+.confirm-backstory p { color: #aaa; font-size: 13px; line-height: 1.6; }
+
+/* Step Navigation */
+.step-nav { display: flex; justify-content: space-between; margin-top: 24px; }
+.st-btn { padding: 12px 24px; background: rgba(60, 70, 85, 0.8); border: 1px solid #4a5a6a; border-radius: 6px; color: #fff; font-size: 14px; cursor: pointer; transition: all 0.15s; }
+.st-btn:hover { background: rgba(80, 90, 105, 0.8); }
+.st-btn.primary { background: linear-gradient(135deg, #1a5a9c, #0a3a6c); border-color: #4a9eff; }
+.st-btn.primary:hover { background: linear-gradient(135deg, #2a6aac, #1a4a7c); }
+.st-btn.lg { padding: 16px 32px; font-size: 16px; }
+.st-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Step Indicator */
+.step-indicator { display: flex; justify-content: center; align-items: center; gap: 0; margin-top: 24px; }
+.step-dot { width: 32px; height: 32px; border-radius: 50%; background: #2a3a4a; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #666; }
+.step-dot.active { background: #4a9eff; color: #fff; }
+.step-dot.completed { background: #2a8a4a; color: #fff; }
+.step-line { width: 60px; height: 2px; background: #2a3a4a; }
+.step-line.completed { background: #2a8a4a; }
+
+/* Admin */
+.admin-option { background: rgba(255, 215, 0, 0.1); border: 1px solid #ffd700; border-radius: 8px; padding: 16px; margin-top: 16px; }
+.admin-option label { display: flex; align-items: center; gap: 12px; cursor: pointer; color: #ffd700; }
+
+@@media (max-width: 800px) {
+    .path-options, .faction-grid { grid-template-columns: 1fr; }
+}
+</style>
+
+@code {
+    // Local enum for major factions
+    private enum MajorFactionType
+    {
+        Federation,
+        KlingonEmpire,
+        RomulanStarEmpire,
+        CardassianUnion,
+        FerengiAlliance,
+        Dominion,
+        BorgCollective,
+        BreenConfederacy
+    }
+    
+    private int _currentStep = 1;
+    private bool _joinFaction = true;
+    private bool _isAdmin = false; // Would be set from auth service
+    private bool _takeFactionLeadership = false;
+    
+    private MajorFactionType? _selectedMajorFaction = MajorFactionType.Federation;
+    private string _selectedSubFactionType => GetSubFactionTypeName();
+    
+    private string _houseName = "";
+    private string _houseMotto = "";
+    private string _primaryColor = "#4a9eff";
+    private string _secondaryColor = "#1a3a5c";
+    private string _selectedEmblem = "⚔️";
+    private string _houseBackstory = "";
+    
+    private List<string> _availableEmblems = new()
+    {
+        "⚔️", "🛡️", "🦅", "🐉", "⭐", "🌟", "💎", "🔱", 
+        "🏰", "👑", "🎯", "⚡", "🔥", "❄️", "🌙", "☀️"
+    };
+    
+    private List<MajorFactionInfo> _majorFactions = new()
+    {
+        new() { Type = MajorFactionType.Federation, Name = "Federation", Icon = "🌐", LeaderTitle = "President", SubFactionName = "Colony/Member World", PlayerLed = false },
+        new() { Type = MajorFactionType.KlingonEmpire, Name = "Klingon Empire", Icon = "⚔️", LeaderTitle = "Chancellor", SubFactionName = "Great House", PlayerLed = false },
+        new() { Type = MajorFactionType.RomulanStarEmpire, Name = "Romulan Empire", Icon = "🦅", LeaderTitle = "Praetor", SubFactionName = "Senatorial House", PlayerLed = false },
+        new() { Type = MajorFactionType.CardassianUnion, Name = "Cardassian Union", Icon = "🔶", LeaderTitle = "Legate", SubFactionName = "Military Family", PlayerLed = false },
+        new() { Type = MajorFactionType.FerengiAlliance, Name = "Ferengi Alliance", Icon = "💰", LeaderTitle = "Grand Nagus", SubFactionName = "Business House", PlayerLed = false },
+        new() { Type = MajorFactionType.Dominion, Name = "Dominion", Icon = "👁️", LeaderTitle = "Founder", SubFactionName = "Administrator", PlayerLed = false },
+        new() { Type = MajorFactionType.BorgCollective, Name = "Borg Collective", Icon = "🔲", LeaderTitle = "Queen", SubFactionName = "Unimatrix", PlayerLed = false },
+        new() { Type = MajorFactionType.BreenConfederacy, Name = "Breen", Icon = "❄️", LeaderTitle = "Thot", SubFactionName = "Confederacy Cell", PlayerLed = false },
+    };
+    
+    private string GetSubFactionTypeName()
+    {
+        if (!_joinFaction) return "Independent Colony";
+        
+        return _selectedMajorFaction switch
+        {
+            MajorFactionType.Federation => "Colony",
+            MajorFactionType.KlingonEmpire => "Great House",
+            MajorFactionType.RomulanStarEmpire => "Senatorial House",
+            MajorFactionType.CardassianUnion => "Military Family",
+            MajorFactionType.FerengiAlliance => "Business House",
+            MajorFactionType.Dominion => "Administrative Sector",
+            MajorFactionType.BorgCollective => "Unimatrix",
+            _ => "House"
+        };
+    }
+    
+    private void SelectMajorFaction(MajorFactionType type)
+    {
+        _selectedMajorFaction = type;
+    }
+    
+    private void NextStep()
+    {
+        if (_currentStep < 4) _currentStep++;
+    }
+    
+    private void PrevStep()
+    {
+        if (_currentStep > 1) _currentStep--;
+    }
+    
+    private void StartGame()
+    {
+        // TODO: Integrate with GameStartService when available
+        // For now, just navigate to galaxy map
+        // Store config in session/state for later processing
+        
+        Console.WriteLine($"Starting game: {_houseName}, Faction: {_selectedMajorFaction}, Join: {_joinFaction}");
+        
+        Nav.NavigateTo("/game/galaxy");
+    }
+    
+    private class MajorFactionInfo
+    {
+        public MajorFactionType Type { get; set; }
+        public string Name { get; set; } = "";
+        public string Icon { get; set; } = "";
+        public string LeaderTitle { get; set; } = "";
+        public string SubFactionName { get; set; } = "";
+        public bool PlayerLed { get; set; }
+    }
+}

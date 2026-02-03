@@ -1,0 +1,250 @@
+@* FederationShip.razor - Ship display component for Federation vessels *@
+
+<div class="@GetContainerClasses()" @onclick="HandleClick">
+    <div class="@GetShipClasses()"></div>
+    @if (ShowNameplate)
+    {
+        <div class="ship-nameplate">
+            <span class="ship-name">@GetDisplayName()</span>
+            <span class="ship-class-icon">@GetClassIcon()</span>
+        </div>
+    }
+</div>
+
+<style>
+    .ship-container {
+        display: inline-flex;
+        flex-direction: column;
+        background: linear-gradient(180deg, #2d2d2d 0%, #1a1a1a 100%);
+        border: 1px solid #3a3a3a;
+        border-radius: 6px;
+        overflow: hidden;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+        transition: all 0.2s;
+    }
+    
+    .ship-container:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+    }
+    
+    .ship-container.clickable {
+        cursor: pointer;
+    }
+    
+    .ship-container.selected {
+        border-color: #fbbf24;
+        box-shadow: 0 0 20px rgba(251, 191, 36, 0.3);
+    }
+    
+    .ship-nameplate {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 12px;
+        background: linear-gradient(180deg, #c9a861 0%, #8b7355 50%, #6b5a45 100%);
+        border-top: 1px solid #d4b872;
+    }
+    
+    .ship-nameplate .ship-name {
+        font-size: 10px;
+        font-weight: 700;
+        color: #1a1510;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+    }
+    
+    .ship-nameplate .ship-class-icon {
+        width: 22px;
+        height: 22px;
+        background: linear-gradient(180deg, #d4b872 0%, #a08050 100%);
+        border: 2px solid #6b5a45;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    }
+</style>
+
+@code {
+    /// <summary>
+    /// The ship type to display
+    /// </summary>
+    [Parameter] public string ShipType { get; set; } = "galaxy";
+    
+    /// <summary>
+    /// Size variant: "thumb", "small", "medium", "large"
+    /// </summary>
+    [Parameter] public string Size { get; set; } = "medium";
+    
+    /// <summary>
+    /// Ship category: "shuttle", "civilian", "military", "starship"
+    /// </summary>
+    [Parameter] public string Category { get; set; } = "military";
+    
+    /// <summary>
+    /// Whether to show the nameplate
+    /// </summary>
+    [Parameter] public bool ShowNameplate { get; set; } = false;
+    
+    /// <summary>
+    /// Whether selected
+    /// </summary>
+    [Parameter] public bool IsSelected { get; set; } = false;
+    
+    /// <summary>
+    /// Custom display name
+    /// </summary>
+    [Parameter] public string? DisplayName { get; set; }
+    
+    /// <summary>
+    /// Click callback
+    /// </summary>
+    [Parameter] public EventCallback<string> OnClick { get; set; }
+    
+    /// <summary>
+    /// Additional CSS classes
+    /// </summary>
+    [Parameter] public string? CssClass { get; set; }
+
+    private string GetContainerClasses()
+    {
+        var classes = new List<string> { "ship-container" };
+        if (IsSelected) classes.Add("selected");
+        if (OnClick.HasDelegate) classes.Add("clickable");
+        if (!string.IsNullOrEmpty(CssClass)) classes.Add(CssClass);
+        return string.Join(" ", classes);
+    }
+
+    private string GetShipClasses()
+    {
+        var classes = new List<string> { "ship-card", Category, ShipType.ToLowerInvariant() };
+        if (!string.IsNullOrEmpty(Size)) classes.Add(Size);
+        return string.Join(" ", classes);
+    }
+
+    private async Task HandleClick()
+    {
+        if (OnClick.HasDelegate)
+            await OnClick.InvokeAsync(ShipType);
+    }
+
+    private string GetDisplayName()
+    {
+        if (!string.IsNullOrEmpty(DisplayName)) return DisplayName;
+        return ShipType.ToLowerInvariant() switch
+        {
+            // Shuttles
+            "type-6" => "Type 6",
+            "type-7" => "Type 7",
+            "type-9" => "Type 9",
+            "type-11" => "Type 11",
+            "runabout" => "Runabout",
+            "delta-flyer" => "Delta Flyer",
+            "argo" => "Argo",
+            "scoutship" => "Scoutship",
+            "transport" => "Transport",
+            "cargo-drone" => "Cargo Drone",
+            "medical" => "Medical",
+            "science" => "Science",
+            "vulcan-ship" => "Vulcan",
+            "tellarite-ship" => "Tellarite",
+            "andorian-ship" => "Andorian",
+            "yacht" => "Yacht",
+            // Military
+            "enterprise-tos" or "constitution" => "Constitution",
+            "reliant" or "miranda" => "Miranda",
+            "excelsior" => "Excelsior",
+            "galaxy" => "Galaxy",
+            "enterprise-d" => "Enterprise-D",
+            "nebula" => "Nebula",
+            "akira" => "Akira",
+            "defiant" => "Defiant",
+            "sovereign" or "enterprise-e" => "Sovereign",
+            "prometheus" => "Prometheus",
+            "nova" => "Nova",
+            "steamrunner" => "Steamrunner",
+            "saber" => "Saber",
+            "california" => "California",
+            "luna" or "titan" => "Luna",
+            "crossfield" or "discovery" => "Crossfield",
+            _ => ShipType
+        };
+    }
+
+    private string GetClassIcon()
+    {
+        return ShipType.ToLowerInvariant() switch
+        {
+            // Shuttles - shuttle icon
+            "type-6" or "type-7" or "type-9" or "type-11" or "runabout" or "delta-flyer" or "argo" => "🚁",
+            // Scouts
+            "scoutship" or "nova" => "🔭",
+            // Science
+            "science" or "nebula" => "🔬",
+            // Medical
+            "medical" => "➕",
+            // Transports
+            "transport" or "cargo-drone" or "yacht" => "📦",
+            // Allied species
+            "vulcan-ship" or "tellarite-ship" or "andorian-ship" => "🤝",
+            // Light combat
+            "saber" or "steamrunner" or "defiant" => "⚔️",
+            // Cruisers
+            "miranda" or "reliant" or "excelsior" or "akira" => "🚀",
+            // Heavy/Capital
+            "galaxy" or "sovereign" or "enterprise-d" or "enterprise-e" or "prometheus" => "⭐",
+            // Explorers
+            "constitution" or "enterprise-tos" or "luna" or "crossfield" or "california" => "🌟",
+            _ => "🚀"
+        };
+    }
+
+    // Ship data collections
+    public static readonly ShipData[] Shuttles = new[]
+    {
+        new ShipData("type-6", "Type 6", "Shuttle", 1, 0, 0, 1),
+        new ShipData("type-7", "Type 7", "Shuttle", 1, 0, 0, 2),
+        new ShipData("type-9", "Type 9", "Shuttle", 2, 0, 0, 2),
+        new ShipData("runabout", "Runabout", "Shuttle", 4, 2, 1, 4),
+        new ShipData("delta-flyer", "Delta Flyer", "Shuttle", 3, 3, 2, 5),
+        new ShipData("argo", "Argo", "Shuttle", 2, 0, 0, 3),
+    };
+
+    public static readonly ShipData[] CivilianShips = new[]
+    {
+        new ShipData("scoutship", "Scoutship", "Scout", 2, 1, 1, 6),
+        new ShipData("transport", "Transport", "Freighter", 1, 1, 0, 4),
+        new ShipData("cargo-drone", "Cargo Drone", "Freighter", 0, 0, 0, 2),
+        new ShipData("medical", "Medical Ship", "Support", 1, 2, 0, 5),
+        new ShipData("science", "Science Vessel", "Science", 1, 2, 3, 7),
+        new ShipData("yacht", "Captain's Yacht", "Shuttle", 2, 1, 0, 4),
+    };
+
+    public static readonly ShipData[] MilitaryShips = new[]
+    {
+        // Light
+        new ShipData("saber", "Saber", "Escort", 6, 4, 2, 5),
+        new ShipData("steamrunner", "Steamrunner", "Escort", 7, 5, 2, 5),
+        new ShipData("defiant", "Defiant", "Escort", 12, 8, 2, 4),
+        new ShipData("nova", "Nova", "Scout", 3, 3, 4, 6),
+        // Medium
+        new ShipData("miranda", "Miranda", "Cruiser", 5, 4, 2, 5),
+        new ShipData("excelsior", "Excelsior", "Cruiser", 7, 6, 3, 6),
+        new ShipData("akira", "Akira", "Cruiser", 10, 7, 3, 6),
+        new ShipData("nebula", "Nebula", "Cruiser", 6, 6, 5, 7),
+        new ShipData("california", "California", "Cruiser", 4, 5, 3, 6),
+        // Heavy
+        new ShipData("constitution", "Constitution", "Explorer", 6, 5, 4, 7),
+        new ShipData("galaxy", "Galaxy", "Explorer", 8, 9, 6, 8),
+        new ShipData("sovereign", "Sovereign", "Battleship", 12, 10, 5, 8),
+        new ShipData("prometheus", "Prometheus", "Battleship", 14, 9, 4, 9),
+        new ShipData("luna", "Luna", "Explorer", 9, 8, 7, 8),
+        new ShipData("crossfield", "Crossfield", "Science", 6, 6, 8, 10),
+    };
+
+    public record ShipData(string Type, string Name, string Class, int Attack, int Defense, int Science, int Speed);
+}

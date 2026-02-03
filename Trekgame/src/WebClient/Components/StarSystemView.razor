@@ -1,0 +1,180 @@
+@namespace StarTrekGame.Components
+@inject SpaceEffectsService Effects
+@inject AssetService Assets
+
+<div class="star-system-view" style="@ContainerStyle">
+    @* Include animation keyframes once *@
+    <style>
+        @((MarkupString)Effects.GetAnimationKeyframesCSS())
+    </style>
+    
+    @* Background stars field *@
+    <div class="starfield-bg"></div>
+    
+    @* Central Star *@
+    @if (Star != null)
+    {
+        var starStyle = Effects.GetStarStyle(Star.Type, StarSize);
+        <div class="star-container" style="@GetStarContainerStyle()">
+            <div class="star-flare" style="@starStyle.FlareStyle"></div>
+            <div class="star-glow" style="@starStyle.GlowStyle"></div>
+            <div class="star-core" style="@starStyle.CoreStyle">
+                @if (!string.IsNullOrEmpty(Star.SpritePath))
+                {
+                    <img src="@Star.SpritePath" alt="@Star.Name" style="width: 100%; height: 100%; border-radius: 50%;" />
+                }
+            </div>
+        </div>
+    }
+    
+    @* Planets with dynamic shadows *@
+    @foreach (var planet in Planets)
+    {
+        var planetStyle = Effects.GetPlanetStyle(
+            planet.OrbitX, planet.OrbitY,
+            StarPosition.X, StarPosition.Y,
+            PlanetSize,
+            planet.HasAtmosphere,
+            Effects.GetAtmosphereColor(planet.Type)
+        );
+        
+        <div class="planet-container" style="@GetPlanetContainerStyle(planet)">
+            @* Atmosphere glow (behind planet) *@
+            @if (planet.HasAtmosphere)
+            {
+                <div class="planet-atmosphere" style="@planetStyle.AtmosphereStyle"></div>
+            }
+            
+            @* Planet body *@
+            <div class="planet-body" style="@planetStyle.ContainerStyle">
+                @if (!string.IsNullOrEmpty(planet.SpritePath))
+                {
+                    <img src="@planet.SpritePath" alt="@planet.Name" 
+                         style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" />
+                }
+                else
+                {
+                    <div class="planet-placeholder" style="@GetPlanetPlaceholderStyle(planet.Type)"></div>
+                }
+                
+                @* Shadow overlay *@
+                <div class="planet-shadow" style="@planetStyle.ShadowStyle"></div>
+                
+                @* Terminator edge softening *@
+                <div class="planet-terminator" style="@planetStyle.TerminatorStyle"></div>
+            </div>
+            
+            @* Planet label *@
+            @if (ShowLabels)
+            {
+                <div class="planet-label">@planet.Name</div>
+            }
+        </div>
+    }
+    
+    @* Orbit paths (optional) *@
+    @if (ShowOrbits)
+    {
+        @foreach (var planet in Planets)
+        {
+            <div class="orbit-path" style="@GetOrbitPathStyle(planet)"></div>
+        }
+    }
+</div>
+
+@code {
+    [Parameter] public StarData? Star { get; set; }
+    [Parameter] public List<PlanetData> Planets { get; set; } = new();
+    [Parameter] public int Width { get; set; } = 800;
+    [Parameter] public int Height { get; set; } = 600;
+    [Parameter] public int StarSize { get; set; } = 80;
+    [Parameter] public int PlanetSize { get; set; } = 48;
+    [Parameter] public bool ShowOrbits { get; set; } = true;
+    [Parameter] public bool ShowLabels { get; set; } = true;
+    
+    private (double X, double Y) StarPosition => (Width / 2.0, Height / 2.0);
+    
+    private string ContainerStyle => $@"
+        width: {Width}px;
+        height: {Height}px;
+        position: relative;
+        background: linear-gradient(to bottom, #000010, #000005);
+        overflow: hidden;
+        border-radius: 8px;
+    ";
+    
+    private string GetStarContainerStyle() => $@"
+        position: absolute;
+        left: {StarPosition.X - StarSize}px;
+        top: {StarPosition.Y - StarSize}px;
+        width: {StarSize * 2}px;
+        height: {StarSize * 2}px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    ";
+    
+    private string GetPlanetContainerStyle(PlanetData planet) => $@"
+        position: absolute;
+        left: {planet.OrbitX - PlanetSize / 2}px;
+        top: {planet.OrbitY - PlanetSize / 2}px;
+        width: {PlanetSize}px;
+        height: {PlanetSize}px;
+    ";
+    
+    private string GetOrbitPathStyle(PlanetData planet)
+    {
+        var orbitRadius = Math.Sqrt(
+            Math.Pow(planet.OrbitX - StarPosition.X, 2) + 
+            Math.Pow(planet.OrbitY - StarPosition.Y, 2));
+        
+        return $@"
+            position: absolute;
+            left: {StarPosition.X - orbitRadius}px;
+            top: {StarPosition.Y - orbitRadius}px;
+            width: {orbitRadius * 2}px;
+            height: {orbitRadius * 2}px;
+            border: 1px dashed rgba(255,255,255,0.15);
+            border-radius: 50%;
+            pointer-events: none;
+        ";
+    }
+    
+    private string GetPlanetPlaceholderStyle(PlanetType type)
+    {
+        var color = type switch
+        {
+            PlanetType.Terran => "linear-gradient(135deg, #4a7c59, #2e5a3a, #1a3a2a)",
+            PlanetType.Ocean => "linear-gradient(135deg, #1e5799, #207cca, #2989d8)",
+            PlanetType.Desert => "linear-gradient(135deg, #c4a35a, #8b7355, #6b5344)",
+            PlanetType.Ice => "linear-gradient(135deg, #e0f0ff, #a0c0e0, #80a0c0)",
+            PlanetType.Volcanic => "linear-gradient(135deg, #8b0000, #ff4500, #ff6600)",
+            PlanetType.GasGiant => "linear-gradient(135deg, #d4a574, #c19660, #a6804c)",
+            PlanetType.Toxic => "linear-gradient(135deg, #9acd32, #6b8e23, #556b2f)",
+            _ => "linear-gradient(135deg, #666, #444, #333)"
+        };
+        
+        return $"width: 100%; height: 100%; border-radius: 50%; background: {color};";
+    }
+}
+
+@* Data Models for the component *@
+@code {
+    public class StarData
+    {
+        public string Name { get; set; } = "Star";
+        public StarType Type { get; set; } = StarType.YellowDwarf;
+        public string? SpritePath { get; set; }
+    }
+    
+    public class PlanetData
+    {
+        public string Name { get; set; } = "Planet";
+        public PlanetType Type { get; set; } = PlanetType.Terran;
+        public double OrbitX { get; set; }
+        public double OrbitY { get; set; }
+        public double OrbitRadius { get; set; }
+        public bool HasAtmosphere { get; set; } = true;
+        public string? SpritePath { get; set; }
+    }
+}

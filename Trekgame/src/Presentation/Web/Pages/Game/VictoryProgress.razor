@@ -1,0 +1,223 @@
+@page "/game/victory-status"
+@page "/game/victory-progress"
+@layout StellarisLayout
+@using MudBlazor
+@using StarTrekGame.Web.Services
+@using Blazored.LocalStorage
+@inject IGameApiClient Api
+@inject ILocalStorageService LocalStorage
+@inject NavigationManager Navigation
+
+<PageTitle>Victory Progress - Galactic Strategy</PageTitle>
+
+<div class="victory-page">
+    <header class="victory-header">
+        <a href="/game/galaxy" class="back-link">← BACK TO GALAXY</a>
+        <h1>🏆 VICTORY CONDITIONS</h1>
+    </header>
+
+    <div class="victory-content">
+        <div class="progress-grid">
+            @foreach (var condition in _victoryConditions)
+            {
+                <div class="victory-card @(condition.Percentage >= 100 ? "achieved" : "")">
+                    <div class="card-header">
+                        <span class="victory-icon">@condition.Icon</span>
+                        <div class="victory-title">
+                            <h2>@condition.Name</h2>
+                            <span class="victory-type">@condition.Type Victory</span>
+                        </div>
+                        <span class="victory-percent">@condition.Percentage%</span>
+                    </div>
+                    <p class="victory-desc">@condition.Description</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill @condition.Type.ToLower()" style="width: @condition.Percentage%"></div>
+                    </div>
+                    <div class="progress-details">
+                        <span class="progress-current">@condition.ProgressText</span>
+                    </div>
+                    @if (condition.Tips != null)
+                    {
+                        <div class="victory-tips">
+                            <span class="tip-label">💡 Strategy:</span>
+                            @condition.Tips
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        <div class="leaderboard-section">
+            <h2>🌟 FACTION STANDINGS</h2>
+            <div class="leaderboard">
+                @foreach (var faction in _factionStandings)
+                {
+                    <div class="standing-row @(faction.IsPlayer ? "player" : "")">
+                        <span class="standing-rank">#@faction.Rank</span>
+                        <span class="standing-icon">@faction.Icon</span>
+                        <div class="standing-info">
+                            <span class="standing-name">@faction.Name</span>
+                            <span class="standing-stats">@faction.Systems systems • @faction.Fleets fleets • @faction.Score pts</span>
+                        </div>
+                        <div class="standing-bar">
+                            <div class="bar-fill" style="width: @faction.ScorePercent%; background: @faction.Color;"></div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .victory-page { min-height: 100vh; background: linear-gradient(180deg, #0a0a15 0%, #0f1525 100%); }
+    
+    .victory-header { display: flex; align-items: center; gap: 24px; padding: 16px 24px; background: rgba(0,0,0,0.3); border-bottom: 2px solid rgba(255,204,0,0.5); }
+    .back-link { color: #ff9900; text-decoration: none; padding: 8px 16px; border: 1px solid rgba(255,153,0,0.5); border-radius: 6px; font-weight: 600; }
+    .back-link:hover { background: rgba(255,153,0,0.2); }
+    .victory-header h1 { margin: 0; font-size: 24px; color: #ffcc00; letter-spacing: 3px; }
+    
+    .victory-content { max-width: 1200px; margin: 0 auto; padding: 24px; }
+    
+    .progress-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; margin-bottom: 32px; }
+    
+    .victory-card { background: rgba(15, 25, 40, 0.8); border: 1px solid rgba(60, 90, 130, 0.4); border-radius: 12px; padding: 20px; transition: all 0.2s; }
+    .victory-card:hover { border-color: rgba(74, 158, 255, 0.5); transform: translateY(-2px); }
+    .victory-card.achieved { border-color: #44dd66; background: rgba(68, 221, 102, 0.1); }
+    
+    .card-header { display: flex; align-items: center; gap: 16px; margin-bottom: 12px; }
+    .victory-icon { font-size: 40px; }
+    .victory-title { flex: 1; }
+    .victory-title h2 { margin: 0; font-size: 18px; color: #fff; }
+    .victory-type { font-size: 11px; color: #7890a8; text-transform: uppercase; letter-spacing: 1px; }
+    .victory-percent { font-size: 28px; font-weight: 700; color: #ffcc00; }
+    
+    .victory-desc { font-size: 13px; color: #a8b8c8; margin: 0 0 16px 0; line-height: 1.5; }
+    
+    .progress-bar { height: 8px; background: rgba(0,0,0,0.4); border-radius: 4px; overflow: hidden; margin-bottom: 8px; }
+    .progress-fill { height: 100%; border-radius: 4px; transition: width 0.5s; }
+    .progress-fill.domination { background: linear-gradient(90deg, #ff4455, #ff6677); }
+    .progress-fill.conquest { background: linear-gradient(90deg, #ff8800, #ffaa00); }
+    .progress-fill.economic { background: linear-gradient(90deg, #ffcc00, #ffee44); }
+    .progress-fill.scientific { background: linear-gradient(90deg, #aa66ff, #cc88ff); }
+    .progress-fill.diplomatic { background: linear-gradient(90deg, #4a9eff, #6abeFF); }
+    
+    .progress-details { display: flex; justify-content: space-between; font-size: 12px; color: #7890a8; }
+    
+    .victory-tips { margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(60,90,130,0.3); font-size: 11px; color: #7890a8; }
+    .tip-label { color: #ffcc00; }
+    
+    .leaderboard-section { background: rgba(15, 25, 40, 0.8); border: 1px solid rgba(60, 90, 130, 0.4); border-radius: 12px; padding: 20px; }
+    .leaderboard-section h2 { margin: 0 0 16px 0; font-size: 18px; color: #ff9900; }
+    
+    .leaderboard { display: flex; flex-direction: column; gap: 8px; }
+    .standing-row { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: rgba(0,0,0,0.2); border-radius: 8px; }
+    .standing-row.player { background: rgba(74,158,255,0.1); border: 1px solid rgba(74,158,255,0.3); }
+    .standing-rank { font-size: 18px; font-weight: 700; color: #ffcc00; min-width: 40px; }
+    .standing-icon { font-size: 24px; }
+    .standing-info { flex: 1; }
+    .standing-name { display: block; font-weight: 600; color: #fff; }
+    .standing-stats { font-size: 11px; color: #7890a8; }
+    .standing-bar { width: 150px; height: 8px; background: rgba(0,0,0,0.4); border-radius: 4px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 4px; }
+</style>
+
+@code {
+    private List<VictoryConditionData> _victoryConditions = new();
+    private List<FactionStanding> _factionStandings = new();
+
+    protected override void OnInitialized()
+    {
+        LoadVictoryData();
+    }
+
+    private void LoadVictoryData()
+    {
+        _victoryConditions = new List<VictoryConditionData>
+        {
+            new()
+            {
+                Name = "Domination",
+                Type = "Domination",
+                Icon = "👑",
+                Description = "Control 75% of all star systems through colonization or conquest. Show the galaxy who truly rules.",
+                Percentage = 35,
+                ProgressText = "7 / 20 systems controlled",
+                Tips = "Focus on expanding to unclaimed systems first, then consider military action."
+            },
+            new()
+            {
+                Name = "Conquest",
+                Type = "Conquest",
+                Icon = "⚔️",
+                Description = "Eliminate all rival factions by destroying their fleets and colonies. Only one empire can remain.",
+                Percentage = 20,
+                ProgressText = "1 / 5 factions eliminated",
+                Tips = "Build a powerful military and target weaker opponents first."
+            },
+            new()
+            {
+                Name = "Economic",
+                Type = "Economic",
+                Icon = "💰",
+                Description = "Accumulate 50,000 credits through trade, production, and shrewd management of your empire's resources.",
+                Percentage = 48,
+                ProgressText = "24,150 / 50,000 credits",
+                Tips = "Build trade posts and establish trade agreements with other factions."
+            },
+            new()
+            {
+                Name = "Scientific",
+                Type = "Scientific",
+                Icon = "🔬",
+                Description = "Research all available technologies, proving your faction's intellectual superiority.",
+                Percentage = 60,
+                ProgressText = "12 / 20 technologies researched",
+                Tips = "Prioritize research buildings and assign scientists to laboratories."
+            },
+            new()
+            {
+                Name = "Diplomatic",
+                Type = "Diplomatic",
+                Icon = "🤝",
+                Description = "Form alliances with all surviving factions, uniting the galaxy through peace and cooperation.",
+                Percentage = 25,
+                ProgressText = "1 / 4 alliances formed",
+                Tips = "Improve relations through gifts and trade agreements before proposing alliances."
+            }
+        };
+
+        _factionStandings = new List<FactionStanding>
+        {
+            new() { Rank = 1, Name = "United Federation", Icon = "🌐", Systems = 7, Fleets = 4, Score = 2450, ScorePercent = 100, Color = "#4a9eff", IsPlayer = true },
+            new() { Rank = 2, Name = "Klingon Empire", Icon = "⚔️", Systems = 6, Fleets = 5, Score = 2100, ScorePercent = 86, Color = "#8B0000", IsPlayer = false },
+            new() { Rank = 3, Name = "Romulan Star Empire", Icon = "🦅", Systems = 5, Fleets = 3, Score = 1800, ScorePercent = 73, Color = "#006400", IsPlayer = false },
+            new() { Rank = 4, Name = "Cardassian Union", Icon = "🐍", Systems = 4, Fleets = 3, Score = 1400, ScorePercent = 57, Color = "#4a4a6a", IsPlayer = false },
+            new() { Rank = 5, Name = "Ferengi Alliance", Icon = "💰", Systems = 3, Fleets = 2, Score = 1100, ScorePercent = 45, Color = "#FFD700", IsPlayer = false },
+        };
+    }
+
+    private class VictoryConditionData
+    {
+        public string Name { get; set; } = "";
+        public string Type { get; set; } = "";
+        public string Icon { get; set; } = "";
+        public string Description { get; set; } = "";
+        public int Percentage { get; set; }
+        public string ProgressText { get; set; } = "";
+        public string? Tips { get; set; }
+    }
+
+    private class FactionStanding
+    {
+        public int Rank { get; set; }
+        public string Name { get; set; } = "";
+        public string Icon { get; set; } = "";
+        public int Systems { get; set; }
+        public int Fleets { get; set; }
+        public int Score { get; set; }
+        public int ScorePercent { get; set; }
+        public string Color { get; set; } = "";
+        public bool IsPlayer { get; set; }
+    }
+}

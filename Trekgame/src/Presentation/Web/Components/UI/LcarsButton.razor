@@ -1,0 +1,71 @@
+@namespace StarTrekGame.Web.Components.UI
+
+<button class="lcars-btn @VariantClass @SizeClass @(GlowPulse ? "glow-pulse" : "")" 
+        style="@Style" 
+        disabled="@Disabled"
+        @onclick="OnClick">
+    @if (!string.IsNullOrEmpty(Icon))
+    {
+        <span class="lcars-btn__icon">@Icon</span>
+    }
+    @if (!string.IsNullOrEmpty(Text))
+    {
+        <span class="lcars-btn__text">@Text</span>
+    }
+    @ChildContent
+</button>
+
+@code {
+    [Parameter] public string? Text { get; set; }
+    [Parameter] public string? Icon { get; set; }
+    [Parameter] public string Variant { get; set; } = "primary"; // primary, secondary, danger, success, outline, pill
+    [Parameter] public string Size { get; set; } = "medium"; // small, medium, large
+    [Parameter] public bool GlowPulse { get; set; } = false;
+    [Parameter] public bool Disabled { get; set; } = false;
+    [Parameter] public string? Style { get; set; }
+    [Parameter] public EventCallback<MouseEventArgs> OnClick { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    private string VariantClass => Variant switch
+    {
+        "secondary" => "lcars-btn--secondary",
+        "danger" => "lcars-btn--danger",
+        "success" => "lcars-btn--success",
+        "outline" => "lcars-btn--outline",
+        "pill" => "lcars-btn--pill",
+        _ => ""
+    };
+
+    private string SizeClass => Size switch
+    {
+        "small" => "lcars-btn--sm",
+        "large" => "lcars-btn--lg",
+        _ => ""
+    };
+}
+
+<style>
+    .lcars-btn__icon {
+        margin-right: 6px;
+    }
+
+    .lcars-btn--sm {
+        padding: 4px 12px;
+        font-size: 10px;
+    }
+
+    .lcars-btn--lg {
+        padding: 12px 28px;
+        font-size: 14px;
+    }
+
+    .lcars-btn--secondary {
+        background: var(--ui-secondary);
+    }
+
+    .lcars-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        filter: grayscale(50%);
+    }
+</style>

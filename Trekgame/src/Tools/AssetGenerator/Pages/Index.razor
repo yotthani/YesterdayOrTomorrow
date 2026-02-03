@@ -1,0 +1,2049 @@
+@page "/"
+@inject GeminiApiService GeminiApi
+@inject AssetGeneratorService AssetGenerator
+@inject SpriteSheetService SpriteSheetService
+@inject IJSRuntime JS
+
+<PageTitle>Star Trek Asset Generator</PageTitle>
+
+<div class="generator-container">
+    <!-- API Configuration Panel -->
+    <section class="panel api-panel">
+        <h2>🔑 API Configuration</h2>
+        <div class="api-config">
+            <input type="password" 
+                   @bind="_apiKey" 
+                   @bind:event="oninput"
+                   placeholder="Enter Gemini API Key" 
+                   class="api-input" />
+            <button class="btn btn-primary" @onclick="ConfigureApi" disabled="@string.IsNullOrEmpty(_apiKey)">
+                @if (_isTestingApi)
+                {
+                    <span>Testing...</span>
+                }
+                else
+                {
+                    <span>Connect</span>
+                }
+            </button>
+            <span class="api-status @(_apiConnected ? "connected" : "disconnected")">
+                @(_apiConnected ? "✓ Connected" : "○ Not Connected")
+            </span>
+        </div>
+        @if (!string.IsNullOrEmpty(_apiError))
+        {
+            <div class="error-message">@_apiError</div>
+        }
+    </section>
+
+    <!-- Generation Setup Panel -->
+    <section class="panel setup-panel">
+        <h2>⚙️ Generation Setup</h2>
+        
+        <div class="setup-grid">
+            <div class="setup-item">
+                <label>Faction</label>
+                <select value="@_selectedFaction" @onchange="OnFactionChanged" class="select-input">
+                    @foreach (var faction in Enum.GetValues<Faction>())
+                    {
+                        <option value="@faction">@faction</option>
+                    }
+                </select>
+            </div>
+            
+            <div class="setup-item">
+                <label>Asset Category</label>
+                <select @bind="_selectedCategory" class="select-input">
+                    @foreach (var category in GetAvailableCategoriesForFaction())
+                    {
+                        <option value="@category">@GetCategoryDisplayName(category)</option>
+                    }
+                </select>
+            </div>
+            
+            <div class="setup-item">
+                <label>AI Model</label>
+                <select @bind="_selectedModel" class="select-input">
+                    @foreach (var model in _availableModels)
+                    {
+                        <option value="@model">@model</option>
+                    }
+                </select>
+            </div>
+            
+            <div class="setup-item">
+                <label>Grid Size</label>
+                <span class="info-value">@GetGridInfo()</span>
+            </div>
+            
+            <div class="setup-item">
+                <label>Estimated Cost</label>
+                <span class="info-value cost">~$@GetEstimatedCost().ToString("F2")</span>
+            </div>
+            
+            <div class="setup-item checkbox-item">
+                <label>
+                    <input type="checkbox" @bind="_removeBackground" />
+                    Remove Black Background
+                </label>
+                <span class="info-hint">Makes background transparent (recommended)</span>
+            </div>
+            
+            @if (_removeBackground)
+            {
+                <div class="setup-item">
+                    <label>Background Tolerance</label>
+                    <input type="range" min="10" max="50" @bind="_backgroundTolerance" class="range-input" />
+                    <span class="range-value">@_backgroundTolerance</span>
+                </div>
+            }
+            
+            <div class="setup-item checkbox-item">
+                <label>
+                    <input type="checkbox" @bind="_autoRetryOnRateLimit" />
+                    Auto-Retry on Rate Limit (429)
+                </label>
+                <span class="info-hint">Automatically retry when API is rate limited</span>
+            </div>
+            
+            @if (_autoRetryOnRateLimit)
+            {
+                <div class="setup-item">
+                    <label>Retry Delay (seconds)</label>
+                    <input type="range" min="10" max="120" step="5" @bind="_retryDelaySeconds" class="range-input" />
+                    <span class="range-value">@_retryDelaySeconds s</span>
+                </div>
+                <div class="setup-item">
+                    <label>Max Retries</label>
+                    <input type="range" min="1" max="10" @bind="_maxRetries" class="range-input" />
+                    <span class="range-value">@_maxRetries</span>
+                </div>
+            }
+        </div>
+        
+        <div class="action-buttons">
+            <button class="btn btn-secondary" @onclick="PreviewPrompts" disabled="@(!_apiConnected)">
+                📋 Preview Prompts
+            </button>
+            <button class="btn btn-secondary" @onclick="GenerateSingleTest" disabled="@(!_apiConnected || _isGenerating)">
+                🧪 Test Single Asset
+            </button>
+            <button class="btn btn-primary" @onclick="StartGeneration" disabled="@(!_apiConnected || _isGenerating)">
+                🚀 Start Full Generation
+            </button>
+            <button class="btn btn-secondary" @onclick="CreateEmptyJobAndImport" disabled="@_isGenerating">
+                📥 Import Individual Assets
+            </button>
+            <button class="btn btn-secondary" @onclick="ImportSpritesheetWithCrop" disabled="@_isGenerating">
+                🖼️ Import Spritesheet (Crop)
+            </button>
+            <button class="btn btn-secondary" @onclick="GenerateManifestOnly">
+                📄 Generate Manifest Only
+            </button>
+            <button class="btn btn-info" @onclick="NormalizeGridFromSpritesheet" disabled="@_isGenerating">
+                🔧 Normalize Grid
+            </button>
+        </div>
+        
+        <!-- Hidden file input for normalize grid -->
+        <InputFile id="normalizeFileInput" OnChange="OnNormalizeFileSelected" accept=".png" style="display: none;" />
+    </section>
+    
+    <!-- Normalize Grid Panel -->
+    @if (_showNormalizePanel)
+    {
+        <section class="panel normalize-panel">
+            <div class="panel-header">
+                <h2>🔧 Grid Normalizer</h2>
+                <button class="btn-close" @onclick="() => _showNormalizePanel = false">×</button>
+            </div>
+            
+            <div class="normalize-settings">
+                <div class="setup-item">
+                    <label>Grid Columns</label>
+                    <input type="number" min="1" max="12" @bind="_normalizeColumns" class="number-input" />
+                </div>
+                <div class="setup-item">
+                    <label>Grid Rows</label>
+                    <input type="number" min="1" max="12" @bind="_normalizeRows" class="number-input" />
+                </div>
+                <div class="setup-item">
+                    <label>Cell Size (px)</label>
+                    <input type="number" min="64" max="1024" step="32" @bind="_normalizeCellSize" class="number-input" />
+                </div>
+                <div class="setup-item">
+                    <label>Padding (px)</label>
+                    <input type="number" min="0" max="64" @bind="_normalizePadding" class="number-input" />
+                </div>
+                <div class="setup-item checkbox-item">
+                    <label>
+                        <input type="checkbox" @bind="_normalizeAutoDetect" />
+                        Auto-detect asset bounds
+                    </label>
+                </div>
+            </div>
+            
+            @if (!string.IsNullOrEmpty(_normalizeSourceImage))
+            {
+                <div class="normalize-preview">
+                    <h3>Source Spritesheet</h3>
+                    <img src="data:image/png;base64,@_normalizeSourceImage" alt="Source" class="preview-image" />
+                    <p>Size: @_normalizeSourceWidth x @_normalizeSourceHeight px</p>
+                </div>
+                
+                <div class="normalize-actions">
+                    <button class="btn btn-primary" @onclick="ProcessNormalization" disabled="@_isNormalizing">
+                        @if (_isNormalizing)
+                        {
+                            <span>Processing...</span>
+                        }
+                        else
+                        {
+                            <span>🔄 Process & Normalize</span>
+                        }
+                    </button>
+                </div>
+                
+                @if (!string.IsNullOrEmpty(_normalizeResultImage))
+                {
+                    <div class="normalize-result">
+                        <h3>Normalized Result</h3>
+                        <img src="data:image/png;base64,@_normalizeResultImage" alt="Result" class="preview-image" />
+                        <div class="result-actions">
+                            <button class="btn btn-primary" @onclick="DownloadNormalizedGrid">
+                                💾 Download Normalized Grid
+                            </button>
+                        </div>
+                    </div>
+                }
+            }
+            
+            @if (!string.IsNullOrEmpty(_normalizeStatus))
+            {
+                <div class="normalize-status @(_normalizeHasError ? "error" : "info")">
+                    @_normalizeStatus
+                </div>
+            }
+        </section>
+    }
+
+    <!-- Prompt Preview Panel -->
+    @if (_showPromptPreview)
+    {
+        <section class="panel preview-panel">
+            <div class="panel-header">
+                <h2>📋 Prompt Preview</h2>
+                <button class="btn-close" @onclick="() => _showPromptPreview = false">×</button>
+            </div>
+            <div class="prompt-list">
+                @foreach (var prompt in _previewPrompts.Take(5))
+                {
+                    <div class="prompt-item">
+                        <strong>@prompt.Name</strong>
+                        <pre>@prompt.Prompt</pre>
+                    </div>
+                }
+                @if (_previewPrompts.Count > 5)
+                {
+                    <div class="more-indicator">... and @(_previewPrompts.Count - 5) more prompts</div>
+                }
+            </div>
+        </section>
+    }
+
+    <!-- Test Result Panel -->
+    @if (_testResult != null)
+    {
+        <section class="panel test-panel">
+            <div class="panel-header">
+                <h2>🧪 Test Result</h2>
+                <button class="btn-close" @onclick="() => _testResult = null">×</button>
+            </div>
+            <div class="test-content">
+                @if (!string.IsNullOrEmpty(_testResult.ImageBase64))
+                {
+                    <img src="data:@_testResult.MimeType;base64,@_testResult.ImageBase64" alt="Test Result" class="test-image" />
+                    <button class="btn btn-secondary" @onclick="DownloadTestImage">💾 Download</button>
+                }
+                else
+                {
+                    <div class="error-message">@_testResult.ErrorMessage</div>
+                }
+            </div>
+        </section>
+    }
+
+    <!-- Progress Panel -->
+    @if (_currentJob != null)
+    {
+        <section class="panel progress-panel">
+            <h2>📊 Generation Progress</h2>
+            
+            <div class="progress-info">
+                <span>@_currentJob.Faction - @GetCategoryDisplayName(_currentJob.Category)</span>
+                <span class="progress-stats">
+                    @_currentJob.CompletedAssets / @_currentJob.TotalAssets completed
+                    @if (_currentJob.FailedAssets > 0)
+                    {
+                        <span class="failed-count">(@_currentJob.FailedAssets failed)</span>
+                    }
+                </span>
+            </div>
+            
+            <div class="progress-bar-container">
+                <div class="progress-bar" style="width: @_currentJob.ProgressPercent%"></div>
+            </div>
+            <span class="progress-percent">@_currentJob.ProgressPercent.ToString("F1")%</span>
+            
+            <div class="job-controls">
+                @if (_currentJob.Status == JobStatus.Running)
+                {
+                    <button class="btn btn-warning" @onclick="PauseGeneration">⏸ Pause</button>
+                    <button class="btn btn-danger" @onclick="CancelGeneration">⏹ Cancel</button>
+                }
+                else if (_currentJob.Status == JobStatus.Paused)
+                {
+                    <button class="btn btn-primary" @onclick="ResumeGeneration">▶ Resume</button>
+                    <button class="btn btn-danger" @onclick="CancelGeneration">⏹ Cancel</button>
+                }
+                else if (_currentJob.Status == JobStatus.Completed)
+                {
+                    <button class="btn btn-primary" @onclick="DownloadResults">💾 Download Sprite Sheet</button>
+                    <button class="btn btn-secondary" @onclick="DownloadManifest">📄 Download Manifest</button>
+                    <button class="btn btn-secondary" @onclick="DownloadIndividualAssets">📁 Download Individual</button>
+                    <button class="btn btn-secondary" @onclick="TriggerImportFiles">📥 Import Existing</button>
+                }
+            </div>
+            
+            <!-- Hidden file input for import -->
+            <InputFile id="importFileInput" OnChange="OnFilesSelected" multiple accept=".png,.jpg,.jpeg" style="display: none;" />
+            
+            <!-- Import Status -->
+            @if (_isImporting)
+            {
+                <div class="import-status">
+                    <span>📥 Importing @_importProgress of @_importTotal files...</span>
+                </div>
+            }
+            
+            <!-- Asset Grid Preview -->
+            <div class="asset-grid" style="grid-template-columns: repeat(@_currentJob.GridSpec.Columns, 1fr)">
+                @foreach (var asset in _currentJob.Assets)
+                {
+                    <div class="asset-cell @GetAssetStatusClass(asset.Status) @(_selectedAsset == asset ? "selected" : "")" 
+                         title="@asset.Name"
+                         @onclick="() => SelectAsset(asset)">
+                        @if (asset.Status == AssetStatus.Generated && !string.IsNullOrEmpty(asset.GeneratedImagePath))
+                        {
+                            <img src="data:image/png;base64,@asset.GeneratedImagePath" alt="@asset.Name" />
+                            <div class="asset-overlay">
+                                <button class="btn-regenerate" @onclick:stopPropagation="true" @onclick="() => RegenerateSingleAsset(asset)" title="Regenerate this asset">
+                                    🔄
+                                </button>
+                            </div>
+                            <div class="hover-preview">
+                                <img src="data:image/png;base64,@asset.GeneratedImagePath" alt="@asset.Name preview" />
+                                <span class="hover-preview-label">@asset.Name</span>
+                            </div>
+                        }
+                        else if (asset.Status == AssetStatus.Generating)
+                        {
+                            <div class="generating-indicator">⏳</div>
+                        }
+                        else if (asset.Status == AssetStatus.Failed)
+                        {
+                            <div class="failed-indicator" title="@asset.ErrorMessage">❌</div>
+                            <div class="asset-overlay">
+                                <button class="btn-regenerate" @onclick:stopPropagation="true" @onclick="() => RegenerateSingleAsset(asset)" title="Retry this asset">
+                                    🔄
+                                </button>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="pending-indicator">○</div>
+                        }
+                    </div>
+                }
+            </div>
+            
+            <!-- Selected Asset Details -->
+            @if (_selectedAsset != null)
+            {
+                <div class="asset-details-panel">
+                    <h3>@_selectedAsset.Name</h3>
+                    <div class="asset-details-grid">
+                        <div class="detail-row">
+                            <span class="detail-label">Status:</span>
+                            <span class="detail-value status-@_selectedAsset.Status.ToString().ToLower()">@_selectedAsset.Status</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Position:</span>
+                            <span class="detail-value">Row @(_selectedAsset.GridRow + 1), Col @(_selectedAsset.GridCol + 1)</span>
+                        </div>
+                        @if (!string.IsNullOrEmpty(_selectedAsset.ErrorMessage))
+                        {
+                            <div class="detail-row error">
+                                <span class="detail-label">Error:</span>
+                                <span class="detail-value">@_selectedAsset.ErrorMessage</span>
+                            </div>
+                        }
+                    </div>
+                    <div class="asset-actions">
+                        <button class="btn btn-primary" @onclick="() => RegenerateSingleAsset(_selectedAsset)" 
+                                disabled="@(_selectedAsset.Status == AssetStatus.Generating || _isRegenerating)">
+                            @if (_isRegenerating && _regeneratingAssetId == _selectedAsset.Id)
+                            {
+                                <span>🔄 Regenerating...</span>
+                            }
+                            else
+                            {
+                                <span>🔄 Regenerate</span>
+                            }
+                        </button>
+                        @if (_selectedAsset.Status == AssetStatus.Generated)
+                        {
+                            <button class="btn btn-secondary" @onclick="() => DownloadSingleAsset(_selectedAsset)">
+                                💾 Download
+                            </button>
+                        }
+                        <button class="btn btn-secondary" @onclick="() => ShowPrompt(_selectedAsset)">
+                            📝 View Prompt
+                        </button>
+                    </div>
+                    @if (_showPromptFor == _selectedAsset.Id)
+                    {
+                        <div class="prompt-preview">
+                            <h4>Generated Prompt:</h4>
+                            <pre>@_selectedAsset.PromptUsed</pre>
+                        </div>
+                    }
+                </div>
+            }
+        </section>
+    }
+
+    <!-- Statistics Panel -->
+    <section class="panel stats-panel">
+        <h2>📈 Project Statistics</h2>
+        <div class="stats-grid">
+            <div class="stat-item">
+                <span class="stat-value">11</span>
+                <span class="stat-label">Factions</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value">8</span>
+                <span class="stat-label">Categories</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value">3,212</span>
+                <span class="stat-label">Total Assets</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value">~$128</span>
+                <span class="stat-label">Est. Total Cost</span>
+            </div>
+        </div>
+    </section>
+</div>
+
+<style>
+    .generator-container {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+    
+    .panel {
+        background: var(--bg-panel);
+        border-radius: 8px;
+        padding: 1.5rem;
+        border: 1px solid var(--accent-secondary);
+    }
+    
+    .panel h2 {
+        margin: 0 0 1rem 0;
+        font-size: 1.25rem;
+        color: var(--accent);
+    }
+    
+    .panel-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+    
+    .panel-header h2 {
+        margin: 0;
+    }
+    
+    .btn-close {
+        background: transparent;
+        border: none;
+        color: var(--text-muted);
+        font-size: 1.5rem;
+        cursor: pointer;
+        padding: 0 0.5rem;
+    }
+    
+    .btn-close:hover {
+        color: var(--text);
+    }
+    
+    /* API Panel */
+    .api-config {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+    
+    .api-input {
+        flex: 1;
+        min-width: 300px;
+        padding: 0.75rem 1rem;
+        background: var(--bg-dark);
+        border: 1px solid var(--accent-secondary);
+        border-radius: 4px;
+        color: var(--text);
+        font-size: 1rem;
+    }
+    
+    .api-input:focus {
+        outline: none;
+        border-color: var(--accent);
+    }
+    
+    .api-status {
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        font-weight: 500;
+    }
+    
+    .api-status.connected {
+        background: rgba(74, 222, 128, 0.2);
+        color: var(--success);
+    }
+    
+    .api-status.disconnected {
+        background: rgba(136, 136, 136, 0.2);
+        color: var(--text-muted);
+    }
+    
+    /* Buttons */
+    .btn {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 4px;
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+    
+    .btn-primary {
+        background: var(--accent);
+        color: white;
+    }
+    
+    .btn-primary:hover:not(:disabled) {
+        background: #d13a52;
+    }
+    
+    .btn-secondary {
+        background: var(--accent-secondary);
+        color: var(--text);
+    }
+    
+    .btn-secondary:hover:not(:disabled) {
+        background: #1a4a7a;
+    }
+    
+    .btn-warning {
+        background: var(--warning);
+        color: #1a1a2e;
+    }
+    
+    .btn-danger {
+        background: var(--error);
+        color: white;
+    }
+    
+    /* Setup Panel */
+    .setup-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .setup-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .setup-item.checkbox-item {
+        flex-direction: row;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .setup-item.checkbox-item label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+    }
+    
+    .setup-item.checkbox-item input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        accent-color: #ff9900;
+    }
+    
+    .info-hint {
+        font-size: 0.75rem;
+        color: #888;
+    }
+    
+    .range-input {
+        width: 100%;
+        accent-color: #ff9900;
+    }
+    
+    .range-value {
+        font-size: 0.85rem;
+        color: #ff9900;
+        font-weight: 500;
+    }
+    
+    .setup-item label {
+        font-size: 0.875rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    
+    .select-input {
+        padding: 0.75rem 1rem;
+        background: var(--bg-dark);
+        border: 1px solid var(--accent-secondary);
+        border-radius: 4px;
+        color: var(--text);
+        font-size: 1rem;
+    }
+    
+    .info-value {
+        font-size: 1rem;
+        color: var(--text);
+        padding: 0.75rem 0;
+    }
+    
+    .info-value.cost {
+        color: var(--success);
+        font-weight: 600;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    
+    /* Prompt Preview */
+    .prompt-list {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+    
+    .prompt-item {
+        background: var(--bg-dark);
+        padding: 1rem;
+        border-radius: 4px;
+        margin-bottom: 0.5rem;
+    }
+    
+    .prompt-item strong {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: var(--accent);
+    }
+    
+    .prompt-item pre {
+        margin: 0;
+        white-space: pre-wrap;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        max-height: 150px;
+        overflow-y: auto;
+    }
+    
+    .more-indicator {
+        text-align: center;
+        color: var(--text-muted);
+        padding: 1rem;
+    }
+    
+    /* Test Result */
+    .test-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .test-image {
+        max-width: 360px;
+        border-radius: 8px;
+        border: 2px solid var(--accent-secondary);
+    }
+    
+    /* Progress Panel */
+    .progress-info {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+    }
+    
+    .progress-stats {
+        color: var(--text-muted);
+    }
+    
+    .failed-count {
+        color: var(--error);
+    }
+    
+    .progress-bar-container {
+        height: 8px;
+        background: var(--bg-dark);
+        border-radius: 4px;
+        overflow: hidden;
+        margin-bottom: 0.25rem;
+    }
+    
+    .progress-bar {
+        height: 100%;
+        background: linear-gradient(90deg, var(--accent), var(--success));
+        transition: width 0.3s ease;
+    }
+    
+    .progress-percent {
+        font-size: 0.875rem;
+        color: var(--text-muted);
+    }
+    
+    .job-controls {
+        display: flex;
+        gap: 1rem;
+        margin: 1rem 0;
+        flex-wrap: wrap;
+    }
+    
+    /* Asset Grid */
+    .asset-grid {
+        display: grid;
+        gap: 4px;
+        margin-top: 1rem;
+        background: var(--bg-dark);
+        padding: 8px;
+        border-radius: 8px;
+    }
+    
+    .asset-cell {
+        aspect-ratio: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+        overflow: hidden;
+        background: #2a2a3e;
+        min-height: 40px;
+        position: relative;
+        cursor: pointer;
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    
+    .asset-cell:hover {
+        transform: scale(1.05);
+        z-index: 10;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    }
+    
+    .asset-cell.selected {
+        outline: 3px solid var(--accent);
+        outline-offset: 2px;
+    }
+    
+    .asset-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+    }
+    
+    .asset-cell:hover .asset-overlay {
+        opacity: 1;
+    }
+    
+    .btn-regenerate {
+        background: var(--accent);
+        border: none;
+        border-radius: 50%;
+        width: 36px;
+        height: 36px;
+        font-size: 1.2rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.15s ease, background 0.15s ease;
+    }
+    
+    .btn-regenerate:hover {
+        background: var(--accent-light);
+        transform: scale(1.1);
+    }
+    
+    /* Asset Details Panel */
+    .asset-details-panel {
+        margin-top: 1.5rem;
+        padding: 1rem;
+        background: var(--bg-dark);
+        border-radius: 8px;
+        border: 1px solid var(--accent-secondary);
+    }
+    
+    .asset-details-panel h3 {
+        margin: 0 0 1rem 0;
+        color: var(--accent);
+    }
+    
+    .asset-details-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .detail-row {
+        display: flex;
+        gap: 1rem;
+    }
+    
+    .detail-label {
+        color: var(--text-muted);
+        min-width: 80px;
+    }
+    
+    .detail-value {
+        color: var(--text);
+    }
+    
+    .detail-value.status-generated {
+        color: var(--success);
+    }
+    
+    .detail-value.status-failed {
+        color: var(--error);
+    }
+    
+    .detail-value.status-generating {
+        color: var(--warning);
+    }
+    
+    .detail-row.error .detail-value {
+        color: var(--error);
+        font-size: 0.875rem;
+    }
+    
+    .asset-actions {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+    
+    .prompt-preview {
+        margin-top: 1rem;
+        padding: 1rem;
+        background: var(--bg-panel);
+        border-radius: 4px;
+        border: 1px solid var(--accent-secondary);
+    }
+    
+    .prompt-preview h4 {
+        margin: 0 0 0.5rem 0;
+        color: var(--text-muted);
+        font-size: 0.875rem;
+    }
+    
+    .prompt-preview pre {
+        margin: 0;
+        padding: 0.75rem;
+        background: var(--bg-dark);
+        border-radius: 4px;
+        font-size: 0.75rem;
+        white-space: pre-wrap;
+        word-break: break-word;
+        max-height: 200px;
+        overflow-y: auto;
+        color: var(--text);
+    }
+    
+    /* Import Status */
+    .import-status {
+        margin-top: 1rem;
+        padding: 0.75rem 1rem;
+        background: var(--accent-secondary);
+        border-radius: 4px;
+        color: var(--text);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .import-status span {
+        animation: pulse 1.5s infinite;
+    }
+    
+    @@keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.6; }
+    }
+    
+    .asset-cell img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    /* Hover Preview Popup */
+    .hover-preview {
+        display: none;
+        position: absolute;
+        bottom: calc(100% + 10px);
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1000;
+        pointer-events: none;
+        filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.7));
+    }
+    
+    .asset-cell:hover .hover-preview {
+        display: block;
+    }
+    
+    .hover-preview img {
+        width: 240px;
+        height: 240px;
+        object-fit: contain;
+        border-radius: 8px;
+        border: 2px solid var(--accent, #f59e0b);
+        background: #1a1a2e;
+        display: block;
+    }
+    
+    .hover-preview-label {
+        display: block;
+        text-align: center;
+        padding: 4px 8px;
+        background: rgba(0, 0, 0, 0.85);
+        color: #ddd;
+        font-size: 11px;
+        border-radius: 0 0 6px 6px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 240px;
+    }
+    
+    /* Flip preview below for cells near the top of the grid */
+    .asset-grid > .asset-cell:nth-child(-n+6) .hover-preview {
+        bottom: auto;
+        top: calc(100% + 10px);
+    }
+    
+    .asset-cell.status-pending {
+        border: 1px dashed var(--text-muted);
+    }
+    
+    .asset-cell.status-generating {
+        border: 2px solid var(--warning);
+        animation: pulse 1s infinite;
+    }
+    
+    .asset-cell.status-generated {
+        border: 2px solid var(--success);
+    }
+    
+    .asset-cell.status-failed {
+        border: 2px solid var(--error);
+        background: rgba(248, 113, 113, 0.1);
+    }
+    
+    @@keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+    
+    .generating-indicator,
+    .failed-indicator,
+    .pending-indicator {
+        font-size: 1.25rem;
+    }
+    
+    /* Stats Panel */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
+    }
+    
+    .stat-item {
+        text-align: center;
+        padding: 1rem;
+        background: var(--bg-dark);
+        border-radius: 8px;
+    }
+    
+    .stat-value {
+        display: block;
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--accent);
+    }
+    
+    .stat-label {
+        font-size: 0.875rem;
+        color: var(--text-muted);
+    }
+    
+    /* Error Message */
+    .error-message {
+        background: rgba(248, 113, 113, 0.1);
+        border: 1px solid var(--error);
+        color: var(--error);
+        padding: 0.75rem 1rem;
+        border-radius: 4px;
+        margin-top: 1rem;
+    }
+    
+    /* Normalize Grid Panel */
+    .normalize-panel {
+        background: linear-gradient(135deg, var(--bg-panel), #1a2a3a);
+    }
+    
+    .normalize-settings {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .normalize-preview {
+        margin: 1rem 0;
+        text-align: center;
+    }
+    
+    .normalize-preview h3,
+    .normalize-result h3 {
+        color: var(--accent);
+        margin-bottom: 0.5rem;
+    }
+    
+    .preview-image {
+        max-width: 100%;
+        max-height: 400px;
+        border: 2px solid var(--accent-secondary);
+        border-radius: 8px;
+        background: repeating-conic-gradient(#333 0% 25%, #444 0% 50%) 50% / 20px 20px;
+    }
+    
+    .normalize-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin: 1.5rem 0;
+    }
+    
+    .normalize-result {
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--accent-secondary);
+        text-align: center;
+    }
+    
+    .result-actions {
+        margin-top: 1rem;
+    }
+    
+    .normalize-status {
+        padding: 0.75rem 1rem;
+        border-radius: 4px;
+        margin-top: 1rem;
+    }
+    
+    .normalize-status.info {
+        background: rgba(59, 130, 246, 0.2);
+        border: 1px solid rgba(59, 130, 246, 0.5);
+        color: #93c5fd;
+    }
+    
+    .normalize-status.error {
+        background: rgba(239, 68, 68, 0.2);
+        border: 1px solid rgba(239, 68, 68, 0.5);
+        color: #fca5a5;
+    }
+    
+    .number-input {
+        width: 100px;
+        padding: 0.5rem;
+        background: var(--bg-dark);
+        border: 1px solid var(--accent-secondary);
+        border-radius: 4px;
+        color: var(--text);
+    }
+    
+    .btn-info {
+        background: #3b82f6;
+        color: white;
+    }
+    
+    .btn-info:hover {
+        background: #2563eb;
+    }
+    
+    /* Responsive */
+    @@media (max-width: 768px) {
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .api-config {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        
+        .api-input {
+            min-width: unset;
+        }
+    }
+</style>
+
+@code {
+    private string _apiKey = string.Empty;
+    private bool _apiConnected;
+    private bool _isTestingApi;
+    private string? _apiError;
+    
+    private Faction _selectedFaction = Faction.Federation;
+    private AssetCategory _selectedCategory = AssetCategory.MilitaryShips;
+    
+    // Model selection
+    private string _selectedModel = "gemini-3-pro-image-preview";
+    private readonly string[] _availableModels = new[]
+    {
+        "gemini-3-pro-image-preview",
+        "imagen-4.0-generate-001",
+        "gemini-2.0-flash-preview-image-generation",
+        "imagen-3.0-generate-002"
+    };
+    
+    private bool _showPromptPreview;
+    private List<(string Name, string Prompt)> _previewPrompts = new();
+    
+    private GenerationResult? _testResult;
+    private GenerationJob? _currentJob;
+    private bool _isGenerating;
+    
+    // Background removal settings
+    private bool _removeBackground = true;
+    private int _backgroundTolerance = 25;
+    
+    // Rate limiting / retry settings
+    private bool _autoRetryOnRateLimit = true;
+    private int _retryDelaySeconds = 30;
+    private int _maxRetries = 3;
+    
+    // Single asset selection and regeneration
+    private AssetDefinition? _selectedAsset;
+    private bool _isRegenerating;
+    private string? _regeneratingAssetId;
+    private string? _showPromptFor;
+    
+    // Import functionality
+    private bool _isImporting;
+    private int _importProgress;
+    private int _importTotal;
+    private bool _importAsSpritesheet; // true = crop to grid size, false = individual assets
+    
+    // Grid Normalizer
+    private bool _showNormalizePanel;
+    private bool _isNormalizing;
+    private string _normalizeSourceImage = string.Empty;
+    private string _normalizeResultImage = string.Empty;
+    private int _normalizeSourceWidth;
+    private int _normalizeSourceHeight;
+    private int _normalizeColumns = 8;
+    private int _normalizeRows = 6;
+    private int _normalizeCellSize = 360;
+    private int _normalizePadding = 5;
+    private bool _normalizeAutoDetect = true;
+    private string _normalizeStatus = string.Empty;
+    private bool _normalizeHasError;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        AssetGenerator.OnAssetGenerated += OnAssetGenerated;
+        AssetGenerator.OnAssetFailed += OnAssetFailed;
+        AssetGenerator.OnJobProgressChanged += OnJobProgressChanged;
+        GeminiApi.OnStatusMessage += OnApiStatusMessage;
+        
+        // Load JSON prompt data
+        try
+        {
+            await AssetGenerator.PromptBuilder.InitializeJsonDataAsync();
+            Console.WriteLine("JSON prompt data loaded successfully");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Warning: Could not load JSON prompt data: {ex.Message}");
+            // Continue anyway - will fall back to hardcoded prompts
+        }
+    }
+    
+    private void OnApiStatusMessage(string message)
+    {
+        // Update UI with rate limit status
+        InvokeAsync(() =>
+        {
+            // Could add a status display here
+            Console.WriteLine(message);
+            StateHasChanged();
+        });
+    }
+    
+    private async Task ConfigureApi()
+    {
+        _isTestingApi = true;
+        _apiError = null;
+        StateHasChanged();
+        
+        GeminiApi.SetApiKey(_apiKey);
+        _apiConnected = true;
+        _isTestingApi = false;
+        
+        StateHasChanged();
+    }
+    
+    private void PreviewPrompts()
+    {
+        _previewPrompts.Clear();
+        var assetList = AssetGenerator.PromptBuilder.GetAssetList(_selectedFaction, _selectedCategory);
+        
+        foreach (var assetName in assetList.Take(10))
+        {
+            var prompt = AssetGenerator.PreviewPrompt(_selectedFaction, _selectedCategory, assetName);
+            _previewPrompts.Add((assetName, prompt));
+        }
+        
+        _showPromptPreview = true;
+    }
+    
+    private async Task GenerateSingleTest()
+    {
+        _isGenerating = true;
+        _testResult = null;
+        StateHasChanged();
+        
+        // Apply settings
+        AssetGenerator.RemoveBackground = _removeBackground;
+        AssetGenerator.BackgroundTolerance = _backgroundTolerance;
+        GeminiApi.SetModel(_selectedModel);
+        
+        var assetList = AssetGenerator.PromptBuilder.GetAssetList(_selectedFaction, _selectedCategory);
+        var testAsset = assetList.FirstOrDefault() ?? "Test Asset";
+        
+        _testResult = await AssetGenerator.GenerateSingleAssetAsync(_selectedFaction, _selectedCategory, testAsset);
+        
+        _isGenerating = false;
+        StateHasChanged();
+    }
+    
+    private async Task StartGeneration()
+    {
+        _isGenerating = true;
+        
+        // Apply settings
+        AssetGenerator.RemoveBackground = _removeBackground;
+        AssetGenerator.BackgroundTolerance = _backgroundTolerance;
+        GeminiApi.SetModel(_selectedModel);
+        
+        // Apply rate limiting settings
+        GeminiApi.AutoRetryOnRateLimit = _autoRetryOnRateLimit;
+        GeminiApi.RetryDelaySeconds = _retryDelaySeconds;
+        GeminiApi.MaxRetries = _maxRetries;
+        
+        _currentJob = AssetGenerator.CreateJob(_selectedFaction, _selectedCategory);
+        StateHasChanged();
+        
+        await AssetGenerator.RunJobAsync(_currentJob);
+        
+        _isGenerating = false;
+        StateHasChanged();
+    }
+    
+    private void PauseGeneration()
+    {
+        AssetGenerator.PauseJob();
+    }
+    
+    private void ResumeGeneration()
+    {
+        AssetGenerator.ResumeJob();
+    }
+    
+    private void CancelGeneration()
+    {
+        AssetGenerator.CancelJob();
+        _isGenerating = false;
+    }
+    
+    private void OnAssetGenerated(AssetDefinition asset)
+    {
+        InvokeAsync(StateHasChanged);
+    }
+    
+    private void OnAssetFailed(AssetDefinition asset, string error)
+    {
+        InvokeAsync(StateHasChanged);
+    }
+    
+    private void OnJobProgressChanged(GenerationJob job)
+    {
+        InvokeAsync(StateHasChanged);
+    }
+    
+    private async Task DownloadTestImage()
+    {
+        if (_testResult?.ImageBase64 == null) return;
+        
+        await JS.InvokeVoidAsync("downloadBase64File", 
+            $"test_{_selectedFaction}_{_selectedCategory}.png",
+            _testResult.ImageBase64,
+            "image/png");
+    }
+    
+    private async Task DownloadResults()
+    {
+        if (_currentJob == null) return;
+        
+        try
+        {
+            // Assemble sprite sheet from individual images using JavaScript canvas
+            var gridSpec = _currentJob.GridSpec;
+            var imageDataList = _currentJob.Assets
+                .OrderBy(a => a.GridRow)
+                .ThenBy(a => a.GridCol)
+                .Select(a => new {
+                    row = a.GridRow,
+                    col = a.GridCol,
+                    imageBase64 = a.Status == AssetStatus.Generated ? a.GeneratedImagePath : null
+                })
+                .ToList();
+            
+            var spriteSheetBase64 = await JS.InvokeAsync<string>("assembleSpriteSheet", new {
+                images = imageDataList,
+                columns = gridSpec.Columns,
+                rows = gridSpec.Rows,
+                cellSize = gridSpec.CellSize
+            });
+            
+            if (!string.IsNullOrEmpty(spriteSheetBase64))
+            {
+                var filename = $"{_selectedFaction.ToString().ToLower()}_{_selectedCategory.ToString().ToLower()}_spritesheet.png";
+                await JS.InvokeVoidAsync("downloadBase64File", filename, spriteSheetBase64, "image/png");
+            }
+            else
+            {
+                Console.WriteLine("Failed to assemble sprite sheet");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error downloading sprite sheet: {ex.Message}");
+        }
+    }
+    
+    private async Task DownloadManifest()
+    {
+        if (_currentJob == null) return;
+        
+        var manifest = SpriteSheetService.CreateManifest(_currentJob);
+        var json = SpriteSheetService.SerializeManifest(manifest);
+        
+        await JS.InvokeVoidAsync("downloadTextFile",
+            $"{_selectedFaction.ToString().ToLower()}_{_selectedCategory.ToString().ToLower()}_manifest.json",
+            json,
+            "application/json");
+    }
+    
+    private async Task GenerateManifestOnly()
+    {
+        // Create a job without running it (no image generation)
+        var job = AssetGenerator.CreateJob(_selectedFaction, _selectedCategory);
+        
+        // Generate prompts for each asset (without generating images)
+        foreach (var asset in job.Assets)
+        {
+            asset.PromptUsed = AssetGenerator.PromptBuilder.BuildPrompt(asset.Faction, asset.Category, asset.Name);
+        }
+        
+        // Build the manifest with all prompts but no images
+        var manifest = new
+        {
+            factionName = _selectedFaction.ToString(),
+            categoryName = _selectedCategory.ToString(),
+            generatedAt = DateTime.UtcNow.ToString("o"),
+            grid = new
+            {
+                columns = job.GridSpec.Columns,
+                rows = job.GridSpec.Rows,
+                totalAssets = job.GridSpec.TotalAssets,
+                cellSize = job.GridSpec.CellSize,
+                spriteWidth = job.GridSpec.SpriteWidth,
+                spriteHeight = job.GridSpec.SpriteHeight
+            },
+            architectureStyle = GetFactionArchitectureStyle(_selectedFaction, _selectedCategory),
+            assets = job.Assets.Select(a => new
+            {
+                row = a.GridRow,
+                col = a.GridCol,
+                name = a.Name,
+                type = a.Category.ToString(),
+                promptUsed = a.PromptUsed ?? string.Empty
+            }).ToList()
+        };
+        
+        var options = new System.Text.Json.JsonSerializerOptions 
+        { 
+            WriteIndented = true,
+            Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+        };
+        var json = System.Text.Json.JsonSerializer.Serialize(manifest, options);
+        
+        var filename = $"{_selectedFaction.ToString().ToLower()}_{_selectedCategory.ToString().ToLower()}_manifest.json";
+        await JS.InvokeVoidAsync("downloadTextFile", filename, json, "application/json");
+    }
+    
+    private object? GetFactionArchitectureStyle(Faction faction, AssetCategory category)
+    {
+        // Return architecture style info for Buildings category
+        if (category != AssetCategory.Buildings) return null;
+        
+        return faction switch
+        {
+            Faction.Federation => new
+            {
+                description = "Utopian, optimistic futurism - welcoming and open",
+                keyElements = new[] {
+                    "Curved glass domes, organic flowing lines",
+                    "White/beige walls with large transparent aluminum windows",
+                    "Lush interior gardens visible through windows",
+                    "Clean energy integration (solar panels, fusion reactors)",
+                    "Starfleet delta emblems on official buildings",
+                    "San Francisco / Vulcan temple influenced design"
+                },
+                colors = "Pearl white, light gray, blue accents, transparent glass, chrome trim"
+            },
+            Faction.Klingon => new
+            {
+                description = "Brutal warrior fortress architecture - imposing, angular, built to intimidate",
+                keyElements = new[] {
+                    "Massive dark stone walls with metal reinforcements",
+                    "Angular, aggressive shapes - pointed spires and battlements",
+                    "Red accent lighting from torches and energy conduits",
+                    "Klingon trefoil emblems prominently displayed",
+                    "Trophy displays - enemy weapons, skulls, banners",
+                    "NO soft curves, NO glass domes - WARRIOR culture"
+                },
+                colors = "Dark gray stone, gunmetal, red accent lights, bronze/copper trim, black iron"
+            },
+            Faction.Romulan => new
+            {
+                description = "Elegant but intimidating - classical Roman/Imperial aesthetic with hidden surveillance",
+                keyElements = new[] {
+                    "Classical columns and grand facades hiding advanced technology",
+                    "Green marble and polished dark stone",
+                    "Bird of prey motifs - wings, talons, predatory shapes",
+                    "Hidden rooms, secret passages, surveillance everywhere",
+                    "Romulan Star Empire eagle emblems"
+                },
+                colors = "Deep green marble, dark gray stone, bronze/copper accents, emerald lighting"
+            },
+            Faction.Cardassian => new
+            {
+                description = "Brutalist, oppressive, functional - designed for control and military efficiency",
+                keyElements = new[] {
+                    "Heavy concrete and metal construction",
+                    "Minimal windows - small, high, barred",
+                    "Cobra/serpent head motifs echoing ship design",
+                    "Surveillance towers and security checkpoints",
+                    "Designed for occupation - controlling subject populations"
+                },
+                colors = "Ochre brown, tan, concrete gray, rust orange accents, yellow warning lights"
+            },
+            Faction.Ferengi => new
+            {
+                description = "Ostentatious commercial architecture - designed to display wealth and generate profit",
+                keyElements = new[] {
+                    "GOLD, ORANGE, BRONZE everywhere - wealth on display",
+                    "Neon signs and holographic advertisements",
+                    "Large ear motifs in architecture",
+                    "Vault doors and secure storage visible",
+                    "Rules of Acquisition displayed on walls"
+                },
+                colors = "Gold, orange, bronze, copper, with garish neon accents"
+            },
+            Faction.Borg => new
+            {
+                description = "Technological nightmare - geometric, dark, organic-tech hybrid, pure function",
+                keyElements = new[] {
+                    "GEOMETRIC shapes - cubes, hexagons, octagons - NO organic curves",
+                    "Dark metal with exposed circuitry and conduits",
+                    "GREEN glow from power systems",
+                    "NO windows, NO aesthetic design - pure function",
+                    "Assimilation chambers and regeneration alcoves"
+                },
+                colors = "Black metal, dark gray, gunmetal, GREEN accent lighting only"
+            },
+            Faction.Dominion => new
+            {
+                description = "Organic, purple, theocratic - designed to honor the Founders",
+                keyElements = new[] {
+                    "ORGANIC curves and shapes - like insects or sea creatures",
+                    "PURPLE and VIOLET primary colors",
+                    "Bioluminescent lighting",
+                    "Founder worship shrines throughout",
+                    "Ketracel-white dispensers for Jem'Hadar"
+                },
+                colors = "Purple, violet, lavender, with bioluminescent blue-purple accents"
+            },
+            _ => null
+        };
+    }
+    
+    private async Task DownloadIndividualAssets()
+    {
+        if (_currentJob == null) return;
+        
+        foreach (var asset in _currentJob.Assets.Where(a => a.Status == AssetStatus.Generated))
+        {
+            if (!string.IsNullOrEmpty(asset.GeneratedImagePath))
+            {
+                var filename = $"{_selectedFaction.ToString().ToLower()}_{_selectedCategory.ToString().ToLower()}_{asset.GridRow}_{asset.GridCol}_{SanitizeFilename(asset.Name)}.png";
+                await JS.InvokeVoidAsync("downloadBase64File", filename, asset.GeneratedImagePath, "image/png");
+                await Task.Delay(100);
+            }
+        }
+    }
+    
+    private string SanitizeFilename(string name)
+    {
+        var invalid = new char[] { '<', '>', ':', '"', '/', '\\', '|', '?', '*', ' ' };
+        var result = name;
+        foreach (var c in invalid)
+        {
+            result = result.Replace(c, '_');
+        }
+        return result.ToLower();
+    }
+    
+    private string GetCategoryDisplayName(AssetCategory category)
+    {
+        return category switch
+        {
+            AssetCategory.MilitaryShips => "🚀 Military Ships (36)",
+            AssetCategory.CivilianShips => "🚢 Civilian Ships (36)",
+            AssetCategory.MilitaryStructures => "🛡️ Military Structures (36)",
+            AssetCategory.CivilianStructures => "🏗️ Civilian Structures (36)",
+            AssetCategory.Buildings => "🏛️ Buildings (48)",
+            AssetCategory.Troops => "⚔️ Troops (36)",
+            AssetCategory.Vehicles => "🚗 Vehicles (16)",
+            AssetCategory.Portraits => "👤 Portraits (36)",
+            AssetCategory.HouseSymbols => "🏰 House Symbols (48)",
+            AssetCategory.EventCharacters => "✨ Event Characters (36)",
+            AssetCategory.FactionLeaders => "👑 Faction Leaders (16)",
+            AssetCategory.SpecialCharacters => "⭐ Special Characters (16)",
+            // New categories
+            AssetCategory.UIElements => "🖥️ UI Elements (36)",
+            AssetCategory.UIIcons => "🔷 UI Icons (48)",
+            AssetCategory.Planets => "🌍 Planets (36)",
+            AssetCategory.Stars => "⭐ Stars (16)",
+            AssetCategory.Anomalies => "🌀 Anomalies (36)",
+            AssetCategory.GalaxyTiles => "🗺️ Galaxy Tiles (36)",
+            AssetCategory.SystemElements => "☄️ System Elements (36)",
+            AssetCategory.Effects => "💥 Effects (36)",
+            AssetCategory.FactionSymbols => "🏴 Faction Symbols (16)",
+            _ => category.ToString()
+        };
+    }
+    
+    private List<AssetCategory> GetAvailableCategoriesForFaction()
+    {
+        return AssetGenerator.PromptBuilder.GetAvailableCategories(_selectedFaction);
+    }
+    
+    private void OnFactionChanged(ChangeEventArgs e)
+    {
+        if (Enum.TryParse<Faction>(e.Value?.ToString(), out var faction))
+        {
+            _selectedFaction = faction;
+            // Reset category to first available for this faction
+            var available = GetAvailableCategoriesForFaction();
+            if (available.Any() && !available.Contains(_selectedCategory))
+            {
+                _selectedCategory = available.First();
+            }
+        }
+    }
+    
+    private string GetGridInfo()
+    {
+        var spec = AssetGenerator.PromptBuilder.GetGridSpec(_selectedCategory);
+        return $"{spec.Columns}×{spec.Rows} = {spec.TotalAssets} assets ({spec.SpriteWidth}×{spec.SpriteHeight}px)";
+    }
+    
+    private double GetEstimatedCost()
+    {
+        var spec = AssetGenerator.PromptBuilder.GetGridSpec(_selectedCategory);
+        return spec.TotalAssets * 0.04;
+    }
+    
+    private string GetAssetStatusClass(AssetStatus status)
+    {
+        return status switch
+        {
+            AssetStatus.Pending => "status-pending",
+            AssetStatus.Generating => "status-generating",
+            AssetStatus.Generated => "status-generated",
+            AssetStatus.Failed => "status-failed",
+            AssetStatus.Skipped => "status-skipped",
+            _ => ""
+        };
+    }
+    
+    // Single asset selection and regeneration methods
+    private void SelectAsset(AssetDefinition asset)
+    {
+        _selectedAsset = (_selectedAsset == asset) ? null : asset;
+        _showPromptFor = null;
+        StateHasChanged();
+    }
+    
+    private void ShowPrompt(AssetDefinition asset)
+    {
+        _showPromptFor = (_showPromptFor == asset.Id) ? null : asset.Id;
+        StateHasChanged();
+    }
+    
+    private async Task RegenerateSingleAsset(AssetDefinition asset)
+    {
+        if (_isRegenerating) return;
+        
+        _isRegenerating = true;
+        _regeneratingAssetId = asset.Id;
+        asset.Status = AssetStatus.Generating;
+        asset.ErrorMessage = null;
+        StateHasChanged();
+        
+        try
+        {
+            var result = await AssetGenerator.GenerateSingleAssetAsync(
+                _selectedFaction, 
+                _selectedCategory, 
+                asset.Name,
+                _removeBackground,
+                _backgroundTolerance);
+            
+            if (result.Success && !string.IsNullOrEmpty(result.ImageBase64))
+            {
+                asset.GeneratedImagePath = result.ImageBase64;
+                asset.PromptUsed = result.PromptUsed;
+                asset.Status = AssetStatus.Generated;
+            }
+            else
+            {
+                asset.Status = AssetStatus.Failed;
+                asset.ErrorMessage = result.Error ?? "Unknown error";
+            }
+        }
+        catch (Exception ex)
+        {
+            asset.Status = AssetStatus.Failed;
+            asset.ErrorMessage = ex.Message;
+        }
+        finally
+        {
+            _isRegenerating = false;
+            _regeneratingAssetId = null;
+            StateHasChanged();
+        }
+    }
+    
+    private async Task DownloadSingleAsset(AssetDefinition asset)
+    {
+        if (string.IsNullOrEmpty(asset.GeneratedImagePath)) return;
+        
+        var fileName = $"{_selectedFaction}_{_selectedCategory}_{SanitizeFilename(asset.Name)}.png";
+        var dataUrl = $"data:image/png;base64,{asset.GeneratedImagePath}";
+        
+        await JS.InvokeVoidAsync("downloadFile", dataUrl, fileName);
+    }
+    
+    // ═══════════════════════════════════════════════════════════════════
+    // IMPORT FUNCTIONALITY
+    // ═══════════════════════════════════════════════════════════════════
+    
+    private async Task CreateEmptyJobAndImport()
+    {
+        // Create an empty job for the selected faction/category
+        _currentJob = AssetGenerator.CreateJob(_selectedFaction, _selectedCategory);
+        _currentJob.Status = JobStatus.Completed; // Mark as completed so we can import
+        _importAsSpritesheet = false; // Individual assets - no cropping
+        StateHasChanged();
+        
+        // Trigger file selection
+        await TriggerImportFiles();
+    }
+    
+    private async Task ImportSpritesheetWithCrop()
+    {
+        // Create an empty job for the selected faction/category
+        _currentJob = AssetGenerator.CreateJob(_selectedFaction, _selectedCategory);
+        _currentJob.Status = JobStatus.Completed;
+        _importAsSpritesheet = true; // Spritesheet - crop to grid size
+        StateHasChanged();
+        
+        // Trigger file selection
+        await TriggerImportFiles();
+    }
+    
+    private async Task TriggerImportFiles()
+    {
+        await JS.InvokeVoidAsync("triggerFileInput", "importFileInput");
+    }
+    
+    private async Task OnFilesSelected(InputFileChangeEventArgs e)
+    {
+        if (_currentJob == null) return;
+        
+        var files = e.GetMultipleFiles(100); // Max 100 files
+        if (files.Count == 0) return;
+        
+        _isImporting = true;
+        _importTotal = files.Count;
+        _importProgress = 0;
+        StateHasChanged();
+        
+        // Sort files by name for consistent ordering
+        var sortedFiles = files.OrderBy(f => f.Name).ToList();
+        
+        // Track which assets have been filled (for fallback sequential assignment)
+        var filledAssets = new HashSet<int>();
+        
+        // Get target grid size for cropping spritesheets
+        var gridSpec = _currentJob.GridSpec;
+        var targetWidth = gridSpec.SpriteWidth;
+        var targetHeight = gridSpec.SpriteHeight;
+        
+        // First pass: Try to match files to assets by name/pattern
+        var unmatchedFiles = new List<(IBrowserFile file, string base64)>();
+        
+        foreach (var file in sortedFiles)
+        {
+            _importProgress++;
+            StateHasChanged();
+            
+            try
+            {
+                // Read file as base64
+                using var stream = file.OpenReadStream(maxAllowedSize: 20 * 1024 * 1024); // 20MB max
+                using var ms = new MemoryStream();
+                await stream.CopyToAsync(ms);
+                var base64 = Convert.ToBase64String(ms.ToArray());
+                
+                // Crop to grid size ONLY if importing as spritesheet
+                if (_importAsSpritesheet)
+                {
+                    try
+                    {
+                        base64 = await JS.InvokeAsync<string>("cropToSize", base64, targetWidth, targetHeight);
+                        Console.WriteLine($"Cropped spritesheet {file.Name} to {targetWidth}x{targetHeight}");
+                    }
+                    catch (Exception cropEx)
+                    {
+                        Console.WriteLine($"Failed to crop {file.Name}: {cropEx.Message}");
+                    }
+                }
+                
+                // Try to find matching asset
+                var asset = FindMatchingAsset(file.Name, filledAssets);
+                
+                if (asset != null)
+                {
+                    var assetIndex = _currentJob.Assets.IndexOf(asset);
+                    filledAssets.Add(assetIndex);
+                    asset.GeneratedImagePath = base64;
+                    asset.Status = AssetStatus.Generated;
+                }
+                else
+                {
+                    // No match found - save for sequential assignment
+                    unmatchedFiles.Add((file, base64));
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to import {file.Name}: {ex.Message}");
+            }
+            
+            await Task.Delay(10); // Small delay for UI updates
+        }
+        
+        // Second pass: Assign unmatched files sequentially to empty slots
+        var nextEmptyIndex = 0;
+        foreach (var (file, base64) in unmatchedFiles)
+        {
+            // Find next empty slot (not already filled)
+            while (nextEmptyIndex < _currentJob.Assets.Count && 
+                   (filledAssets.Contains(nextEmptyIndex) || 
+                    _currentJob.Assets[nextEmptyIndex].Status == AssetStatus.Generated))
+            {
+                nextEmptyIndex++;
+            }
+            
+            if (nextEmptyIndex < _currentJob.Assets.Count)
+            {
+                var asset = _currentJob.Assets[nextEmptyIndex];
+                asset.GeneratedImagePath = base64;
+                asset.Status = AssetStatus.Generated;
+                filledAssets.Add(nextEmptyIndex);
+                
+                // Update name from filename if helpful
+                var nameFromFile = ExtractAssetNameFromFilename(file.Name);
+                if (!string.IsNullOrEmpty(nameFromFile) && nameFromFile.Length > 3)
+                {
+                    asset.Name = nameFromFile;
+                }
+                
+                nextEmptyIndex++;
+            }
+        }
+        
+        _isImporting = false;
+        StateHasChanged();
+    }
+    
+    private AssetDefinition? FindMatchingAsset(string filename, HashSet<int> filledAssets)
+    {
+        if (_currentJob == null) return null;
+        
+        var lowerFilename = filename.ToLower();
+        
+        // Try different matching patterns:
+        
+        // Pattern 1: Exact name match (e.g., "Constitution.png" matches "Constitution")
+        for (int i = 0; i < _currentJob.Assets.Count; i++)
+        {
+            if (filledAssets.Contains(i)) continue; // Skip already filled
+            
+            var asset = _currentJob.Assets[i];
+            var sanitizedName = SanitizeFilename(asset.Name).ToLower();
+            
+            // For better matching, also try without spaces
+            var noSpaceName = sanitizedName.Replace(" ", "").Replace("-", "");
+            var noSpaceFilename = lowerFilename.Replace(" ", "").Replace("-", "").Replace("_", "");
+            
+            if (noSpaceFilename.Contains(noSpaceName) && noSpaceName.Length >= 3)
+            {
+                return asset;
+            }
+        }
+        
+        // Pattern 2: Grid position (e.g., "0_0_constitution.png" or "row0_col0.png")
+        var gridMatch = System.Text.RegularExpressions.Regex.Match(lowerFilename, @"(\d+)[_x](\d+)");
+        if (gridMatch.Success)
+        {
+            var row = int.Parse(gridMatch.Groups[1].Value);
+            var col = int.Parse(gridMatch.Groups[2].Value);
+            var assetIndex = _currentJob.Assets.FindIndex(a => a.GridRow == row && a.GridCol == col);
+            if (assetIndex >= 0 && !filledAssets.Contains(assetIndex))
+            {
+                return _currentJob.Assets[assetIndex];
+            }
+        }
+        
+        // Pattern 3: Sequential number at end (e.g., "image_01.png" -> asset at index 1)
+        var numMatch = System.Text.RegularExpressions.Regex.Match(lowerFilename, @"[_\-]?(\d+)\.(?:png|jpg|jpeg)$");
+        if (numMatch.Success)
+        {
+            var index = int.Parse(numMatch.Groups[1].Value);
+            if (index < _currentJob.Assets.Count && !filledAssets.Contains(index))
+            {
+                return _currentJob.Assets[index];
+            }
+        }
+        
+        return null;
+    }
+    
+    private string ExtractAssetNameFromFilename(string filename)
+    {
+        // Remove extension
+        var name = System.IO.Path.GetFileNameWithoutExtension(filename);
+        
+        // Remove common prefixes like "federation_militaryships_0_0_"
+        var parts = name.Split('_');
+        if (parts.Length > 4)
+        {
+            // Assume format: faction_category_row_col_name
+            return string.Join(" ", parts.Skip(4)).Replace("_", " ");
+        }
+        
+        // Just clean up underscores
+        return name.Replace("_", " ");
+    }
+    
+    // ============ GRID NORMALIZER METHODS ============
+    
+    private async Task NormalizeGridFromSpritesheet()
+    {
+        _showNormalizePanel = true;
+        _normalizeSourceImage = string.Empty;
+        _normalizeResultImage = string.Empty;
+        _normalizeStatus = string.Empty;
+        _normalizeHasError = false;
+        
+        // Set defaults based on current category
+        var gridSpec = AssetGenerator.PromptBuilder.GetGridSpec(_selectedCategory);
+        _normalizeColumns = gridSpec.Columns;
+        _normalizeRows = gridSpec.Rows;
+        _normalizeCellSize = gridSpec.CellSize;
+        
+        StateHasChanged();
+        
+        // Trigger file picker
+        await JS.InvokeVoidAsync("triggerFileInput", "normalizeFileInput");
+    }
+    
+    private async Task OnNormalizeFileSelected(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        if (file == null) return;
+        
+        try
+        {
+            _normalizeStatus = "Loading image...";
+            _normalizeHasError = false;
+            StateHasChanged();
+            
+            // Read the file
+            using var stream = file.OpenReadStream(maxAllowedSize: 50 * 1024 * 1024); // 50MB max
+            using var ms = new MemoryStream();
+            await stream.CopyToAsync(ms);
+            var bytes = ms.ToArray();
+            _normalizeSourceImage = Convert.ToBase64String(bytes);
+            
+            // Get image dimensions via JS
+            var dimensions = await JS.InvokeAsync<int[]>("getImageDimensions", _normalizeSourceImage);
+            _normalizeSourceWidth = dimensions[0];
+            _normalizeSourceHeight = dimensions[1];
+            
+            // Auto-detect grid size from image dimensions
+            if (_normalizeAutoDetect)
+            {
+                // Try common grid sizes
+                var possibleCellSizes = new[] { 360, 256, 300, 320, 400, 512 };
+                foreach (var cellSize in possibleCellSizes)
+                {
+                    if (_normalizeSourceWidth % cellSize == 0 && _normalizeSourceHeight % cellSize == 0)
+                    {
+                        _normalizeColumns = _normalizeSourceWidth / cellSize;
+                        _normalizeRows = _normalizeSourceHeight / cellSize;
+                        _normalizeCellSize = cellSize;
+                        break;
+                    }
+                }
+            }
+            
+            _normalizeStatus = $"Loaded: {_normalizeSourceWidth}x{_normalizeSourceHeight} - Detected grid: {_normalizeColumns}x{_normalizeRows} @ {_normalizeCellSize}px";
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            _normalizeStatus = $"Error loading image: {ex.Message}";
+            _normalizeHasError = true;
+            StateHasChanged();
+        }
+    }
+    
+    private async Task ProcessNormalization()
+    {
+        if (string.IsNullOrEmpty(_normalizeSourceImage))
+            return;
+        
+        _isNormalizing = true;
+        _normalizeStatus = "Processing grid normalization...";
+        _normalizeHasError = false;
+        StateHasChanged();
+        
+        try
+        {
+            // Call JavaScript function to do the heavy lifting
+            _normalizeResultImage = await JS.InvokeAsync<string>(
+                "normalizeGrid", 
+                _normalizeSourceImage,
+                _normalizeColumns,
+                _normalizeRows,
+                _normalizeCellSize,
+                _normalizePadding,
+                _normalizeAutoDetect
+            );
+            
+            _normalizeStatus = $"✅ Normalized {_normalizeColumns * _normalizeRows} assets into clean {_normalizeColumns}x{_normalizeRows} grid at {_normalizeCellSize}px per cell";
+        }
+        catch (Exception ex)
+        {
+            _normalizeStatus = $"Error: {ex.Message}";
+            _normalizeHasError = true;
+        }
+        finally
+        {
+            _isNormalizing = false;
+            StateHasChanged();
+        }
+    }
+    
+    private async Task DownloadNormalizedGrid()
+    {
+        if (string.IsNullOrEmpty(_normalizeResultImage))
+            return;
+        
+        var filename = $"{_selectedFaction.ToString().ToLower()}_{_selectedCategory.ToString().ToLower()}_normalized.png";
+        await JS.InvokeVoidAsync("downloadBase64File", _normalizeResultImage, filename, "image/png");
+    }
+}

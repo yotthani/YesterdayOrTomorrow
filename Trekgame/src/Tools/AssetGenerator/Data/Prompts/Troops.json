@@ -1,0 +1,83 @@
+{
+  "category": "Troops",
+  "description": "Ground military units for all factions",
+  "factionStyles": {
+    "federation": {
+      "aesthetic": "Professional military, MACO-style tactical gear",
+      "colors": "Gold/black tactical uniforms, body armor",
+      "features": ["Phaser rifles", "Tricorders", "Starfleet insignia"],
+      "troops": [
+        { "id": "security", "name": "Security Officer", "role": "Basic infantry", "equipment": ["Phaser", "Body armor"] },
+        { "id": "maco", "name": "MACO Soldier", "role": "Elite infantry", "equipment": ["Phaser rifle", "Heavy armor", "Grenades"] },
+        { "id": "medic", "name": "Combat Medic", "role": "Field medic", "equipment": ["Medical kit", "Phaser pistol"] },
+        { "id": "engineer", "name": "Combat Engineer", "role": "Technical support", "equipment": ["Engineering kit", "Phaser", "Tools"] }
+      ]
+    },
+    "klingon": {
+      "aesthetic": "Warrior armor, battle-ready",
+      "colors": "Dark metal armor, red accents, leather",
+      "features": ["Bat'leth", "Disruptor", "Spiked armor"],
+      "troops": [
+        { "id": "warrior", "name": "Klingon Warrior", "role": "Basic infantry", "equipment": ["Disruptor", "Bat'leth"] },
+        { "id": "beserker", "name": "Klingon Berserker", "role": "Melee specialist", "equipment": ["Dual bat'leths", "Light armor"] },
+        { "id": "honor_guard", "name": "Honor Guard", "role": "Elite infantry", "equipment": ["Disruptor rifle", "Heavy armor", "D'k tahg"] },
+        { "id": "dahar_master", "name": "Dahar Master", "role": "Veteran commander", "equipment": ["Legendary bat'leth", "Command armor"] }
+      ]
+    },
+    "romulan": {
+      "aesthetic": "Sleek, secretive military gear",
+      "colors": "Green/silver armor, cloaking patterns",
+      "features": ["Disruptor pistol", "Personal cloak", "Tal Shiar insignia"],
+      "troops": [
+        { "id": "centurion", "name": "Romulan Centurion", "role": "Basic infantry", "equipment": ["Disruptor", "Light armor"] },
+        { "id": "uhlan", "name": "Romulan Uhlan", "role": "Scout", "equipment": ["Disruptor pistol", "Cloaking device"] },
+        { "id": "tal_shiar", "name": "Tal Shiar Agent", "role": "Elite operative", "equipment": ["Concealed weapons", "Spy gear"] },
+        { "id": "reman", "name": "Reman Warrior", "role": "Shock troops", "equipment": ["Heavy weapons", "Night vision"] }
+      ]
+    },
+    "cardassian": {
+      "aesthetic": "Militaristic, efficient armor",
+      "colors": "Brown/gray armor, Cardassian insignia",
+      "features": ["Phaser rifle", "Interrogation tools", "Heavy boots"],
+      "troops": [
+        { "id": "soldier", "name": "Cardassian Soldier", "role": "Basic infantry", "equipment": ["Phaser rifle", "Standard armor"] },
+        { "id": "glinn", "name": "Cardassian Glinn", "role": "Squad leader", "equipment": ["Disruptor", "Officer armor"] },
+        { "id": "obsidian", "name": "Obsidian Order Agent", "role": "Elite operative", "equipment": ["Hidden weapons", "Torture devices"] },
+        { "id": "gul_guard", "name": "Gul's Guard", "role": "Elite protection", "equipment": ["Heavy armor", "Ceremonial weapons"] }
+      ]
+    },
+    "borg": {
+      "aesthetic": "Cybernetic, assimilated bodies",
+      "colors": "Pale skin, black implants, green glow",
+      "features": ["Assimilation tubules", "Arm weapons", "Ocular implants"],
+      "troops": [
+        { "id": "drone", "name": "Borg Drone", "role": "Basic unit", "equipment": ["Assimilation tubules", "Arm tool"] },
+        { "id": "tactical", "name": "Tactical Drone", "role": "Combat unit", "equipment": ["Arm cannon", "Shield adaptation"] },
+        { "id": "heavy", "name": "Heavy Assault Drone", "role": "Heavy unit", "equipment": ["Dual arm cannons", "Heavy plating"] }
+      ]
+    },
+    "dominion": {
+      "aesthetic": "Genetically engineered soldiers",
+      "colors": "Purple/gray armor, scaled skin (Jem'Hadar)",
+      "features": ["Kar'takin polearm", "Shroud ability", "Ketracel-white tube"],
+      "troops": [
+        { "id": "jemhadar", "name": "Jem'Hadar Soldier", "role": "Basic infantry", "equipment": ["Kar'takin", "Plasma rifle"] },
+        { "id": "first", "name": "Jem'Hadar First", "role": "Squad leader", "equipment": ["Command armor", "Enhanced weapons"] },
+        { "id": "elder", "name": "Honored Elder", "role": "Veteran", "equipment": ["Veteran armor", "Battle trophies"] }
+      ]
+    }
+  },
+  "styleGuide": {
+    "material": "Claymation 3D style, detailed armor and weapons",
+    "quality": "High-end stop-motion animation quality",
+    "lighting": "Dramatic lighting showing armor details",
+    "composition": "Full body shot, action-ready pose",
+    "background": "Solid black (#000000)",
+    "critical": [
+      "Each faction has DISTINCT armor style",
+      "Weapons must match faction technology",
+      "Species-appropriate body types",
+      "Battle-ready but not action poses"
+    ]
+  }
+}

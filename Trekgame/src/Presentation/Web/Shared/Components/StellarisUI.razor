@@ -1,0 +1,95 @@
+@using Microsoft.AspNetCore.Components.Rendering
+@* StellarisUI.razor - Shared UI Components for Stellaris-style interface *@
+
+@* 
+   USAGE:
+   <StellarisUI.Panel Title="FLEET OVERVIEW">
+       Content here
+   </StellarisUI.Panel>
+   
+   <StellarisUI.TopBar Resources="@resources" Turn="@turn" OnEndTurn="EndTurn" />
+   
+   <StellarisUI.ResourceDisplay Resources="@resources" />
+*@
+
+@namespace StarTrekGame.Web.Shared.Components
+
+@* ═══════════════════════════════════════════════════════════════════════════════
+   PANEL COMPONENT - Main container for UI sections
+   ═══════════════════════════════════════════════════════════════════════════════ *@
+@code {
+    public class Panel : ComponentBase
+    {
+        [Parameter] public string Title { get; set; } = "";
+        [Parameter] public string Icon { get; set; } = "";
+        [Parameter] public bool Collapsible { get; set; } = false;
+        [Parameter] public bool StartCollapsed { get; set; } = false;
+        [Parameter] public string Width { get; set; } = "auto";
+        [Parameter] public string Height { get; set; } = "auto";
+        [Parameter] public string CssClass { get; set; } = "";
+        [Parameter] public RenderFragment? ChildContent { get; set; }
+        [Parameter] public RenderFragment? HeaderActions { get; set; }
+        
+        private bool _collapsed;
+        
+        protected override void OnInitialized() => _collapsed = StartCollapsed;
+        
+        protected override void BuildRenderTree(RenderTreeBuilder builder)
+        {
+            builder.OpenElement(0, "div");
+            builder.AddAttribute(1, "class", $"stellaris-panel {CssClass} {(_collapsed ? "collapsed" : "")}");
+            builder.AddAttribute(2, "style", $"width: {Width}; height: {Height};");
+            
+            // Header
+            builder.OpenElement(3, "div");
+            builder.AddAttribute(4, "class", "panel-header");
+            if (Collapsible)
+            {
+                builder.AddAttribute(5, "onclick", EventCallback.Factory.Create(this, () => _collapsed = !_collapsed));
+                builder.AddAttribute(6, "style", "cursor: pointer;");
+            }
+            
+            if (!string.IsNullOrEmpty(Icon))
+            {
+                builder.OpenElement(7, "span");
+                builder.AddAttribute(8, "class", "panel-icon");
+                builder.AddContent(9, Icon);
+                builder.CloseElement();
+            }
+            
+            builder.OpenElement(10, "span");
+            builder.AddAttribute(11, "class", "panel-title");
+            builder.AddContent(12, Title);
+            builder.CloseElement();
+            
+            if (HeaderActions != null)
+            {
+                builder.OpenElement(13, "div");
+                builder.AddAttribute(14, "class", "panel-actions");
+                builder.AddContent(15, HeaderActions);
+                builder.CloseElement();
+            }
+            
+            if (Collapsible)
+            {
+                builder.OpenElement(16, "span");
+                builder.AddAttribute(17, "class", "collapse-indicator");
+                builder.AddContent(18, _collapsed ? "▶" : "▼");
+                builder.CloseElement();
+            }
+            
+            builder.CloseElement(); // header
+            
+            // Content
+            if (!_collapsed)
+            {
+                builder.OpenElement(19, "div");
+                builder.AddAttribute(20, "class", "panel-content");
+                builder.AddContent(21, ChildContent);
+                builder.CloseElement();
+            }
+            
+            builder.CloseElement(); // panel
+        }
+    }
+}

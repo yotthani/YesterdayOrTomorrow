@@ -1,0 +1,214 @@
+/* ==============================================
+   GALACTIC STRATEGY - Borg Collective Ships
+   3D Rendered Style with Nameplates
+   
+   Two sprite sheets:
+   - military_ships.png: Cubes, Spheres, Combat vessels
+   - civilian_ships.png: Infrastructure, Support (assimilated)
+   
+   Both: ~2000 x 1103 px, 4 columns x 4 rows
+   ============================================== */
+
+/* ==============================================
+   Base Borg Ship Component
+   ============================================== */
+
+.ship-card.borg {
+    background-repeat: no-repeat;
+    background-size: 1000px 552px; /* 50% scale default */
+}
+
+/* ==============================================
+   BORG MILITARY SHIPS
+   Sheet: borg/military_ships.png
+   
+   Row 1: Cube, Sphere, Diamond, Tactical Cube
+   Row 2: Probe, Scout Ship, Fusion Cube, Interceptor
+   Row 3: Assimilator, Construction, Mining Drone, Transport Sphere
+   Row 4: Repair Drone, Shuttle, Freighter (Target), Queen's Vessel
+   ============================================== */
+
+.ship-card.borg.military {
+    background-image: url('/images/ships/borg/military_ships.png');
+}
+
+/* Row 1 - Capital Ships */
+.ship-card.borg.cube              { background-position: 0 0; }
+.ship-card.borg.sphere            { background-position: -250px 0; }
+.ship-card.borg.diamond           { background-position: -500px 0; }
+.ship-card.borg.tactical-cube     { background-position: -750px 0; }
+
+/* Row 2 - Combat */
+.ship-card.borg.probe             { background-position: 0 -138px; }
+.ship-card.borg.scout             { background-position: -250px -138px; }
+.ship-card.borg.fusion-cube       { background-position: -500px -138px; }
+.ship-card.borg.interceptor       { background-position: -750px -138px; }
+
+/* Row 3 - Support */
+.ship-card.borg.assimilator       { background-position: 0 -276px; }
+.ship-card.borg.construction      { background-position: -250px -276px; }
+.ship-card.borg.mining-drone      { background-position: -500px -276px; }
+.ship-card.borg.transport-sphere  { background-position: -750px -276px; }
+
+/* Row 4 - Utility */
+.ship-card.borg.repair-drone      { background-position: 0 -414px; }
+.ship-card.borg.shuttle           { background-position: -250px -414px; }
+.ship-card.borg.freighter         { background-position: -500px -414px; }
+.ship-card.borg.queens-vessel     { background-position: -750px -414px; }
+
+/* ==============================================
+   BORG CIVILIAN/INFRASTRUCTURE
+   Sheet: borg/civilian_ships.png
+   
+   Row 1: Assembler, Construction Platform, Resource Barge, Storage Silo
+   Row 2: Transport Node, Fuel Processor, Builder Drone, Maintenance Tender
+   Row 3: Data Relay, Survey Probe, Sensor Platform, Waste Transport
+   Row 4: Support Craft, Colony Matrix, Integration Node, Processing Node
+   ============================================== */
+
+.ship-card.borg.civilian {
+    background-image: url('/images/ships/borg/civilian_ships.png');
+}
+
+/* Row 1 */
+.ship-card.borg.assembler             { background-position: 0 0; }
+.ship-card.borg.construction-platform { background-position: -250px 0; }
+.ship-card.borg.resource-barge        { background-position: -500px 0; }
+.ship-card.borg.storage-silo          { background-position: -750px 0; }
+
+/* Row 2 */
+.ship-card.borg.transport-node        { background-position: 0 -138px; }
+.ship-card.borg.fuel-processor        { background-position: -250px -138px; }
+.ship-card.borg.builder-drone         { background-position: -500px -138px; }
+.ship-card.borg.maintenance-tender    { background-position: -750px -138px; }
+
+/* Row 3 */
+.ship-card.borg.data-relay            { background-position: 0 -276px; }
+.ship-card.borg.survey-probe          { background-position: -250px -276px; }
+.ship-card.borg.sensor-platform       { background-position: -500px -276px; }
+.ship-card.borg.waste-transport       { background-position: -750px -276px; }
+
+/* Row 4 */
+.ship-card.borg.support-craft         { background-position: 0 -414px; }
+.ship-card.borg.colony-matrix         { background-position: -250px -414px; }
+.ship-card.borg.integration-node      { background-position: -500px -414px; }
+.ship-card.borg.processing-node       { background-position: -750px -414px; }
+
+/* ==============================================
+   Large Size Positions (100% scale)
+   ============================================== */
+
+.ship-card.borg.large {
+    background-size: 2000px 1103px;
+}
+
+/* Military Large */
+.ship-card.borg.large.cube              { background-position: 0 0; }
+.ship-card.borg.large.sphere            { background-position: -500px 0; }
+.ship-card.borg.large.diamond           { background-position: -1000px 0; }
+.ship-card.borg.large.tactical-cube     { background-position: -1500px 0; }
+
+.ship-card.borg.large.probe             { background-position: 0 -276px; }
+.ship-card.borg.large.scout             { background-position: -500px -276px; }
+.ship-card.borg.large.fusion-cube       { background-position: -1000px -276px; }
+.ship-card.borg.large.interceptor       { background-position: -1500px -276px; }
+
+.ship-card.borg.large.assimilator       { background-position: 0 -552px; }
+.ship-card.borg.large.construction      { background-position: -500px -552px; }
+.ship-card.borg.large.mining-drone      { background-position: -1000px -552px; }
+.ship-card.borg.large.transport-sphere  { background-position: -1500px -552px; }
+
+.ship-card.borg.large.repair-drone      { background-position: 0 -828px; }
+.ship-card.borg.large.shuttle           { background-position: -500px -828px; }
+.ship-card.borg.large.freighter         { background-position: -1000px -828px; }
+.ship-card.borg.large.queens-vessel     { background-position: -1500px -828px; }
+
+/* ==============================================
+   Small Size Positions (25% scale)
+   ============================================== */
+
+.ship-card.borg.small {
+    background-size: 500px 276px;
+}
+
+.ship-card.borg.small.cube              { background-position: 0 0; }
+.ship-card.borg.small.sphere            { background-position: -125px 0; }
+.ship-card.borg.small.diamond           { background-position: -250px 0; }
+.ship-card.borg.small.tactical-cube     { background-position: -375px 0; }
+
+/* ==============================================
+   Borg Frame Style (Green Glow)
+   ============================================== */
+
+.ship-frame.borg {
+    border-color: rgba(34, 197, 94, 0.6);
+    box-shadow: 
+        0 4px 12px rgba(0, 0, 0, 0.5),
+        0 0 20px rgba(34, 197, 94, 0.4);
+}
+
+.ship-frame.borg.selected {
+    border-color: #22c55e;
+    box-shadow: 
+        0 4px 12px rgba(0, 0, 0, 0.5),
+        0 0 30px rgba(34, 197, 94, 0.6);
+}
+
+/* ==============================================
+   Borg Ship Effects
+   ============================================== */
+
+/* Borg green pulse glow */
+@keyframes borg-pulse {
+    0%, 100% { 
+        box-shadow: 0 0 15px rgba(34, 197, 94, 0.4);
+        filter: brightness(1);
+    }
+    50% { 
+        box-shadow: 0 0 30px rgba(34, 197, 94, 0.7);
+        filter: brightness(1.1);
+    }
+}
+
+.ship-card.borg.active {
+    animation: borg-pulse 2s ease-in-out infinite;
+}
+
+/* Assimilation effect */
+@keyframes assimilation {
+    0% { filter: hue-rotate(0deg) brightness(1); }
+    50% { filter: hue-rotate(80deg) brightness(1.2); }
+    100% { filter: hue-rotate(120deg) brightness(1); }
+}
+
+.ship-card.borg.assimilating {
+    animation: assimilation 3s ease-in-out;
+}
+
+/* Regeneration effect */
+@keyframes regenerate {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+.ship-card.borg.regenerating {
+    animation: regenerate 1s ease-in-out infinite;
+}
+
+/* Borg green scan line effect */
+.ship-card.borg::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(34, 197, 94, 0.8), transparent);
+    animation: borg-scan 3s linear infinite;
+    opacity: 0.5;
+}
+
+@keyframes borg-scan {
+    0% { top: 0; }
+    100% { top: 100%; }
+}

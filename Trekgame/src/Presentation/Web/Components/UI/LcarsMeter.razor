@@ -1,0 +1,184 @@
+@namespace StarTrekGame.Web.Components.UI
+
+<div class="lcars-meter @(Glow ? "glow-box" : "")" style="width: @(Size)px; height: @(Size)px; @Style">
+    <svg viewBox="0 0 100 100" class="lcars-meter__svg">
+        <!-- Background ring -->
+        <circle class="lcars-meter__ring" 
+                cx="50" cy="50" r="@Radius" 
+                stroke="var(--ui-bg-light)"
+                stroke-width="@StrokeWidth"
+                fill="none"/>
+        
+        <!-- Value ring -->
+        <circle class="lcars-meter__value" 
+                cx="50" cy="50" r="@Radius"
+                stroke="@GetStrokeColor()"
+                stroke-width="@StrokeWidth"
+                stroke-dasharray="@DashArray"
+                stroke-linecap="round"
+                fill="none"
+                style="transform: rotate(-90deg); transform-origin: center;"/>
+        
+        <!-- Tick marks (optional) -->
+        @if (ShowTicks)
+        {
+            @for (int i = 0; i < 12; i++)
+            {
+                var angle = i * 30 - 90;
+                var x1 = 50 + (Radius + 5) * Math.Cos(angle * Math.PI / 180);
+                var y1 = 50 + (Radius + 5) * Math.Sin(angle * Math.PI / 180);
+                var x2 = 50 + (Radius + 10) * Math.Cos(angle * Math.PI / 180);
+                var y2 = 50 + (Radius + 10) * Math.Sin(angle * Math.PI / 180);
+                <line x1="@x1" y1="@y1" x2="@x2" y2="@y2" 
+                      stroke="var(--ui-border-medium)" stroke-width="1"/>
+            }
+        }
+        
+        <!-- Center dot -->
+        @if (ShowCenter)
+        {
+            <circle cx="50" cy="50" r="3" fill="var(--ui-primary)"/>
+        }
+    </svg>
+    
+    <!-- Label in center -->
+    <div class="lcars-meter__label">
+        @if (!string.IsNullOrEmpty(Icon))
+        {
+            <span class="lcars-meter__icon">@Icon</span>
+        }
+        else
+        {
+            <span class="lcars-meter__value-text" style="font-size: @(Size / 4)px;">
+                @ValueDisplay
+            </span>
+            @if (!string.IsNullOrEmpty(Unit))
+            {
+                <span class="lcars-meter__unit">@Unit</span>
+            }
+        }
+    </div>
+    
+    @if (!string.IsNullOrEmpty(Label))
+    {
+        <div class="lcars-meter__bottom-label">@Label</div>
+    }
+</div>
+
+@code {
+    [Parameter] public double Value { get; set; } = 0; // 0-100 or custom range
+    [Parameter] public double Min { get; set; } = 0;
+    [Parameter] public double Max { get; set; } = 100;
+    [Parameter] public int Size { get; set; } = 80;
+    [Parameter] public string? Label { get; set; }
+    [Parameter] public string? Unit { get; set; }
+    [Parameter] public string? Icon { get; set; }
+    [Parameter] public string Color { get; set; } = "primary";
+    [Parameter] public bool ShowTicks { get; set; } = false;
+    [Parameter] public bool ShowCenter { get; set; } = true;
+    [Parameter] public bool Glow { get; set; } = false;
+    [Parameter] public string? Style { get; set; }
+
+    private int Radius => 40;
+    private int StrokeWidth => 8;
+    private double Circumference => 2 * Math.PI * Radius;
+    
+    private double NormalizedValue => Math.Clamp((Value - Min) / (Max - Min) * 100, 0, 100);
+    
+    private string DashArray
+    {
+        get
+        {
+            var filled = Circumference * NormalizedValue / 100;
+            var empty = Circumference - filled;
+            return $"{filled:F1} {empty:F1}";
+        }
+    }
+
+    private string ValueDisplay
+    {
+        get
+        {
+            if (Max == 100 && Min == 0)
+                return $"{Value:F0}";
+            return $"{Value:F1}";
+        }
+    }
+
+    private string GetStrokeColor()
+    {
+        if (Color == "auto")
+        {
+            // Auto color based on value
+            if (NormalizedValue >= 80) return "var(--ui-success)";
+            if (NormalizedValue >= 50) return "var(--ui-primary)";
+            if (NormalizedValue >= 25) return "var(--ui-warning)";
+            return "var(--ui-danger)";
+        }
+
+        return Color switch
+        {
+            "primary" => "var(--ui-primary)",
+            "success" => "var(--ui-success)",
+            "warning" => "var(--ui-warning)",
+            "danger" => "var(--ui-danger)",
+            "accent" => "var(--ui-accent)",
+            _ => Color
+        };
+    }
+}
+
+<style>
+    .lcars-meter {
+        position: relative;
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .lcars-meter__svg {
+        width: 100%;
+        height: 100%;
+    }
+
+    .lcars-meter__label {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .lcars-meter__icon {
+        font-size: 1.5em;
+    }
+
+    .lcars-meter__value-text {
+        font-family: 'Orbitron', monospace;
+        font-weight: 700;
+        color: var(--ui-text-bright);
+        line-height: 1;
+    }
+
+    .lcars-meter__unit {
+        font-size: 0.5em;
+        color: var(--ui-text-dim);
+        text-transform: uppercase;
+    }
+
+    .lcars-meter__bottom-label {
+        font-size: 10px;
+        color: var(--ui-text-dim);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-top: 4px;
+    }
+
+    .lcars-meter__value {
+        transition: stroke-dasharray 0.5s ease;
+    }
+</style>

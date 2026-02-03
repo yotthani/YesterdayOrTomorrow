@@ -1,0 +1,835 @@
+/* ============================================
+   GALACTIC STRATEGY - LCARS-INSPIRED THEME
+   Star Trek-style interface with modern touch
+   ============================================ */
+
+/* ==========================================
+   CSS CUSTOM PROPERTIES (Theme Variables)
+   ========================================== */
+:root {
+    /* Base colors */
+    --lcars-bg-dark: #000000;
+    --lcars-bg-medium: #0a0a14;
+    --lcars-bg-light: #141428;
+    --lcars-panel-bg: rgba(10, 10, 20, 0.95);
+    
+    /* LCARS accent colors */
+    --lcars-orange: #ff9900;
+    --lcars-gold: #ffcc00;
+    --lcars-tan: #cc9966;
+    --lcars-lavender: #cc99cc;
+    --lcars-blue: #9999ff;
+    --lcars-sky: #99ccff;
+    --lcars-red: #cc6666;
+    --lcars-purple: #9966cc;
+    --lcars-teal: #66cccc;
+    
+    /* Faction colors */
+    --faction-federation: #1a5fb4;
+    --faction-federation-light: #99c1f1;
+    --faction-klingon: #8b0000;
+    --faction-klingon-light: #cd5c5c;
+    --faction-romulan: #2e7d32;
+    --faction-romulan-light: #81c784;
+    --faction-cardassian: #5d4037;
+    --faction-cardassian-light: #a1887f;
+    --faction-ferengi: #f57c00;
+    --faction-ferengi-light: #ffb74d;
+    --faction-breen: #37474f;
+    --faction-breen-light: #78909c;
+    --faction-vulcan: #b71c1c;
+    --faction-vulcan-light: #ef5350;
+    --faction-tholian: #ff6f00;
+    --faction-tholian-light: #ffa726;
+    --faction-gorn: #33691e;
+    --faction-gorn-light: #8bc34a;
+    --faction-bajoran: #6d4c41;
+    --faction-bajoran-light: #a1887f;
+    
+    /* Star types */
+    --star-yellow: #ffdd44;
+    --star-orange: #ff8c00;
+    --star-red: #ff4444;
+    --star-blue: #4488ff;
+    --star-white: #ffffff;
+    --star-binary: #cc88ff;
+    --star-neutron: #88ffff;
+    
+    /* Planet types */
+    --planet-terran: #4488cc;
+    --planet-desert: #cc8844;
+    --planet-arctic: #88ccff;
+    --planet-volcanic: #ff4422;
+    --planet-oceanic: #2266aa;
+    --planet-jungle: #44aa44;
+    --planet-barren: #666666;
+    --planet-gas-giant: #cc8866;
+    
+    /* UI metrics */
+    --lcars-corner-radius: 20px;
+    --lcars-button-radius: 12px;
+    --panel-padding: 16px;
+    --header-height: 60px;
+    
+    /* Typography */
+    --font-main: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    --font-display: 'Orbitron', 'Audiowide', 'Segoe UI', sans-serif;
+    --font-mono: 'Consolas', 'Monaco', monospace;
+    
+    /* Animations */
+    --transition-fast: 150ms ease;
+    --transition-normal: 300ms ease;
+    --transition-slow: 500ms ease;
+    
+    /* Glow effects */
+    --glow-federation: 0 0 10px rgba(26, 95, 180, 0.5);
+    --glow-alert: 0 0 15px rgba(255, 68, 68, 0.7);
+    --glow-success: 0 0 10px rgba(68, 255, 68, 0.5);
+}
+
+/* ==========================================
+   BASE STYLES
+   ========================================== */
+body {
+    background: var(--lcars-bg-dark);
+    color: var(--lcars-sky);
+    font-family: var(--font-main);
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--lcars-bg-medium);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--lcars-orange);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--lcars-gold);
+}
+
+/* ==========================================
+   LCARS PANEL COMPONENTS
+   ========================================== */
+.lcars-panel {
+    background: var(--lcars-panel-bg);
+    border: 2px solid var(--lcars-orange);
+    border-radius: var(--lcars-corner-radius);
+    padding: var(--panel-padding);
+    position: relative;
+}
+
+.lcars-panel::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: 20px;
+    right: 20px;
+    height: 4px;
+    background: linear-gradient(90deg, 
+        var(--lcars-orange), 
+        var(--lcars-gold), 
+        var(--lcars-orange));
+    border-radius: 0 0 4px 4px;
+}
+
+.lcars-panel-header {
+    background: linear-gradient(90deg, var(--lcars-orange) 0%, var(--lcars-gold) 100%);
+    color: var(--lcars-bg-dark);
+    padding: 8px 16px;
+    margin: -16px -16px 16px -16px;
+    border-radius: 18px 18px 0 0;
+    font-family: var(--font-display);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* ==========================================
+   LCARS BUTTONS
+   ========================================== */
+.lcars-button {
+    background: var(--lcars-orange);
+    color: var(--lcars-bg-dark);
+    border: none;
+    padding: 10px 20px;
+    border-radius: var(--lcars-button-radius);
+    font-family: var(--font-display);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    position: relative;
+    overflow: hidden;
+}
+
+.lcars-button:hover {
+    background: var(--lcars-gold);
+    box-shadow: var(--glow-federation);
+    transform: translateY(-1px);
+}
+
+.lcars-button:active {
+    transform: translateY(0);
+}
+
+.lcars-button.primary {
+    background: var(--lcars-blue);
+}
+
+.lcars-button.success {
+    background: var(--lcars-teal);
+}
+
+.lcars-button.danger {
+    background: var(--lcars-red);
+}
+
+.lcars-button.secondary {
+    background: var(--lcars-lavender);
+}
+
+.lcars-button:disabled {
+    background: #444;
+    color: #888;
+    cursor: not-allowed;
+}
+
+/* Button ripple effect */
+.lcars-button::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    transition: transform 0.4s ease;
+}
+
+.lcars-button:active::after {
+    transform: translate(-50%, -50%) scale(40);
+    opacity: 0;
+}
+
+/* ==========================================
+   GALAXY MAP STYLES
+   ========================================== */
+.galaxy-container {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    background: 
+        radial-gradient(ellipse at center, rgba(20, 20, 50, 0.8) 0%, transparent 70%),
+        var(--lcars-bg-dark);
+    overflow: hidden;
+}
+
+.galaxy-map {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* Hyperlane styling */
+.hyperlane {
+    stroke: rgba(100, 150, 255, 0.3);
+    stroke-width: 1;
+    fill: none;
+    transition: all var(--transition-normal);
+}
+
+.hyperlane:hover {
+    stroke: rgba(100, 150, 255, 0.6);
+    stroke-width: 2;
+}
+
+.hyperlane.active {
+    stroke: var(--lcars-gold);
+    stroke-width: 2;
+    filter: drop-shadow(0 0 5px var(--lcars-gold));
+}
+
+.hyperlane.blocked {
+    stroke: rgba(255, 68, 68, 0.4);
+    stroke-dasharray: 5, 5;
+}
+
+/* Star system nodes */
+.star-system {
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.star-system:hover {
+    transform: scale(1.2);
+}
+
+.star-system.selected {
+    filter: drop-shadow(0 0 15px var(--lcars-gold));
+}
+
+.star-glow {
+    fill: currentColor;
+    opacity: 0.3;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.2; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(1.1); }
+}
+
+/* Territory overlay */
+.territory-overlay {
+    fill-opacity: 0.15;
+    stroke-width: 2;
+    stroke-opacity: 0.5;
+}
+
+.territory-overlay.federation { fill: var(--faction-federation); stroke: var(--faction-federation-light); }
+.territory-overlay.klingon { fill: var(--faction-klingon); stroke: var(--faction-klingon-light); }
+.territory-overlay.romulan { fill: var(--faction-romulan); stroke: var(--faction-romulan-light); }
+.territory-overlay.cardassian { fill: var(--faction-cardassian); stroke: var(--faction-cardassian-light); }
+.territory-overlay.ferengi { fill: var(--faction-ferengi); stroke: var(--faction-ferengi-light); }
+
+/* ==========================================
+   SYSTEM VIEW STYLES
+   ========================================== */
+.system-view {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--lcars-bg-dark);
+    z-index: 100;
+}
+
+.system-star {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    box-shadow: 
+        0 0 60px currentColor,
+        0 0 120px currentColor,
+        inset 0 0 30px rgba(255, 255, 255, 0.3);
+}
+
+.planet-orbit {
+    position: absolute;
+    border: 1px dashed rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.planet {
+    position: absolute;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    background-size: cover;
+    background-position: center;
+}
+
+.planet:hover {
+    transform: scale(1.2);
+    box-shadow: 0 0 20px currentColor;
+}
+
+.planet.selected {
+    box-shadow: 0 0 30px var(--lcars-gold);
+}
+
+.planet-label {
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    color: var(--lcars-sky);
+    white-space: nowrap;
+}
+
+/* ==========================================
+   FLEET DISPLAY
+   ========================================== */
+.fleet-icon {
+    position: absolute;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.fleet-icon:hover {
+    transform: scale(1.2);
+    filter: drop-shadow(0 0 10px currentColor);
+}
+
+.fleet-icon.selected {
+    filter: drop-shadow(0 0 15px var(--lcars-gold));
+}
+
+.fleet-icon.moving {
+    animation: fleet-pulse 1s ease-in-out infinite;
+}
+
+@keyframes fleet-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+.fleet-path {
+    stroke: var(--lcars-gold);
+    stroke-width: 2;
+    stroke-dasharray: 10, 5;
+    fill: none;
+    animation: dash 1s linear infinite;
+}
+
+@keyframes dash {
+    to { stroke-dashoffset: -15; }
+}
+
+/* ==========================================
+   SHIP SILHOUETTES (SVG-based)
+   ========================================== */
+.ship-silhouette {
+    fill: currentColor;
+    transition: all var(--transition-fast);
+}
+
+.ship-silhouette.federation { color: var(--faction-federation-light); }
+.ship-silhouette.klingon { color: var(--faction-klingon-light); }
+.ship-silhouette.romulan { color: var(--faction-romulan-light); }
+.ship-silhouette.cardassian { color: var(--faction-cardassian-light); }
+
+/* ==========================================
+   INFO PANELS
+   ========================================== */
+.info-panel {
+    position: fixed;
+    background: var(--lcars-panel-bg);
+    border-left: 4px solid var(--lcars-orange);
+    padding: 16px;
+    box-shadow: -5px 0 20px rgba(0, 0, 0, 0.5);
+    z-index: 200;
+}
+
+.info-panel.right {
+    right: 0;
+    top: var(--header-height);
+    bottom: 0;
+    width: 320px;
+    border-left: 4px solid var(--lcars-orange);
+}
+
+.info-panel.bottom {
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: auto;
+    max-height: 40%;
+    border-top: 4px solid var(--lcars-orange);
+    border-left: none;
+}
+
+.info-panel-title {
+    font-family: var(--font-display);
+    font-size: 18px;
+    color: var(--lcars-gold);
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border-bottom: 1px solid var(--lcars-orange);
+    padding-bottom: 8px;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.info-label {
+    color: var(--lcars-lavender);
+    font-size: 12px;
+    text-transform: uppercase;
+}
+
+.info-value {
+    color: var(--lcars-sky);
+    font-weight: 600;
+}
+
+/* ==========================================
+   RESOURCE BARS
+   ========================================== */
+.resource-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 4px 0;
+}
+
+.resource-icon {
+    width: 24px;
+    height: 24px;
+}
+
+.resource-progress {
+    flex: 1;
+    height: 8px;
+    background: var(--lcars-bg-light);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.resource-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width var(--transition-normal);
+}
+
+.resource-fill.credits { background: var(--lcars-gold); }
+.resource-fill.dilithium { background: var(--lcars-blue); }
+.resource-fill.deuterium { background: var(--lcars-teal); }
+.resource-fill.duranium { background: var(--lcars-lavender); }
+
+.resource-text {
+    min-width: 60px;
+    text-align: right;
+    font-family: var(--font-mono);
+    font-size: 12px;
+}
+
+/* ==========================================
+   MINIMAP
+   ========================================== */
+.minimap {
+    position: fixed;
+    bottom: 16px;
+    left: 16px;
+    width: 200px;
+    height: 200px;
+    background: var(--lcars-panel-bg);
+    border: 2px solid var(--lcars-orange);
+    border-radius: var(--lcars-corner-radius);
+    overflow: hidden;
+    z-index: 150;
+}
+
+.minimap-viewport {
+    position: absolute;
+    border: 2px solid var(--lcars-gold);
+    background: rgba(255, 204, 0, 0.1);
+    pointer-events: none;
+}
+
+/* ==========================================
+   TOOLTIPS
+   ========================================== */
+.tooltip {
+    position: absolute;
+    background: var(--lcars-panel-bg);
+    border: 1px solid var(--lcars-orange);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 12px;
+    pointer-events: none;
+    z-index: 1000;
+    max-width: 250px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.tooltip-title {
+    color: var(--lcars-gold);
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.tooltip-content {
+    color: var(--lcars-sky);
+}
+
+/* ==========================================
+   HEADER BAR
+   ========================================== */
+.game-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--header-height);
+    background: linear-gradient(180deg, var(--lcars-bg-medium) 0%, var(--lcars-bg-dark) 100%);
+    border-bottom: 3px solid var(--lcars-orange);
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    z-index: 500;
+}
+
+.header-logo {
+    font-family: var(--font-display);
+    font-size: 24px;
+    color: var(--lcars-gold);
+    text-transform: uppercase;
+    letter-spacing: 4px;
+}
+
+.header-nav {
+    display: flex;
+    gap: 4px;
+    margin-left: 32px;
+}
+
+.header-nav-item {
+    padding: 8px 16px;
+    background: var(--lcars-bg-light);
+    border-radius: var(--lcars-button-radius);
+    color: var(--lcars-sky);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.header-nav-item:hover {
+    background: var(--lcars-orange);
+    color: var(--lcars-bg-dark);
+}
+
+.header-nav-item.active {
+    background: var(--lcars-gold);
+    color: var(--lcars-bg-dark);
+}
+
+.header-resources {
+    display: flex;
+    gap: 16px;
+    margin-left: auto;
+}
+
+.header-resource {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 14px;
+}
+
+.header-resource-icon {
+    width: 20px;
+    height: 20px;
+}
+
+/* ==========================================
+   LOADING & TRANSITIONS
+   ========================================== */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--lcars-bg-dark);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.loading-spinner {
+    width: 60px;
+    height: 60px;
+    border: 4px solid var(--lcars-bg-light);
+    border-top-color: var(--lcars-orange);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.loading-text {
+    margin-top: 20px;
+    font-family: var(--font-display);
+    font-size: 16px;
+    color: var(--lcars-gold);
+    text-transform: uppercase;
+    letter-spacing: 4px;
+}
+
+/* ==========================================
+   MODAL DIALOGS
+   ========================================== */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(4px);
+    z-index: 800;
+}
+
+.modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--lcars-panel-bg);
+    border: 3px solid var(--lcars-orange);
+    border-radius: var(--lcars-corner-radius);
+    padding: 24px;
+    min-width: 400px;
+    max-width: 90vw;
+    max-height: 90vh;
+    overflow: auto;
+    z-index: 850;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--lcars-orange);
+}
+
+.modal-title {
+    font-family: var(--font-display);
+    font-size: 20px;
+    color: var(--lcars-gold);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.modal-close {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--lcars-red);
+    border: none;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.modal-close:hover {
+    background: #ff4444;
+    transform: scale(1.1);
+}
+
+.modal-body {
+    margin-bottom: 16px;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--lcars-orange);
+}
+
+/* ==========================================
+   FACTION-SPECIFIC THEMES
+   ========================================== */
+.theme-federation {
+    --lcars-orange: #4488ff;
+    --lcars-gold: #99c1f1;
+}
+
+.theme-klingon {
+    --lcars-orange: #8b0000;
+    --lcars-gold: #cd5c5c;
+}
+
+.theme-romulan {
+    --lcars-orange: #2e7d32;
+    --lcars-gold: #81c784;
+}
+
+.theme-cardassian {
+    --lcars-orange: #5d4037;
+    --lcars-gold: #a1887f;
+}
+
+.theme-ferengi {
+    --lcars-orange: #f57c00;
+    --lcars-gold: #ffb74d;
+}
+
+/* ==========================================
+   RESPONSIVE ADJUSTMENTS
+   ========================================== */
+@media (max-width: 768px) {
+    .info-panel.right {
+        width: 100%;
+        height: 50%;
+        top: auto;
+        bottom: 0;
+        border-left: none;
+        border-top: 4px solid var(--lcars-orange);
+    }
+    
+    .minimap {
+        width: 120px;
+        height: 120px;
+    }
+    
+    .header-nav {
+        display: none;
+    }
+}
+
+/* ==========================================
+   UTILITY CLASSES
+   ========================================== */
+.text-gold { color: var(--lcars-gold); }
+.text-orange { color: var(--lcars-orange); }
+.text-blue { color: var(--lcars-blue); }
+.text-sky { color: var(--lcars-sky); }
+.text-red { color: var(--lcars-red); }
+.text-teal { color: var(--lcars-teal); }
+
+.bg-panel { background: var(--lcars-panel-bg); }
+.bg-dark { background: var(--lcars-bg-dark); }
+.bg-medium { background: var(--lcars-bg-medium); }
+
+.glow-gold { box-shadow: 0 0 15px var(--lcars-gold); }
+.glow-blue { box-shadow: 0 0 15px var(--lcars-blue); }
+.glow-red { box-shadow: 0 0 15px var(--lcars-red); }
+
+.font-display { font-family: var(--font-display); }
+.font-mono { font-family: var(--font-mono); }
+
+.uppercase { text-transform: uppercase; }
+.letter-spacing { letter-spacing: 2px; }

@@ -1,0 +1,434 @@
+@page "/game/overview"
+@using MudBlazor
+@using StarTrekGame.Web.Services
+@using Blazored.LocalStorage
+@inject IGameApiClient Api
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+@inject ILocalStorageService LocalStorage
+@inject ISoundService Sound
+
+<PageTitle>Game Overview</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="py-4">
+    @if (_loading)
+    {
+        <MudProgressLinear Color="Color.Primary" Indeterminate="true" />
+    }
+    else if (_victory != null)
+    {
+        @* Victory Screen *@
+        <MudPaper Class="pa-6 text-center" Elevation="4" Style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);">
+            <MudIcon Icon="@Icons.Material.Filled.EmojiEvents" Size="Size.Large" Color="Color.Warning" Style="font-size: 80px;" />
+            <MudText Typo="Typo.h3" Color="Color.Warning" Class="mt-4">@(_victory.IsWinner ? "VICTORY!" : "DEFEAT")</MudText>
+            <MudText Typo="Typo.h5" Color="Color.Secondary" Class="mt-2">@_victory.WinnerName has achieved @_victory.VictoryType Victory!</MudText>
+            <MudText Typo="Typo.body1" Class="mt-4">Game ended on Turn @_victory.Turn</MudText>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large" Class="mt-4" OnClick="@(() => Navigation.NavigateTo("/"))">
+                Return to Menu
+            </MudButton>
+        </MudPaper>
+    }
+    else if (_game == null)
+    {
+        <MudAlert Severity="Severity.Warning">No active game found</MudAlert>
+    }
+    else
+    {
+        @* Victory Progress *@
+        <MudPaper Class="pa-4 mb-4" Elevation="2" Style="background: linear-gradient(90deg, rgba(255,153,0,0.1) 0%, transparent 100%);">
+            <MudText Typo="Typo.h6" Color="Color.Warning" Class="mb-3">🏆 VICTORY CONDITIONS</MudText>
+            <MudGrid>
+                <MudItem xs="12" md="4">
+                    <MudStack Spacing="1">
+                        <MudText Typo="Typo.subtitle2" Color="Color.Secondary">Conquest Victory</MudText>
+                        <MudProgressLinear Value="@_conquestProgress" Color="Color.Error" Size="Size.Medium" Rounded="true" />
+                        <MudText Typo="Typo.caption">Control 75% of all systems (@_playerSystems/@_totalSystems)</MudText>
+                    </MudStack>
+                </MudItem>
+                <MudItem xs="12" md="4">
+                    <MudStack Spacing="1">
+                        <MudText Typo="Typo.subtitle2" Color="Color.Secondary">Economic Victory</MudText>
+                        <MudProgressLinear Value="@_economicProgress" Color="Color.Success" Size="Size.Medium" Rounded="true" />
+                        <MudText Typo="Typo.caption">Accumulate 10,000 credits (@_playerCredits/10000)</MudText>
+                    </MudStack>
+                </MudItem>
+                <MudItem xs="12" md="4">
+                    <MudStack Spacing="1">
+                        <MudText Typo="Typo.subtitle2" Color="Color.Secondary">Time Victory</MudText>
+                        <MudProgressLinear Value="@((_game?.Turn ?? 0) / 100.0 * 100)" Color="Color.Info" Size="Size.Medium" Rounded="true" />
+                        <MudText Typo="Typo.caption">Highest score at turn 100 (Turn @_game?.Turn/100)</MudText>
+                    </MudStack>
+                </MudItem>
+            </MudGrid>
+        </MudPaper>
+
+        @* Header *@
+        <MudPaper Class="pa-4 mb-4" Elevation="2">
+            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                <MudStack Spacing="0">
+                    <MudText Typo="Typo.h4" Color="Color.Warning">@_game.Name</MudText>
+                    <MudText Typo="Typo.subtitle1" Color="Color.Secondary">
+                        Turn @_game.Turn • @_game.Phase Phase • @_game.SystemCount Systems
+                    </MudText>
+                </MudStack>
+                <MudStack Row="true" Spacing="2">
+                    @if (!_hasSubmittedOrders)
+                    {
+                        <MudButton Variant="Variant.Filled" Color="Color.Success" Size="Size.Large"
+                                   OnClick="EndTurn" StartIcon="@Icons.Material.Filled.Check"
+                                   Disabled="_processingTurn">
+                            End Turn
+                        </MudButton>
+                    }
+                    else
+                    {
+                        <MudChip T="string" Color="Color.Success" Size="Size.Large">Orders Submitted ✓</MudChip>
+                    }
+                    @if (_game.Phase == "Orders" && _allFactionsReady)
+                    {
+                        <MudButton Variant="Variant.Filled" Color="Color.Warning" Size="Size.Large"
+                                   OnClick="ProcessTurn" StartIcon="@Icons.Material.Filled.PlayArrow"
+                                   Disabled="_processingTurn">
+                            @if (_processingTurn)
+                            {
+                                <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
+                            }
+                            Process Turn
+                        </MudButton>
+                    }
+                </MudStack>
+            </MudStack>
+        </MudPaper>
+
+        <MudGrid>
+            @* Factions *@
+            <MudItem xs="12" md="6">
+                <MudPaper Class="pa-4" Elevation="2">
+                    <MudText Typo="Typo.h6" Class="mb-3">Factions</MudText>
+                    @foreach (var faction in _game.Factions)
+                    {
+                        <MudCard Class="mb-2" Outlined="true">
+                            <MudCardContent Class="pa-3">
+                                <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                                    <MudStack Spacing="0">
+                                        <MudText Typo="Typo.subtitle1">@faction.Name</MudText>
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                            @(faction.PlayerName ?? "AI") • @faction.RaceId
+                                        </MudText>
+                                    </MudStack>
+                                    <MudStack Row="true" Spacing="1">
+                                        @if (faction.IsDefeated)
+                                        {
+                                            <MudChip T="string" Size="Size.Small" Color="Color.Error">Defeated</MudChip>
+                                        }
+                                        else if (faction.HasSubmittedOrders)
+                                        {
+                                            <MudChip T="string" Size="Size.Small" Color="Color.Success">Ready</MudChip>
+                                        }
+                                        else
+                                        {
+                                            <MudChip T="string" Size="Size.Small" Color="Color.Warning">Pending</MudChip>
+                                        }
+                                    </MudStack>
+                                </MudStack>
+                            </MudCardContent>
+                        </MudCard>
+                    }
+                </MudPaper>
+            </MudItem>
+
+            @* Your Faction Summary *@
+            <MudItem xs="12" md="6">
+                @if (_faction != null)
+                {
+                    <MudPaper Class="pa-4" Elevation="2">
+                        <MudText Typo="Typo.h6" Class="mb-3">Your Empire: @_faction.Name</MudText>
+                        
+                        @* Resources *@
+                        <MudText Typo="Typo.subtitle2" Class="mb-2">Treasury</MudText>
+                        <MudGrid Spacing="2" Class="mb-4">
+                            <MudItem xs="6" sm="3">
+                                <MudPaper Class="pa-2 text-center" Elevation="0" Style="background: rgba(255,204,0,0.2)">
+                                    <MudText Typo="Typo.h6" Color="Color.Warning">@_faction.Treasury.Credits</MudText>
+                                    <MudText Typo="Typo.caption">Credits</MudText>
+                                </MudPaper>
+                            </MudItem>
+                            <MudItem xs="6" sm="3">
+                                <MudPaper Class="pa-2 text-center" Elevation="0" Style="background: rgba(51,153,255,0.2)">
+                                    <MudText Typo="Typo.h6" Color="Color.Info">@_faction.Treasury.Dilithium</MudText>
+                                    <MudText Typo="Typo.caption">Dilithium</MudText>
+                                </MudPaper>
+                            </MudItem>
+                            <MudItem xs="6" sm="3">
+                                <MudPaper Class="pa-2 text-center" Elevation="0" Style="background: rgba(102,255,153,0.2)">
+                                    <MudText Typo="Typo.h6" Color="Color.Success">@_faction.Treasury.Deuterium</MudText>
+                                    <MudText Typo="Typo.caption">Deuterium</MudText>
+                                </MudPaper>
+                            </MudItem>
+                            <MudItem xs="6" sm="3">
+                                <MudPaper Class="pa-2 text-center" Elevation="0" Style="background: rgba(153,153,153,0.2)">
+                                    <MudText Typo="Typo.h6">@_faction.Treasury.Duranium</MudText>
+                                    <MudText Typo="Typo.caption">Duranium</MudText>
+                                </MudPaper>
+                            </MudItem>
+                        </MudGrid>
+
+                        @* Quick Stats *@
+                        <MudSimpleTable Dense="true">
+                            <tbody>
+                                <tr>
+                                    <td>Fleets</td>
+                                    <td style="text-align: right"><strong>@_faction.Fleets.Count</strong></td>
+                                </tr>
+                                <tr>
+                                    <td>Colonies</td>
+                                    <td style="text-align: right"><strong>@_faction.Colonies.Count</strong></td>
+                                </tr>
+                                <tr>
+                                    <td>Total Ships</td>
+                                    <td style="text-align: right"><strong>@_faction.Fleets.Sum(f => f.ShipCount)</strong></td>
+                                </tr>
+                            </tbody>
+                        </MudSimpleTable>
+                    </MudPaper>
+                }
+            </MudItem>
+
+            @* Quick Actions *@
+            <MudItem xs="12">
+                <MudPaper Class="pa-4" Elevation="2">
+                    <MudText Typo="Typo.h6" Class="mb-3">Quick Actions</MudText>
+                    <MudStack Row="true" Spacing="3" Wrap="Wrap.Wrap">
+                        <MudButton Variant="Variant.Outlined" Color="Color.Primary" 
+                                   Href="/game/map" StartIcon="@Icons.Material.Filled.Map">
+                            Galaxy Map
+                        </MudButton>
+                        <MudButton Variant="Variant.Outlined" Color="Color.Info" 
+                                   Href="/game/fleets" StartIcon="@Icons.Material.Filled.RocketLaunch">
+                            Fleet Command
+                        </MudButton>
+                        <MudButton Variant="Variant.Outlined" Color="Color.Success" 
+                                   Href="/game/colonies" StartIcon="@Icons.Material.Filled.LocationCity">
+                            Colony Management
+                        </MudButton>
+                        <MudButton Variant="Variant.Outlined" Color="Color.Warning" 
+                                   Href="/game/research" StartIcon="@Icons.Material.Filled.Science" Disabled="true">
+                            Research (Coming Soon)
+                        </MudButton>
+                    </MudStack>
+                </MudPaper>
+            </MudItem>
+
+            @* Recent Events *@
+            @if (_turnEvents.Any())
+            {
+                <MudItem xs="12">
+                    <MudPaper Class="pa-4" Elevation="2">
+                        <MudText Typo="Typo.h6" Class="mb-3">Recent Events</MudText>
+                        <MudTimeline TimelinePosition="TimelinePosition.Start">
+                            @foreach (var evt in _turnEvents.Take(5))
+                            {
+                                <MudTimelineItem Color="Color.Primary" Size="Size.Small">
+                                    <MudText Typo="Typo.body2">@evt</MudText>
+                                </MudTimelineItem>
+                            }
+                        </MudTimeline>
+                    </MudPaper>
+                </MudItem>
+            }
+        </MudGrid>
+    }
+</MudContainer>
+
+<style>
+    .text-center { text-align: center; }
+</style>
+
+@code {
+    private bool _loading = true;
+    private bool _processingTurn;
+    private GameDetailDto? _game;
+    private FactionDetailDto? _faction;
+    private List<string> _turnEvents = new();
+    private Guid? _currentFactionId;
+    private bool _hasSubmittedOrders;
+    private bool _allFactionsReady;
+    
+    // Victory tracking
+    private VictoryInfo? _victory;
+    private int _playerSystems;
+    private int _totalSystems;
+    private int _playerCredits;
+    private double _conquestProgress;
+    private double _economicProgress;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _currentFactionId = await LocalStorage.GetItemAsync<Guid?>("currentFactionId");
+        await LoadGame();
+    }
+
+    private async Task LoadGame()
+    {
+        _loading = true;
+        try
+        {
+            var games = await Api.GetGamesAsync();
+            if (!games.Any())
+            {
+                Snackbar.Add("No games found", Severity.Warning);
+                Navigation.NavigateTo("/");
+                return;
+            }
+
+            var gameId = games.First().Id;
+            _game = await Api.GetGameAsync(gameId);
+            
+            if (_game == null) return;
+
+            // Check for victory/defeat
+            var remainingFactions = _game.Factions.Where(f => !f.IsDefeated).ToList();
+            if (remainingFactions.Count == 1)
+            {
+                var winner = remainingFactions.First();
+                _victory = new VictoryInfo
+                {
+                    WinnerId = winner.Id,
+                    WinnerName = winner.Name,
+                    VictoryType = "Conquest",
+                    Turn = _game.Turn,
+                    IsWinner = winner.Id == _currentFactionId
+                };
+                return;
+            }
+
+            // Check if current player is defeated
+            var currentFaction = _game.Factions.FirstOrDefault(f => f.Id == _currentFactionId);
+            if (currentFaction?.IsDefeated == true)
+            {
+                _victory = new VictoryInfo
+                {
+                    WinnerId = Guid.Empty,
+                    WinnerName = "Others",
+                    VictoryType = "Your faction was eliminated",
+                    Turn = _game.Turn,
+                    IsWinner = false
+                };
+                return;
+            }
+
+            // Calculate victory progress
+            _totalSystems = _game.SystemCount;
+            _hasSubmittedOrders = currentFaction?.HasSubmittedOrders ?? false;
+            _allFactionsReady = _game.Factions.Where(f => !f.IsDefeated && f.PlayerName != null).All(f => f.HasSubmittedOrders);
+
+            // Load player faction details
+            var playerFaction = _game.Factions.FirstOrDefault(f => f.Id == _currentFactionId) 
+                ?? _game.Factions.FirstOrDefault(f => f.PlayerName != null);
+            
+            if (playerFaction != null)
+            {
+                var fleets = await Api.GetFleetsAsync(playerFaction.Id);
+                var colonies = await Api.GetColoniesAsync(playerFaction.Id);
+                
+                _playerSystems = colonies.Count;
+                _playerCredits = 1500; // Would come from treasury API
+                
+                _conquestProgress = Math.Min(100, (_playerSystems / (double)Math.Max(1, _totalSystems * 0.75)) * 100);
+                _economicProgress = Math.Min(100, (_playerCredits / 10000.0) * 100);
+                
+                _faction = new FactionDetailDto(
+                    playerFaction.Id,
+                    playerFaction.Name,
+                    playerFaction.RaceId,
+                    new TreasuryDto(_playerCredits, 100, 500, 300),
+                    fleets.Select(f => new Services.FleetSummaryDto(f.Id, f.Name, f.CurrentSystemId, 
+                        f.CurrentSystemName, f.ShipGroups?.Sum(g => g.Count) ?? 0, f.DestinationId.HasValue)).ToList(),
+                    colonies.Select(c => new ColonySummaryDto(c.Id, c.Name, c.SystemId, 
+                        c.Population, c.ProductionCapacity)).ToList()
+                );
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Failed to load game: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private async Task EndTurn()
+    {
+        if (_game == null || _currentFactionId == null) return;
+        
+        _processingTurn = true;
+        try
+        {
+            await Sound.PlayAsync("select");
+            await Api.EndTurnAsync(_game.Id, _currentFactionId.Value);
+            _hasSubmittedOrders = true;
+            await Sound.PlaySuccessAsync();
+            Snackbar.Add("Turn ended - waiting for other players", Severity.Success);
+            await LoadGame();
+        }
+        catch (Exception ex)
+        {
+            await Sound.PlayErrorAsync();
+            Snackbar.Add($"Failed to end turn: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _processingTurn = false;
+        }
+    }
+
+    private async Task ProcessTurn()
+    {
+        if (_game == null) return;
+        
+        _processingTurn = true;
+        try
+        {
+            await Sound.PlayAsync("scan"); // Processing sounds
+            var result = await Api.ProcessTurnAsync(_game.Id);
+            _turnEvents = result.Events;
+            
+            await Sound.PlayAsync("turn_end");
+            Snackbar.Add($"Turn {result.NewTurn} processed!", Severity.Success);
+            
+            // Play combat alert if there were battles
+            if (result.Events.Any(e => e.Contains("Combat") || e.Contains("⚔")))
+            {
+                await Sound.PlayAlertAsync();
+            }
+            
+            // Show events
+            foreach (var evt in result.Events.Take(3))
+            {
+                Snackbar.Add(evt, Severity.Info);
+            }
+            
+            await LoadGame();
+        }
+        catch (Exception ex)
+        {
+            await Sound.PlayErrorAsync();
+            Snackbar.Add($"Failed to process turn: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _processingTurn = false;
+        }
+    }
+
+    private class VictoryInfo
+    {
+        public Guid WinnerId { get; set; }
+        public string WinnerName { get; set; } = "";
+        public string VictoryType { get; set; } = "";
+        public int Turn { get; set; }
+        public bool IsWinner { get; set; }
+    }
+}

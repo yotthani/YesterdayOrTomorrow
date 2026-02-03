@@ -1,0 +1,393 @@
+@using Blazored.LocalStorage
+@using StarTrekGame.Web.Services
+@inject ILocalStorageService LocalStorage
+@inject ISoundService Sound
+@inject IJSRuntime JS
+
+@if (_isOpen)
+{
+    <div class="settings-overlay" @onclick="Close"></div>
+    <div class="settings-panel">
+        <div class="settings-header">
+            <h2>⚙️ SETTINGS</h2>
+            <button class="close-btn" @onclick="Close">✕</button>
+        </div>
+        
+        <div class="settings-content">
+            <div class="settings-section">
+                <h3>🔊 Audio</h3>
+                <div class="setting-row">
+                    <span class="setting-label">Master Volume</span>
+                    <div class="slider-container">
+                        <input type="range" min="0" max="100" @bind="_masterVolume" @bind:event="oninput" @onchange="UpdateVolume" />
+                        <span class="slider-value">@_masterVolume%</span>
+                    </div>
+                </div>
+                <div class="setting-row">
+                    <span class="setting-label">Sound Effects</span>
+                    <label class="toggle">
+                        <input type="checkbox" @bind="_soundEnabled" @bind:after="UpdateSoundEnabled" />
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <div class="setting-row">
+                    <span class="setting-label">Music</span>
+                    <label class="toggle">
+                        <input type="checkbox" @bind="_musicEnabled" @bind:after="SaveSettings" />
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h3>🎮 Gameplay</h3>
+                <div class="setting-row">
+                    <span class="setting-label">Auto-End Turn</span>
+                    <label class="toggle">
+                        <input type="checkbox" @bind="_autoEndTurn" @bind:after="SaveSettings" />
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <div class="setting-row">
+                    <span class="setting-label">Confirm End Turn</span>
+                    <label class="toggle">
+                        <input type="checkbox" @bind="_confirmEndTurn" @bind:after="SaveSettings" />
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <div class="setting-row">
+                    <span class="setting-label">Show Tooltips</span>
+                    <label class="toggle">
+                        <input type="checkbox" @bind="_showTooltips" @bind:after="SaveSettings" />
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <div class="setting-row">
+                    <span class="setting-label">Animation Speed</span>
+                    <select @bind="_animationSpeed" @bind:after="SaveSettings">
+                        <option value="slow">Slow</option>
+                        <option value="normal">Normal</option>
+                        <option value="fast">Fast</option>
+                        <option value="instant">Instant</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h3>🖥️ Display</h3>
+                <div class="setting-row">
+                    <span class="setting-label">UI Scale</span>
+                    <select @bind="_uiScale" @bind:after="SaveSettings">
+                        <option value="0.8">Small (80%)</option>
+                        <option value="1.0">Normal (100%)</option>
+                        <option value="1.2">Large (120%)</option>
+                        <option value="1.4">Extra Large (140%)</option>
+                    </select>
+                </div>
+                <div class="setting-row">
+                    <span class="setting-label">Show Grid</span>
+                    <label class="toggle">
+                        <input type="checkbox" @bind="_showGrid" @bind:after="SaveSettings" />
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <div class="setting-row">
+                    <span class="setting-label">Show System Names</span>
+                    <label class="toggle">
+                        <input type="checkbox" @bind="_showSystemNames" @bind:after="SaveSettings" />
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h3>⌨️ Keyboard Shortcuts</h3>
+                <div class="shortcuts-list">
+                    <div class="shortcut"><kbd>Space</kbd> End Turn</div>
+                    <div class="shortcut"><kbd>G</kbd> Galaxy Map</div>
+                    <div class="shortcut"><kbd>R</kbd> Research</div>
+                    <div class="shortcut"><kbd>D</kbd> Diplomacy</div>
+                    <div class="shortcut"><kbd>F</kbd> Fleets</div>
+                    <div class="shortcut"><kbd>C</kbd> Colonies</div>
+                    <div class="shortcut"><kbd>Esc</kbd> Close/Cancel</div>
+                    <div class="shortcut"><kbd>F1</kbd> Help</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-footer">
+            <button class="reset-btn" @onclick="ResetToDefaults">Reset to Defaults</button>
+            <button class="save-btn" @onclick="SaveAndClose">Save & Close</button>
+        </div>
+    </div>
+}
+
+<style>
+    .settings-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 9998;
+    }
+    .settings-panel {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 480px;
+        max-height: 80vh;
+        background: linear-gradient(180deg, rgba(20, 30, 50, 0.98) 0%, rgba(10, 15, 25, 0.98) 100%);
+        border: 2px solid rgba(74, 158, 255, 0.5);
+        border-radius: 12px;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+    .settings-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 20px;
+        background: rgba(0, 0, 0, 0.3);
+        border-bottom: 1px solid rgba(74, 158, 255, 0.3);
+    }
+    .settings-header h2 {
+        margin: 0;
+        font-size: 18px;
+        color: #ff9900;
+    }
+    .close-btn {
+        background: transparent;
+        border: none;
+        color: #7890a8;
+        font-size: 20px;
+        cursor: pointer;
+    }
+    .close-btn:hover { color: #ff4455; }
+    
+    .settings-content {
+        flex: 1;
+        overflow-y: auto;
+        padding: 16px 20px;
+    }
+    .settings-section {
+        margin-bottom: 24px;
+    }
+    .settings-section h3 {
+        font-size: 14px;
+        color: #4a9eff;
+        margin: 0 0 12px 0;
+        padding-bottom: 8px;
+        border-bottom: 1px solid rgba(74, 158, 255, 0.2);
+    }
+    .setting-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+    }
+    .setting-label {
+        font-size: 13px;
+        color: #c8d4e8;
+    }
+    .slider-container {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .slider-container input[type="range"] {
+        width: 120px;
+        accent-color: #4a9eff;
+    }
+    .slider-value {
+        min-width: 40px;
+        text-align: right;
+        font-size: 12px;
+        color: #7890a8;
+    }
+    select {
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(74, 158, 255, 0.4);
+        border-radius: 4px;
+        padding: 6px 12px;
+        color: #c8d4e8;
+        font-size: 12px;
+    }
+    .toggle {
+        position: relative;
+        width: 48px;
+        height: 24px;
+    }
+    .toggle input { display: none; }
+    .toggle-slider {
+        position: absolute;
+        inset: 0;
+        background: rgba(60, 60, 80, 0.8);
+        border-radius: 12px;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+    .toggle-slider::before {
+        content: '';
+        position: absolute;
+        width: 18px;
+        height: 18px;
+        left: 3px;
+        top: 3px;
+        background: #7890a8;
+        border-radius: 50%;
+        transition: 0.2s;
+    }
+    .toggle input:checked + .toggle-slider { background: rgba(74, 158, 255, 0.5); }
+    .toggle input:checked + .toggle-slider::before { transform: translateX(24px); background: #4a9eff; }
+    
+    .shortcuts-list {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+    .shortcut {
+        font-size: 12px;
+        color: #7890a8;
+    }
+    kbd {
+        display: inline-block;
+        padding: 2px 6px;
+        background: rgba(0, 0, 0, 0.4);
+        border: 1px solid rgba(74, 158, 255, 0.3);
+        border-radius: 4px;
+        font-family: monospace;
+        font-size: 11px;
+        color: #ff9900;
+        margin-right: 6px;
+    }
+    
+    .settings-footer {
+        display: flex;
+        justify-content: space-between;
+        padding: 16px 20px;
+        background: rgba(0, 0, 0, 0.2);
+        border-top: 1px solid rgba(74, 158, 255, 0.2);
+    }
+    .reset-btn, .save-btn {
+        padding: 10px 20px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+    .reset-btn {
+        background: transparent;
+        border: 1px solid rgba(255, 68, 85, 0.5);
+        color: #ff4455;
+    }
+    .reset-btn:hover { background: rgba(255, 68, 85, 0.1); }
+    .save-btn {
+        background: linear-gradient(180deg, #4a9eff, #2a6ecc);
+        border: none;
+        color: #fff;
+    }
+    .save-btn:hover { background: linear-gradient(180deg, #5aaeFF, #3a7edc); }
+</style>
+
+@code {
+    private bool _isOpen;
+    
+    // Audio settings
+    private int _masterVolume = 70;
+    private bool _soundEnabled = true;
+    private bool _musicEnabled = true;
+    
+    // Gameplay settings
+    private bool _autoEndTurn = false;
+    private bool _confirmEndTurn = true;
+    private bool _showTooltips = true;
+    private string _animationSpeed = "normal";
+    
+    // Display settings
+    private string _uiScale = "1.0";
+    private bool _showGrid = true;
+    private bool _showSystemNames = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadSettings();
+    }
+
+    public void Open()
+    {
+        _isOpen = true;
+        StateHasChanged();
+    }
+
+    public void Close()
+    {
+        _isOpen = false;
+        StateHasChanged();
+    }
+
+    private async Task LoadSettings()
+    {
+        _masterVolume = await LocalStorage.GetItemAsync<int?>("settings_masterVolume") ?? 70;
+        _soundEnabled = await LocalStorage.GetItemAsync<bool?>("settings_soundEnabled") ?? true;
+        _musicEnabled = await LocalStorage.GetItemAsync<bool?>("settings_musicEnabled") ?? true;
+        _autoEndTurn = await LocalStorage.GetItemAsync<bool?>("settings_autoEndTurn") ?? false;
+        _confirmEndTurn = await LocalStorage.GetItemAsync<bool?>("settings_confirmEndTurn") ?? true;
+        _showTooltips = await LocalStorage.GetItemAsync<bool?>("settings_showTooltips") ?? true;
+        _animationSpeed = await LocalStorage.GetItemAsync<string>("settings_animationSpeed") ?? "normal";
+        _uiScale = await LocalStorage.GetItemAsync<string>("settings_uiScale") ?? "1.0";
+        _showGrid = await LocalStorage.GetItemAsync<bool?>("settings_showGrid") ?? true;
+        _showSystemNames = await LocalStorage.GetItemAsync<bool?>("settings_showSystemNames") ?? true;
+    }
+
+    private async Task SaveSettings()
+    {
+        await LocalStorage.SetItemAsync("settings_masterVolume", _masterVolume);
+        await LocalStorage.SetItemAsync("settings_soundEnabled", _soundEnabled);
+        await LocalStorage.SetItemAsync("settings_musicEnabled", _musicEnabled);
+        await LocalStorage.SetItemAsync("settings_autoEndTurn", _autoEndTurn);
+        await LocalStorage.SetItemAsync("settings_confirmEndTurn", _confirmEndTurn);
+        await LocalStorage.SetItemAsync("settings_showTooltips", _showTooltips);
+        await LocalStorage.SetItemAsync("settings_animationSpeed", _animationSpeed);
+        await LocalStorage.SetItemAsync("settings_uiScale", _uiScale);
+        await LocalStorage.SetItemAsync("settings_showGrid", _showGrid);
+        await LocalStorage.SetItemAsync("settings_showSystemNames", _showSystemNames);
+    }
+
+    private async Task UpdateVolume()
+    {
+        await Sound.SetVolumeAsync(_masterVolume / 100f);
+        await SaveSettings();
+    }
+
+    private async Task UpdateSoundEnabled()
+    {
+        await Sound.SetEnabledAsync(_soundEnabled);
+        await SaveSettings();
+    }
+
+    private async Task ResetToDefaults()
+    {
+        _masterVolume = 70;
+        _soundEnabled = true;
+        _musicEnabled = true;
+        _autoEndTurn = false;
+        _confirmEndTurn = true;
+        _showTooltips = true;
+        _animationSpeed = "normal";
+        _uiScale = "1.0";
+        _showGrid = true;
+        _showSystemNames = true;
+        await SaveSettings();
+        await UpdateVolume();
+        await UpdateSoundEnabled();
+    }
+
+    private async Task SaveAndClose()
+    {
+        await SaveSettings();
+        await Sound.PlayClickAsync();
+        Close();
+    }
+}

@@ -1,0 +1,62 @@
+@namespace StarTrekGame.Web.Components.UI
+
+<div class="lcars-alert lcars-alert--@Type @(RedAlert ? "lcars-alert--red-alert" : "") @(Glow ? "glow-box" : "")" 
+     style="@Style">
+    <span class="lcars-alert__icon">@GetIcon()</span>
+    <div class="lcars-alert__content">
+        @if (!string.IsNullOrEmpty(Title))
+        {
+            <div class="lcars-alert__title">@Title</div>
+        }
+        @if (!string.IsNullOrEmpty(Message))
+        {
+            <div class="lcars-alert__message">@Message</div>
+        }
+        @ChildContent
+    </div>
+    @if (Dismissible)
+    {
+        <button class="lcars-alert__dismiss" @onclick="OnDismiss">✕</button>
+    }
+</div>
+
+@code {
+    [Parameter] public string Type { get; set; } = "info"; // info, success, warning, danger
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public string? Message { get; set; }
+    [Parameter] public bool Dismissible { get; set; } = false;
+    [Parameter] public bool RedAlert { get; set; } = false;
+    [Parameter] public bool Glow { get; set; } = false;
+    [Parameter] public string? Style { get; set; }
+    [Parameter] public EventCallback OnDismiss { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    private string GetIcon() => Type switch
+    {
+        "success" => "✓",
+        "warning" => "⚠",
+        "danger" => "⚡",
+        _ => "ℹ"
+    };
+}
+
+<style>
+    .lcars-alert--info {
+        border-color: var(--ui-primary);
+    }
+
+    .lcars-alert__dismiss {
+        background: none;
+        border: none;
+        color: var(--ui-text-dim);
+        cursor: pointer;
+        padding: 4px 8px;
+        font-size: 16px;
+        opacity: 0.6;
+        transition: opacity 0.2s;
+    }
+
+    .lcars-alert__dismiss:hover {
+        opacity: 1;
+    }
+</style>

@@ -1,0 +1,448 @@
+/* ==============================================
+   GALACTIC STRATEGY - Federation Ships
+   3D Rendered Style with Nameplates
+   
+   Two sprite sheets:
+   - shuttles_civilian.png: Shuttles, transports, civilian vessels
+   - military_ships.png: Starships, warships, capital ships
+   
+   Both: 2000 x 1103 px, 6 columns x 3 rows
+   Cell Size: ~333 x 368 px
+   ============================================== */
+
+:root {
+    --ship-sheet-width: 2000px;
+    --ship-sheet-height: 1103px;
+    --ship-cols: 6;
+    --ship-rows: 3;
+    --ship-cell-width: 333px;
+    --ship-cell-height: 368px;
+}
+
+/* ==============================================
+   Base Ship Component
+   ============================================== */
+
+.ship-card {
+    width: 166px;
+    height: 184px;
+    background-repeat: no-repeat;
+    background-size: 1000px 552px; /* 50% scale */
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 
+        0 4px 12px rgba(0, 0, 0, 0.5),
+        inset 0 0 20px rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+}
+
+.ship-card:hover {
+    transform: scale(1.03);
+    box-shadow: 
+        0 6px 20px rgba(0, 0, 0, 0.6),
+        inset 0 0 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Size Variants */
+.ship-card.thumb {
+    width: 56px;
+    height: 61px;
+    background-size: 333px 184px;
+    border-radius: 3px;
+}
+
+.ship-card.small {
+    width: 83px;
+    height: 92px;
+    background-size: 500px 276px;
+    border-radius: 3px;
+}
+
+.ship-card.medium {
+    width: 166px;
+    height: 184px;
+    background-size: 1000px 552px;
+}
+
+.ship-card.large {
+    width: 333px;
+    height: 368px;
+    background-size: 2000px 1103px;
+    border-radius: 6px;
+}
+
+/* ==============================================
+   SHUTTLES & CIVILIAN SHIPS
+   Sheet: shuttles_civilian.png
+   ============================================== */
+
+.ship-card.shuttle,
+.ship-card.civilian {
+    background-image: url('/images/ships/federation/shuttles_civilian.png');
+}
+
+/* Row 1: Type 6, Type 7, Type 9, Runabout, Delta Flyer, Argo */
+.ship-card.type-6        { background-position: 0 0; }
+.ship-card.type-7        { background-position: -166px 0; }
+.ship-card.type-9        { background-position: -333px 0; }
+.ship-card.runabout      { background-position: -500px 0; }
+.ship-card.delta-flyer   { background-position: -666px 0; }
+.ship-card.argo          { background-position: -833px 0; }
+
+/* Row 2: Runabout, Scoutship, Scoutship, Type 11, Transport, Cargo Drone */
+.ship-card.runabout-alt  { background-position: 0 -184px; }
+.ship-card.scoutship     { background-position: -166px -184px; }
+.ship-card.scoutship-alt { background-position: -333px -184px; }
+.ship-card.type-11       { background-position: -500px -184px; }
+.ship-card.transport     { background-position: -666px -184px; }
+.ship-card.cargo-drone   { background-position: -833px -184px; }
+
+/* Row 3: Medical, Science, Vulcan, Tellarite, Andorian, Yacht */
+.ship-card.medical       { background-position: 0 -368px; }
+.ship-card.science       { background-position: -166px -368px; }
+.ship-card.vulcan-ship   { background-position: -333px -368px; }
+.ship-card.tellarite-ship{ background-position: -500px -368px; }
+.ship-card.andorian-ship { background-position: -666px -368px; }
+.ship-card.yacht         { background-position: -833px -368px; }
+
+/* ==============================================
+   MILITARY SHIPS
+   Sheet: military_ships.png
+   ============================================== */
+
+.ship-card.military,
+.ship-card.starship {
+    background-image: url('/images/ships/federation/military_ships.png');
+}
+
+/* Row 1: Enterprise, Reliant, Excelsior, Galaxy, Enterprise-D, Nebula */
+.ship-card.enterprise-tos,
+.ship-card.constitution  { background-position: 0 0; }
+.ship-card.reliant,
+.ship-card.miranda       { background-position: -166px 0; }
+.ship-card.excelsior     { background-position: -333px 0; }
+.ship-card.galaxy        { background-position: -500px 0; }
+.ship-card.enterprise-d  { background-position: -666px 0; }
+.ship-card.nebula        { background-position: -833px 0; }
+
+/* Row 2: Nebula, Akira, Defiant, Sovereign-E, Prometheus, Prometheus */
+.ship-card.nebula-alt    { background-position: 0 -184px; }
+.ship-card.akira         { background-position: -166px -184px; }
+.ship-card.defiant       { background-position: -333px -184px; }
+.ship-card.sovereign,
+.ship-card.enterprise-e  { background-position: -500px -184px; }
+.ship-card.prometheus    { background-position: -666px -184px; }
+.ship-card.prometheus-alt{ background-position: -833px -184px; }
+
+/* Row 3: Nova, Steamrunner, Saber, California, Luna, Crossfield */
+.ship-card.nova          { background-position: 0 -368px; }
+.ship-card.steamrunner   { background-position: -166px -368px; }
+.ship-card.saber         { background-position: -333px -368px; }
+.ship-card.california    { background-position: -500px -368px; }
+.ship-card.luna,
+.ship-card.titan         { background-position: -666px -368px; }
+.ship-card.crossfield,
+.ship-card.discovery     { background-position: -833px -368px; }
+
+/* ==============================================
+   Large Size Positions (100% scale)
+   ============================================== */
+
+/* Shuttles Large */
+.ship-card.large.type-6        { background-position: 0 0; }
+.ship-card.large.type-7        { background-position: -333px 0; }
+.ship-card.large.type-9        { background-position: -666px 0; }
+.ship-card.large.runabout      { background-position: -1000px 0; }
+.ship-card.large.delta-flyer   { background-position: -1333px 0; }
+.ship-card.large.argo          { background-position: -1666px 0; }
+
+.ship-card.large.runabout-alt  { background-position: 0 -368px; }
+.ship-card.large.scoutship     { background-position: -333px -368px; }
+.ship-card.large.scoutship-alt { background-position: -666px -368px; }
+.ship-card.large.type-11       { background-position: -1000px -368px; }
+.ship-card.large.transport     { background-position: -1333px -368px; }
+.ship-card.large.cargo-drone   { background-position: -1666px -368px; }
+
+.ship-card.large.medical       { background-position: 0 -736px; }
+.ship-card.large.science       { background-position: -333px -736px; }
+.ship-card.large.vulcan-ship   { background-position: -666px -736px; }
+.ship-card.large.tellarite-ship{ background-position: -1000px -736px; }
+.ship-card.large.andorian-ship { background-position: -1333px -736px; }
+.ship-card.large.yacht         { background-position: -1666px -736px; }
+
+/* Military Large */
+.ship-card.large.enterprise-tos,
+.ship-card.large.constitution  { background-position: 0 0; }
+.ship-card.large.reliant,
+.ship-card.large.miranda       { background-position: -333px 0; }
+.ship-card.large.excelsior     { background-position: -666px 0; }
+.ship-card.large.galaxy        { background-position: -1000px 0; }
+.ship-card.large.enterprise-d  { background-position: -1333px 0; }
+.ship-card.large.nebula        { background-position: -1666px 0; }
+
+.ship-card.large.nebula-alt    { background-position: 0 -368px; }
+.ship-card.large.akira         { background-position: -333px -368px; }
+.ship-card.large.defiant       { background-position: -666px -368px; }
+.ship-card.large.sovereign,
+.ship-card.large.enterprise-e  { background-position: -1000px -368px; }
+.ship-card.large.prometheus    { background-position: -1333px -368px; }
+.ship-card.large.prometheus-alt{ background-position: -1666px -368px; }
+
+.ship-card.large.nova          { background-position: 0 -736px; }
+.ship-card.large.steamrunner   { background-position: -333px -736px; }
+.ship-card.large.saber         { background-position: -666px -736px; }
+.ship-card.large.california    { background-position: -1000px -736px; }
+.ship-card.large.luna,
+.ship-card.large.titan         { background-position: -1333px -736px; }
+.ship-card.large.crossfield,
+.ship-card.large.discovery     { background-position: -1666px -736px; }
+
+/* ==============================================
+   Ship Frame Styles
+   ============================================== */
+
+.ship-frame {
+    display: inline-block;
+    padding: 3px;
+    background: linear-gradient(180deg, #3a3a3a 0%, #1a1a1a 100%);
+    border: 1px solid #4a4a4a;
+    border-radius: 6px;
+    box-shadow: 
+        0 4px 12px rgba(0, 0, 0, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.ship-frame.federation {
+    border-color: rgba(59, 130, 246, 0.6);
+    box-shadow: 
+        0 4px 12px rgba(0, 0, 0, 0.5),
+        0 0 20px rgba(59, 130, 246, 0.3);
+}
+
+.ship-frame.selected {
+    border-color: #fbbf24;
+    box-shadow: 
+        0 4px 12px rgba(0, 0, 0, 0.5),
+        0 0 25px rgba(251, 191, 36, 0.4);
+}
+
+/* ==============================================
+   Ship Selection Grid
+   ============================================== */
+
+.ship-selection-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 16px;
+    padding: 16px;
+}
+
+.ship-selection-item {
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.ship-selection-item:hover {
+    transform: translateY(-4px);
+}
+
+.ship-selection-item.selected {
+    transform: translateY(-4px);
+}
+
+.ship-selection-item.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ==============================================
+   Ship Info Card (with nameplate)
+   ============================================== */
+
+.ship-info-card {
+    display: inline-flex;
+    flex-direction: column;
+    background: linear-gradient(180deg, #2d2d2d 0%, #1a1a1a 100%);
+    border: 1px solid #3a3a3a;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+    transition: all 0.2s;
+}
+
+.ship-info-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+}
+
+.ship-info-card.selected {
+    border-color: #fbbf24;
+    box-shadow: 0 0 20px rgba(251, 191, 36, 0.3);
+}
+
+.ship-info-card .ship-image {
+    width: 166px;
+    height: 150px;
+    background-repeat: no-repeat;
+    background-size: 1000px 552px;
+}
+
+/* Nameplate (matching bronze style) */
+.ship-info-card .ship-nameplate {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background: linear-gradient(180deg, #c9a861 0%, #8b7355 50%, #6b5a45 100%);
+    border-top: 1px solid #d4b872;
+}
+
+.ship-info-card .ship-name {
+    font-size: 11px;
+    font-weight: 700;
+    color: #1a1510;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.ship-info-card .ship-class-icon {
+    width: 24px;
+    height: 24px;
+    background: linear-gradient(180deg, #d4b872 0%, #a08050 100%);
+    border: 2px solid #6b5a45;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* ==============================================
+   Fleet Composition Display
+   ============================================== */
+
+.fleet-ship-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: rgba(20, 25, 35, 0.8);
+    border: 1px solid rgba(100, 120, 160, 0.2);
+    border-radius: 6px;
+    margin-bottom: 8px;
+    transition: all 0.2s;
+}
+
+.fleet-ship-row:hover {
+    background: rgba(30, 40, 55, 0.9);
+    border-color: rgba(100, 120, 160, 0.4);
+}
+
+.fleet-ship-row .ship-thumb {
+    flex-shrink: 0;
+}
+
+.fleet-ship-row .ship-details {
+    flex: 1;
+}
+
+.fleet-ship-row .ship-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 2px;
+}
+
+.fleet-ship-row .ship-class {
+    font-size: 11px;
+    color: rgba(200, 212, 232, 0.6);
+}
+
+.fleet-ship-row .ship-stats {
+    display: flex;
+    gap: 12px;
+}
+
+.fleet-ship-row .ship-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 4px 8px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+}
+
+.fleet-ship-row .stat-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+}
+
+.fleet-ship-row .stat-label {
+    font-size: 9px;
+    color: rgba(200, 212, 232, 0.5);
+    text-transform: uppercase;
+}
+
+/* ==============================================
+   Ship Class Categories
+   ============================================== */
+
+/* Visual indicators for ship roles */
+.ship-card.escort::after,
+.ship-card.tactical::after {
+    content: '⚔️';
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    font-size: 14px;
+}
+
+.ship-card.science-vessel::after {
+    content: '🔬';
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    font-size: 14px;
+}
+
+.ship-card.explorer::after {
+    content: '🌟';
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    font-size: 14px;
+}
+
+.ship-card.carrier::after {
+    content: '🛫';
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    font-size: 14px;
+}
+
+/* ==============================================
+   Animations
+   ============================================== */
+
+@keyframes ship-hover {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+}
+
+.ship-card.animate-hover {
+    animation: ship-hover 3s ease-in-out infinite;
+}
+
+@keyframes ship-selected-glow {
+    0%, 100% { box-shadow: 0 0 15px rgba(59, 130, 246, 0.4); }
+    50% { box-shadow: 0 0 25px rgba(59, 130, 246, 0.6); }
+}
+
+.ship-card.selected {
+    animation: ship-selected-glow 2s ease-in-out infinite;
+}

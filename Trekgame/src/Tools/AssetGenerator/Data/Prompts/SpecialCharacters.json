@@ -1,0 +1,264 @@
+{
+  "category": "SpecialCharacters",
+  "description": "Iconic Star Trek characters - Q, Data, Khan, etc.",
+  "assets": [
+    {
+      "id": "q_classic",
+      "name": "Q Classic Smirk Starfleet",
+      "match": ["q classic", "q starfleet", "q smirk"],
+      "prompt": {
+        "title": "Q (THE OMNIPOTENT)",
+        "species": "Q Continuum entity in human form",
+        "appearance": [
+          "Human male, middle-aged, distinguished",
+          "Dark hair, slightly receding",
+          "Mischievous, arrogant smirk"
+        ],
+        "clothing": [
+          "Starfleet command red uniform",
+          "Captain's pips"
+        ],
+        "expression": "Amused superiority, about to snap fingers",
+        "reference": "Think: John de Lancie's iconic portrayal - omnipotent trickster god"
+      }
+    },
+    {
+      "id": "q_judge",
+      "name": "Q Judge Robes Tribunal",
+      "match": ["q judge", "q tribunal", "q robes"],
+      "prompt": {
+        "title": "Q AS JUDGE",
+        "species": "Q Continuum entity",
+        "appearance": [
+          "Human male in dramatic judge attire",
+          "Stern, theatrical expression"
+        ],
+        "clothing": [
+          "Ornate judicial robes",
+          "Post-atomic horror judge outfit",
+          "Elaborate headpiece"
+        ],
+        "expression": "Theatrical condemnation, judging humanity",
+        "reference": "Think: Q from 'Encounter at Farpoint' and 'All Good Things'"
+      }
+    },
+    {
+      "id": "q_mariachi",
+      "name": "Q Mariachi Snapping Fingers",
+      "match": ["q mariachi", "q snapping"],
+      "prompt": {
+        "title": "Q IN COSTUME",
+        "species": "Q Continuum entity",
+        "appearance": [
+          "Human male in festive costume",
+          "Playful, mischievous grin"
+        ],
+        "clothing": [
+          "Mariachi outfit OR other theatrical costume",
+          "Colorful, elaborate"
+        ],
+        "expression": "Fingers raised about to snap, playful chaos",
+        "reference": "Think: Q's love of theatrical entrances and costumes"
+      }
+    },
+    {
+      "id": "data_curious",
+      "name": "Data Yellow Eyes Curious",
+      "match": ["data yellow", "data curious", "data soong"],
+      "prompt": {
+        "title": "DATA (ANDROID)",
+        "species": "Soong-type android",
+        "appearance": [
+          "Pale white/golden skin tone",
+          "YELLOW EYES - distinctive golden irises",
+          "Slicked back black hair",
+          "Perfect, symmetrical features"
+        ],
+        "clothing": [
+          "Starfleet operations gold uniform (TNG era)",
+          "Lieutenant Commander pips"
+        ],
+        "expression": "Curious head tilt, studying something with fascination",
+        "reference": "Think: Brent Spiner's Data - innocent curiosity about humanity"
+      }
+    },
+    {
+      "id": "data_emotion",
+      "name": "Data Emotion Chip Smiling",
+      "match": ["data emotion", "data smiling", "data chip"],
+      "prompt": {
+        "title": "DATA WITH EMOTION CHIP",
+        "species": "Soong-type android",
+        "appearance": [
+          "Pale white/golden skin tone",
+          "YELLOW EYES",
+          "Attempting a genuine smile (slightly awkward)"
+        ],
+        "clothing": [
+          "Starfleet uniform, movie era"
+        ],
+        "expression": "Genuine but slightly awkward smile - experiencing emotion",
+        "reference": "Think: Data from Generations/First Contact - learning to feel"
+      }
+    },
+    {
+      "id": "lore_evil",
+      "name": "Lore Evil Twin Smirk",
+      "match": ["lore", "evil twin"],
+      "prompt": {
+        "title": "LORE (EVIL ANDROID)",
+        "species": "Soong-type android (Data's brother)",
+        "appearance": [
+          "Identical to Data but with cruel expression",
+          "YELLOW EYES with malicious glint",
+          "Same pale skin, black hair"
+        ],
+        "clothing": [
+          "Civilian clothing OR crystalline entity era outfit",
+          "No Starfleet uniform"
+        ],
+        "expression": "Cruel smirk, superiority complex, malicious intelligence",
+        "reference": "Think: Lore - Data's evil twin, believes androids are superior"
+      }
+    },
+    {
+      "id": "khan_classic",
+      "name": "Khan Classic Vengeful",
+      "match": ["khan classic", "khan vengeful", "khan noonien"],
+      "prompt": {
+        "title": "KHAN NOONIEN SINGH",
+        "species": "Human Augment (genetically enhanced)",
+        "appearance": [
+          "Muscular, powerful build",
+          "Long dark hair, flowing",
+          "Swarthy complexion",
+          "Intense, burning eyes"
+        ],
+        "clothing": [
+          "Torn Starfleet uniform OR",
+          "Dramatic chest-baring outfit",
+          "Weathered, battle-worn"
+        ],
+        "expression": "Burning vengeance, theatrical rage",
+        "reference": "Think: Ricardo Montalban's Khan - 'From hell's heart I stab at thee'"
+      }
+    },
+    {
+      "id": "borg_queen",
+      "name": "Borg Queen Seductive",
+      "match": ["borg queen", "queen seductive"],
+      "prompt": {
+        "title": "BORG QUEEN",
+        "species": "Borg (unique individual)",
+        "appearance": [
+          "Pale gray skin",
+          "Bald or minimal dark hair slicked back",
+          "One eye organic, one cybernetic",
+          "Mechanical spine visible",
+          "Elegant but terrifying"
+        ],
+        "clothing": [
+          "Biomechanical body suit",
+          "Green accent lighting",
+          "Tubes and implants"
+        ],
+        "expression": "Seductive menace, cold intelligence",
+        "reference": "Think: 'I am the Borg' - terrifying beauty, hive mind incarnate"
+      }
+    },
+    {
+      "id": "guinan",
+      "name": "Guinan Wise Bartender",
+      "match": ["guinan", "wise bartender", "el-aurian"],
+      "prompt": {
+        "title": "GUINAN",
+        "species": "El-Aurian (long-lived species)",
+        "appearance": [
+          "Dark-skinned woman",
+          "Serene, knowing expression",
+          "Centuries of wisdom in her eyes"
+        ],
+        "clothing": [
+          "Elaborate hat/headpiece (her signature)",
+          "Flowing robes in purple/earth tones",
+          "Ten Forward bartender attire"
+        ],
+        "expression": "Knowing smile, ancient wisdom, mysterious",
+        "reference": "Think: Whoopi Goldberg's Guinan - listener, advisor, mystery"
+      }
+    },
+    {
+      "id": "odo_constable",
+      "name": "Odo Grumpy Constable",
+      "match": ["odo", "constable", "grumpy"],
+      "prompt": {
+        "title": "ODO (CHANGELING)",
+        "species": "Changeling/Founder in humanoid form",
+        "appearance": [
+          "Unfinished humanoid features",
+          "Smooth, simplified face",
+          "Slicked-back 'hair' (part of form)",
+          "No ears, simplified nose"
+        ],
+        "clothing": [
+          "Bajoran security uniform",
+          "Constable badge"
+        ],
+        "expression": "Perpetually grumpy, suspicious, 'hmph'",
+        "reference": "Think: Rene Auberjonois's Odo - curmudgeon with hidden heart"
+      }
+    },
+    {
+      "id": "mirror_spock",
+      "name": "Mirror Spock Goatee",
+      "match": ["mirror spock", "spock goatee", "mirror universe"],
+      "prompt": {
+        "title": "MIRROR SPOCK",
+        "species": "Vulcan (Mirror Universe)",
+        "appearance": [
+          "Vulcan with pointed ears",
+          "GOATEE - the classic mirror universe indicator",
+          "Severe expression but thoughtful"
+        ],
+        "clothing": [
+          "Mirror Universe Starfleet uniform",
+          "Imperial insignia (sword through Earth)"
+        ],
+        "expression": "Calculating, but perhaps questioning the Empire",
+        "reference": "Think: Leonard Nimoy with goatee - logic in a brutal universe"
+      }
+    },
+    {
+      "id": "emh_doctor",
+      "name": "Holographic Doctor EMH",
+      "match": ["holographic doctor", "emh", "doctor voyager"],
+      "prompt": {
+        "title": "THE DOCTOR (EMH)",
+        "species": "Emergency Medical Hologram",
+        "appearance": [
+          "Balding human male appearance",
+          "Slightly portly",
+          "Exasperated expression common"
+        ],
+        "clothing": [
+          "Starfleet medical uniform (blue, Voyager era)",
+          "Mobile emitter on arm"
+        ],
+        "expression": "Exasperated or smugly self-satisfied",
+        "reference": "Think: Robert Picardo - 'Please state the nature of the medical emergency'"
+      }
+    }
+  ],
+  "styleGuide": {
+    "material": "Plasticine clay with subtle comic-like shader",
+    "quality": "High-end stop-motion animation (Laika/Aardman style)",
+    "lighting": "Soft, cinematic studio lighting with subsurface scattering",
+    "composition": "Medium shot portrait, 3/4 view, looking at camera",
+    "background": "Solid black (#000000)",
+    "characteristics": [
+      "Must be RECOGNIZABLE as the specific character",
+      "Key features that define the character must be present",
+      "Expression and pose should capture their personality"
+    ]
+  }
+}

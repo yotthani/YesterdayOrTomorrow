@@ -1,0 +1,385 @@
+@page "/game/events"
+@inject NavigationManager Nav
+
+<div class="events-screen">
+    <div class="events-header">
+        <h1>📜 Events & Decisions</h1>
+        <button class="btn-back" @onclick="GoBack">← Back</button>
+    </div>
+
+    @if (_loading)
+    {
+        <div class="loading">Loading events...</div>
+    }
+    else if (!_events.Any())
+    {
+        <div class="no-events">
+            <span class="icon">✓</span>
+            <p>No pending events</p>
+        </div>
+    }
+    else
+    {
+        <div class="events-list">
+            @foreach (var evt in _events)
+            {
+                <div class="event-card @(evt.IsMajor ? "major" : "")">
+                    <div class="event-icon">@GetCategoryIcon(evt.Category)</div>
+                    <div class="event-content">
+                        <h3>@evt.Title</h3>
+                        <p>@evt.Description</p>
+                        <div class="event-meta">
+                            <span class="category">@evt.Category</span>
+                            <span class="turn">Turn @evt.TurnCreated</span>
+                        </div>
+                    </div>
+                    <div class="event-options">
+                        @foreach (var opt in evt.Options)
+                        {
+                            <button class="option-btn" @onclick="() => SelectOption(evt.Id, opt.Id)" title="@opt.Tooltip">
+                                @opt.Text
+                                @if (opt.RiskChance > 0)
+                                {
+                                    <span class="risk">⚠️ @((int)(opt.RiskChance * 100))% risk</span>
+                                }
+                            </button>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    @if (_showConfirmModal && _selectedOption != null)
+    {
+        <div class="modal-overlay" @onclick="CancelSelection">
+            <div class="modal" @onclick:stopPropagation="true">
+                <h2>Confirm Decision</h2>
+                <p>@_selectedOption.Text</p>
+                <div class="effects">
+                    @foreach (var effect in _selectedOption.Effects)
+                    {
+                        <span class="effect @GetEffectClass(effect)">@FormatEffect(effect)</span>
+                    }
+                </div>
+                <div class="modal-buttons">
+                    <button class="btn-confirm" @onclick="ConfirmSelection">Confirm</button>
+                    <button class="btn-cancel" @onclick="CancelSelection">Cancel</button>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (_showResultModal && _eventResult != null)
+    {
+        <div class="modal-overlay" @onclick="CloseResult">
+            <div class="modal result" @onclick:stopPropagation="true">
+                <h2>@(_eventResult.RiskTriggered ? "⚠️ Unexpected Outcome" : "✓ Decision Implemented")</h2>
+                <p>@_eventResult.Message</p>
+                <div class="effects">
+                    @foreach (var effect in _eventResult.Effects)
+                    {
+                        <span class="effect">@effect</span>
+                    }
+                </div>
+                <button class="btn-close" @onclick="CloseResult">Continue</button>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    .events-screen {
+        min-height: 100vh;
+        padding: 20px;
+        background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3a 100%);
+        color: white;
+    }
+    .events-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+    }
+    .events-header h1 { margin: 0; }
+    .btn-back {
+        padding: 10px 20px;
+        background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.2);
+        border-radius: 5px;
+        color: white;
+        cursor: pointer;
+    }
+    .events-list {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+    .event-card {
+        display: grid;
+        grid-template-columns: 60px 1fr auto;
+        gap: 20px;
+        padding: 20px;
+        background: rgba(0,0,0,0.4);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 12px;
+    }
+    .event-card.major {
+        border-color: #f39c12;
+        background: rgba(243, 156, 18, 0.1);
+    }
+    .event-icon {
+        font-size: 2.5em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .event-content h3 { margin: 0 0 10px 0; }
+    .event-content p { color: #aaa; margin: 0 0 10px 0; }
+    .event-meta {
+        display: flex;
+        gap: 15px;
+        font-size: 0.85em;
+        color: #888;
+    }
+    .event-options {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .option-btn {
+        padding: 10px 15px;
+        background: rgba(52, 152, 219, 0.3);
+        border: 1px solid #3498db;
+        border-radius: 8px;
+        color: white;
+        cursor: pointer;
+        text-align: left;
+    }
+    .option-btn:hover { background: rgba(52, 152, 219, 0.5); }
+    .risk {
+        display: block;
+        color: #f39c12;
+        font-size: 0.85em;
+        margin-top: 5px;
+    }
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.85);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+    .modal {
+        background: #1a1a2e;
+        border-radius: 15px;
+        padding: 25px;
+        max-width: 500px;
+        width: 90%;
+    }
+    .modal h2 { margin-top: 0; }
+    .effects {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin: 15px 0;
+    }
+    .effect {
+        padding: 5px 12px;
+        border-radius: 15px;
+        font-size: 0.9em;
+    }
+    .effect.positive { background: rgba(46, 204, 113, 0.3); color: #2ecc71; }
+    .effect.negative { background: rgba(231, 76, 60, 0.3); color: #e74c3c; }
+    .effect.neutral { background: rgba(255,255,255,0.1); }
+    .modal-buttons {
+        display: flex;
+        gap: 15px;
+        margin-top: 20px;
+    }
+    .modal-buttons button {
+        flex: 1;
+        padding: 12px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+    .btn-confirm { background: #27ae60; color: white; }
+    .btn-cancel { background: #7f8c8d; color: white; }
+    .btn-close { width: 100%; padding: 12px; background: #3498db; border: none; border-radius: 8px; color: white; cursor: pointer; }
+    .no-events {
+        text-align: center;
+        padding: 60px;
+        color: #888;
+    }
+    .no-events .icon { font-size: 4em; display: block; margin-bottom: 15px; }
+    .loading { text-align: center; padding: 50px; color: #888; }
+</style>
+
+@code {
+    private bool _loading = true;
+    private List<GameEventDisplay> _events = new();
+    private Guid _selectedEventId;
+    private EventOptionDisplay? _selectedOption;
+    private bool _showConfirmModal = false;
+    private bool _showResultModal = false;
+    private EventResultDisplay? _eventResult;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadEvents();
+    }
+
+    private async Task LoadEvents()
+    {
+        _loading = true;
+        await Task.Delay(300);
+        
+        _events = new List<GameEventDisplay>
+        {
+            new GameEventDisplay
+            {
+                Id = Guid.NewGuid(),
+                Title = "Colony Crisis",
+                Description = "A disease outbreak threatens our colony. We must act quickly.",
+                Category = "Colony",
+                TurnCreated = 15,
+                IsMajor = true,
+                Options = new List<EventOptionDisplay>
+                {
+                    new EventOptionDisplay { Id = "quarantine", Text = "Implement quarantine", Tooltip = "Safe but slow recovery", Effects = new[] { "credits:-200", "stability:-10" }, RiskChance = 0 },
+                    new EventOptionDisplay { Id = "medicine", Text = "Rush experimental medicine", Tooltip = "Fast but risky", Effects = new[] { "credits:-500", "pop_happiness:+10" }, RiskChance = 0.3 }
+                }
+            },
+            new GameEventDisplay
+            {
+                Id = Guid.NewGuid(),
+                Title = "Abandoned Station",
+                Description = "Scouts discovered an abandoned space station with active power.",
+                Category = "Exploration",
+                TurnCreated = 14,
+                IsMajor = false,
+                Options = new List<EventOptionDisplay>
+                {
+                    new EventOptionDisplay { Id = "salvage", Text = "Send salvage team", Tooltip = "Recover materials", Effects = new[] { "minerals:+200" }, RiskChance = 0.2 },
+                    new EventOptionDisplay { Id = "study", Text = "Send scientists", Tooltip = "Research insights", Effects = new[] { "research:+150" }, RiskChance = 0.05 }
+                }
+            }
+        };
+        
+        _loading = false;
+    }
+
+    private void GoBack() => Nav.NavigateTo("/game/galaxy");
+
+    private string GetCategoryIcon(string category) => category.ToLower() switch
+    {
+        "colony" => "🏠",
+        "exploration" => "🔭",
+        "diplomatic" => "🤝",
+        "military" => "⚔️",
+        "economic" => "💰",
+        "research" => "🔬",
+        "crisis" => "⚠️",
+        _ => "📜"
+    };
+
+    private string GetEffectClass(string effect)
+    {
+        if (effect.Contains('+') || effect.Contains("gain")) return "positive";
+        if (effect.Contains('-') || effect.Contains("lose")) return "negative";
+        return "neutral";
+    }
+
+    private string FormatEffect(string effect)
+    {
+        var parts = effect.Split(':');
+        if (parts.Length < 2) return effect;
+        var type = parts[0];
+        var value = parts[1];
+        var icon = type.ToLower() switch
+        {
+            "credits" => "💰",
+            "minerals" => "🔩",
+            "food" => "🌾",
+            "energy" => "⚡",
+            "stability" => "⚖️",
+            "pop" => "👥",
+            "pop_happiness" => "😊",
+            "research" => "🔬",
+            _ => "•"
+        };
+        return $"{icon} {value} {type}";
+    }
+
+    private void SelectOption(Guid eventId, string optionId)
+    {
+        var evt = _events.FirstOrDefault(e => e.Id == eventId);
+        if (evt == null) return;
+        _selectedEventId = eventId;
+        _selectedOption = evt.Options.FirstOrDefault(o => o.Id == optionId);
+        _showConfirmModal = true;
+    }
+
+    private void CancelSelection()
+    {
+        _showConfirmModal = false;
+        _selectedOption = null;
+    }
+
+    private async Task ConfirmSelection()
+    {
+        _showConfirmModal = false;
+        await Task.Delay(500);
+        
+        var riskTriggered = _selectedOption?.RiskChance > 0 && Random.Shared.NextDouble() < _selectedOption.RiskChance;
+        
+        _eventResult = new EventResultDisplay
+        {
+            Message = riskTriggered ? "Unexpected consequences..." : "Decision implemented.",
+            RiskTriggered = riskTriggered,
+            Effects = _selectedOption?.Effects.Select(FormatEffect).ToList() ?? new List<string>()
+        };
+        
+        _showResultModal = true;
+        _events.RemoveAll(e => e.Id == _selectedEventId);
+    }
+
+    private void CloseResult()
+    {
+        _showResultModal = false;
+        _eventResult = null;
+    }
+
+    public class GameEventDisplay
+    {
+        public Guid Id { get; set; }
+        public string Title { get; set; } = "";
+        public string Description { get; set; } = "";
+        public string Category { get; set; } = "";
+        public int TurnCreated { get; set; }
+        public bool IsMajor { get; set; }
+        public List<EventOptionDisplay> Options { get; set; } = new();
+    }
+
+    public class EventOptionDisplay
+    {
+        public string Id { get; set; } = "";
+        public string Text { get; set; } = "";
+        public string Tooltip { get; set; } = "";
+        public string[] Effects { get; set; } = Array.Empty<string>();
+        public double RiskChance { get; set; }
+    }
+
+    public class EventResultDisplay
+    {
+        public string Message { get; set; } = "";
+        public bool RiskTriggered { get; set; }
+        public List<string> Effects { get; set; } = new();
+    }
+}

@@ -1,0 +1,63 @@
+@namespace StarTrekGame.Web.Components.UI
+
+<div class="lcars-panel @PanelClass @TextureClass" style="@Style">
+    @if (!string.IsNullOrEmpty(Title))
+    {
+        <div class="lcars-header">
+            <div class="lcars-header__elbow" style="background: var(--ui-@HeaderColor);"></div>
+            <div class="lcars-header__bar" style="background: var(--ui-@HeaderColor);">
+                <span class="lcars-header__title">@Title</span>
+            </div>
+            <div class="lcars-header__cap" style="background: var(--ui-@AccentColor);"></div>
+        </div>
+    }
+    <div class="lcars-panel__content" style="padding: @Padding;">
+        @ChildContent
+    </div>
+</div>
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public string HeaderColor { get; set; } = "primary";
+    [Parameter] public string AccentColor { get; set; } = "secondary";
+    [Parameter] public string Rounded { get; set; } = ""; // tl, tr, bl, br, or combinations
+    [Parameter] public string Texture { get; set; } = ""; // noise, scanlines, brushed-metal, hex-grid, circuit
+    [Parameter] public string Padding { get; set; } = "16px";
+    [Parameter] public string? Style { get; set; }
+
+    private string PanelClass
+    {
+        get
+        {
+            var classes = new List<string>();
+            if (Rounded.Contains("tl")) classes.Add("lcars-panel--rounded-tl");
+            if (Rounded.Contains("tr")) classes.Add("lcars-panel--rounded-tr");
+            if (Rounded.Contains("bl")) classes.Add("lcars-panel--rounded-bl");
+            if (Rounded.Contains("br")) classes.Add("lcars-panel--rounded-br");
+            return string.Join(" ", classes);
+        }
+    }
+
+    private string TextureClass
+    {
+        get
+        {
+            return Texture switch
+            {
+                "noise" => "texture-noise",
+                "scanlines" => "texture-scanlines",
+                "brushed-metal" => "texture-brushed-metal",
+                "hex-grid" => "texture-hex-grid",
+                "circuit" => "texture-circuit",
+                _ => ""
+            };
+        }
+    }
+}
+
+<style>
+    .lcars-panel__content {
+        position: relative;
+    }
+</style>

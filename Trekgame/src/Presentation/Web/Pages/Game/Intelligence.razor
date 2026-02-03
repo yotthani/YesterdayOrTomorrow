@@ -1,0 +1,1246 @@
+@page "/game/intelligence"
+@using MudBlazor
+@using StarTrekGame.Web.Services
+@using Blazored.LocalStorage
+@inject IGameApiClient Api
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+@inject ILocalStorageService LocalStorage
+
+<PageTitle>Intelligence Operations - Galactic Strategy</PageTitle>
+
+<div class="intel-wrapper">
+    <header class="intel-header">
+        <a href="/game/map" class="back-btn">◄ GALAXY MAP</a>
+        <h1>INTELLIGENCE OPERATIONS</h1>
+        <div class="header-stats">
+            <div class="stat-item">
+                <span class="stat-icon">🕵️</span>
+                <div class="stat-data">
+                    <span class="stat-label">AGENTS</span>
+                    <span class="stat-value">@_totalAgents / @_maxAgents</span>
+                </div>
+            </div>
+            <div class="stat-item">
+                <span class="stat-icon">🔒</span>
+                <div class="stat-data">
+                    <span class="stat-label">COUNTER-INTEL</span>
+                    <span class="stat-value">@_counterIntelLevel%</span>
+                </div>
+            </div>
+            <div class="stat-item">
+                <span class="stat-icon">📊</span>
+                <div class="stat-data">
+                    <span class="stat-label">INTEL POINTS</span>
+                    <span class="stat-value">@_intelPoints</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="intel-content">
+        @* Left Panel - Active Operations *@
+        <aside class="intel-panel operations-panel">
+            <div class="panel-header">
+                <h3>🎯 ACTIVE OPERATIONS</h3>
+                <span class="op-count">@_activeOperations.Count / @_maxOperations</span>
+            </div>
+            <div class="panel-content">
+                @if (_activeOperations.Any())
+                {
+                    @foreach (var op in _activeOperations)
+                    {
+                        <div class="operation-card @op.Status.ToLower()">
+                            <div class="op-header">
+                                <span class="op-type-icon">@GetOperationIcon(op.Type)</span>
+                                <span class="op-name">@op.Name</span>
+                                <span class="op-status @op.Status.ToLower()">@op.Status</span>
+                            </div>
+                            <div class="op-target">
+                                <span class="target-label">Target:</span>
+                                <span class="target-name">@op.TargetName</span>
+                            </div>
+                            <div class="op-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: @op.Progress%"></div>
+                                </div>
+                                <span class="progress-text">@op.Progress% - @op.TurnsRemaining turns</span>
+                            </div>
+                            <div class="op-details">
+                                <span class="detail">
+                                    <span class="detail-icon">🎲</span>
+                                    <span>Success: @op.SuccessChance%</span>
+                                </span>
+                                <span class="detail">
+                                    <span class="detail-icon">⚠️</span>
+                                    <span>Detection: @op.DetectionRisk%</span>
+                                </span>
+                            </div>
+                            <div class="op-actions">
+                                @if (op.Status == "In Progress")
+                                {
+                                    <button class="op-btn abort" @onclick="() => AbortOperation(op.Id)">ABORT</button>
+                                }
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="no-operations">
+                        <span class="empty-icon">🕵️</span>
+                        <span>No active operations</span>
+                        <span class="empty-hint">Select a target to begin</span>
+                    </div>
+                }
+            </div>
+        </aside>
+
+        @* Center - Galaxy Intelligence Map *@
+        <main class="intel-center">
+            <div class="intel-map-tabs">
+                <button class="map-tab @(_selectedView == "factions" ? "active" : "")" 
+                        @onclick='() => _selectedView = "factions"'>
+                    <span>🏛️</span> Factions
+                </button>
+                <button class="map-tab @(_selectedView == "reports" ? "active" : "")"
+                        @onclick='() => _selectedView = "reports"'>
+                    <span>📜</span> Intel Reports
+                </button>
+                <button class="map-tab @(_selectedView == "agents" ? "active" : "")"
+                        @onclick='() => _selectedView = "agents"'>
+                    <span>🕵️</span> Agents
+                </button>
+            </div>
+
+            @if (_selectedView == "factions")
+            {
+                <div class="faction-grid">
+                    @foreach (var faction in _factions)
+                    {
+                        <div class="faction-card @(faction.Id == _selectedFactionId ? "selected" : "") @(faction.IsHostile ? "hostile" : "")"
+                             @onclick="() => SelectFaction(faction.Id)">
+                            <div class="faction-emblem" style="background: @faction.Color;">
+                                @faction.Emblem
+                            </div>
+                            <div class="faction-info">
+                                <span class="faction-name">@faction.Name</span>
+                                <span class="faction-relation @GetRelationClass(faction.Relation)">@faction.Relation</span>
+                            </div>
+                            <div class="faction-intel">
+                                <div class="intel-bar">
+                                    <div class="intel-fill" style="width: @faction.IntelLevel%"></div>
+                                </div>
+                                <span class="intel-level">Intel: @faction.IntelLevel%</span>
+                            </div>
+                            <div class="faction-stats">
+                                @if (faction.IntelLevel >= 20)
+                                {
+                                    <span class="known-stat">🌍 @faction.KnownColonies colonies</span>
+                                }
+                                @if (faction.IntelLevel >= 40)
+                                {
+                                    <span class="known-stat">🚀 @faction.KnownFleets fleets</span>
+                                }
+                                @if (faction.IntelLevel >= 60)
+                                {
+                                    <span class="known-stat">⚔️ Military: @faction.MilitaryStrength</span>
+                                }
+                                @if (faction.IntelLevel < 20)
+                                {
+                                    <span class="unknown">Insufficient intelligence</span>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else if (_selectedView == "reports")
+            {
+                <div class="reports-list">
+                    @foreach (var report in _intelReports)
+                    {
+                        <div class="report-item @report.Importance.ToLower()">
+                            <div class="report-header">
+                                <span class="report-icon">@GetReportIcon(report.Type)</span>
+                                <span class="report-title">@report.Title</span>
+                                <span class="report-turn">Turn @report.Turn</span>
+                            </div>
+                            <p class="report-content">@report.Content</p>
+                            <div class="report-meta">
+                                <span class="report-source">Source: @report.Source</span>
+                                <span class="report-reliability @report.Reliability.ToLower()">@report.Reliability</span>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else if (_selectedView == "agents")
+            {
+                <div class="agents-grid">
+                    @foreach (var agent in _agents)
+                    {
+                        <div class="agent-card @(agent.Status.ToLower())">
+                            <div class="agent-portrait">
+                                <span class="agent-icon">🕵️</span>
+                                <span class="agent-level">Lvl @agent.Level</span>
+                            </div>
+                            <div class="agent-info">
+                                <span class="agent-name">@agent.Name</span>
+                                <span class="agent-specialty">@agent.Specialty</span>
+                            </div>
+                            <div class="agent-status-bar">
+                                <span class="status-label">@agent.Status</span>
+                                @if (agent.AssignedTo != null)
+                                {
+                                    <span class="assigned-to">📍 @agent.AssignedTo</span>
+                                }
+                            </div>
+                            <div class="agent-skills">
+                                <div class="skill">
+                                    <span class="skill-name">Infiltration</span>
+                                    <div class="skill-bar"><div class="skill-fill" style="width: @agent.Infiltration%"></div></div>
+                                </div>
+                                <div class="skill">
+                                    <span class="skill-name">Sabotage</span>
+                                    <div class="skill-bar"><div class="skill-fill" style="width: @agent.Sabotage%"></div></div>
+                                </div>
+                                <div class="skill">
+                                    <span class="skill-name">Tech Theft</span>
+                                    <div class="skill-bar"><div class="skill-fill" style="width: @agent.TechTheft%"></div></div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    
+                    @if (_totalAgents < _maxAgents)
+                    {
+                        <div class="agent-card recruit" @onclick="RecruitAgent">
+                            <div class="recruit-content">
+                                <span class="recruit-icon">+</span>
+                                <span class="recruit-text">Recruit Agent</span>
+                                <span class="recruit-cost">500 💰</span>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </main>
+
+        @* Right Panel - Mission Planning *@
+        <aside class="intel-panel mission-panel">
+            @if (_selectedFactionId.HasValue)
+            {
+                var faction = _factions.FirstOrDefault(f => f.Id == _selectedFactionId);
+                @if (faction != null)
+                {
+                    <div class="panel-header">
+                        <h3>🎯 MISSION PLANNING</h3>
+                    </div>
+                    <div class="panel-content">
+                        <div class="target-info">
+                            <div class="target-emblem" style="background: @faction.Color;">@faction.Emblem</div>
+                            <div class="target-details">
+                                <span class="target-name">@faction.Name</span>
+                                <span class="target-relation @GetRelationClass(faction.Relation)">@faction.Relation</span>
+                            </div>
+                        </div>
+
+                        <h4>AVAILABLE MISSIONS</h4>
+                        <div class="missions-list">
+                            @foreach (var mission in _availableMissions)
+                            {
+                                var canStart = mission.RequiredIntel <= faction.IntelLevel && _activeOperations.Count < _maxOperations;
+                                <div class="mission-option @(canStart ? "" : "locked") @(_selectedMission?.Type == mission.Type ? "selected" : "")"
+                                     @onclick="() => SelectMission(mission)">
+                                    <div class="mission-header">
+                                        <span class="mission-icon">@mission.Icon</span>
+                                        <span class="mission-name">@mission.Name</span>
+                                    </div>
+                                    <p class="mission-desc">@mission.Description</p>
+                                    <div class="mission-stats">
+                                        <span class="mission-stat">
+                                            <span class="stat-icon">⏱️</span> @mission.Duration turns
+                                        </span>
+                                        <span class="mission-stat">
+                                            <span class="stat-icon">🎲</span> @mission.BaseSuccess% success
+                                        </span>
+                                        <span class="mission-stat">
+                                            <span class="stat-icon">⚠️</span> @mission.DetectionRisk% risk
+                                        </span>
+                                    </div>
+                                    @if (mission.RequiredIntel > faction.IntelLevel)
+                                    {
+                                        <div class="mission-locked">
+                                            <span>🔒 Requires @mission.RequiredIntel% intel</span>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        </div>
+
+                        @if (_selectedMission != null)
+                        {
+                            <div class="mission-launch">
+                                <h4>ASSIGN AGENT</h4>
+                                <select class="agent-select" @bind="_selectedAgentId">
+                                    <option value="">-- Select Agent --</option>
+                                    @foreach (var agent in _agents.Where(a => a.Status == "Available"))
+                                    {
+                                        <option value="@agent.Id">@agent.Name (Lvl @agent.Level)</option>
+                                    }
+                                </select>
+                                
+                                @if (_selectedAgentId.HasValue)
+                                {
+                                    var agent = _agents.FirstOrDefault(a => a.Id == _selectedAgentId);
+                                    @if (agent != null)
+                                    {
+                                        <div class="launch-preview">
+                                            <div class="preview-stat">
+                                                <span>Adjusted Success:</span>
+                                                <span class="value success">@CalculateSuccess(_selectedMission, agent)%</span>
+                                            </div>
+                                            <div class="preview-stat">
+                                                <span>Detection Risk:</span>
+                                                <span class="value risk">@CalculateRisk(_selectedMission, agent)%</span>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                                
+                                <button class="launch-btn" @onclick="LaunchMission" 
+                                        disabled="@(!_selectedAgentId.HasValue || _activeOperations.Count >= _maxOperations)">
+                                    LAUNCH OPERATION
+                                </button>
+                            </div>
+                        }
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="panel-header">
+                    <h3>📊 INTELLIGENCE SUMMARY</h3>
+                </div>
+                <div class="panel-content">
+                    <div class="intel-summary">
+                        <p class="summary-text">Select a faction to view intelligence data and plan operations.</p>
+                        
+                        <div class="summary-stats">
+                            <div class="summary-stat">
+                                <span class="stat-label">Total Operations</span>
+                                <span class="stat-value">@_totalOperationsCompleted</span>
+                            </div>
+                            <div class="summary-stat">
+                                <span class="stat-label">Success Rate</span>
+                                <span class="stat-value">@_successRate%</span>
+                            </div>
+                            <div class="summary-stat">
+                                <span class="stat-label">Agents Lost</span>
+                                <span class="stat-value">@_agentsLost</span>
+                            </div>
+                            <div class="summary-stat">
+                                <span class="stat-label">Tech Stolen</span>
+                                <span class="stat-value">@_techStolen</span>
+                            </div>
+                        </div>
+
+                        <h4>RECENT SUCCESSES</h4>
+                        <div class="recent-ops">
+                            @foreach (var op in _recentSuccesses.Take(3))
+                            {
+                                <div class="recent-op success">
+                                    <span class="op-icon">✓</span>
+                                    <span class="op-text">@op</span>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </aside>
+    </div>
+</div>
+
+<style>
+/* Intelligence Operations Styling */
+.intel-wrapper {
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(135deg, #050810 0%, #0a0f18 50%, #060912 100%);
+    display: flex;
+    flex-direction: column;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    color: #c8d4e8;
+}
+
+.intel-header {
+    height: 70px;
+    background: linear-gradient(180deg, rgba(20, 15, 30, 0.98) 0%, rgba(12, 10, 20, 0.99) 100%);
+    border-bottom: 1px solid rgba(139, 92, 246, 0.4);
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    gap: 24px;
+}
+
+.intel-header h1 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #a78bfa;
+    letter-spacing: 2px;
+    margin: 0;
+}
+
+.back-btn {
+    padding: 8px 14px;
+    background: rgba(139, 92, 246, 0.2);
+    border: 1px solid rgba(139, 92, 246, 0.4);
+    border-radius: 4px;
+    color: #a78bfa;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.back-btn:hover { background: rgba(139, 92, 246, 0.4); color: #fff; }
+
+.header-stats {
+    margin-left: auto;
+    display: flex;
+    gap: 24px;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.stat-icon { font-size: 20px; }
+
+.stat-data { display: flex; flex-direction: column; }
+
+.stat-label { font-size: 9px; color: rgba(167, 139, 250, 0.6); letter-spacing: 1px; }
+.stat-value { font-size: 16px; color: #a78bfa; font-weight: 600; }
+
+.intel-content {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 320px 1fr 360px;
+    gap: 16px;
+    padding: 16px;
+    overflow: hidden;
+}
+
+.intel-panel {
+    background: linear-gradient(180deg, rgba(20, 15, 35, 0.95) 0%, rgba(12, 10, 24, 0.98) 100%);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.panel-header {
+    background: linear-gradient(90deg, rgba(139, 92, 246, 0.4) 0%, rgba(99, 52, 206, 0.2) 100%);
+    padding: 12px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(139, 92, 246, 0.3);
+}
+
+.panel-header h3 {
+    margin: 0;
+    font-size: 12px;
+    font-weight: 600;
+    color: #c4b5fd;
+    letter-spacing: 1px;
+}
+
+.panel-content {
+    flex: 1;
+    padding: 12px;
+    overflow-y: auto;
+}
+
+/* Operation Cards */
+.operation-card {
+    background: rgba(30, 25, 50, 0.5);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 10px;
+}
+
+.operation-card.in-progress { border-left: 3px solid #a78bfa; }
+.operation-card.completed { border-left: 3px solid #4ade80; opacity: 0.7; }
+.operation-card.failed { border-left: 3px solid #f87171; opacity: 0.7; }
+
+.op-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.op-type-icon { font-size: 18px; }
+.op-name { flex: 1; font-size: 13px; color: #fff; font-weight: 500; }
+
+.op-status {
+    font-size: 9px;
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-weight: 600;
+}
+
+.op-status.in-progress { background: rgba(167, 139, 250, 0.3); color: #c4b5fd; }
+.op-status.completed { background: rgba(74, 222, 128, 0.3); color: #4ade80; }
+.op-status.failed { background: rgba(248, 113, 113, 0.3); color: #f87171; }
+
+.op-target {
+    font-size: 11px;
+    margin-bottom: 8px;
+    color: rgba(200, 212, 232, 0.7);
+}
+
+.target-name { color: #fbbf24; }
+
+.op-progress { margin-bottom: 8px; }
+
+.progress-bar {
+    height: 4px;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 4px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #8b5cf6, #a78bfa);
+    border-radius: 2px;
+}
+
+.progress-text { font-size: 10px; color: rgba(167, 139, 250, 0.8); }
+
+.op-details {
+    display: flex;
+    gap: 16px;
+    font-size: 10px;
+    color: rgba(200, 212, 232, 0.6);
+}
+
+.detail { display: flex; align-items: center; gap: 4px; }
+
+.op-actions { margin-top: 10px; }
+
+.op-btn {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.op-btn.abort {
+    background: rgba(248, 113, 113, 0.2);
+    color: #f87171;
+    border: 1px solid rgba(248, 113, 113, 0.3);
+}
+
+.op-btn.abort:hover { background: rgba(248, 113, 113, 0.4); }
+
+.no-operations {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
+    color: rgba(167, 139, 250, 0.5);
+    text-align: center;
+}
+
+.empty-icon { font-size: 40px; margin-bottom: 12px; opacity: 0.5; }
+.empty-hint { font-size: 11px; margin-top: 6px; opacity: 0.7; }
+
+/* Center - Map/Views */
+.intel-center {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    overflow: hidden;
+}
+
+.intel-map-tabs {
+    display: flex;
+    gap: 4px;
+    background: rgba(15, 12, 25, 0.8);
+    padding: 6px;
+    border-radius: 6px;
+}
+
+.map-tab {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px;
+    background: rgba(30, 25, 50, 0.5);
+    border: 1px solid transparent;
+    border-radius: 4px;
+    color: rgba(167, 139, 250, 0.7);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.map-tab:hover { background: rgba(40, 35, 65, 0.6); color: #c4b5fd; }
+
+.map-tab.active {
+    background: rgba(139, 92, 246, 0.4);
+    border-color: rgba(167, 139, 250, 0.5);
+    color: #fff;
+}
+
+/* Faction Grid */
+.faction-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px;
+    overflow-y: auto;
+    padding: 4px;
+}
+
+.faction-card {
+    background: rgba(25, 20, 45, 0.6);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    border-radius: 8px;
+    padding: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.faction-card:hover { border-color: rgba(167, 139, 250, 0.5); transform: translateY(-2px); }
+.faction-card.selected { border-color: #fbbf24; box-shadow: 0 0 15px rgba(251, 191, 36, 0.2); }
+.faction-card.hostile { border-left: 3px solid #ef4444; }
+
+.faction-emblem {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    float: left;
+    margin-right: 12px;
+}
+
+.faction-info { margin-bottom: 12px; }
+
+.faction-name { display: block; font-size: 14px; color: #fff; font-weight: 600; margin-bottom: 4px; }
+
+.faction-relation {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 3px;
+}
+
+.faction-relation.friendly { background: rgba(74, 222, 128, 0.2); color: #4ade80; }
+.faction-relation.neutral { background: rgba(251, 191, 36, 0.2); color: #fbbf24; }
+.faction-relation.hostile { background: rgba(248, 113, 113, 0.2); color: #f87171; }
+.faction-relation.allied { background: rgba(96, 165, 250, 0.2); color: #60a5fa; }
+
+.faction-intel { clear: both; margin-bottom: 10px; }
+
+.intel-bar {
+    height: 6px;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 4px;
+}
+
+.intel-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #8b5cf6, #a78bfa);
+    border-radius: 3px;
+}
+
+.intel-level { font-size: 10px; color: rgba(167, 139, 250, 0.8); }
+
+.faction-stats { font-size: 11px; color: rgba(200, 212, 232, 0.7); }
+
+.known-stat { display: block; margin-bottom: 4px; }
+.unknown { color: rgba(167, 139, 250, 0.5); font-style: italic; }
+
+/* Reports */
+.reports-list {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.report-item {
+    background: rgba(25, 20, 45, 0.5);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 10px;
+}
+
+.report-item.critical { border-left: 3px solid #ef4444; }
+.report-item.important { border-left: 3px solid #fbbf24; }
+.report-item.routine { border-left: 3px solid #60a5fa; }
+
+.report-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.report-icon { font-size: 16px; }
+.report-title { flex: 1; font-size: 13px; color: #fff; font-weight: 500; }
+.report-turn { font-size: 10px; color: rgba(167, 139, 250, 0.6); }
+
+.report-content {
+    font-size: 12px;
+    color: rgba(200, 212, 232, 0.8);
+    line-height: 1.5;
+    margin: 0 0 10px;
+}
+
+.report-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: rgba(167, 139, 250, 0.6);
+}
+
+.report-reliability.high { color: #4ade80; }
+.report-reliability.medium { color: #fbbf24; }
+.report-reliability.low { color: #f87171; }
+
+/* Agents */
+.agents-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+    overflow-y: auto;
+}
+
+.agent-card {
+    background: rgba(25, 20, 45, 0.6);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    border-radius: 8px;
+    padding: 14px;
+}
+
+.agent-card.available { border-top: 3px solid #4ade80; }
+.agent-card.deployed { border-top: 3px solid #fbbf24; }
+.agent-card.compromised { border-top: 3px solid #f87171; }
+
+.agent-portrait {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.agent-icon { font-size: 32px; }
+
+.agent-level {
+    font-size: 10px;
+    background: rgba(139, 92, 246, 0.3);
+    padding: 2px 8px;
+    border-radius: 3px;
+    color: #c4b5fd;
+}
+
+.agent-name { display: block; font-size: 14px; color: #fff; font-weight: 500; }
+.agent-specialty { display: block; font-size: 11px; color: rgba(167, 139, 250, 0.7); margin-bottom: 8px; }
+
+.agent-status-bar {
+    font-size: 10px;
+    padding: 6px 10px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+.status-label { color: #c4b5fd; }
+.assigned-to { color: #fbbf24; margin-left: 8px; }
+
+.agent-skills { display: flex; flex-direction: column; gap: 6px; }
+
+.skill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.skill-name { font-size: 10px; color: rgba(200, 212, 232, 0.7); width: 70px; }
+
+.skill-bar {
+    flex: 1;
+    height: 4px;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.skill-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #8b5cf6, #a78bfa);
+}
+
+.agent-card.recruit {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-style: dashed;
+    cursor: pointer;
+    min-height: 180px;
+}
+
+.agent-card.recruit:hover { background: rgba(139, 92, 246, 0.1); }
+
+.recruit-content { text-align: center; color: rgba(167, 139, 250, 0.6); }
+
+.recruit-icon { display: block; font-size: 32px; margin-bottom: 8px; }
+.recruit-text { display: block; font-size: 12px; margin-bottom: 4px; }
+.recruit-cost { display: block; font-size: 11px; color: #fbbf24; }
+
+/* Mission Planning */
+.target-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: rgba(30, 25, 50, 0.5);
+    border-radius: 6px;
+    margin-bottom: 16px;
+}
+
+.target-emblem {
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+}
+
+.target-details .target-name { display: block; font-size: 14px; color: #fff; font-weight: 500; }
+
+.panel-content h4 {
+    margin: 16px 0 10px;
+    font-size: 10px;
+    color: rgba(167, 139, 250, 0.6);
+    letter-spacing: 1px;
+}
+
+.missions-list { margin-bottom: 16px; }
+
+.mission-option {
+    background: rgba(25, 20, 45, 0.4);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    border-radius: 6px;
+    padding: 10px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.mission-option:hover:not(.locked) { border-color: rgba(167, 139, 250, 0.5); }
+.mission-option.selected { border-color: #fbbf24; background: rgba(251, 191, 36, 0.1); }
+.mission-option.locked { opacity: 0.5; cursor: not-allowed; }
+
+.mission-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.mission-icon { font-size: 16px; }
+.mission-name { font-size: 12px; color: #fff; font-weight: 500; }
+
+.mission-desc {
+    font-size: 10px;
+    color: rgba(200, 212, 232, 0.7);
+    margin: 0 0 8px;
+    line-height: 1.4;
+}
+
+.mission-stats {
+    display: flex;
+    gap: 12px;
+    font-size: 10px;
+    color: rgba(167, 139, 250, 0.7);
+}
+
+.mission-stat { display: flex; align-items: center; gap: 4px; }
+
+.mission-locked {
+    margin-top: 8px;
+    font-size: 10px;
+    color: #f87171;
+}
+
+.mission-launch {
+    padding: 12px;
+    background: rgba(30, 25, 50, 0.5);
+    border-radius: 6px;
+}
+
+.agent-select {
+    width: 100%;
+    padding: 10px;
+    background: rgba(20, 15, 35, 0.8);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    border-radius: 4px;
+    color: #fff;
+    font-size: 12px;
+    margin-bottom: 12px;
+}
+
+.launch-preview {
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+    margin-bottom: 12px;
+}
+
+.preview-stat {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    padding: 4px 0;
+}
+
+.preview-stat .value.success { color: #4ade80; }
+.preview-stat .value.risk { color: #f87171; }
+
+.launch-btn {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(180deg, #8b5cf6 0%, #7c3aed 100%);
+    border: none;
+    border-radius: 6px;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.launch-btn:hover:not(:disabled) { background: linear-gradient(180deg, #a78bfa 0%, #8b5cf6 100%); }
+.launch-btn:disabled { background: rgba(100, 100, 100, 0.3); cursor: not-allowed; }
+
+/* Summary */
+.intel-summary { text-align: center; padding: 20px; }
+
+.summary-text { color: rgba(167, 139, 250, 0.7); font-size: 12px; margin-bottom: 20px; }
+
+.summary-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.summary-stat {
+    background: rgba(30, 25, 50, 0.5);
+    padding: 12px;
+    border-radius: 6px;
+}
+
+.summary-stat .stat-label { display: block; font-size: 9px; color: rgba(167, 139, 250, 0.6); letter-spacing: 1px; margin-bottom: 4px; }
+.summary-stat .stat-value { display: block; font-size: 18px; color: #c4b5fd; font-weight: 600; }
+
+.recent-ops { text-align: left; }
+
+.recent-op {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    background: rgba(74, 222, 128, 0.1);
+    border-radius: 4px;
+    margin-bottom: 6px;
+    font-size: 11px;
+}
+
+.recent-op.success { color: #4ade80; }
+.op-text { color: rgba(200, 212, 232, 0.8); }
+</style>
+
+@code {
+    private string _selectedView = "factions";
+    private Guid? _selectedFactionId;
+    private MissionType? _selectedMission;
+    private Guid? _selectedAgentId;
+    
+    // Stats
+    private int _totalAgents = 5;
+    private int _maxAgents = 8;
+    private int _counterIntelLevel = 72;
+    private int _intelPoints = 1250;
+    private int _maxOperations = 3;
+    private int _totalOperationsCompleted = 24;
+    private int _successRate = 78;
+    private int _agentsLost = 2;
+    private int _techStolen = 5;
+    
+    // Data
+    private List<ActiveOperation> _activeOperations = new();
+    private List<FactionIntel> _factions = new();
+    private List<IntelReport> _intelReports = new();
+    private List<AgentData> _agents = new();
+    private List<MissionType> _availableMissions = new();
+    private List<string> _recentSuccesses = new();
+
+    protected override void OnInitialized()
+    {
+        LoadIntelData();
+    }
+
+    private void LoadIntelData()
+    {
+        _activeOperations = new List<ActiveOperation>
+        {
+            new() { Id = Guid.NewGuid(), Name = "Operation Shadow Net", Type = "surveillance", TargetName = "Romulan Star Empire", Status = "In Progress", Progress = 65, TurnsRemaining = 2, SuccessChance = 78, DetectionRisk = 15 },
+            new() { Id = Guid.NewGuid(), Name = "Tech Acquisition Alpha", Type = "tech_theft", TargetName = "Cardassian Union", Status = "In Progress", Progress = 30, TurnsRemaining = 4, SuccessChance = 62, DetectionRisk = 35 }
+        };
+
+        _factions = new List<FactionIntel>
+        {
+            new() { Id = Guid.NewGuid(), Name = "Romulan Star Empire", Emblem = "🦅", Color = "#22c55e", Relation = "Hostile", IntelLevel = 65, KnownColonies = 12, KnownFleets = 8, MilitaryStrength = "Strong", IsHostile = true },
+            new() { Id = Guid.NewGuid(), Name = "Klingon Empire", Emblem = "⚔️", Color = "#dc2626", Relation = "Neutral", IntelLevel = 45, KnownColonies = 8, KnownFleets = 6, MilitaryStrength = "Unknown", IsHostile = false },
+            new() { Id = Guid.NewGuid(), Name = "Cardassian Union", Emblem = "🔱", Color = "#ca8a04", Relation = "Hostile", IntelLevel = 55, KnownColonies = 10, KnownFleets = 5, MilitaryStrength = "Moderate", IsHostile = true },
+            new() { Id = Guid.NewGuid(), Name = "Ferengi Alliance", Emblem = "💰", Color = "#f97316", Relation = "Friendly", IntelLevel = 80, KnownColonies = 6, KnownFleets = 4, MilitaryStrength = "Weak", IsHostile = false },
+            new() { Id = Guid.NewGuid(), Name = "Vulcan High Command", Emblem = "🖖", Color = "#059669", Relation = "Allied", IntelLevel = 95, KnownColonies = 15, KnownFleets = 10, MilitaryStrength = "Moderate", IsHostile = false }
+        };
+
+        _intelReports = new List<IntelReport>
+        {
+            new() { Title = "Romulan Fleet Movement Detected", Type = "military", Content = "Long-range sensors have detected unusual Romulan fleet movements near the Neutral Zone. Analysis suggests possible military exercises or preparation for offensive operations.", Turn = 52, Source = "Sensor Array Alpha-7", Reliability = "High", Importance = "critical" },
+            new() { Title = "Cardassian Research Breakthrough", Type = "technology", Content = "Intelligence indicates the Cardassian Union has made significant advances in shield technology. Estimated 15% improvement in shield efficiency.", Turn = 50, Source = "Agent Gamma-3", Reliability = "Medium", Importance = "important" },
+            new() { Title = "Ferengi Trade Routes Updated", Type = "economic", Content = "New trade route information acquired through diplomatic channels. Several profitable opportunities identified in sectors 7 and 12.", Turn = 48, Source = "Diplomatic Corps", Reliability = "High", Importance = "routine" }
+        };
+
+        _agents = new List<AgentData>
+        {
+            new() { Id = Guid.NewGuid(), Name = "Agent Shadow", Level = 5, Specialty = "Infiltration Expert", Status = "Available", Infiltration = 85, Sabotage = 60, TechTheft = 70 },
+            new() { Id = Guid.NewGuid(), Name = "Agent Cipher", Level = 4, Specialty = "Tech Specialist", Status = "Deployed", AssignedTo = "Romulan Empire", Infiltration = 65, Sabotage = 50, TechTheft = 90 },
+            new() { Id = Guid.NewGuid(), Name = "Agent Ghost", Level = 3, Specialty = "Saboteur", Status = "Available", Infiltration = 70, Sabotage = 85, TechTheft = 55 },
+            new() { Id = Guid.NewGuid(), Name = "Agent Whisper", Level = 4, Specialty = "Counter-Intel", Status = "Deployed", AssignedTo = "Cardassian Union", Infiltration = 75, Sabotage = 65, TechTheft = 75 },
+            new() { Id = Guid.NewGuid(), Name = "Agent Mirage", Level = 2, Specialty = "Rookie", Status = "Available", Infiltration = 50, Sabotage = 45, TechTheft = 55 }
+        };
+
+        _availableMissions = new List<MissionType>
+        {
+            new() { Type = "surveillance", Name = "Surveillance Operation", Icon = "👁️", Description = "Gather general intelligence on target faction activities and movements.", Duration = 3, BaseSuccess = 80, DetectionRisk = 10, RequiredIntel = 0 },
+            new() { Type = "infiltration", Name = "Deep Infiltration", Icon = "🕵️", Description = "Plant an agent for long-term intelligence gathering.", Duration = 5, BaseSuccess = 65, DetectionRisk = 25, RequiredIntel = 30 },
+            new() { Type = "tech_theft", Name = "Technology Acquisition", Icon = "💾", Description = "Steal technological secrets and research data.", Duration = 4, BaseSuccess = 55, DetectionRisk = 40, RequiredIntel = 50 },
+            new() { Type = "sabotage", Name = "Sabotage Mission", Icon = "💥", Description = "Disrupt enemy operations, production, or military assets.", Duration = 4, BaseSuccess = 60, DetectionRisk = 50, RequiredIntel = 60 },
+            new() { Type = "assassination", Name = "Targeted Elimination", Icon = "☠️", Description = "Eliminate key enemy personnel. High risk operation.", Duration = 6, BaseSuccess = 45, DetectionRisk = 70, RequiredIntel = 80 }
+        };
+
+        _recentSuccesses = new List<string>
+        {
+            "Romulan fleet positions acquired",
+            "Cardassian shield schematics stolen",
+            "Klingon agent network exposed"
+        };
+    }
+
+    private void SelectFaction(Guid factionId) => _selectedFactionId = _selectedFactionId == factionId ? null : factionId;
+    
+    private void SelectMission(MissionType mission)
+    {
+        if (mission.RequiredIntel <= (_factions.FirstOrDefault(f => f.Id == _selectedFactionId)?.IntelLevel ?? 0))
+            _selectedMission = _selectedMission?.Type == mission.Type ? null : mission;
+    }
+
+    private async Task LaunchMission()
+    {
+        if (_selectedMission == null || !_selectedAgentId.HasValue || !_selectedFactionId.HasValue) return;
+        
+        var faction = _factions.FirstOrDefault(f => f.Id == _selectedFactionId);
+        var agent = _agents.FirstOrDefault(a => a.Id == _selectedAgentId);
+        
+        if (faction != null && agent != null)
+        {
+            _activeOperations.Add(new ActiveOperation
+            {
+                Id = Guid.NewGuid(),
+                Name = $"{_selectedMission.Name} - {faction.Name}",
+                Type = _selectedMission.Type,
+                TargetName = faction.Name,
+                Status = "In Progress",
+                Progress = 0,
+                TurnsRemaining = _selectedMission.Duration,
+                SuccessChance = CalculateSuccess(_selectedMission, agent),
+                DetectionRisk = CalculateRisk(_selectedMission, agent)
+            });
+            
+            agent.Status = "Deployed";
+            agent.AssignedTo = faction.Name;
+            
+            Snackbar.Add($"Operation launched against {faction.Name}", Severity.Success);
+            _selectedMission = null;
+            _selectedAgentId = null;
+        }
+    }
+
+    private async Task AbortOperation(Guid opId)
+    {
+        var op = _activeOperations.FirstOrDefault(o => o.Id == opId);
+        if (op != null)
+        {
+            _activeOperations.Remove(op);
+            Snackbar.Add("Operation aborted", Severity.Warning);
+        }
+    }
+
+    private async Task RecruitAgent()
+    {
+        if (_totalAgents < _maxAgents)
+        {
+            _totalAgents++;
+            _agents.Add(new AgentData
+            {
+                Id = Guid.NewGuid(),
+                Name = $"Agent {_agents.Count + 1}",
+                Level = 1,
+                Specialty = "Trainee",
+                Status = "Available",
+                Infiltration = 40,
+                Sabotage = 35,
+                TechTheft = 40
+            });
+            Snackbar.Add("New agent recruited", Severity.Success);
+        }
+    }
+
+    private int CalculateSuccess(MissionType mission, AgentData agent)
+    {
+        var bonus = mission.Type switch
+        {
+            "infiltration" => agent.Infiltration / 5,
+            "sabotage" => agent.Sabotage / 5,
+            "tech_theft" => agent.TechTheft / 5,
+            _ => agent.Level * 3
+        };
+        return Math.Min(95, mission.BaseSuccess + bonus);
+    }
+
+    private int CalculateRisk(MissionType mission, AgentData agent)
+    {
+        var reduction = agent.Infiltration / 10 + agent.Level * 2;
+        return Math.Max(5, mission.DetectionRisk - reduction);
+    }
+
+    private string GetOperationIcon(string type) => type switch
+    {
+        "surveillance" => "👁️",
+        "infiltration" => "🕵️",
+        "tech_theft" => "💾",
+        "sabotage" => "💥",
+        "assassination" => "☠️",
+        _ => "🎯"
+    };
+
+    private string GetReportIcon(string type) => type switch
+    {
+        "military" => "⚔️",
+        "technology" => "🔬",
+        "economic" => "💰",
+        "political" => "🏛️",
+        _ => "📋"
+    };
+
+    private string GetRelationClass(string relation) => relation.ToLower() switch
+    {
+        "friendly" => "friendly",
+        "hostile" => "hostile",
+        "allied" => "allied",
+        _ => "neutral"
+    };
+
+    // Data classes
+    private class ActiveOperation
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; } = "";
+        public string Type { get; set; } = "";
+        public string TargetName { get; set; } = "";
+        public string Status { get; set; } = "";
+        public int Progress { get; set; }
+        public int TurnsRemaining { get; set; }
+        public int SuccessChance { get; set; }
+        public int DetectionRisk { get; set; }
+    }
+
+    private class FactionIntel
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; } = "";
+        public string Emblem { get; set; } = "";
+        public string Color { get; set; } = "";
+        public string Relation { get; set; } = "";
+        public int IntelLevel { get; set; }
+        public int KnownColonies { get; set; }
+        public int KnownFleets { get; set; }
+        public string MilitaryStrength { get; set; } = "";
+        public bool IsHostile { get; set; }
+    }
+
+    private class IntelReport
+    {
+        public string Title { get; set; } = "";
+        public string Type { get; set; } = "";
+        public string Content { get; set; } = "";
+        public int Turn { get; set; }
+        public string Source { get; set; } = "";
+        public string Reliability { get; set; } = "";
+        public string Importance { get; set; } = "";
+    }
+
+    private class AgentData
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; } = "";
+        public int Level { get; set; }
+        public string Specialty { get; set; } = "";
+        public string Status { get; set; } = "";
+        public string? AssignedTo { get; set; }
+        public int Infiltration { get; set; }
+        public int Sabotage { get; set; }
+        public int TechTheft { get; set; }
+    }
+
+    private class MissionType
+    {
+        public string Type { get; set; } = "";
+        public string Name { get; set; } = "";
+        public string Icon { get; set; } = "";
+        public string Description { get; set; } = "";
+        public int Duration { get; set; }
+        public int BaseSuccess { get; set; }
+        public int DetectionRisk { get; set; }
+        public int RequiredIntel { get; set; }
+    }
+}

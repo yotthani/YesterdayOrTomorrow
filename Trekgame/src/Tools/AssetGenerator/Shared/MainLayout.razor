@@ -1,0 +1,84 @@
+@inherits LayoutComponentBase
+
+<div class="app-container">
+    <header class="app-header">
+        <h1>🖖 Star Trek Asset Generator</h1>
+        <span class="version">v1.0 - Gemini API</span>
+    </header>
+    
+    <main class="app-main">
+        @Body
+    </main>
+    
+    <footer class="app-footer">
+        <span>Assets: 360×360px | Output: Sprite Sheets + Manifest.json</span>
+    </footer>
+</div>
+
+<style>
+    :root {
+        --bg-dark: #1a1a2e;
+        --bg-panel: #16213e;
+        --accent: #e94560;
+        --accent-secondary: #0f3460;
+        --text: #eee;
+        --text-muted: #888;
+        --success: #4ade80;
+        --warning: #fbbf24;
+        --error: #f87171;
+    }
+    
+    * {
+        box-sizing: border-box;
+    }
+    
+    body {
+        margin: 0;
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        background: var(--bg-dark);
+        color: var(--text);
+    }
+    
+    .app-container {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+    }
+    
+    .app-header {
+        background: var(--bg-panel);
+        padding: 1rem 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 2px solid var(--accent);
+    }
+    
+    .app-header h1 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
+    
+    .version {
+        color: var(--text-muted);
+        font-size: 0.875rem;
+    }
+    
+    .app-main {
+        flex: 1;
+        padding: 2rem;
+        max-width: 1600px;
+        margin: 0 auto;
+        width: 100%;
+    }
+    
+    .app-footer {
+        background: var(--bg-panel);
+        padding: 0.75rem 2rem;
+        text-align: center;
+        color: var(--text-muted);
+        font-size: 0.875rem;
+        border-top: 1px solid var(--accent-secondary);
+    }
+</style>

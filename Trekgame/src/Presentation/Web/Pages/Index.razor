@@ -1,0 +1,890 @@
+@page "/old-menu"
+@using MudBlazor
+@using StarTrekGame.Web.Services
+@using StarTrekGame.Web.Components.Shared
+@using Blazored.LocalStorage
+@inject IGameApiClient Api
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+@inject ILocalStorageService LocalStorage
+
+<PageTitle>Galactic Strategy - Main Menu</PageTitle>
+
+@* Vibrant Animated Space Background *@
+<SpaceBackground />
+
+@* Main Menu Content *@
+<div class="main-menu-container">
+    @* Header / Logo *@
+    <header class="menu-header">
+        <div class="logo-section">
+            <div class="logo-glow"></div>
+            <h1 class="game-logo">GALACTIC STRATEGY</h1>
+            <p class="game-subtitle">A 4X SPACE STRATEGY EXPERIENCE</p>
+        </div>
+    </header>
+    
+    @* Main Menu Cards *@
+    <main class="menu-main">
+        <div class="menu-grid">
+            @* Continue / Join Game Card *@
+            <div class="menu-card primary">
+                <div class="card-icon">🚀</div>
+                <div class="card-content">
+                    <h2>PLAY GAME</h2>
+                    @if (_loading)
+                    {
+                        <p class="card-status">Scanning for games...</p>
+                        <div class="loading-bar">
+                            <div class="loading-fill"></div>
+                        </div>
+                    }
+                    else if (_demoGame != null)
+                    {
+                        <p class="card-status">@_demoGame.Name • Turn @_demoGame.Turn</p>
+                        <p class="card-detail">@_demoGame.Factions.Count factions • @_demoGame.SystemCount systems</p>
+                        
+                        @if (_existingFaction != null)
+                        {
+                            <button class="menu-btn primary" @onclick="ContinueGame">
+                                <span class="btn-icon">▶</span> CONTINUE AS @_existingFaction.Name.ToUpper()
+                            </button>
+                        }
+                        else
+                        {
+                            <button class="menu-btn primary" @onclick="() => _showJoinDialog = true">
+                                <span class="btn-icon">+</span> JOIN GAME
+                            </button>
+                        }
+                    }
+                    else
+                    {
+                        <p class="card-status">No games available</p>
+                        <button class="menu-btn secondary" @onclick="CreateNewGame">
+                            <span class="btn-icon">★</span> CREATE NEW GAME
+                        </button>
+                    }
+                </div>
+            </div>
+            
+            @* New Game Card *@
+            <div class="menu-card">
+                <div class="card-icon">🌟</div>
+                <div class="card-content">
+                    <h2>NEW GAME</h2>
+                    <p class="card-status">Start a fresh galaxy</p>
+                    <button class="menu-btn" @onclick="CreateNewGame">
+                        <span class="btn-icon">+</span> CREATE GALAXY
+                    </button>
+                </div>
+            </div>
+            
+            @* Settings Card *@
+            <div class="menu-card">
+                <div class="card-icon">⚙️</div>
+                <div class="card-content">
+                    <h2>SETTINGS</h2>
+                    <p class="card-status">Customize your experience</p>
+                    <button class="menu-btn" @onclick="OpenSettings">
+                        <span class="btn-icon">◉</span> CONFIGURE
+                    </button>
+                </div>
+            </div>
+            
+            @* Tutorial Card *@
+            <div class="menu-card">
+                <div class="card-icon">📖</div>
+                <div class="card-content">
+                    <h2>TUTORIAL</h2>
+                    <p class="card-status">Learn the basics</p>
+                    <button class="menu-btn" @onclick="OpenTutorial">
+                        <span class="btn-icon">?</span> START TUTORIAL
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    @* Footer *@
+    <footer class="menu-footer">
+        <p class="disclaimer">
+            ⚠️ Star Trek and all related marks are solely owned by CBS Studios Inc. / Paramount.
+            This is a non-commercial fan project for recreational use only.
+        </p>
+        <p class="version">v0.1.0 • Made with 💛 for the Final Frontier</p>
+    </footer>
+</div>
+
+@* Join Game Dialog *@
+@if (_showJoinDialog)
+{
+    <div class="dialog-overlay" @onclick="() => _showJoinDialog = false">
+        <div class="dialog-panel" @onclick:stopPropagation="true">
+            <div class="dialog-header">
+                <h2>JOIN GALAXY</h2>
+                <button class="dialog-close" @onclick="() => _showJoinDialog = false">✕</button>
+            </div>
+            
+            <div class="dialog-body">
+                @* Player Name *@
+                <div class="form-group">
+                    <label>COMMANDER NAME</label>
+                    <input type="text" class="form-input" @bind="_playerName" placeholder="Enter your name..." />
+                </div>
+                
+                @* Faction Name *@
+                <div class="form-group">
+                    <label>FACTION NAME</label>
+                    <input type="text" class="form-input" @bind="_factionName" placeholder="Your empire's name..." />
+                </div>
+                
+                @* Race Selection *@
+                <div class="form-group">
+                    <label>SELECT SPECIES</label>
+                    <div class="race-grid">
+                        @foreach (var race in _races)
+                        {
+                            <div class="race-card @(_selectedRace == race.Id ? "selected" : "")" 
+                                 @onclick="() => SelectRace(race.Id)">
+                                <div class="race-portrait @race.Id"></div>
+                                <div class="race-name">@race.Name</div>
+                                <div class="race-bonus">@race.Bonus</div>
+                            </div>
+                        }
+                    </div>
+                </div>
+                
+                @* Existing Factions *@
+                @if (_availableFactions.Any())
+                {
+                    <div class="form-group">
+                        <label>OR JOIN EXISTING FACTION</label>
+                        <div class="faction-list">
+                            @foreach (var faction in _availableFactions)
+                            {
+                                <button class="faction-btn" @onclick="() => JoinExistingFaction(faction)">
+                                    @faction.Name
+                                </button>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+            
+            <div class="dialog-footer">
+                <button class="menu-btn secondary" @onclick="() => _showJoinDialog = false">CANCEL</button>
+                <button class="menu-btn primary" @onclick="JoinGame" disabled="@(!CanJoinGame)">
+                    <span class="btn-icon">🚀</span> LAUNCH
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+<style>
+    /* ===== MAIN MENU CONTAINER ===== */
+    .main-menu-container {
+        position: relative;
+        z-index: 1;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        padding: 40px;
+    }
+    
+    /* ===== HEADER ===== */
+    .menu-header {
+        text-align: center;
+        padding: 40px 0 60px;
+    }
+    
+    .logo-section {
+        position: relative;
+        display: inline-block;
+    }
+    
+    .logo-glow {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 600px;
+        height: 200px;
+        background: radial-gradient(ellipse, rgba(255, 180, 80, 0.15) 0%, transparent 60%);
+        pointer-events: none;
+        animation: logo-glow-pulse 4s ease-in-out infinite;
+    }
+    
+    @@keyframes logo-glow-pulse {
+        0%, 100% { opacity: 0.8; transform: translate(-50%, -50%) scale(1); }
+        50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+    }
+    
+    .game-logo {
+        font-family: 'Orbitron', 'Segoe UI', sans-serif;
+        font-size: 64px;
+        font-weight: 900;
+        letter-spacing: 12px;
+        color: #ffdd88;
+        text-shadow: 
+            0 0 30px rgba(255, 200, 100, 0.6),
+            0 0 60px rgba(255, 150, 50, 0.4),
+            0 0 100px rgba(255, 100, 0, 0.2);
+        margin: 0;
+        animation: title-shimmer 3s ease-in-out infinite;
+    }
+    
+    @@keyframes title-shimmer {
+        0%, 100% { 
+            text-shadow: 
+                0 0 30px rgba(255, 200, 100, 0.6),
+                0 0 60px rgba(255, 150, 50, 0.4);
+        }
+        50% { 
+            text-shadow: 
+                0 0 40px rgba(255, 220, 120, 0.8),
+                0 0 80px rgba(255, 180, 80, 0.5);
+        }
+    }
+    
+    .game-subtitle {
+        font-family: 'Roboto', sans-serif;
+        font-size: 14px;
+        letter-spacing: 8px;
+        color: rgba(180, 200, 220, 0.8);
+        margin-top: 16px;
+    }
+    
+    /* ===== MENU GRID ===== */
+    .menu-main {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .menu-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 320px);
+        gap: 24px;
+        max-width: 700px;
+    }
+    
+    /* ===== MENU CARDS ===== */
+    .menu-card {
+        background: rgba(15, 20, 35, 0.85);
+        border: 1px solid rgba(100, 140, 180, 0.3);
+        border-radius: 16px;
+        padding: 32px;
+        backdrop-filter: blur(20px);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .menu-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, transparent, rgba(100, 160, 220, 0.5), transparent);
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+    
+    .menu-card:hover {
+        border-color: rgba(100, 180, 255, 0.5);
+        box-shadow: 
+            0 0 40px rgba(100, 160, 220, 0.15),
+            inset 0 0 30px rgba(100, 160, 220, 0.05);
+        transform: translateY(-4px);
+    }
+    
+    .menu-card:hover::before {
+        opacity: 1;
+    }
+    
+    .menu-card.primary {
+        grid-column: span 2;
+        border-color: rgba(255, 180, 80, 0.4);
+    }
+    
+    .menu-card.primary::before {
+        background: linear-gradient(90deg, transparent, rgba(255, 180, 80, 0.6), transparent);
+    }
+    
+    .menu-card.primary:hover {
+        border-color: rgba(255, 200, 100, 0.6);
+        box-shadow: 
+            0 0 50px rgba(255, 180, 80, 0.2),
+            inset 0 0 40px rgba(255, 180, 80, 0.05);
+    }
+    
+    .card-icon {
+        font-size: 48px;
+        margin-bottom: 16px;
+        filter: drop-shadow(0 0 10px rgba(255, 200, 100, 0.3));
+    }
+    
+    .card-content h2 {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 20px;
+        font-weight: 700;
+        letter-spacing: 3px;
+        color: #ddeeff;
+        margin: 0 0 8px;
+    }
+    
+    .card-status {
+        color: rgba(150, 180, 210, 0.9);
+        font-size: 14px;
+        margin: 0 0 4px;
+    }
+    
+    .card-detail {
+        color: rgba(120, 150, 180, 0.7);
+        font-size: 12px;
+        margin: 0 0 20px;
+    }
+    
+    /* ===== LOADING BAR ===== */
+    .loading-bar {
+        height: 4px;
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 2px;
+        margin: 16px 0;
+        overflow: hidden;
+    }
+    
+    .loading-fill {
+        height: 100%;
+        width: 30%;
+        background: linear-gradient(90deg, #4488ff, #88ccff, #4488ff);
+        background-size: 200% 100%;
+        border-radius: 2px;
+        animation: loading-slide 1.5s ease-in-out infinite;
+    }
+    
+    @@keyframes loading-slide {
+        0% { transform: translateX(-100%); background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { transform: translateX(400%); background-position: 0% 50%; }
+    }
+    
+    /* ===== MENU BUTTONS ===== */
+    .menu-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 14px 28px;
+        background: rgba(60, 100, 140, 0.2);
+        border: 2px solid rgba(100, 160, 220, 0.5);
+        border-radius: 8px;
+        color: #aaccee;
+        font-family: 'Orbitron', sans-serif;
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 2px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-transform: uppercase;
+    }
+    
+    .menu-btn:hover:not(:disabled) {
+        background: rgba(80, 140, 200, 0.3);
+        border-color: rgba(120, 180, 240, 0.7);
+        color: #ddeeff;
+        box-shadow: 0 0 20px rgba(100, 160, 220, 0.3);
+        transform: translateY(-2px);
+    }
+    
+    .menu-btn:active:not(:disabled) {
+        transform: translateY(0);
+    }
+    
+    .menu-btn:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+    }
+    
+    .menu-btn.primary {
+        background: linear-gradient(135deg, rgba(255, 180, 80, 0.3), rgba(255, 140, 40, 0.2));
+        border-color: rgba(255, 180, 80, 0.6);
+        color: #ffdd99;
+    }
+    
+    .menu-btn.primary:hover:not(:disabled) {
+        background: linear-gradient(135deg, rgba(255, 200, 100, 0.4), rgba(255, 160, 60, 0.3));
+        border-color: rgba(255, 200, 100, 0.8);
+        color: #ffeebb;
+        box-shadow: 0 0 25px rgba(255, 180, 80, 0.4);
+    }
+    
+    .menu-btn.secondary {
+        background: transparent;
+        border-color: rgba(150, 150, 150, 0.4);
+        color: #aaa;
+    }
+    
+    .btn-icon {
+        font-size: 14px;
+    }
+    
+    /* ===== FOOTER ===== */
+    .menu-footer {
+        text-align: center;
+        padding: 30px 0;
+    }
+    
+    .disclaimer {
+        font-size: 11px;
+        color: rgba(150, 150, 150, 0.7);
+        max-width: 700px;
+        margin: 0 auto 12px;
+        line-height: 1.6;
+    }
+    
+    .version {
+        font-size: 12px;
+        color: rgba(100, 130, 160, 0.6);
+        margin: 0;
+    }
+    
+    /* ===== DIALOG ===== */
+    .dialog-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(8px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        animation: fade-in 0.2s ease;
+    }
+    
+    @@keyframes fade-in {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    .dialog-panel {
+        background: rgba(15, 20, 35, 0.98);
+        border: 2px solid rgba(100, 160, 220, 0.4);
+        border-radius: 20px;
+        width: 90%;
+        max-width: 600px;
+        max-height: 85vh;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 
+            0 0 60px rgba(0, 0, 0, 0.5),
+            0 0 30px rgba(100, 160, 220, 0.1);
+        animation: slide-up 0.3s ease;
+    }
+    
+    @@keyframes slide-up {
+        from { transform: translateY(30px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+    
+    .dialog-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px 24px;
+        background: linear-gradient(90deg, rgba(100, 160, 220, 0.2), transparent);
+        border-bottom: 1px solid rgba(100, 160, 220, 0.2);
+    }
+    
+    .dialog-header h2 {
+        font-family: 'Orbitron', sans-serif;
+        font-size: 18px;
+        font-weight: 700;
+        letter-spacing: 3px;
+        color: #ddeeff;
+        margin: 0;
+    }
+    
+    .dialog-close {
+        background: none;
+        border: none;
+        color: rgba(150, 180, 210, 0.7);
+        font-size: 24px;
+        cursor: pointer;
+        transition: color 0.2s;
+        padding: 0;
+        line-height: 1;
+    }
+    
+    .dialog-close:hover {
+        color: #fff;
+    }
+    
+    .dialog-body {
+        padding: 24px;
+        overflow-y: auto;
+        flex: 1;
+    }
+    
+    .dialog-footer {
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+        padding: 20px 24px;
+        background: rgba(0, 0, 0, 0.2);
+        border-top: 1px solid rgba(100, 160, 220, 0.1);
+    }
+    
+    /* ===== FORM ELEMENTS ===== */
+    .form-group {
+        margin-bottom: 24px;
+    }
+    
+    .form-group label {
+        display: block;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 2px;
+        color: rgba(150, 180, 210, 0.8);
+        margin-bottom: 8px;
+        text-transform: uppercase;
+    }
+    
+    .form-input {
+        width: 100%;
+        padding: 14px 16px;
+        background: rgba(0, 0, 0, 0.3);
+        border: 2px solid rgba(100, 140, 180, 0.3);
+        border-radius: 8px;
+        color: #ddeeff;
+        font-size: 15px;
+        transition: all 0.2s;
+    }
+    
+    .form-input:focus {
+        outline: none;
+        border-color: rgba(100, 180, 255, 0.6);
+        box-shadow: 0 0 15px rgba(100, 160, 220, 0.2);
+    }
+    
+    .form-input::placeholder {
+        color: rgba(120, 150, 180, 0.5);
+    }
+    
+    /* ===== RACE SELECTION ===== */
+    .race-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        max-height: 400px;
+        overflow-y: auto;
+        padding-right: 8px;
+    }
+    
+    .race-card {
+        padding: 12px 8px;
+        background: rgba(0, 0, 0, 0.3);
+        border: 2px solid rgba(100, 140, 180, 0.2);
+        border-radius: 12px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .race-card:hover {
+        border-color: rgba(100, 180, 255, 0.4);
+        background: rgba(100, 160, 220, 0.1);
+        transform: translateY(-2px);
+    }
+    
+    .race-card.selected {
+        border-color: rgba(255, 180, 80, 0.7);
+        background: rgba(255, 180, 80, 0.15);
+        box-shadow: 0 0 20px rgba(255, 180, 80, 0.3);
+    }
+    
+    /* Race Portraits using sprite sheet */
+    .race-portrait {
+        width: 80px;
+        height: 88px;
+        margin: 0 auto 8px;
+        background-image: url('/images/portraits/race_portraits_v2.png');
+        background-size: 480px 265px; /* 24% scale of 2000x1103 */
+        background-repeat: no-repeat;
+        border-radius: 8px;
+        border: 2px solid rgba(100, 140, 180, 0.3);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    }
+    
+    /* Portrait positions at 24% scale (cell=80px) */
+    /* Row 1: Klingon, Vulcan, Andorian, Ferengi, Cardassian, Borg */
+    .race-portrait.klingon { background-position: 0 0; }
+    .race-portrait.vulcan { background-position: -80px 0; }
+    .race-portrait.andorian { background-position: -160px 0; }
+    .race-portrait.ferengi { background-position: -240px 0; }
+    .race-portrait.cardassian { background-position: -320px 0; }
+    .race-portrait.borg { background-position: -400px 0; }
+    
+    /* Row 2: Trill, Bajoran, Romulan, Gorn, Orion, Betazoid */
+    .race-portrait.trill { background-position: 0 -88px; }
+    .race-portrait.bajoran { background-position: -80px -88px; }
+    .race-portrait.romulan { background-position: -160px -88px; }
+    .race-portrait.gorn { background-position: -240px -88px; }
+    .race-portrait.orion { background-position: -320px -88px; }
+    .race-portrait.betazoid { background-position: -400px -88px; }
+    
+    /* Row 3: Tellarite, Bolian, Jem'Hadar, Q, Human-male, Human-female */
+    .race-portrait.tellarite { background-position: 0 -176px; }
+    .race-portrait.bolian { background-position: -80px -176px; }
+    .race-portrait.jemhadar { background-position: -160px -176px; }
+    .race-portrait.q { background-position: -240px -176px; }
+    .race-portrait.terran, .race-portrait.human { background-position: -320px -176px; }
+    .race-portrait.human-female { background-position: -400px -176px; }
+    
+    /* Map missing races to similar existing portraits */
+    .race-portrait.founders { background-position: -240px -176px; } /* Use Q portrait */
+    .race-portrait.vorta { background-position: -80px -176px; } /* Use Bolian portrait */
+    .race-portrait.breen { background-position: -240px -88px; } /* Use Gorn portrait */
+    .race-portrait.kazon { background-position: -320px -88px; } /* Use Orion portrait */
+    .race-portrait.hirogen { background-position: -240px -88px; } /* Use Gorn portrait */
+    .race-card.selected .race-portrait {
+        border-color: rgba(255, 180, 80, 0.8);
+        box-shadow: 0 0 15px rgba(255, 180, 80, 0.4);
+    }
+    
+    .race-name {
+        font-size: 12px;
+        font-weight: 600;
+        color: #ddeeff;
+        margin-bottom: 4px;
+    }
+    
+    .race-bonus {
+        font-size: 10px;
+        color: rgba(150, 180, 210, 0.7);
+    }
+    
+    /* ===== FACTION LIST ===== */
+    .faction-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    
+    .faction-btn {
+        padding: 10px 16px;
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid rgba(100, 140, 180, 0.3);
+        border-radius: 6px;
+        color: #aaccee;
+        font-size: 13px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .faction-btn:hover {
+        border-color: rgba(100, 180, 255, 0.5);
+        background: rgba(100, 160, 220, 0.2);
+    }
+    
+    /* ===== RESPONSIVE ===== */
+    @@media (max-width: 768px) {
+        .game-logo {
+            font-size: 36px;
+            letter-spacing: 6px;
+        }
+        
+        .game-subtitle {
+            font-size: 11px;
+            letter-spacing: 4px;
+        }
+        
+        .menu-grid {
+            grid-template-columns: 1fr;
+            max-width: 400px;
+        }
+        
+        .menu-card.primary {
+            grid-column: span 1;
+        }
+        
+        .race-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+</style>
+
+@code {
+    private bool _loading = true;
+    private bool _showJoinDialog = false;
+    private GameDetailDto? _demoGame;
+    private FactionSummaryDto? _existingFaction;
+    private string _playerName = "";
+    private string _factionName = "";
+    private string _selectedRace = "";
+    
+    private List<RaceInfo> _races = new()
+    {
+        // Federation Members
+        new("terran", "Human", "+Diplomacy, +Adaptability"),
+        new("vulcan", "Vulcan", "+Research, +Logic"),
+        new("andorian", "Andorian", "+Combat, +Honor"),
+        new("tellarite", "Tellarite", "+Engineering, +Trade"),
+        new("betazoid", "Betazoid", "+Diplomacy, +Telepathy"),
+        new("trill", "Trill", "+Science, +Experience"),
+        // Major Powers
+        new("klingon", "Klingon", "+Combat, +Honor"),
+        new("romulan", "Romulan", "+Espionage, +Cloaking"),
+        new("cardassian", "Cardassian", "+Production, +Control"),
+        new("ferengi", "Ferengi", "+Trade, +Profit"),
+        new("bajoran", "Bajoran", "+Faith, +Resistance"),
+        // Dominion
+        new("founders", "Founders", "+Infiltration, +Control"),
+        new("jemhadar", "Jem'Hadar", "+Combat, +Loyalty"),
+        new("vorta", "Vorta", "+Diplomacy, +Administration"),
+        // Others
+        new("borg", "Borg", "+Assimilation, +Adaptation"),
+        new("breen", "Breen", "+Combat, +Mystery"),
+        new("kazon", "Kazon", "+Aggression, +Resources"),
+        new("hirogen", "Hirogen", "+Hunting, +Combat"),
+    };
+    
+    private void SelectRace(string raceId)
+    {
+        _selectedRace = raceId;
+        // Also set default faction name based on race
+        if (string.IsNullOrWhiteSpace(_factionName))
+        {
+            _factionName = raceId switch
+            {
+                "terran" => "United Federation",
+                "klingon" => "Klingon Empire",
+                "romulan" => "Romulan Star Empire",
+                "cardassian" => "Cardassian Union",
+                "ferengi" => "Ferengi Alliance",
+                "vulcan" => "Vulcan High Command",
+                "andorian" => "Andorian Empire",
+                "borg" => "Borg Collective",
+                "founders" => "Dominion",
+                _ => $"{_races.First(r => r.Id == raceId).Name} Empire"
+            };
+        }
+    }
+    
+    private IEnumerable<FactionSummaryDto> _availableFactions => 
+        _demoGame?.Factions.Where(f => f.PlayerName == null && !f.IsDefeated) ?? Enumerable.Empty<FactionSummaryDto>();
+    
+    private bool CanJoinGame => 
+        !string.IsNullOrWhiteSpace(_playerName) && 
+        !string.IsNullOrWhiteSpace(_factionName) &&
+        !string.IsNullOrWhiteSpace(_selectedRace);
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadGameData();
+    }
+    
+    private async Task LoadGameData()
+    {
+        _loading = true;
+        try
+        {
+            var games = await Api.GetGamesAsync();
+            var firstGame = games.FirstOrDefault();
+            if (firstGame != null)
+            {
+                _demoGame = await Api.GetGameAsync(firstGame.Id);
+                
+                // Check if player already has a faction
+                var savedFactionId = await LocalStorage.GetItemAsync<Guid?>("currentFactionId");
+                if (savedFactionId.HasValue && _demoGame != null)
+                {
+                    _existingFaction = _demoGame.Factions.FirstOrDefault(f => f.Id == savedFactionId.Value);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error loading games: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+    
+    private async Task ContinueGame()
+    {
+        if (_existingFaction == null || _demoGame == null) return;
+        Navigation.NavigateTo("/game/galaxy");
+    }
+    
+    private async Task JoinGame()
+    {
+        if (_demoGame == null || !CanJoinGame) return;
+        
+        try
+        {
+            var result = await Api.JoinGameAsync(_demoGame.Id, _playerName, _factionName, _selectedRace);
+            if (result != null)
+            {
+                await LocalStorage.SetItemAsync("currentGameId", _demoGame.Id);
+                await LocalStorage.SetItemAsync("currentFactionId", result.Id);
+                await LocalStorage.SetItemAsync("currentPlayerName", _playerName);
+                await LocalStorage.SetItemAsync("currentRaceId", _selectedRace);
+                
+                Snackbar.Add($"Welcome, {_playerName}! Your empire awaits.", Severity.Success);
+                Navigation.NavigateTo("/game/galaxy");
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Failed to join game: {ex.Message}", Severity.Error);
+        }
+    }
+    
+    private async Task JoinExistingFaction(FactionSummaryDto faction)
+    {
+        if (_demoGame == null || string.IsNullOrWhiteSpace(_playerName)) return;
+        
+        try
+        {
+            var result = await Api.JoinGameAsync(_demoGame.Id, _playerName, faction.Name, null);
+            if (result != null)
+            {
+                await LocalStorage.SetItemAsync("currentGameId", _demoGame.Id);
+                await LocalStorage.SetItemAsync("currentFactionId", result.Id);
+                await LocalStorage.SetItemAsync("currentPlayerName", _playerName);
+                
+                Snackbar.Add($"You have taken command of {faction.Name}!", Severity.Success);
+                Navigation.NavigateTo("/game/galaxy");
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Failed to join faction: {ex.Message}", Severity.Error);
+        }
+    }
+    
+    private void CreateNewGame()
+    {
+        Navigation.NavigateTo("/game/setup");
+    }
+    
+    private void OpenSettings()
+    {
+        Navigation.NavigateTo("/game/settings");
+    }
+    
+    private void OpenTutorial()
+    {
+        Navigation.NavigateTo("/game/tutorial");
+    }
+    
+    private record RaceInfo(string Id, string Name, string Bonus);
+}

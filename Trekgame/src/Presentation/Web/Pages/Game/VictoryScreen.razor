@@ -1,0 +1,707 @@
+@page "/game/victory"
+@inject HttpClient Http
+@inject NavigationManager Nav
+
+<div class="victory-screen @GetFactionClass()">
+    <div class="victory-header">
+        <h1>🏆 Victory Conditions</h1>
+        <button class="btn-back" @onclick="GoBack">← Back</button>
+    </div>
+
+    @if (_loading)
+    {
+        <div class="loading">Analyzing victory progress...</div>
+    }
+    else
+    {
+        <div class="victory-content">
+            <!-- Current Status -->
+            <div class="status-panel">
+                <h2>Empire Status</h2>
+                <div class="status-grid">
+                    <div class="status-item">
+                        <span class="label">Turn</span>
+                        <span class="value">@_gameStatus?.CurrentTurn</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="label">Score</span>
+                        <span class="value">@_gameStatus?.TotalScore</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="label">Rank</span>
+                        <span class="value rank-@_gameStatus?.Rank">@GetRankText(_gameStatus?.Rank ?? 1)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Victory Conditions -->
+            <div class="conditions-panel">
+                @foreach (var condition in _victoryConditions)
+                {
+                    <div class="condition-card @(condition.IsAchieved ? "achieved" : "") @(condition.IsEnabled ? "" : "disabled")">
+                        <div class="condition-header">
+                            <div class="condition-icon">@GetConditionIcon(condition.Type)</div>
+                            <div class="condition-info">
+                                <h3>@condition.Name</h3>
+                                <p>@condition.Description</p>
+                            </div>
+                            @if (condition.IsAchieved)
+                            {
+                                <div class="achieved-badge">✅ ACHIEVED</div>
+                            }
+                        </div>
+
+                        <div class="condition-progress">
+                            @foreach (var req in condition.Requirements)
+                            {
+                                <div class="requirement @(req.IsMet ? "met" : "")">
+                                    <span class="req-name">@req.Name</span>
+                                    <div class="req-bar">
+                                        <div class="bar-fill" style="width: @req.PercentComplete%"></div>
+                                    </div>
+                                    <span class="req-progress">@req.Current / @req.Target</span>
+                                    @if (req.IsMet)
+                                    {
+                                        <span class="check">✓</span>
+                                    }
+                                </div>
+                            }
+                        </div>
+
+                        @if (!condition.IsEnabled)
+                        {
+                            <div class="disabled-overlay">
+                                <span>Disabled in game settings</span>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+
+            <!-- Score Breakdown -->
+            <div class="score-panel">
+                <h2>Score Breakdown</h2>
+                <div class="score-categories">
+                    @foreach (var category in _scoreBreakdown)
+                    {
+                        <div class="score-category">
+                            <span class="cat-icon">@category.Icon</span>
+                            <span class="cat-name">@category.Name</span>
+                            <div class="cat-bar">
+                                <div class="bar-fill" style="width: @category.Percentage%"></div>
+                            </div>
+                            <span class="cat-score">@category.Score</span>
+                        </div>
+                    }
+                </div>
+                <div class="total-score">
+                    <span>Total Score:</span>
+                    <span class="total">@_gameStatus?.TotalScore</span>
+                </div>
+            </div>
+
+            <!-- Faction Comparison -->
+            <div class="comparison-panel">
+                <h2>Faction Comparison</h2>
+                <div class="faction-list">
+                    @foreach (var faction in _factionScores.OrderByDescending(f => f.Score))
+                    {
+                        <div class="faction-row @(faction.IsPlayer ? "player" : "") @(faction.IsDefeated ? "defeated" : "")">
+                            <span class="faction-rank">#@faction.Rank</span>
+                            <span class="faction-name">@faction.Name</span>
+                            <div class="faction-bar">
+                                <div class="bar-fill" style="width: @faction.ScorePercent%"></div>
+                            </div>
+                            <span class="faction-score">@faction.Score</span>
+                            @if (faction.IsDefeated)
+                            {
+                                <span class="defeated-badge">☠️</span>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Crisis Alert -->
+            @if (_crisisActive)
+            {
+                <div class="crisis-panel">
+                    <div class="crisis-alert">
+                        <span class="crisis-icon">⚠️</span>
+                        <div class="crisis-info">
+                            <h3>@_crisisReport?.Name</h3>
+                            <p>Phase @_crisisReport?.Phase - @_crisisReport?.CurrentEscalation</p>
+                            <p class="victory-cond">Victory: @_crisisReport?.VictoryCondition</p>
+                        </div>
+                        <div class="crisis-stats">
+                            <div class="stat">
+                                <span>Enemy Fleets</span>
+                                <span class="value">@_crisisReport?.EnemyFleets</span>
+                            </div>
+                            <div class="stat">
+                                <span>Systems Lost</span>
+                                <span class="value">@_crisisReport?.SystemsLost</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<style>
+    .victory-screen {
+        min-height: 100vh;
+        padding: 20px;
+        background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3a 100%);
+        color: white;
+    }
+
+    .victory-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+    }
+
+    .victory-header h1 { margin: 0; }
+
+    .victory-content {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    .status-panel, .score-panel, .comparison-panel, .crisis-panel {
+        background: rgba(0,0,0,0.4);
+        border-radius: 15px;
+        padding: 20px;
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .conditions-panel {
+        grid-column: span 2;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .status-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        margin-top: 15px;
+    }
+
+    .status-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 15px;
+        background: rgba(255,255,255,0.05);
+        border-radius: 10px;
+    }
+
+    .status-item .label {
+        color: #888;
+        font-size: 0.9em;
+    }
+
+    .status-item .value {
+        font-size: 2em;
+        font-weight: bold;
+    }
+
+    .rank-1 { color: #f1c40f; }
+    .rank-2 { color: #bdc3c7; }
+    .rank-3 { color: #cd6133; }
+
+    .condition-card {
+        background: rgba(255,255,255,0.05);
+        border: 2px solid rgba(255,255,255,0.1);
+        border-radius: 12px;
+        padding: 20px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .condition-card.achieved {
+        border-color: #2ecc71;
+        background: rgba(46, 204, 113, 0.1);
+    }
+
+    .condition-card.disabled {
+        opacity: 0.5;
+    }
+
+    .condition-header {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 15px;
+    }
+
+    .condition-icon {
+        font-size: 3em;
+    }
+
+    .condition-info h3 {
+        margin: 0;
+        font-size: 1.3em;
+    }
+
+    .condition-info p {
+        margin: 5px 0 0;
+        color: #aaa;
+        font-size: 0.9em;
+    }
+
+    .achieved-badge {
+        padding: 8px 15px;
+        background: #2ecc71;
+        border-radius: 20px;
+        font-weight: bold;
+        font-size: 0.9em;
+    }
+
+    .condition-progress {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .requirement {
+        display: grid;
+        grid-template-columns: 150px 1fr 100px 30px;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .requirement.met .req-name {
+        color: #2ecc71;
+    }
+
+    .req-bar {
+        height: 8px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #3498db, #2ecc71);
+        transition: width 0.3s;
+    }
+
+    .requirement.met .bar-fill {
+        background: #2ecc71;
+    }
+
+    .req-progress {
+        text-align: right;
+        font-size: 0.9em;
+        color: #888;
+    }
+
+    .check {
+        color: #2ecc71;
+        font-size: 1.2em;
+    }
+
+    .disabled-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2em;
+        color: #888;
+    }
+
+    .score-categories {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-top: 15px;
+    }
+
+    .score-category {
+        display: grid;
+        grid-template-columns: 40px 120px 1fr 60px;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .cat-icon {
+        font-size: 1.5em;
+    }
+
+    .cat-bar {
+        height: 12px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 6px;
+        overflow: hidden;
+    }
+
+    .cat-score {
+        text-align: right;
+        font-weight: bold;
+    }
+
+    .total-score {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+        padding-top: 15px;
+        border-top: 1px solid rgba(255,255,255,0.2);
+        font-size: 1.3em;
+    }
+
+    .total-score .total {
+        font-weight: bold;
+        color: #f1c40f;
+    }
+
+    .faction-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 15px;
+    }
+
+    .faction-row {
+        display: grid;
+        grid-template-columns: 40px 150px 1fr 80px 30px;
+        align-items: center;
+        gap: 10px;
+        padding: 10px;
+        background: rgba(255,255,255,0.05);
+        border-radius: 8px;
+    }
+
+    .faction-row.player {
+        background: rgba(52, 152, 219, 0.2);
+        border: 1px solid #3498db;
+    }
+
+    .faction-row.defeated {
+        opacity: 0.5;
+    }
+
+    .faction-rank {
+        font-weight: bold;
+        color: #f1c40f;
+    }
+
+    .faction-bar {
+        height: 10px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 5px;
+        overflow: hidden;
+    }
+
+    .faction-row.player .bar-fill {
+        background: #3498db;
+    }
+
+    .crisis-panel {
+        grid-column: span 2;
+    }
+
+    .crisis-alert {
+        display: flex;
+        gap: 20px;
+        padding: 20px;
+        background: rgba(231, 76, 60, 0.2);
+        border: 2px solid #e74c3c;
+        border-radius: 12px;
+    }
+
+    .crisis-icon {
+        font-size: 3em;
+    }
+
+    .crisis-info {
+        flex: 1;
+    }
+
+    .crisis-info h3 {
+        margin: 0;
+        color: #e74c3c;
+    }
+
+    .victory-cond {
+        color: #2ecc71;
+        font-style: italic;
+    }
+
+    .crisis-stats {
+        display: flex;
+        gap: 20px;
+    }
+
+    .crisis-stats .stat {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 10px 20px;
+        background: rgba(0,0,0,0.3);
+        border-radius: 8px;
+    }
+
+    .crisis-stats .value {
+        font-size: 1.5em;
+        font-weight: bold;
+        color: #e74c3c;
+    }
+
+    .btn-back {
+        padding: 10px 20px;
+        background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.2);
+        border-radius: 5px;
+        color: white;
+        cursor: pointer;
+    }
+
+    .loading {
+        text-align: center;
+        padding: 50px;
+        color: #888;
+    }
+
+    h2 {
+        margin-top: 0;
+        padding-bottom: 10px;
+        border-bottom: 1px solid rgba(255,255,255,0.2);
+    }
+
+    @@media (max-width: 1000px) {
+        .victory-content {
+            grid-template-columns: 1fr;
+        }
+        .conditions-panel, .crisis-panel {
+            grid-column: span 1;
+        }
+    }
+</style>
+
+@code {
+    private bool _loading = true;
+    private GameStatusDisplay? _gameStatus;
+    private List<VictoryConditionDisplay> _victoryConditions = new();
+    private List<ScoreCategoryDisplay> _scoreBreakdown = new();
+    private List<FactionScoreDisplay> _factionScores = new();
+    private bool _crisisActive = false;
+    private CrisisReportDisplay? _crisisReport;
+    private string _factionId = "federation";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        _loading = true;
+        try
+        {
+            // Mock data
+            _gameStatus = new GameStatusDisplay
+            {
+                CurrentTurn = 47,
+                TotalScore = 12450,
+                Rank = 1
+            };
+
+            _victoryConditions = new List<VictoryConditionDisplay>
+            {
+                new()
+                {
+                    Type = "Domination",
+                    Name = "Galactic Domination",
+                    Description = "Control 75% of colonizable systems in the galaxy.",
+                    IsEnabled = true,
+                    IsAchieved = false,
+                    Requirements = new()
+                    {
+                        new() { Name = "Systems Controlled", Current = 28, Target = 40, IsMet = false },
+                        new() { Name = "Major Factions Defeated", Current = 1, Target = 3, IsMet = false }
+                    }
+                },
+                new()
+                {
+                    Type = "Federation",
+                    Name = "Federation Victory",
+                    Description = "Unite the galaxy through diplomacy and form a Federation.",
+                    IsEnabled = true,
+                    IsAchieved = false,
+                    Requirements = new()
+                    {
+                        new() { Name = "Allied Factions", Current = 2, Target = 3, IsMet = false },
+                        new() { Name = "Federation Members", Current = 1, Target = 4, IsMet = false },
+                        new() { Name = "Galactic Council Formed", Current = 0, Target = 1, IsMet = false }
+                    }
+                },
+                new()
+                {
+                    Type = "Scientific",
+                    Name = "Technological Ascension",
+                    Description = "Research all Tier 4 technologies and build a megastructure.",
+                    IsEnabled = true,
+                    IsAchieved = false,
+                    Requirements = new()
+                    {
+                        new() { Name = "Tier 4 Physics Techs", Current = 1, Target = 2, IsMet = false },
+                        new() { Name = "Tier 4 Engineering Techs", Current = 0, Target = 2, IsMet = false },
+                        new() { Name = "Tier 4 Society Techs", Current = 0, Target = 2, IsMet = false },
+                        new() { Name = "Megastructure Built", Current = 0, Target = 1, IsMet = false }
+                    }
+                },
+                new()
+                {
+                    Type = "Economic",
+                    Name = "Economic Hegemony",
+                    Description = "Achieve overwhelming economic superiority.",
+                    IsEnabled = true,
+                    IsAchieved = false,
+                    Requirements = new()
+                    {
+                        new() { Name = "Monthly Income", Current = 850, Target = 1000, IsMet = false },
+                        new() { Name = "Total Population", Current = 120, Target = 200, IsMet = false },
+                        new() { Name = "Trade Routes", Current = 8, Target = 15, IsMet = false }
+                    }
+                },
+                new()
+                {
+                    Type = "Score",
+                    Name = "Score Victory",
+                    Description = "Achieve the highest score when time limit reached.",
+                    IsEnabled = true,
+                    IsAchieved = false,
+                    Requirements = new()
+                    {
+                        new() { Name = "Score Rank", Current = 1, Target = 1, IsMet = true },
+                        new() { Name = "Turns Remaining", Current = 53, Target = 100, IsMet = false }
+                    }
+                }
+            };
+
+            _scoreBreakdown = new List<ScoreCategoryDisplay>
+            {
+                new() { Icon = "🌍", Name = "Colonies", Score = 3200, Percentage = 26 },
+                new() { Icon = "👥", Name = "Population", Score = 2400, Percentage = 19 },
+                new() { Icon = "🔬", Name = "Technology", Score = 2800, Percentage = 22 },
+                new() { Icon = "⚔️", Name = "Military", Score = 1850, Percentage = 15 },
+                new() { Icon = "💰", Name = "Economy", Score = 1200, Percentage = 10 },
+                new() { Icon = "🤝", Name = "Diplomacy", Score = 1000, Percentage = 8 }
+            };
+
+            _factionScores = new List<FactionScoreDisplay>
+            {
+                new() { Rank = 1, Name = "United Federation", Score = 12450, ScorePercent = 100, IsPlayer = true },
+                new() { Rank = 2, Name = "Klingon Empire", Score = 9800, ScorePercent = 79 },
+                new() { Rank = 3, Name = "Romulan Star Empire", Score = 8200, ScorePercent = 66 },
+                new() { Rank = 4, Name = "Cardassian Union", Score = 5100, ScorePercent = 41 },
+                new() { Rank = 5, Name = "Ferengi Alliance", Score = 4200, ScorePercent = 34, IsDefeated = true }
+            };
+
+            // Crisis (if active)
+            _crisisActive = true;
+            _crisisReport = new CrisisReportDisplay
+            {
+                Name = "The Borg Invasion",
+                Phase = 2,
+                CurrentEscalation = "Assimilation begins at border worlds",
+                VictoryCondition = "Destroy the Unicomplex or hold out for 50 turns",
+                EnemyFleets = 8,
+                SystemsLost = 3
+            };
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+        _loading = false;
+    }
+
+    private void GoBack() => Nav.NavigateTo("/game/galaxy");
+    private string GetFactionClass() => _factionId.ToLower();
+
+    private string GetConditionIcon(string type) => type switch
+    {
+        "Domination" => "🗡️",
+        "Federation" => "🤝",
+        "Scientific" => "🔬",
+        "Economic" => "💰",
+        "Score" => "🏆",
+        _ => "🎯"
+    };
+
+    private string GetRankText(int rank) => rank switch
+    {
+        1 => "1st",
+        2 => "2nd",
+        3 => "3rd",
+        _ => $"{rank}th"
+    };
+
+    public class GameStatusDisplay
+    {
+        public int CurrentTurn { get; set; }
+        public int TotalScore { get; set; }
+        public int Rank { get; set; }
+    }
+
+    public class VictoryConditionDisplay
+    {
+        public string Type { get; set; } = "";
+        public string Name { get; set; } = "";
+        public string Description { get; set; } = "";
+        public bool IsEnabled { get; set; }
+        public bool IsAchieved { get; set; }
+        public List<RequirementDisplay> Requirements { get; set; } = new();
+    }
+
+    public class RequirementDisplay
+    {
+        public string Name { get; set; } = "";
+        public int Current { get; set; }
+        public int Target { get; set; }
+        public bool IsMet { get; set; }
+        public int PercentComplete => Target > 0 ? Math.Min(100, Current * 100 / Target) : 0;
+    }
+
+    public class ScoreCategoryDisplay
+    {
+        public string Icon { get; set; } = "";
+        public string Name { get; set; } = "";
+        public int Score { get; set; }
+        public int Percentage { get; set; }
+    }
+
+    public class FactionScoreDisplay
+    {
+        public int Rank { get; set; }
+        public string Name { get; set; } = "";
+        public int Score { get; set; }
+        public int ScorePercent { get; set; }
+        public bool IsPlayer { get; set; }
+        public bool IsDefeated { get; set; }
+    }
+
+    public class CrisisReportDisplay
+    {
+        public string Name { get; set; } = "";
+        public int Phase { get; set; }
+        public string CurrentEscalation { get; set; } = "";
+        public string VictoryCondition { get; set; } = "";
+        public int EnemyFleets { get; set; }
+        public int SystemsLost { get; set; }
+    }
+}

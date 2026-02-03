@@ -1,0 +1,234 @@
+@namespace StarTrekGame.Web.Components.Shared
+
+<svg class="ship-svg @Class" viewBox="-50 -30 100 60" width="@Width" height="@Height" 
+     style="transform: rotate(@(Rotation)deg);">
+    <defs>
+        <!-- Ship hull gradient -->
+        <linearGradient id="hull-@_uniqueId" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="@_highlightColor"/>
+            <stop offset="50%" stop-color="@_baseColor"/>
+            <stop offset="100%" stop-color="@_shadowColor"/>
+        </linearGradient>
+        
+        <!-- Engine glow -->
+        <radialGradient id="engine-@_uniqueId" cx="50%" cy="50%">
+            <stop offset="0%" stop-color="@_engineColor" stop-opacity="1"/>
+            <stop offset="100%" stop-color="@_engineColor" stop-opacity="0"/>
+        </radialGradient>
+        
+        <!-- Glow filter -->
+        <filter id="glow-@_uniqueId">
+            <feGaussianBlur stdDeviation="2" result="blur"/>
+            <feMerge>
+                <feMergeNode in="blur"/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
+    </defs>
+    
+    @switch (ShipClass?.ToLower())
+    {
+        case "explorer":
+        case "cruiser":
+            <!-- Federation-style saucer + nacelles -->
+            <!-- Saucer section -->
+            <ellipse cx="15" cy="0" rx="18" ry="12" fill="url(#hull-@_uniqueId)"/>
+            <!-- Engineering hull -->
+            <path d="M15,0 L-10,0 L-20,6 L-20,-6 Z" fill="url(#hull-@_uniqueId)"/>
+            <!-- Neck -->
+            <rect x="0" y="-3" width="15" height="6" fill="@_baseColor"/>
+            <!-- Nacelle pylons -->
+            <line x1="-5" y1="0" x2="-15" y2="18" stroke="@_baseColor" stroke-width="3"/>
+            <line x1="-5" y1="0" x2="-15" y2="-18" stroke="@_baseColor" stroke-width="3"/>
+            <!-- Nacelles -->
+            <ellipse cx="-25" cy="20" rx="20" ry="5" fill="url(#hull-@_uniqueId)"/>
+            <ellipse cx="-25" cy="-20" rx="20" ry="5" fill="url(#hull-@_uniqueId)"/>
+            <!-- Bussard collectors -->
+            <circle cx="-5" cy="20" r="4" fill="#ff4444"/>
+            <circle cx="-5" cy="-20" r="4" fill="#ff4444"/>
+            <!-- Engine glow -->
+            @if (ShowEngineGlow)
+            {
+                <ellipse cx="-42" cy="20" rx="6" ry="3" fill="url(#engine-@_uniqueId)" filter="url(#glow-@_uniqueId)"/>
+                <ellipse cx="-42" cy="-20" rx="6" ry="3" fill="url(#engine-@_uniqueId)" filter="url(#glow-@_uniqueId)"/>
+            }
+            <!-- Bridge -->
+            <circle cx="20" cy="0" r="4" fill="@_highlightColor"/>
+            break;
+            
+        case "escort":
+        case "destroyer":
+            <!-- Compact, aggressive design -->
+            <path d="M35,0 L-20,15 L-30,10 L-30,-10 L-20,-15 Z" fill="url(#hull-@_uniqueId)"/>
+            <!-- Wings -->
+            <path d="M0,0 L-15,20 L-25,18 L-15,0 Z" fill="@_shadowColor"/>
+            <path d="M0,0 L-15,-20 L-25,-18 L-15,0 Z" fill="@_shadowColor"/>
+            <!-- Engines -->
+            @if (ShowEngineGlow)
+            {
+                <ellipse cx="-32" cy="8" rx="5" ry="3" fill="url(#engine-@_uniqueId)" filter="url(#glow-@_uniqueId)"/>
+                <ellipse cx="-32" cy="-8" rx="5" ry="3" fill="url(#engine-@_uniqueId)" filter="url(#glow-@_uniqueId)"/>
+            }
+            <!-- Cockpit -->
+            <ellipse cx="25" cy="0" rx="6" ry="4" fill="@_highlightColor"/>
+            break;
+            
+        case "battlecruiser":
+        case "warship":
+            <!-- Klingon-style aggressive design -->
+            <path d="M30,0 L10,8 L-30,25 L-35,20 L-20,0 L-35,-20 L-30,-25 L10,-8 Z" fill="url(#hull-@_uniqueId)"/>
+            <!-- Central body -->
+            <ellipse cx="0" cy="0" rx="15" ry="8" fill="@_baseColor"/>
+            <!-- Bridge -->
+            <circle cx="20" cy="0" r="5" fill="@_shadowColor"/>
+            <!-- Engines -->
+            @if (ShowEngineGlow)
+            {
+                <circle cx="-38" cy="22" r="4" fill="url(#engine-@_uniqueId)" filter="url(#glow-@_uniqueId)"/>
+                <circle cx="-38" cy="-22" r="4" fill="url(#engine-@_uniqueId)" filter="url(#glow-@_uniqueId)"/>
+            }
+            break;
+            
+        case "warbird":
+        case "bird of prey":
+            <!-- Romulan/Klingon bird design -->
+            <path d="M25,0 L5,5 L-35,22 L-40,18 L-25,0 L-40,-18 L-35,-22 L5,-5 Z" fill="url(#hull-@_uniqueId)"/>
+            <!-- Head -->
+            <ellipse cx="15" cy="0" rx="12" ry="6" fill="@_baseColor"/>
+            <!-- Eye/bridge -->
+            <circle cx="20" cy="0" r="3" fill="#44ff44"/>
+            <!-- Tail -->
+            <path d="M-25,0 L-40,0 L-45,8 L-40,0 L-45,-8 Z" fill="@_shadowColor"/>
+            @if (ShowEngineGlow)
+            {
+                <ellipse cx="-42" cy="0" rx="4" ry="6" fill="url(#engine-@_uniqueId)" filter="url(#glow-@_uniqueId)"/>
+            }
+            break;
+            
+        case "science":
+        case "research":
+            <!-- Science vessel with sensor arrays -->
+            <ellipse cx="10" cy="0" rx="20" ry="10" fill="url(#hull-@_uniqueId)"/>
+            <!-- Sensor dish -->
+            <ellipse cx="32" cy="0" rx="8" ry="12" fill="@_highlightColor" opacity="0.7"/>
+            <!-- Engineering -->
+            <rect x="-25" y="-5" width="20" height="10" fill="@_baseColor" rx="2"/>
+            <!-- Nacelle -->
+            <ellipse cx="-15" cy="15" rx="15" ry="4" fill="url(#hull-@_uniqueId)"/>
+            <ellipse cx="-15" cy="-15" rx="15" ry="4" fill="url(#hull-@_uniqueId)"/>
+            @if (ShowEngineGlow)
+            {
+                <ellipse cx="-28" cy="15" rx="4" ry="2" fill="url(#engine-@_uniqueId)" filter="url(#glow-@_uniqueId)"/>
+                <ellipse cx="-28" cy="-15" rx="4" ry="2" fill="url(#engine-@_uniqueId)" filter="url(#glow-@_uniqueId)"/>
+            }
+            break;
+            
+        case "transport":
+        case "freighter":
+            <!-- Cargo vessel -->
+            <rect x="-25" y="-12" width="50" height="24" fill="url(#hull-@_uniqueId)" rx="4"/>
+            <!-- Cargo pods -->
+            <rect x="-20" y="-8" width="12" height="16" fill="@_shadowColor" rx="2"/>
+            <rect x="-5" y="-8" width="12" height="16" fill="@_shadowColor" rx="2"/>
+            <rect x="10" y="-8" width="12" height="16" fill="@_shadowColor" rx="2"/>
+            <!-- Cockpit -->
+            <ellipse cx="28" cy="0" rx="6" ry="5" fill="@_highlightColor"/>
+            @if (ShowEngineGlow)
+            {
+                <ellipse cx="-28" cy="0" rx="4" ry="8" fill="url(#engine-@_uniqueId)" filter="url(#glow-@_uniqueId)"/>
+            }
+            break;
+            
+        case "station":
+        case "starbase":
+            <!-- Space station -->
+            <circle r="25" fill="url(#hull-@_uniqueId)"/>
+            <!-- Docking ring -->
+            <circle r="35" fill="none" stroke="@_baseColor" stroke-width="4"/>
+            <!-- Docking ports -->
+            <circle cx="35" cy="0" r="5" fill="@_shadowColor"/>
+            <circle cx="-35" cy="0" r="5" fill="@_shadowColor"/>
+            <circle cx="0" cy="35" r="5" fill="@_shadowColor"/>
+            <circle cx="0" cy="-35" r="5" fill="@_shadowColor"/>
+            <!-- Central hub -->
+            <circle r="12" fill="@_highlightColor"/>
+            break;
+            
+        default:
+            <!-- Generic ship -->
+            <path d="M30,0 L-15,12 L-25,8 L-25,-8 L-15,-12 Z" fill="url(#hull-@_uniqueId)"/>
+            <circle cx="20" cy="0" r="5" fill="@_highlightColor"/>
+            @if (ShowEngineGlow)
+            {
+                <ellipse cx="-28" cy="0" rx="4" ry="5" fill="url(#engine-@_uniqueId)" filter="url(#glow-@_uniqueId)"/>
+            }
+            break;
+    }
+    
+    @if (ShowShields && ShieldsActive)
+    {
+        <ellipse rx="45" ry="28" fill="none" stroke="@_shieldColor" stroke-width="2" opacity="0.4">
+            <animate attributeName="opacity" values="0.2;0.5;0.2" dur="2s" repeatCount="indefinite"/>
+        </ellipse>
+    }
+</svg>
+
+@code {
+    [Parameter] public string ShipClass { get; set; } = "Explorer";
+    [Parameter] public string Faction { get; set; } = "Federation";
+    [Parameter] public int Width { get; set; } = 100;
+    [Parameter] public int Height { get; set; } = 60;
+    [Parameter] public int Rotation { get; set; } = 0;
+    [Parameter] public bool ShowEngineGlow { get; set; } = true;
+    [Parameter] public bool ShowShields { get; set; } = false;
+    [Parameter] public bool ShieldsActive { get; set; } = false;
+    [Parameter] public string? Class { get; set; }
+    
+    private string _uniqueId = Guid.NewGuid().ToString("N")[..8];
+    
+    private string _baseColor => Faction?.ToLower() switch
+    {
+        "federation" or "terran" => "#667788",
+        "klingon" or "warrior" => "#445544",
+        "romulan" => "#446644",
+        "cardassian" => "#665544",
+        "ferengi" => "#887755",
+        "breen" => "#556666",
+        _ => "#666677"
+    };
+    
+    private string _highlightColor => Faction?.ToLower() switch
+    {
+        "federation" or "terran" => "#99aabb",
+        "klingon" or "warrior" => "#778877",
+        "romulan" => "#779977",
+        "cardassian" => "#998877",
+        "ferengi" => "#bbaa88",
+        "breen" => "#889999",
+        _ => "#9999aa"
+    };
+    
+    private string _shadowColor => Faction?.ToLower() switch
+    {
+        "federation" or "terran" => "#334455",
+        "klingon" or "warrior" => "#223322",
+        "romulan" => "#224422",
+        "cardassian" => "#443322",
+        "ferengi" => "#554433",
+        "breen" => "#334444",
+        _ => "#333344"
+    };
+    
+    private string _engineColor => Faction?.ToLower() switch
+    {
+        "federation" or "terran" => "#88ccff",
+        "klingon" or "warrior" => "#ff6644",
+        "romulan" => "#44ff88",
+        "cardassian" => "#ffaa44",
+        "ferengi" => "#ffcc44",
+        "breen" => "#44ffff",
+        _ => "#88aaff"
+    };
+    
+    private string _shieldColor => "#4488ff";
+}

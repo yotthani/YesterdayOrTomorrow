@@ -1,0 +1,59 @@
+{
+  "category": "Vehicles",
+  "description": "Ground vehicles and small craft for all factions",
+  "factionStyles": {
+    "federation": {
+      "aesthetic": "Sleek, clean, hover technology",
+      "colors": "White/silver with blue accents",
+      "features": ["Anti-grav systems", "Smooth curves", "Federation markings"]
+    },
+    "klingon": {
+      "aesthetic": "Aggressive, armored, treaded",
+      "colors": "Dark metal, red accents",
+      "features": ["Heavy armor", "Mounted disruptors", "Spikes"]
+    },
+    "romulan": {
+      "aesthetic": "Elegant but deadly, cloaking capable",
+      "colors": "Green, bronze accents",
+      "features": ["Sleek design", "Hidden weapons", "Sensor baffling"]
+    },
+    "cardassian": {
+      "aesthetic": "Utilitarian, armored transports",
+      "colors": "Brown/tan military",
+      "features": ["Troop compartments", "Heavy treads", "Surveillance gear"]
+    },
+    "borg": {
+      "aesthetic": "Assimilated technology, geometric",
+      "colors": "Black with green glow",
+      "features": ["Assimilation tools", "Adaptive systems", "No windows"]
+    },
+    "dominion": {
+      "aesthetic": "Organic, insectoid design",
+      "colors": "Purple, bioluminescent",
+      "features": ["Ketracel-white dispensers", "Jem'Hadar crew spaces"]
+    }
+  },
+  "vehicleTypes": [
+    { "id": "hover_car", "name": "Hover Car Transport", "size": "small", "role": "Personnel transport" },
+    { "id": "apc", "name": "APC Armored Transport", "size": "medium", "role": "Troop transport" },
+    { "id": "tank", "name": "Tank Assault", "size": "large", "role": "Heavy assault" },
+    { "id": "scout", "name": "Scout Recon", "size": "small", "role": "Reconnaissance" },
+    { "id": "cargo", "name": "Cargo Hauler", "size": "large", "role": "Supply transport" },
+    { "id": "artillery", "name": "Artillery Mobile", "size": "large", "role": "Fire support" },
+    { "id": "shuttle_ground", "name": "Shuttle Atmospheric", "size": "medium", "role": "Air/ground transport" },
+    { "id": "bike", "name": "Speeder Bike", "size": "tiny", "role": "Fast scout" }
+  ],
+  "styleGuide": {
+    "material": "Claymation 3D style, detailed vehicle surfaces",
+    "quality": "High-end stop-motion animation quality",
+    "lighting": "Ground-level lighting with shadows",
+    "composition": "3/4 view showing vehicle profile",
+    "background": "Solid black (#000000)",
+    "critical": [
+      "Each faction has DISTINCT vehicle design",
+      "Military vehicles have visible weapons",
+      "Civilian vehicles should not look military",
+      "Ground-based - no space flight capability shown"
+    ]
+  }
+}

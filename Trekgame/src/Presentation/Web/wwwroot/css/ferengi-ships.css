@@ -1,0 +1,183 @@
+/* ==============================================
+   GALACTIC STRATEGY - Ferengi Ships
+   3D Rendered Style with Nameplates
+   
+   Two sprite sheets:
+   - military_ships.png: D'Kora, Marauders, Combat vessels
+   - civilian_ships.png: Freighters, Trade ships, Support
+   
+   Both: ~2000 x 1103 px, 4 columns x 4 rows
+   ============================================== */
+
+/* ==============================================
+   Base Ferengi Ship Component
+   ============================================== */
+
+.ship-card.ferengi {
+    background-repeat: no-repeat;
+    background-size: 1000px 552px; /* 50% scale default */
+}
+
+/* ==============================================
+   FERENGI MILITARY SHIPS
+   Sheet: ferengi/military_ships.png
+   
+   Row 1: D'Kora, Attack Ship, Raider, Privateer
+   Row 2: Marauder (TNG), Marauder (DS9), Heavy Raider, Escort
+   Row 3: Missile Ship, Mercenary, Patrol Craft, Enforcer
+   Row 4: Commerce Raider, Salvage (Armed), Luxury (Armed), Flagship
+   ============================================== */
+
+.ship-card.ferengi.military {
+    background-image: url('/images/ships/ferengi/military_ships.png');
+}
+
+/* Row 1 */
+.ship-card.ferengi.dkora          { background-position: 0 0; }
+.ship-card.ferengi.attack-ship    { background-position: -250px 0; }
+.ship-card.ferengi.raider         { background-position: -500px 0; }
+.ship-card.ferengi.privateer      { background-position: -750px 0; }
+
+/* Row 2 */
+.ship-card.ferengi.marauder-tng   { background-position: 0 -138px; }
+.ship-card.ferengi.marauder-ds9   { background-position: -250px -138px; }
+.ship-card.ferengi.heavy-raider   { background-position: -500px -138px; }
+.ship-card.ferengi.escort         { background-position: -750px -138px; }
+
+/* Row 3 */
+.ship-card.ferengi.missile-ship   { background-position: 0 -276px; }
+.ship-card.ferengi.mercenary      { background-position: -250px -276px; }
+.ship-card.ferengi.patrol         { background-position: -500px -276px; }
+.ship-card.ferengi.enforcer       { background-position: -750px -276px; }
+
+/* Row 4 */
+.ship-card.ferengi.commerce-raider{ background-position: 0 -414px; }
+.ship-card.ferengi.salvage-armed  { background-position: -250px -414px; }
+.ship-card.ferengi.luxury-armed   { background-position: -500px -414px; }
+.ship-card.ferengi.flagship       { background-position: -750px -414px; }
+
+/* ==============================================
+   FERENGI CIVILIAN SHIPS
+   Sheet: ferengi/civilian_ships.png
+   
+   Row 1: Freighter, Transport, Cargo Tug, Merchantman
+   Row 2: Mining Ship, Salvage Vessel, Repair Tug, Survey Ship
+   Row 3: Luxury Yacht, Trade Cruiser, Gambling Ship, Courier
+   Row 4: Shuttlepod, Ferengi Workbee, Colony Ship, Waste Transport
+   ============================================== */
+
+.ship-card.ferengi.civilian {
+    background-image: url('/images/ships/ferengi/civilian_ships.png');
+}
+
+/* Row 1 */
+.ship-card.ferengi.freighter      { background-position: 0 0; }
+.ship-card.ferengi.transport      { background-position: -250px 0; }
+.ship-card.ferengi.cargo-tug      { background-position: -500px 0; }
+.ship-card.ferengi.merchantman    { background-position: -750px 0; }
+
+/* Row 2 */
+.ship-card.ferengi.mining         { background-position: 0 -138px; }
+.ship-card.ferengi.salvage        { background-position: -250px -138px; }
+.ship-card.ferengi.repair         { background-position: -500px -138px; }
+.ship-card.ferengi.survey         { background-position: -750px -138px; }
+
+/* Row 3 */
+.ship-card.ferengi.luxury-yacht   { background-position: 0 -276px; }
+.ship-card.ferengi.trade-cruiser  { background-position: -250px -276px; }
+.ship-card.ferengi.gambling       { background-position: -500px -276px; }
+.ship-card.ferengi.courier        { background-position: -750px -276px; }
+
+/* Row 4 */
+.ship-card.ferengi.shuttlepod     { background-position: 0 -414px; }
+.ship-card.ferengi.workbee        { background-position: -250px -414px; }
+.ship-card.ferengi.colony         { background-position: -500px -414px; }
+.ship-card.ferengi.waste-transport{ background-position: -750px -414px; }
+
+/* ==============================================
+   Large Size Positions (100% scale)
+   ============================================== */
+
+.ship-card.ferengi.large {
+    background-size: 2000px 1103px;
+}
+
+/* Military Large */
+.ship-card.ferengi.large.dkora          { background-position: 0 0; }
+.ship-card.ferengi.large.attack-ship    { background-position: -500px 0; }
+.ship-card.ferengi.large.raider         { background-position: -1000px 0; }
+.ship-card.ferengi.large.privateer      { background-position: -1500px 0; }
+
+.ship-card.ferengi.large.marauder-tng   { background-position: 0 -276px; }
+.ship-card.ferengi.large.marauder-ds9   { background-position: -500px -276px; }
+.ship-card.ferengi.large.heavy-raider   { background-position: -1000px -276px; }
+.ship-card.ferengi.large.escort         { background-position: -1500px -276px; }
+
+.ship-card.ferengi.large.missile-ship   { background-position: 0 -552px; }
+.ship-card.ferengi.large.mercenary      { background-position: -500px -552px; }
+.ship-card.ferengi.large.patrol         { background-position: -1000px -552px; }
+.ship-card.ferengi.large.enforcer       { background-position: -1500px -552px; }
+
+.ship-card.ferengi.large.commerce-raider{ background-position: 0 -828px; }
+.ship-card.ferengi.large.salvage-armed  { background-position: -500px -828px; }
+.ship-card.ferengi.large.luxury-armed   { background-position: -1000px -828px; }
+.ship-card.ferengi.large.flagship       { background-position: -1500px -828px; }
+
+/* ==============================================
+   Small Size Positions (25% scale)
+   ============================================== */
+
+.ship-card.ferengi.small {
+    background-size: 500px 276px;
+}
+
+.ship-card.ferengi.small.dkora          { background-position: 0 0; }
+.ship-card.ferengi.small.attack-ship    { background-position: -125px 0; }
+.ship-card.ferengi.small.raider         { background-position: -250px 0; }
+.ship-card.ferengi.small.privateer      { background-position: -375px 0; }
+
+.ship-card.ferengi.small.marauder-tng   { background-position: 0 -69px; }
+.ship-card.ferengi.small.marauder-ds9   { background-position: -125px -69px; }
+.ship-card.ferengi.small.heavy-raider   { background-position: -250px -69px; }
+.ship-card.ferengi.small.escort         { background-position: -375px -69px; }
+
+/* ==============================================
+   Ferengi Frame Style (Gold Glow)
+   ============================================== */
+
+.ship-frame.ferengi {
+    border-color: rgba(234, 179, 8, 0.6);
+    box-shadow: 
+        0 4px 12px rgba(0, 0, 0, 0.5),
+        0 0 20px rgba(234, 179, 8, 0.3);
+}
+
+.ship-frame.ferengi.selected {
+    border-color: #fbbf24;
+    box-shadow: 
+        0 4px 12px rgba(0, 0, 0, 0.5),
+        0 0 25px rgba(251, 191, 36, 0.5);
+}
+
+/* ==============================================
+   Ferengi Ship Selection Glow
+   ============================================== */
+
+@keyframes ferengi-ship-glow {
+    0%, 100% { box-shadow: 0 0 15px rgba(234, 179, 8, 0.4); }
+    50% { box-shadow: 0 0 25px rgba(234, 179, 8, 0.6); }
+}
+
+.ship-card.ferengi.selected {
+    animation: ferengi-ship-glow 2s ease-in-out infinite;
+}
+
+/* Profit indicator animation */
+@keyframes latinum-sparkle {
+    0%, 100% { filter: brightness(1); }
+    50% { filter: brightness(1.2); }
+}
+
+.ship-card.ferengi.profitable {
+    animation: latinum-sparkle 1s ease-in-out infinite;
+}

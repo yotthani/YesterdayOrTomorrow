@@ -1,0 +1,121 @@
+{
+  "factionName": "Borg",
+  "categoryName": "Buildings",
+  "architectureStyle": {
+    "description": "Technological nightmare - geometric, dark, organic-tech hybrid, designed purely for function",
+    "keyElements": [
+      "GEOMETRIC shapes - cubes, hexagons, octagons - NO organic curves",
+      "Dark metal with exposed circuitry and conduits",
+      "GREEN glow from power systems and regeneration alcoves",
+      "NO windows - Borg do not need to see outside",
+      "NO aesthetic design - pure brutal function",
+      "Assimilation chambers and alcoves everywhere",
+      "Constantly adapting and growing structures",
+      "Cables, tubes, and machinery exposed",
+      "Drones moving through corridors like insects in a hive",
+      "Technology assimilated from countless species visible",
+      "Central processing nodes for Collective coordination",
+      "NO individuality, NO decoration, NO color except functional green"
+    ],
+    "colors": "Black metal, dark gray, gunmetal, GREEN accent lighting/glow only",
+    "materials": "Assimilated metal alloys, organic-tech hybrid materials, neural interface conduits"
+  },
+  "buildings": [
+    {
+      "name": "Central Plexus",
+      "description": "Primary Collective coordination hub. Massive processing core, millions of data streams, Queen's chamber if present."
+    },
+    {
+      "name": "Assimilation Chamber",
+      "description": "Where new drones are created. Surgical tables, injection tubules, drone storage alcoves."
+    },
+    {
+      "name": "Regeneration Complex",
+      "description": "Thousands of alcoves where drones regenerate. Eerie rows of standing drones, green glow."
+    },
+    {
+      "name": "Maturation Chamber",
+      "description": "Where assimilated children are rapidly aged. Accelerated growth pods, horrifying efficiency."
+    },
+    {
+      "name": "Vinculum Node",
+      "description": "Processes and distributes Collective consciousness. Neural transceiver arrays, data routing."
+    },
+    {
+      "name": "Technology Processing",
+      "description": "Analyzes and integrates assimilated technology. Constant adaptation and improvement."
+    },
+    {
+      "name": "Nanoprobe Fabrication",
+      "description": "Manufactures nanoprobes for assimilation. Microscopic assembly lines, raw material processing."
+    },
+    {
+      "name": "Drone Assembly",
+      "description": "Constructs mechanical components for drones. Cybernetic limbs, ocular implants, armor plating."
+    },
+    {
+      "name": "Power Distribution Hub",
+      "description": "Manages energy from transwarp conduits and singularity cores. Critical infrastructure."
+    },
+    {
+      "name": "Transwarp Gate Control",
+      "description": "Manages transwarp conduit network access. Coordinates fleet movements across the galaxy."
+    },
+    {
+      "name": "Subspace Transceiver Array",
+      "description": "Long-range communication with Collective. Maintains hive mind across vast distances."
+    },
+    {
+      "name": "Vessel Construction",
+      "description": "Where cubes and spheres are built. Massive industrial complex, geometric precision."
+    },
+    {
+      "name": "Resource Processing",
+      "description": "Extracts and refines raw materials. Strips planets efficiently, no waste."
+    },
+    {
+      "name": "Tactical Analysis Node",
+      "description": "Studies enemy weaknesses. Adaptation algorithms developed here."
+    },
+    {
+      "name": "Species Database",
+      "description": "Archives information on all encountered species. Biological and technological data."
+    },
+    {
+      "name": "Temporal Research",
+      "description": "Studies time travel technology. The Borg seek perfection across all timelines."
+    },
+    {
+      "name": "Unicomplex Fragment",
+      "description": "Section of massive Borg central hub. Where the Queen coordinates operations."
+    },
+    {
+      "name": "Drone Storage",
+      "description": "Deactivated drones stored for future use. Thousands in stasis, ready for activation."
+    },
+    {
+      "name": "Shield Generator",
+      "description": "Adaptive shielding for ground installations. Frequency modulation, regeneration."
+    },
+    {
+      "name": "Weapons Platform",
+      "description": "Ground-based defense. Cutting beams, torpedo launchers, adaptive targeting."
+    },
+    {
+      "name": "Neural Interface Hub",
+      "description": "Where drones connect to local Collective network. Mind synchronization point."
+    },
+    {
+      "name": "Biological Processing",
+      "description": "Handles organic components of assimilation. Species-specific adaptations."
+    },
+    {
+      "name": "Debris Reclamation",
+      "description": "Processes destroyed ships and structures. Nothing is wasted, all is assimilated."
+    },
+    {
+      "name": "Expansion Coordinator",
+      "description": "Plans assimilation of new territories. Target prioritization, resource allocation."
+    }
+  ]
+}

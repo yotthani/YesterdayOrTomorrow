@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Star Trek Asset Generator</title>
+    <base href="/" />
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+</head>
+<body>
+    <div id="app">
+        <div style="display: flex; justify-content: center; align-items: center; height: 100vh; background: #1a1a2e; color: #eee; font-family: system-ui;">
+            <div style="text-align: center;">
+                <h1>🖖 Loading Asset Generator...</h1>
+                <p>Initializing Blazor WebAssembly</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="blazor-error-ui" style="display: none; position: fixed; bottom: 0; left: 0; right: 0; padding: 1rem; background: #f87171; color: white; text-align: center;">
+        An unhandled error has occurred.
+        <a href="" style="color: white; text-decoration: underline;">Reload</a>
+    </div>
+
+    <script src="_framework/blazor.webassembly.js"></script>
+    <script>
+        // Trigger file input click
+        window.triggerFileInput = function(elementId) {
+            const input = document.getElementById(elementId);
+            if (input) {
+                input.click();
+            } else {
+                console.error('File input not found:', elementId);
+            }
+        };
+        
+        // Resize image to target dimensions (fit to square with black padding)
+        window.resizeImage = function(base64Data, targetWidth, targetHeight) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = targetWidth;
+                    canvas.height = targetHeight;
+                    const ctx = canvas.getContext('2d');
+                    
+                    // Fill with black background (will be removed later)
+                    ctx.fillStyle = '#000000';
+                    ctx.fillRect(0, 0, targetWidth, targetHeight);
+                    
+                    // Use high quality scaling
+                    ctx.imageSmoothingEnabled = true;
+                    ctx.imageSmoothingQuality = 'high';
+                    
+                    // Calculate scale to fit entire image in square (no cropping)
+                    const scale = Math.min(targetWidth / img.width, targetHeight / img.height);
+                    const scaledWidth = img.width * scale;
+                    const scaledHeight = img.height * scale;
+                    
+                    // Center the scaled image
+                    const offsetX = (targetWidth - scaledWidth) / 2;
+                    const offsetY = (targetHeight - scaledHeight) / 2;
+                    
+                    // Draw scaled image centered (black padding on sides if needed)
+                    ctx.drawImage(img, offsetX, offsetY, scaledWidth, scaledHeight);
+                    
+                    // Return as base64 PNG (without data:image/png;base64, prefix)
+                    const result = canvas.toDataURL('image/png');
+                    resolve(result.replace('data:image/png;base64,', ''));
+                };
+                img.onerror = reject;
+                img.src = 'data:image/png;base64,' + base64Data;
+            });
+        };
+        
+        // Crop image to target size (top-left aligned, removes extra content including watermarks)
+        window.cropToSize = function(base64Data, targetWidth, targetHeight) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = function() {
+                    console.log(`cropToSize: Source ${img.width}x${img.height} → Target ${targetWidth}x${targetHeight}`);
+                    
+                    // Check if cropping is needed
+                    if (img.width <= targetWidth && img.height <= targetHeight) {
+                        console.log('cropToSize: Image is same size or smaller, no cropping needed');
+                        resolve(base64Data);
+                        return;
+                    }
+                    
+                    const canvas = document.createElement('canvas');
+                    canvas.width = targetWidth;
+                    canvas.height = targetHeight;
+                    const ctx = canvas.getContext('2d');
+                    
+                    // Fill with black (in case source is smaller in one dimension)
+                    ctx.fillStyle = '#000000';
+                    ctx.fillRect(0, 0, targetWidth, targetHeight);
+                    
+                    // Calculate how much we're cropping
+                    const cropRight = Math.max(0, img.width - targetWidth);
+                    const cropBottom = Math.max(0, img.height - targetHeight);
+                    console.log(`cropToSize: Cropping ${cropRight}px from right, ${cropBottom}px from bottom`);
+                    
+                    // Draw from top-left of source, taking only what we need
+                    ctx.drawImage(
+                        img,
+                        0, 0,                           // Source X, Y (top-left)
+                        targetWidth, targetHeight,      // Source Width, Height (crop to target)
+                        0, 0,                           // Destination X, Y
+                        targetWidth, targetHeight       // Destination Width, Height
+                    );
+                    
+                    console.log(`cropToSize: Done - output is ${canvas.width}x${canvas.height}`);
+                    
+                    // Return as base64 PNG
+                    const result = canvas.toDataURL('image/png');
+                    resolve(result.replace('data:image/png;base64,', ''));
+                };
+                img.onerror = (e) => {
+                    console.error('cropToSize: Failed to load image', e);
+                    reject(e);
+                };
+                img.src = 'data:image/png;base64,' + base64Data;
+            });
+        };
+        
+        // Download helper functions
+        window.downloadBase64File = function(filename, base64Data, mimeType) {
+            const link = document.createElement('a');
+            link.href = 'data:' + mimeType + ';base64,' + base64Data;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        };
+        
+        window.downloadTextFile = function(filename, content, mimeType) {
+            const blob = new Blob([content], { type: mimeType });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
+        };
+        
+        // Canvas-based sprite sheet assembly
+        window.assembleSpriteSheet = async function(options) {
+            const { images, columns, rows, cellSize } = options;
+            
+            const canvas = document.createElement('canvas');
+            canvas.width = columns * cellSize;
+            canvas.height = rows * cellSize;
+            const ctx = canvas.getContext('2d');
+            
+            // Fill with transparent background
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Load and draw each image
+            const loadPromises = [];
+            
+            for (const item of images) {
+                if (!item.imageBase64) continue; // Skip empty cells
+                
+                const img = new Image();
+                const promise = new Promise((resolve, reject) => {
+                    img.onload = () => {
+                        ctx.drawImage(img, item.col * cellSize, item.row * cellSize, cellSize, cellSize);
+                        resolve();
+                    };
+                    img.onerror = () => {
+                        console.warn(`Failed to load image at row ${item.row}, col ${item.col}`);
+                        resolve(); // Don't reject, just skip
+                    };
+                });
+                img.src = 'data:image/png;base64,' + item.imageBase64;
+                loadPromises.push(promise);
+            }
+            
+            await Promise.all(loadPromises);
+            
+            // Return as base64
+            return canvas.toDataURL('image/png').split(',')[1];
+        };
+        
+        // Download helper for data URLs
+        window.downloadFile = function(dataUrl, filename) {
+            const link = document.createElement('a');
+            link.href = dataUrl;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        };
+        
+        // Remove black background and make it transparent
+        window.removeBlackBackground = function(base64Image, tolerance = 30) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    
+                    // Draw the image
+                    ctx.drawImage(img, 0, 0);
+                    
+                    // Get image data
+                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    const data = imageData.data;
+                    
+                    // Process each pixel
+                    for (let i = 0; i < data.length; i += 4) {
+                        const r = data[i];
+                        const g = data[i + 1];
+                        const b = data[i + 2];
+                        
+                        // Check if pixel is near black
+                        if (r <= tolerance && g <= tolerance && b <= tolerance) {
+                            // Make transparent
+                            data[i + 3] = 0;
+                        }
+                        // Smooth edges - partial transparency for dark pixels near the threshold
+                        else if (r <= tolerance * 2 && g <= tolerance * 2 && b <= tolerance * 2) {
+                            const brightness = (r + g + b) / 3;
+                            const alpha = Math.min(255, (brightness / (tolerance * 2)) * 255);
+                            data[i + 3] = Math.floor(alpha);
+                        }
+                    }
+                    
+                    // Put the modified data back
+                    ctx.putImageData(imageData, 0, 0);
+                    
+                    // Return as base64 PNG
+                    const result = canvas.toDataURL('image/png').split(',')[1];
+                    resolve(result);
+                };
+                img.onerror = reject;
+                img.src = 'data:image/png;base64,' + base64Image;
+            });
+        };
+        
+        // Advanced background removal with edge detection
+        window.removeBackgroundAdvanced = function(base64Image, options = {}) {
+            const tolerance = options.tolerance || 25;
+            const edgeSmoothing = options.edgeSmoothing !== false;
+            const featherRadius = options.featherRadius || 2;
+            
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    
+                    ctx.drawImage(img, 0, 0);
+                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    const data = imageData.data;
+                    const width = canvas.width;
+                    const height = canvas.height;
+                    
+                    // First pass: identify background pixels
+                    const isBackground = new Uint8Array(width * height);
+                    for (let y = 0; y < height; y++) {
+                        for (let x = 0; x < width; x++) {
+                            const i = (y * width + x) * 4;
+                            const r = data[i], g = data[i+1], b = data[i+2];
+                            if (r <= tolerance && g <= tolerance && b <= tolerance) {
+                                isBackground[y * width + x] = 1;
+                            }
+                        }
+                    }
+                    
+                    // Second pass: apply transparency with edge feathering
+                    for (let y = 0; y < height; y++) {
+                        for (let x = 0; x < width; x++) {
+                            const idx = y * width + x;
+                            const i = idx * 4;
+                            
+                            if (isBackground[idx]) {
+                                data[i + 3] = 0; // Fully transparent
+                            } else if (edgeSmoothing) {
+                                // Check neighbors for feathering
+                                let bgNeighbors = 0;
+                                let totalNeighbors = 0;
+                                for (let dy = -featherRadius; dy <= featherRadius; dy++) {
+                                    for (let dx = -featherRadius; dx <= featherRadius; dx++) {
+                                        const nx = x + dx, ny = y + dy;
+                                        if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
+                                            totalNeighbors++;
+                                            if (isBackground[ny * width + nx]) bgNeighbors++;
+                                        }
+                                    }
+                                }
+                                // Reduce alpha near edges
+                                if (bgNeighbors > 0) {
+                                    const edgeFactor = 1 - (bgNeighbors / totalNeighbors) * 0.5;
+                                    data[i + 3] = Math.floor(data[i + 3] * edgeFactor);
+                                }
+                            }
+                        }
+                    }
+                    
+                    ctx.putImageData(imageData, 0, 0);
+                    resolve(canvas.toDataURL('image/png').split(',')[1]);
+                };
+                img.onerror = reject;
+                img.src = 'data:image/png;base64,' + base64Image;
+            });
+        };
+        
+        // Get image dimensions
+        window.getImageDimensions = function(base64Image) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => resolve([img.width, img.height]);
+                img.onerror = reject;
+                img.src = 'data:image/png;base64,' + base64Image;
+            });
+        };
+        
+        // Normalize grid - extract, center, and repack assets
+        window.normalizeGrid = function(base64Image, columns, rows, cellSize, padding, autoDetect) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => {
+                    const sourceCanvas = document.createElement('canvas');
+                    sourceCanvas.width = img.width;
+                    sourceCanvas.height = img.height;
+                    const sourceCtx = sourceCanvas.getContext('2d');
+                    sourceCtx.drawImage(img, 0, 0);
+                    
+                    // Calculate input cell size from source image
+                    const inputCellWidth = img.width / columns;
+                    const inputCellHeight = img.height / rows;
+                    
+                    // Create output canvas
+                    const outputCanvas = document.createElement('canvas');
+                    outputCanvas.width = columns * cellSize;
+                    outputCanvas.height = rows * cellSize;
+                    const outputCtx = outputCanvas.getContext('2d');
+                    
+                    // Fill with transparent
+                    outputCtx.clearRect(0, 0, outputCanvas.width, outputCanvas.height);
+                    
+                    // Process each cell
+                    for (let row = 0; row < rows; row++) {
+                        for (let col = 0; col < columns; col++) {
+                            // Extract cell from source
+                            const srcX = col * inputCellWidth;
+                            const srcY = row * inputCellHeight;
+                            
+                            // Get image data for this cell
+                            const cellData = sourceCtx.getImageData(srcX, srcY, inputCellWidth, inputCellHeight);
+                            
+                            // Find bounding box of non-transparent pixels
+                            let minX = inputCellWidth, minY = inputCellHeight, maxX = 0, maxY = 0;
+                            let hasContent = false;
+                            
+                            if (autoDetect) {
+                                for (let y = 0; y < inputCellHeight; y++) {
+                                    for (let x = 0; x < inputCellWidth; x++) {
+                                        const i = (y * inputCellWidth + x) * 4;
+                                        const alpha = cellData.data[i + 3];
+                                        // Also check if pixel is not pure black (for non-transparent images)
+                                        const r = cellData.data[i];
+                                        const g = cellData.data[i + 1];
+                                        const b = cellData.data[i + 2];
+                                        const isVisible = alpha > 10 && (r > 15 || g > 15 || b > 15);
+                                        
+                                        if (isVisible) {
+                                            hasContent = true;
+                                            if (x < minX) minX = x;
+                                            if (y < minY) minY = y;
+                                            if (x > maxX) maxX = x;
+                                            if (y > maxY) maxY = y;
+                                        }
+                                    }
+                                }
+                            } else {
+                                // No auto-detect: use full cell
+                                minX = 0; minY = 0;
+                                maxX = inputCellWidth - 1;
+                                maxY = inputCellHeight - 1;
+                                hasContent = true;
+                            }
+                            
+                            if (!hasContent) continue;
+                            
+                            // Calculate content dimensions
+                            const contentWidth = maxX - minX + 1;
+                            const contentHeight = maxY - minY + 1;
+                            
+                            // Calculate scale to fit in cell with padding
+                            const availableSize = cellSize - (padding * 2);
+                            const scale = Math.min(availableSize / contentWidth, availableSize / contentHeight, 1.0);
+                            
+                            // Calculate scaled dimensions
+                            const scaledWidth = contentWidth * scale;
+                            const scaledHeight = contentHeight * scale;
+                            
+                            // Calculate position to center in output cell
+                            const destX = col * cellSize + (cellSize - scaledWidth) / 2;
+                            const destY = row * cellSize + (cellSize - scaledHeight) / 2;
+                            
+                            // Create temp canvas for the extracted content
+                            const tempCanvas = document.createElement('canvas');
+                            tempCanvas.width = contentWidth;
+                            tempCanvas.height = contentHeight;
+                            const tempCtx = tempCanvas.getContext('2d');
+                            
+                            // Copy content to temp canvas
+                            tempCtx.putImageData(
+                                sourceCtx.getImageData(srcX + minX, srcY + minY, contentWidth, contentHeight),
+                                0, 0
+                            );
+                            
+                            // Draw scaled and centered to output
+                            outputCtx.imageSmoothingEnabled = true;
+                            outputCtx.imageSmoothingQuality = 'high';
+                            outputCtx.drawImage(tempCanvas, destX, destY, scaledWidth, scaledHeight);
+                        }
+                    }
+                    
+                    resolve(outputCanvas.toDataURL('image/png').split(',')[1]);
+                };
+                img.onerror = reject;
+                img.src = 'data:image/png;base64,' + base64Image;
+            });
+        };
+    </script>
+</body>
+</html>

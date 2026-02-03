@@ -1,0 +1,183 @@
+@namespace StarTrekGame.Web.Components.Fleet
+
+<svg class="ship-display" viewBox="0 0 100 100" 
+     width="@Size" height="@Size"
+     style="@Style">
+    <defs>
+        <linearGradient id="ship-hull-@_instanceId" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="@HullColorLight"/>
+            <stop offset="100%" stop-color="@HullColor"/>
+        </linearGradient>
+        <filter id="ship-glow-@_instanceId">
+            <feGaussianBlur stdDeviation="1.5" result="blur"/>
+            <feMerge>
+                <feMergeNode in="blur"/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
+    </defs>
+    
+    @switch (FactionStyle?.ToLower())
+    {
+        case "federation":
+            @* Federation style - saucer + nacelles *@
+            <ellipse cx="50" cy="35" rx="@(28 * Scale)" ry="@(12 * Scale)" 
+                     fill="url(#ship-hull-@_instanceId)" stroke="@AccentColor" stroke-width="0.5"/>
+            <path d="M@(42 * Scale + 50 - 42*Scale),@(43 * Scale) L@(45 * Scale + 50 - 42*Scale),70 L@(55 * Scale + 50 - 42*Scale),70 L@(58 * Scale + 50 - 42*Scale),@(43 * Scale)" 
+                  fill="url(#ship-hull-@_instanceId)" stroke="@AccentColor" stroke-width="0.5"/>
+            <rect x="@(18 * Scale + 50 - 42*Scale)" y="30" width="@(8 * Scale)" height="@(20 * Scale)" rx="4" 
+                  fill="url(#ship-hull-@_instanceId)" stroke="@AccentColor" stroke-width="0.5"/>
+            <rect x="@(74 * Scale + 50 - 42*Scale)" y="30" width="@(8 * Scale)" height="@(20 * Scale)" rx="4" 
+                  fill="url(#ship-hull-@_instanceId)" stroke="@AccentColor" stroke-width="0.5"/>
+            <rect x="@(19 * Scale + 50 - 42*Scale)" y="35" width="@(6 * Scale)" height="12" fill="@EngineColor" opacity="0.6"/>
+            <rect x="@(75 * Scale + 50 - 42*Scale)" y="35" width="@(6 * Scale)" height="12" fill="@EngineColor" opacity="0.6"/>
+            break;
+            
+        case "klingon":
+            @* Klingon style - angular bird of prey *@
+            <path d="M50,25 L35,40 L30,70 L50,80 L70,70 L65,40 Z" 
+                  fill="url(#ship-hull-@_instanceId)" stroke="@AccentColor" stroke-width="0.5"/>
+            <path d="M35,45 L10,35 L8,55 L30,50" fill="url(#ship-hull-@_instanceId)" stroke="@AccentColor" stroke-width="0.5"/>
+            <path d="M65,45 L90,35 L92,55 L70,50" fill="url(#ship-hull-@_instanceId)" stroke="@AccentColor" stroke-width="0.5"/>
+            <circle cx="10" cy="45" r="3" fill="@WeaponColor" filter="url(#ship-glow-@_instanceId)" opacity="0.8"/>
+            <circle cx="90" cy="45" r="3" fill="@WeaponColor" filter="url(#ship-glow-@_instanceId)" opacity="0.8"/>
+            <ellipse cx="50" cy="75" rx="6" ry="4" fill="@EngineColor" opacity="0.7"/>
+            break;
+            
+        case "romulan":
+            @* Romulan style - warbird shape *@
+            <path d="M50,15 L40,30 L35,50 L40,70 L50,80 L60,70 L65,50 L60,30 Z" 
+                  fill="url(#ship-hull-@_instanceId)" stroke="@AccentColor" stroke-width="0.5"/>
+            <path d="M40,35 L8,25 L5,45 L35,50" fill="url(#ship-hull-@_instanceId)" stroke="@AccentColor" stroke-width="0.5"/>
+            <path d="M60,35 L92,25 L95,45 L65,50" fill="url(#ship-hull-@_instanceId)" stroke="@AccentColor" stroke-width="0.5"/>
+            <path d="M40,55 L10,65 L8,80 L38,65" fill="url(#ship-hull-@_instanceId)" stroke="@AccentColor" stroke-width="0.5"/>
+            <path d="M60,55 L90,65 L92,80 L62,65" fill="url(#ship-hull-@_instanceId)" stroke="@AccentColor" stroke-width="0.5"/>
+            <ellipse cx="50" cy="50" rx="6" ry="8" fill="@EngineColor" filter="url(#ship-glow-@_instanceId)" opacity="0.3"/>
+            <ellipse cx="50" cy="78" rx="5" ry="3" fill="@EngineColor" opacity="0.6"/>
+            break;
+            
+        case "cardassian":
+            @* Cardassian style - elongated angular *@
+            <path d="M50,10 L35,30 L30,70 L50,90 L70,70 L65,30 Z" 
+                  fill="url(#ship-hull-@_instanceId)" stroke="@AccentColor" stroke-width="0.5"/>
+            <path d="M35,40 L15,45 L12,60 L30,55" fill="url(#ship-hull-@_instanceId)" stroke="@AccentColor" stroke-width="0.5"/>
+            <path d="M65,40 L85,45 L88,60 L70,55" fill="url(#ship-hull-@_instanceId)" stroke="@AccentColor" stroke-width="0.5"/>
+            <rect x="47" y="25" width="6" height="50" fill="@AccentDarkColor"/>
+            <ellipse cx="14" cy="52" rx="3" ry="2" fill="@WeaponColor" filter="url(#ship-glow-@_instanceId)" opacity="0.8"/>
+            <ellipse cx="86" cy="52" rx="3" ry="2" fill="@WeaponColor" filter="url(#ship-glow-@_instanceId)" opacity="0.8"/>
+            <rect x="40" y="82" width="20" height="8" rx="2" fill="@EngineColor" opacity="0.5"/>
+            break;
+            
+        case "ferengi":
+            @* Ferengi style - crescent/marauder shape *@
+            <ellipse cx="50" cy="50" rx="35" ry="20" fill="url(#ship-hull-@_instanceId)" stroke="@AccentColor" stroke-width="0.5"/>
+            <path d="M20,40 Q50,20 80,40" fill="none" stroke="@AccentColor" stroke-width="3"/>
+            <ellipse cx="50" cy="45" rx="12" ry="8" fill="@AccentDarkColor"/>
+            <circle cx="50" cy="45" r="4" fill="@EngineColor" opacity="0.5"/>
+            break;
+            
+        default:
+            @* Generic/neutral style *@
+            <path d="M50,15 L30,40 L35,75 L65,75 L70,40 Z" 
+                  fill="url(#ship-hull-@_instanceId)" stroke="@AccentColor" stroke-width="0.5"/>
+            <ellipse cx="50" cy="25" rx="8" ry="5" fill="@AccentDarkColor"/>
+            <rect x="28" y="45" width="5" height="15" fill="@AccentDarkColor"/>
+            <rect x="67" y="45" width="5" height="15" fill="@AccentDarkColor"/>
+            <rect x="40" y="70" width="20" height="8" rx="2" fill="@EngineColor" opacity="0.5"/>
+            break;
+    }
+    
+    @if (ShowDamage && DamageLevel > 0)
+    {
+        @* Damage indicators *@
+        @for (int i = 0; i < Math.Min(DamageLevel, 5); i++)
+        {
+            var dx = 20 + (i * 15) + Random.Shared.Next(-5, 5);
+            var dy = 30 + Random.Shared.Next(0, 40);
+            <circle cx="@dx" cy="@dy" r="3" fill="#ff4400" opacity="0.6"/>
+        }
+    }
+</svg>
+
+<style>
+    .ship-display {
+        display: block;
+    }
+</style>
+
+@code {
+    [Parameter] public string? FactionStyle { get; set; }
+    [Parameter] public string? ShipClass { get; set; }
+    [Parameter] public int Size { get; set; } = 64;
+    [Parameter] public double Scale { get; set; } = 1.0;
+    [Parameter] public string? Style { get; set; }
+    [Parameter] public bool ShowDamage { get; set; }
+    [Parameter] public int DamageLevel { get; set; }
+    
+    private string _instanceId = Guid.NewGuid().ToString("N")[..8];
+    
+    // Colors based on faction
+    private string HullColor => FactionStyle?.ToLower() switch
+    {
+        "federation" => "#1a5fb4",
+        "klingon" => "#1a0a0a",
+        "romulan" => "#1a3a1a",
+        "cardassian" => "#3e2723",
+        "ferengi" => "#5d4037",
+        "vulcan" => "#5d1a1a",
+        "breen" => "#263238",
+        _ => "#3a3a3a"
+    };
+    
+    private string HullColorLight => FactionStyle?.ToLower() switch
+    {
+        "federation" => "#99c1f1",
+        "klingon" => "#4a4a4a",
+        "romulan" => "#4a6a4a",
+        "cardassian" => "#8b7355",
+        "ferengi" => "#8d6e63",
+        "vulcan" => "#8b4a4a",
+        "breen" => "#546e7a",
+        _ => "#777777"
+    };
+    
+    private string AccentColor => FactionStyle?.ToLower() switch
+    {
+        "federation" => "#4488ff",
+        "klingon" => "#8b0000",
+        "romulan" => "#2e7d32",
+        "cardassian" => "#a1887f",
+        "ferengi" => "#f57c00",
+        "vulcan" => "#b71c1c",
+        "breen" => "#607d8b",
+        _ => "#888888"
+    };
+    
+    private string AccentDarkColor => FactionStyle?.ToLower() switch
+    {
+        "federation" => "#2255aa",
+        "klingon" => "#4a2020",
+        "romulan" => "#1a4a1a",
+        "cardassian" => "#5d4037",
+        "ferengi" => "#bf360c",
+        _ => "#555555"
+    };
+    
+    private string EngineColor => FactionStyle?.ToLower() switch
+    {
+        "federation" => "#66ccff",
+        "klingon" => "#ff4400",
+        "romulan" => "#00ff44",
+        "cardassian" => "#ffaa00",
+        "ferengi" => "#ffcc00",
+        _ => "#66aaff"
+    };
+    
+    private string WeaponColor => FactionStyle?.ToLower() switch
+    {
+        "klingon" => "#00ff00",
+        "romulan" => "#00ff44",
+        "cardassian" => "#ffaa00",
+        _ => "#ff6666"
+    };
+}

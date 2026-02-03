@@ -1,0 +1,128 @@
+{
+  "factionName": "Federation",
+  "categoryName": "Vehicles",
+  "grid": {
+    "columns": 4,
+    "rows": 4,
+    "totalAssets": 16,
+    "cellSize": 360,
+    "spriteWidth": 1440,
+    "spriteHeight": 1440
+  },
+  "spriteSheetPath": "federation_vehicles.png",
+  "generatedAt": "2026-01-30T16:30:14.812Z",
+  "assets": [
+    {
+      "row": 0,
+      "col": 0,
+      "name": "Argo Buggy",
+      "type": "Vehicles",
+      "promptUsed": ""
+    },
+    {
+      "row": 0,
+      "col": 1,
+      "name": "Federation Tank",
+      "type": "Vehicles",
+      "promptUsed": ""
+    },
+    {
+      "row": 0,
+      "col": 2,
+      "name": "Phaser Turret Mobile",
+      "type": "Vehicles",
+      "promptUsed": ""
+    },
+    {
+      "row": 0,
+      "col": 3,
+      "name": "Shield Generator Mobile",
+      "type": "Vehicles",
+      "promptUsed": ""
+    },
+    {
+      "row": 1,
+      "col": 0,
+      "name": "APC Troop Carrier",
+      "type": "Vehicles",
+      "promptUsed": ""
+    },
+    {
+      "row": 1,
+      "col": 1,
+      "name": "Cargo Walker",
+      "type": "Vehicles",
+      "promptUsed": ""
+    },
+    {
+      "row": 1,
+      "col": 2,
+      "name": "Medical Evac Vehicle",
+      "type": "Vehicles",
+      "promptUsed": ""
+    },
+    {
+      "row": 1,
+      "col": 3,
+      "name": "Command Vehicle",
+      "type": "Vehicles",
+      "promptUsed": ""
+    },
+    {
+      "row": 2,
+      "col": 0,
+      "name": "MACO Exosuit",
+      "type": "Vehicles",
+      "promptUsed": ""
+    },
+    {
+      "row": 2,
+      "col": 1,
+      "name": "Heavy Assault Exosuit",
+      "type": "Vehicles",
+      "promptUsed": ""
+    },
+    {
+      "row": 2,
+      "col": 2,
+      "name": "Engineering Exosuit",
+      "type": "Vehicles",
+      "promptUsed": ""
+    },
+    {
+      "row": 2,
+      "col": 3,
+      "name": "Recon Exosuit",
+      "type": "Vehicles",
+      "promptUsed": ""
+    },
+    {
+      "row": 3,
+      "col": 0,
+      "name": "Hover Bike Scout",
+      "type": "Vehicles",
+      "promptUsed": ""
+    },
+    {
+      "row": 3,
+      "col": 1,
+      "name": "Workbee Ground",
+      "type": "Vehicles",
+      "promptUsed": ""
+    },
+    {
+      "row": 3,
+      "col": 2,
+      "name": "Tricorder Drone",
+      "type": "Vehicles",
+      "promptUsed": ""
+    },
+    {
+      "row": 3,
+      "col": 3,
+      "name": "Defense Drone",
+      "type": "Vehicles",
+      "promptUsed": ""
+    }
+  ]
+}

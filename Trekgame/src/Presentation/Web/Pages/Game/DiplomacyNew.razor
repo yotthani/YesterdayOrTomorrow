@@ -1,0 +1,261 @@
+@page "/game/diplomacy-new"
+@page "/game/diplomacy"
+@page "/game/contacts"
+@layout StellarisLayout
+@using MudBlazor
+@using StarTrekGame.Web.Services
+@inject IGameApiClient Api
+@using Blazored.LocalStorage
+@inject NavigationManager Navigation
+
+@inject ILocalStorageService LocalStorage
+@inject ISnackbar Snackbar
+<PageTitle>Diplomacy - Galactic Strategy</PageTitle>
+
+<div class="stellaris-layout">
+    <header class="st-topbar">
+        <div class="st-empire-badge"><div class="st-empire-flag">🌐</div><div class="st-empire-info"><span class="st-empire-name">Federation Diplomatic Corps</span><span class="st-empire-type">Foreign Relations</span></div></div>
+        <div class="st-resources">
+            <div class="st-resource highlight"><span class="st-resource-icon">👑</span><div class="st-resource-values"><span class="st-resource-current">@_influence</span><span class="st-resource-income positive">+3/turn</span></div></div>
+        </div>
+        <div class="st-game-controls"><button class="st-end-turn-btn">END TURN</button></div>
+    </header>
+
+    <div class="st-main">
+        <aside class="st-sidebar-left">
+            <nav class="st-nav">
+                <a href="/game/galaxy" class="st-nav-btn"><span class="st-nav-icon">🌌</span><span class="st-nav-label">Galaxy</span></a>
+                <a href="/game/contacts" class="st-nav-btn active"><span class="st-nav-icon">👥</span><span class="st-nav-label">Contacts</span></a>
+            </nav>
+        </aside>
+
+        <div class="diplomacy-content">
+            <div class="diplomacy-header">
+                <h1>GALACTIC RELATIONS</h1>
+                <div class="diplomacy-filters">
+                    <button class="@FilterBtnClass("all")" @onclick="FilterAll">ALL (@_empires.Count)</button>
+                    <button class="@FilterBtnClass("friendly")" @onclick="FilterFriendly">FRIENDLY</button>
+                    <button class="@FilterBtnClass("hostile")" @onclick="FilterHostile">HOSTILE</button>
+                    <button class="@FilterBtnClass("neutral")" @onclick="FilterNeutral">NEUTRAL</button>
+                </div>
+            </div>
+
+            <div class="diplomacy-layout">
+                <div class="empires-list">
+                    @foreach (var empire in FilteredEmpires)
+                    {
+                        <div class="@EmpireCardClass(empire)" @onclick="() => SelectEmpire(empire)">
+                            <div class="empire-portrait">
+                                <FactionLeaderPortrait FactionId="@empire.RaceId" Size="medium" />
+                            </div>
+                            <div class="empire-info">
+                                <span class="empire-name">@empire.FactionName</span>
+                                <span class="relation-badge @GetRelationClass(empire.Opinion)">@GetRelationText(empire.Opinion)</span>
+                                <span class="empire-type">@empire.GovernmentType</span>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                @if (_selectedEmpire != null)
+                {
+                    <div class="empire-detail-panel">
+                        <div class="detail-banner" style="background: linear-gradient(180deg, @_selectedEmpire.Color 0%, transparent 100%);">
+                            <div class="banner-portrait">
+                                <FactionLeaderPortrait FactionId="@_selectedEmpire.RaceId" Size="xlarge" />
+                            </div>
+                            <div class="banner-info"><h2>@_selectedEmpire.FactionName</h2><span>@_selectedEmpire.GovernmentType</span></div>
+                            <div class="banner-relation"><span class="relation-label">RELATIONS</span><span class="relation-value @GetRelationClass(_selectedEmpire.Opinion)">@FormatOpinion(_selectedEmpire.Opinion)</span></div>
+                        </div>
+                        <div class="detail-content">
+                            <div class="content-section">
+                                <h3>DIPLOMATIC ACTIONS</h3>
+                                <div class="actions-grid">
+                                    <button class="action-btn" @onclick="ProposeTrade"><span class="action-icon">💱</span><span class="action-name">Trade</span></button>
+                                    <button class="action-btn" @onclick="ProposeNap"><span class="action-icon">🤝</span><span class="action-name">NAP</span></button>
+                                    <button class="action-btn" @onclick="ProposeResearch"><span class="action-icon">🔬</span><span class="action-name">Research</span></button>
+                                    <button class="action-btn" @onclick="ProposeAlliance"><span class="action-icon">⭐</span><span class="action-name">Alliance</span></button>
+                                    <button class="action-btn danger" @onclick="DeclareWar"><span class="action-icon">⚔</span><span class="action-name">War</span></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.diplomacy-content{flex:1;display:flex;flex-direction:column;background:linear-gradient(180deg,#080c14,#040608)}
+.diplomacy-header{padding:16px 24px;background:rgba(10,15,25,0.9);border-bottom:1px solid var(--st-border-dark);display:flex;align-items:center;gap:24px}
+.diplomacy-header h1{font-family:var(--st-font-display);font-size:18px;color:var(--st-text-white);letter-spacing:2px;margin:0}
+.diplomacy-filters{display:flex;gap:8px;margin-left:auto}
+.filter-btn{padding:6px 14px;background:var(--st-gradient-button);border:1px solid var(--st-border-dark);border-radius:4px;color:var(--st-text-muted);font-size:11px;cursor:pointer}
+.filter-btn:hover{background:var(--st-gradient-button-hover)}.filter-btn.active{border-color:var(--st-accent-blue);color:var(--st-accent-blue)}
+.diplomacy-layout{flex:1;display:flex;gap:16px;padding:16px;overflow:hidden}
+.empires-list{width:350px;overflow-y:auto;display:flex;flex-direction:column;gap:8px}
+.empire-card{display:flex;gap:12px;padding:12px;background:var(--st-gradient-panel);border:1px solid var(--st-border-dark);border-radius:8px;cursor:pointer;align-items:center}
+.empire-card:hover{border-color:var(--st-border-light)}.empire-card.selected{border-color:var(--st-accent-blue)}
+.empire-portrait{width:72px;height:72px;flex-shrink:0}
+.empire-info{flex:1}.empire-name{display:block;font-size:14px;font-weight:600;color:var(--st-text-white)}.empire-type{display:block;font-size:10px;color:var(--st-text-dim)}
+.relation-badge{font-size:9px;padding:2px 6px;border-radius:8px;margin-left:8px}
+.relation-badge.friendly{background:rgba(68,221,102,0.2);color:var(--st-accent-green)}
+.relation-badge.hostile{background:rgba(255,68,85,0.2);color:var(--st-accent-red)}
+.relation-badge.neutral{background:rgba(150,150,150,0.2);color:var(--st-text-muted)}
+.empire-detail-panel{flex:1;background:var(--st-gradient-panel);border:1px solid var(--st-border-dark);border-radius:8px;overflow:hidden}
+.detail-banner{padding:24px;display:flex;align-items:center;gap:20px}
+.banner-portrait{width:128px;height:128px;flex-shrink:0}
+.banner-info{flex:1}.banner-info h2{font-family:var(--st-font-display);font-size:20px;color:var(--st-text-white);margin:0}
+.banner-relation{text-align:right}.relation-label{display:block;font-size:10px;color:rgba(255,255,255,0.5)}.relation-value{font-family:var(--st-font-display);font-size:28px;font-weight:700}
+.relation-value.friendly{color:var(--st-accent-green)}.relation-value.hostile{color:var(--st-accent-red)}.relation-value.neutral{color:var(--st-text-muted)}
+.detail-content{padding:20px}
+.content-section h3{font-size:11px;color:var(--st-text-dim);letter-spacing:1px;margin:0 0 12px;border-bottom:1px solid var(--st-border-dark);padding-bottom:8px}
+.actions-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.action-btn{display:flex;flex-direction:column;align-items:center;padding:12px;background:var(--st-gradient-button);border:1px solid var(--st-border-dark);border-radius:6px;cursor:pointer}
+.action-btn:hover{background:var(--st-gradient-button-hover)}.action-btn.danger{border-color:rgba(255,68,85,0.3)}.action-btn.danger:hover{background:rgba(255,68,85,0.2)}
+.action-icon{font-size:20px;margin-bottom:4px}.action-name{font-size:10px;color:var(--st-text-muted)}
+.st-resource.highlight{background:rgba(170,102,255,0.1);border-color:#aa66ff}
+</style>
+
+@code {
+    private string _filter = "all";
+    private DiplomaticRelationDto? _selectedEmpire;
+    private int _influence = 150;
+    private Guid? _factionId;
+    private List<DiplomaticRelationDto> _empires = new();
+
+    private IEnumerable<DiplomaticRelationDto> FilteredEmpires => _empires.Where(e => 
+        _filter == "all" || 
+        (_filter == "friendly" && e.Opinion >= 50) ||
+        (_filter == "hostile" && e.Opinion <= -50) ||
+        (_filter == "neutral" && e.Opinion > -50 && e.Opinion < 50));
+
+    protected override async Task OnInitializedAsync()
+    {
+        _factionId = await LocalStorage.GetItemAsync<Guid?>("currentFactionId");
+        if (_factionId.HasValue)
+        {
+            await LoadDiplomacyData();
+        }
+        else
+        {
+            LoadMockData();
+        }
+    }
+
+    private async Task LoadDiplomacyData()
+    {
+        try
+        {
+            var relations = await Api.GetDiplomaticRelationsAsync(_factionId!.Value);
+            _empires = relations;
+            _selectedEmpire = _empires.FirstOrDefault();
+        }
+        catch
+        {
+            LoadMockData();
+        }
+    }
+
+    private void LoadMockData()
+    {
+        _empires = new List<DiplomaticRelationDto>
+        {
+            new(Guid.NewGuid(), "Klingon Empire", "klingon", -45, "Warrior Empire", new(), 800, 500, 8),
+            new(Guid.NewGuid(), "Romulan Star Empire", "romulan", -25, "Senatorial Oligarchy", new(), 600, 700, 6),
+            new(Guid.NewGuid(), "Cardassian Union", "cardassian", -10, "Military Dictatorship", new(), 400, 600, 5),
+            new(Guid.NewGuid(), "Ferengi Alliance", "ferengi", 10, "Corporate Plutocracy", new(), 200, 600, 2),
+            new(Guid.NewGuid(), "Borg Collective", "borg", -100, "Hive Mind", new(), 1000, 1000, 10),
+            new(Guid.NewGuid(), "Dominion", "dominion", -80, "Theocratic Empire", new(), 900, 800, 9),
+            new(Guid.NewGuid(), "Breen Confederacy", "breen", -60, "Confederacy", new(), 500, 400, 5),
+            new(Guid.NewGuid(), "Gorn Hegemony", "gorn", -30, "Hegemony", new(), 350, 350, 4),
+            new(Guid.NewGuid(), "Andorian Empire", "andorian", 60, "Imperial Council", new(), 300, 400, 3),
+            new(Guid.NewGuid(), "Vulcan High Command", "vulcan", 70, "Logical Republic", new(), 250, 500, 2),
+            new(Guid.NewGuid(), "Trill Symbiosis", "trill", 40, "Democratic Republic", new(), 200, 300, 2),
+            new(Guid.NewGuid(), "Bajoran Republic", "bajoran", 55, "Theocratic Democracy", new(), 150, 250, 2),
+            new(Guid.NewGuid(), "Tholian Assembly", "tholian", -70, "Crystalline Hive", new(), 450, 300, 4),
+            new(Guid.NewGuid(), "Orion Syndicate", "orion", -20, "Criminal Syndicate", new(), 300, 200, 3),
+        };
+        _selectedEmpire = _empires.FirstOrDefault();
+    }
+
+    private void FilterAll() => _filter = "all";
+    private void FilterFriendly() => _filter = "friendly";
+    private void FilterHostile() => _filter = "hostile";
+    private void FilterNeutral() => _filter = "neutral";
+    
+    private string FilterBtnClass(string f) => "filter-btn" + (_filter == f ? " active" : "");
+    private string EmpireCardClass(DiplomaticRelationDto e) => "empire-card" + (_selectedEmpire?.FactionId == e.FactionId ? " selected" : "");
+    private void SelectEmpire(DiplomaticRelationDto e) => _selectedEmpire = e;
+    
+    private string GetRelationClass(int opinion) => opinion >= 50 ? "friendly" : opinion <= -50 ? "hostile" : "neutral";
+    private string GetRelationText(int opinion) => opinion >= 50 ? "FRIENDLY" : opinion <= -50 ? "HOSTILE" : "NEUTRAL";
+    private string FormatOpinion(int opinion) => opinion > 0 ? $"+{opinion}" : opinion.ToString();
+    
+    private async Task ProposeTrade()
+    {
+        if (_selectedEmpire != null && _factionId.HasValue)
+        {
+            try
+            {
+                await Api.ProposeTreatyAsync(_factionId.Value, _selectedEmpire.FactionId, "trade");
+                Snackbar.Add($"Trade agreement proposed to {_selectedEmpire.FactionName}", Severity.Success);
+            }
+            catch (Exception ex) { Snackbar.Add($"Failed: {ex.Message}", Severity.Error); }
+        }
+    }
+    
+    private async Task ProposeNap()
+    {
+        if (_selectedEmpire != null && _factionId.HasValue)
+        {
+            try
+            {
+                await Api.ProposeTreatyAsync(_factionId.Value, _selectedEmpire.FactionId, "non-aggression");
+                Snackbar.Add($"Non-Aggression Pact proposed to {_selectedEmpire.FactionName}", Severity.Success);
+            }
+            catch (Exception ex) { Snackbar.Add($"Failed: {ex.Message}", Severity.Error); }
+        }
+    }
+    
+    private async Task ProposeResearch()
+    {
+        if (_selectedEmpire != null && _factionId.HasValue)
+        {
+            try
+            {
+                await Api.ProposeTreatyAsync(_factionId.Value, _selectedEmpire.FactionId, "research");
+                Snackbar.Add($"Research Agreement proposed to {_selectedEmpire.FactionName}", Severity.Success);
+            }
+            catch (Exception ex) { Snackbar.Add($"Failed: {ex.Message}", Severity.Error); }
+        }
+    }
+    
+    private async Task ProposeAlliance()
+    {
+        if (_selectedEmpire != null && _factionId.HasValue)
+        {
+            try
+            {
+                await Api.ProposeTreatyAsync(_factionId.Value, _selectedEmpire.FactionId, "alliance");
+                Snackbar.Add($"Alliance proposed to {_selectedEmpire.FactionName}", Severity.Success);
+            }
+            catch (Exception ex) { Snackbar.Add($"Failed: {ex.Message}", Severity.Error); }
+        }
+    }
+    
+    private async Task DeclareWar()
+    {
+        if (_selectedEmpire != null && _factionId.HasValue)
+        {
+            try
+            {
+                await Api.DeclareWarAsync(_factionId.Value, _selectedEmpire.FactionId);
+                Snackbar.Add($"War declared on {_selectedEmpire.FactionName}!", Severity.Warning);
+                await LoadDiplomacyData();
+            }
+            catch (Exception ex) { Snackbar.Add($"Failed: {ex.Message}", Severity.Error); }
+        }
+    }
+}

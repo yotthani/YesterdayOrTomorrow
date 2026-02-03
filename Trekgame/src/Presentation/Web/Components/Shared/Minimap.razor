@@ -1,0 +1,188 @@
+@using StarTrekGame.Web.Services
+@inject IGameApiClient Api
+
+<div class="minimap-container" style="width: @(Width)px; height: @(Height)px;">
+    <div class="minimap-header">MINIMAP</div>
+    <svg viewBox="0 0 200 200" class="minimap-svg">
+        <defs>
+            <radialGradient id="mini-star">
+                <stop offset="0%" stop-color="#ffffff"/>
+                <stop offset="100%" stop-color="#ffcc00"/>
+            </radialGradient>
+        </defs>
+        
+        @* Background *@
+        <rect width="200" height="200" fill="#000020"/>
+        
+        @* Systems *@
+        @foreach (var system in _systems)
+        {
+            var x = NormalizeX(system.X);
+            var y = NormalizeY(system.Y);
+            var color = GetSystemColor(system);
+            
+            <circle cx="@x" cy="@y" r="@(system.Id == SelectedSystemId ? 5 : 3)" 
+                    fill="@color" opacity="0.8"/>
+        }
+        
+        @* Current viewport indicator *@
+        @if (ViewportX.HasValue && ViewportY.HasValue)
+        {
+            var vx = NormalizeX(ViewportX.Value);
+            var vy = NormalizeY(ViewportY.Value);
+            var vw = 40 / ZoomLevel;
+            var vh = 30 / ZoomLevel;
+            
+            <rect x="@(vx - vw/2)" y="@(vy - vh/2)" width="@vw" height="@vh" 
+                  fill="none" stroke="#ff9900" stroke-width="2" stroke-dasharray="4,2"/>
+        }
+        
+        @* Selected system highlight *@
+        @if (SelectedSystemId.HasValue)
+        {
+            var selected = _systems.FirstOrDefault(s => s.Id == SelectedSystemId);
+            if (selected != null)
+            {
+                var sx = NormalizeX(selected.X);
+                var sy = NormalizeY(selected.Y);
+                <circle cx="@sx" cy="@sy" r="8" fill="none" stroke="#ffcc00" stroke-width="2">
+                    <animate attributeName="r" values="6;10;6" dur="1.5s" repeatCount="indefinite"/>
+                    <animate attributeName="opacity" values="1;0.5;1" dur="1.5s" repeatCount="indefinite"/>
+                </circle>
+            }
+        }
+    </svg>
+    
+    @if (ShowLegend)
+    {
+        <div class="minimap-legend">
+            <span class="legend-item"><span class="dot friendly"></span>Friendly</span>
+            <span class="legend-item"><span class="dot enemy"></span>Enemy</span>
+            <span class="legend-item"><span class="dot neutral"></span>Neutral</span>
+        </div>
+    }
+</div>
+
+<style>
+    .minimap-container {
+        background: rgba(10, 10, 30, 0.95);
+        border: 2px solid #ff9900;
+        border-radius: 8px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .minimap-header {
+        background: linear-gradient(90deg, #ff9900, #ffcc00);
+        color: #000;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        padding: 4px 8px;
+        text-align: center;
+    }
+    
+    .minimap-svg {
+        flex: 1;
+        cursor: pointer;
+    }
+    
+    .minimap-legend {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        padding: 4px;
+        background: rgba(0, 0, 20, 0.8);
+        font-size: 9px;
+        color: #888;
+    }
+    
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+    
+    .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+    }
+    
+    .dot.friendly { background: #4488ff; }
+    .dot.enemy { background: #ff4444; }
+    .dot.neutral { background: #888888; }
+</style>
+
+@code {
+    [Parameter] public Guid GameId { get; set; }
+    [Parameter] public Guid? FactionId { get; set; }
+    [Parameter] public Guid? SelectedSystemId { get; set; }
+    [Parameter] public double? ViewportX { get; set; }
+    [Parameter] public double? ViewportY { get; set; }
+    [Parameter] public double ZoomLevel { get; set; } = 1.0;
+    [Parameter] public int Width { get; set; } = 180;
+    [Parameter] public int Height { get; set; } = 200;
+    [Parameter] public bool ShowLegend { get; set; } = true;
+    [Parameter] public EventCallback<Guid> OnSystemClicked { get; set; }
+
+    private List<StarSystemDto> _systems = new();
+    private double _minX, _maxX, _minY, _maxY;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadSystems();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (GameId != Guid.Empty && !_systems.Any())
+        {
+            await LoadSystems();
+        }
+    }
+
+    private async Task LoadSystems()
+    {
+        try
+        {
+            _systems = await Api.GetKnownSystemsAsync(GameId, FactionId ?? Guid.Empty);
+            
+            if (_systems.Any())
+            {
+                _minX = _systems.Min(s => s.X) - 50;
+                _maxX = _systems.Max(s => s.X) + 50;
+                _minY = _systems.Min(s => s.Y) - 50;
+                _maxY = _systems.Max(s => s.Y) + 50;
+            }
+        }
+        catch
+        {
+            // Silently fail - minimap is non-critical
+        }
+    }
+
+    private double NormalizeX(double x)
+    {
+        if (_maxX == _minX) return 100;
+        return 10 + (x - _minX) / (_maxX - _minX) * 180;
+    }
+
+    private double NormalizeY(double y)
+    {
+        if (_maxY == _minY) return 100;
+        return 10 + (y - _minY) / (_maxY - _minY) * 180;
+    }
+
+    private string GetSystemColor(StarSystemDto system)
+    {
+        if (!system.ControllingFactionId.HasValue)
+            return "#666666"; // Neutral
+        
+        if (system.ControllingFactionId == FactionId)
+            return "#4488ff"; // Friendly
+        
+        return "#ff4444"; // Enemy
+    }
+}

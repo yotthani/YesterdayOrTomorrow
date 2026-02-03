@@ -1,0 +1,193 @@
+@page "/game/lobby/{GameId:guid}"
+@using MudBlazor
+@using StarTrekGame.Web.Services
+@using Blazored.LocalStorage
+@inject IGameApiClient Api
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+@inject ILocalStorageService LocalStorage
+
+<PageTitle>Game Lobby</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="py-8">
+    @if (_loading)
+    {
+        <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+    }
+    else if (_game == null)
+    {
+        <MudAlert Severity="Severity.Error">Game not found</MudAlert>
+        <MudButton Variant="Variant.Outlined" Href="/" Class="mt-4">Back to Home</MudButton>
+    }
+    else
+    {
+        <MudPaper Class="pa-6" Elevation="3">
+            <MudStack AlignItems="AlignItems.Center" Class="mb-6">
+                <MudText Typo="Typo.h4" Color="Color.Warning">@_game.Name</MudText>
+                <MudText Typo="Typo.subtitle1" Color="Color.Secondary">
+                    Turn @_game.Turn • @_game.Phase • @_game.SystemCount systems
+                </MudText>
+            </MudStack>
+
+            <MudDivider Class="mb-4" />
+
+            <MudText Typo="Typo.h6" Class="mb-3">Players</MudText>
+            <MudSimpleTable Dense="true" Hover="true" Class="mb-6">
+                <thead>
+                    <tr>
+                        <th>Faction</th>
+                        <th>Race</th>
+                        <th>Player</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var faction in _game.Factions)
+                    {
+                        <tr>
+                            <td>@faction.Name</td>
+                            <td>@faction.RaceId</td>
+                            <td>@(faction.PlayerName ?? "AI")</td>
+                            <td>
+                                @if (faction.IsDefeated)
+                                {
+                                    <MudChip T="string" Size="Size.Small" Color="Color.Error">Defeated</MudChip>
+                                }
+                                else if (faction.HasSubmittedOrders)
+                                {
+                                    <MudChip T="string" Size="Size.Small" Color="Color.Success">Ready</MudChip>
+                                }
+                                else
+                                {
+                                    <MudChip T="string" Size="Size.Small" Color="Color.Warning">Pending</MudChip>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </MudSimpleTable>
+
+            <MudDivider Class="mb-4" />
+
+            <MudText Typo="Typo.h6" Class="mb-3">Join Game</MudText>
+            <MudStack Spacing="3">
+                <MudTextField @bind-Value="_playerName" Label="Your Name" Variant="Variant.Outlined" />
+                
+                @* Available Factions to take over *@
+                @if (AvailableFactions.Any())
+                {
+                    <MudText Typo="Typo.subtitle2" Class="mb-1">Take Over Existing Empire:</MudText>
+                    @foreach (var faction in AvailableFactions)
+                    {
+                        <MudButton Variant="Variant.Outlined" Color="Color.Warning" FullWidth="true"
+                                   OnClick="() => JoinAsFaction(faction.Name)" 
+                                   Disabled="@string.IsNullOrWhiteSpace(_playerName)">
+                            @faction.Name (@faction.RaceId)
+                        </MudButton>
+                    }
+                    
+                    <MudDivider Class="my-2" />
+                    <MudText Typo="Typo.subtitle2" Class="mb-1">Or Create New Empire:</MudText>
+                }
+                
+                <MudSelect T="string" @bind-Value="_selectedRace" Label="Choose Race" Variant="Variant.Outlined">
+                    <MudSelectItem Value="@("terran")">Terrans - Balanced, diplomatic</MudSelectItem>
+                    <MudSelectItem Value="@("warrior")">Warriors - Combat focused</MudSelectItem>
+                    <MudSelectItem Value="@("logician")">Logicians - Research bonus</MudSelectItem>
+                    <MudSelectItem Value="@("merchant")">Merchants - Economic advantage</MudSelectItem>
+                </MudSelect>
+
+                <MudTextField @bind-Value="_factionName" Label="New Faction Name" Variant="Variant.Outlined" />
+                
+                <MudStack Row="true" Spacing="2" Justify="Justify.FlexEnd">
+                    <MudButton Variant="Variant.Text" Href="/">Cancel</MudButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" 
+                               OnClick="JoinGame" Disabled="@(!CanJoin)">
+                        Create New Empire
+                    </MudButton>
+                </MudStack>
+            </MudStack>
+        </MudPaper>
+    }
+</MudContainer>
+
+@code {
+    [Parameter] public Guid GameId { get; set; }
+
+    private GameDetailDto? _game;
+    private bool _loading = true;
+    
+    private string _playerName = "";
+    private string _factionName = "";
+    private string _selectedRace = "terran";
+
+    private bool CanJoin => !string.IsNullOrWhiteSpace(_playerName) && 
+                            !string.IsNullOrWhiteSpace(_factionName);
+
+    private List<FactionSummaryDto> AvailableFactions => 
+        _game?.Factions.Where(f => f.PlayerName == null && !f.IsDefeated).ToList() ?? new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadGame();
+    }
+
+    private async Task LoadGame()
+    {
+        _loading = true;
+        try
+        {
+            _game = await Api.GetGameAsync(GameId);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Failed to load game: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private async Task JoinGame()
+    {
+        try
+        {
+            var faction = await Api.JoinGameAsync(GameId, _playerName, _factionName, _selectedRace);
+            
+            // Store session info
+            await LocalStorage.SetItemAsync("currentGameId", GameId);
+            await LocalStorage.SetItemAsync("currentFactionId", faction.Id);
+            await LocalStorage.SetItemAsync("currentFactionName", faction.Name);
+            
+            Snackbar.Add($"Welcome, {faction.Name}!", Severity.Success);
+            Navigation.NavigateTo("/game/map");
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Failed to join: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private async Task JoinAsFaction(string factionName)
+    {
+        if (string.IsNullOrWhiteSpace(_playerName)) return;
+        
+        try
+        {
+            var faction = await Api.JoinGameAsync(GameId, _playerName, factionName, "");
+            
+            // Store session info
+            await LocalStorage.SetItemAsync("currentGameId", GameId);
+            await LocalStorage.SetItemAsync("currentFactionId", faction.Id);
+            await LocalStorage.SetItemAsync("currentFactionName", faction.Name);
+            
+            Snackbar.Add($"You now command the {faction.Name}!", Severity.Success);
+            Navigation.NavigateTo("/game/map");
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Failed to take over faction: {ex.Message}", Severity.Error);
+        }
+    }
+}

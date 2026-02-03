@@ -1,0 +1,539 @@
+@using Microsoft.JSInterop
+@inject IJSRuntime JS
+@implements IAsyncDisposable
+
+@* Sound Service Component - Add to MainLayout *@
+
+@code {
+    private bool _initialized;
+    private static Action<string, float>? _playSoundCallback;
+    
+    public static void PlaySound(string soundType, float volume = 1.0f)
+    {
+        _playSoundCallback?.Invoke(soundType, volume);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && !_initialized)
+        {
+            _initialized = true;
+            _playSoundCallback = async (type, vol) => await PlaySoundInternal(type, vol);
+            
+            await JS.InvokeVoidAsync("eval", SoundSystemScript);
+        }
+    }
+
+    private async Task PlaySoundInternal(string soundType, float volume)
+    {
+        try
+        {
+            await JS.InvokeVoidAsync("GameSounds.play", soundType, volume);
+        }
+        catch { /* Ignore sound errors */ }
+    }
+
+    private const string SoundSystemScript = @"
+window.GameSounds = {
+    ctx: null,
+    enabled: true,
+    masterVolume: 0.8,
+    
+    init() {
+        if (!this.ctx) {
+            this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        return this.ctx;
+    },
+    
+    play(type, volume = 1.0) {
+        if (!this.enabled) return;
+        const ctx = this.init();
+        const vol = volume * this.masterVolume;
+        
+        switch(type) {
+            // === COMBAT SOUNDS ===
+            case 'phaser':
+                this.playPhaser(ctx, vol);
+                break;
+            case 'torpedo':
+                this.playTorpedo(ctx, vol);
+                break;
+            case 'explosion':
+                this.playExplosion(ctx, vol);
+                break;
+            case 'shield_hit':
+                this.playShieldHit(ctx, vol);
+                break;
+            case 'hull_hit':
+                this.playHullHit(ctx, vol);
+                break;
+            case 'critical':
+                this.playCritical(ctx, vol);
+                break;
+                
+            // === UI SOUNDS ===
+            case 'click':
+                this.playClick(ctx, vol);
+                break;
+            case 'hover':
+                this.playHover(ctx, vol * 0.3);
+                break;
+            case 'select':
+                this.playSelect(ctx, vol);
+                break;
+            case 'error':
+                this.playError(ctx, vol);
+                break;
+            case 'success':
+                this.playSuccess(ctx, vol);
+                break;
+            case 'notification':
+                this.playNotification(ctx, vol);
+                break;
+            case 'turn_end':
+                this.playTurnEnd(ctx, vol);
+                break;
+                
+            // === AMBIENT SOUNDS ===
+            case 'warp':
+                this.playWarp(ctx, vol);
+                break;
+            case 'scan':
+                this.playScan(ctx, vol);
+                break;
+            case 'comm':
+                this.playComm(ctx, vol);
+                break;
+            case 'alert':
+                this.playAlert(ctx, vol);
+                break;
+            case 'build_complete':
+                this.playBuildComplete(ctx, vol);
+                break;
+        }
+    },
+    
+    // === COMBAT SOUND IMPLEMENTATIONS ===
+    
+    playPhaser(ctx, vol) {
+        // Classic Star Trek phaser - descending frequency sweep
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        const filter = ctx.createBiquadFilter();
+        
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(2000, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(400, ctx.currentTime + 0.3);
+        
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(3000, ctx.currentTime);
+        filter.frequency.exponentialRampToValueAtTime(500, ctx.currentTime + 0.3);
+        
+        gain.gain.setValueAtTime(vol * 0.4, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+        
+        osc.connect(filter);
+        filter.connect(gain);
+        gain.connect(ctx.destination);
+        
+        osc.start();
+        osc.stop(ctx.currentTime + 0.4);
+    },
+    
+    playTorpedo(ctx, vol) {
+        // Photon torpedo launch - low rumble with high ping
+        const osc1 = ctx.createOscillator();
+        const osc2 = ctx.createOscillator();
+        const gain = ctx.createGain();
+        
+        osc1.type = 'sine';
+        osc1.frequency.setValueAtTime(80, ctx.currentTime);
+        osc1.frequency.exponentialRampToValueAtTime(40, ctx.currentTime + 0.5);
+        
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(800, ctx.currentTime);
+        osc2.frequency.exponentialRampToValueAtTime(200, ctx.currentTime + 0.3);
+        
+        gain.gain.setValueAtTime(vol * 0.5, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6);
+        
+        osc1.connect(gain);
+        osc2.connect(gain);
+        gain.connect(ctx.destination);
+        
+        osc1.start();
+        osc2.start();
+        osc1.stop(ctx.currentTime + 0.7);
+        osc2.stop(ctx.currentTime + 0.4);
+    },
+    
+    playExplosion(ctx, vol) {
+        // Ship explosion - noise burst with low rumble
+        const bufferSize = ctx.sampleRate * 0.8;
+        const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        
+        for (let i = 0; i < bufferSize; i++) {
+            data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.15));
+        }
+        
+        const noise = ctx.createBufferSource();
+        noise.buffer = buffer;
+        
+        const filter = ctx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(1000, ctx.currentTime);
+        filter.frequency.exponentialRampToValueAtTime(100, ctx.currentTime + 0.5);
+        
+        const gain = ctx.createGain();
+        gain.gain.setValueAtTime(vol * 0.7, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.8);
+        
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(ctx.destination);
+        
+        noise.start();
+    },
+    
+    playShieldHit(ctx, vol) {
+        // Shield impact - electrical crackle
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(150, ctx.currentTime);
+        
+        // Rapid frequency modulation for crackle
+        for (let i = 0; i < 10; i++) {
+            osc.frequency.setValueAtTime(100 + Math.random() * 200, ctx.currentTime + i * 0.02);
+        }
+        
+        gain.gain.setValueAtTime(vol * 0.3, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+        
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        
+        osc.start();
+        osc.stop(ctx.currentTime + 0.3);
+    },
+    
+    playHullHit(ctx, vol) {
+        // Hull breach - metallic impact
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(300, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(50, ctx.currentTime + 0.15);
+        
+        gain.gain.setValueAtTime(vol * 0.5, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2);
+        
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        
+        osc.start();
+        osc.stop(ctx.currentTime + 0.25);
+    },
+    
+    playCritical(ctx, vol) {
+        // Critical hit - explosion + alarm
+        this.playExplosion(ctx, vol);
+        
+        setTimeout(() => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(880, ctx.currentTime);
+            
+            gain.gain.setValueAtTime(vol * 0.3, ctx.currentTime);
+            gain.gain.setValueAtTime(0, ctx.currentTime + 0.1);
+            gain.gain.setValueAtTime(vol * 0.3, ctx.currentTime + 0.15);
+            gain.gain.setValueAtTime(0, ctx.currentTime + 0.25);
+            
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            
+            osc.start();
+            osc.stop(ctx.currentTime + 0.3);
+        }, 200);
+    },
+    
+    // === UI SOUND IMPLEMENTATIONS ===
+    
+    playClick(ctx, vol) {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(600, ctx.currentTime);
+        
+        gain.gain.setValueAtTime(vol * 0.2, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
+        
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        
+        osc.start();
+        osc.stop(ctx.currentTime + 0.06);
+    },
+    
+    playHover(ctx, vol) {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(400, ctx.currentTime);
+        
+        gain.gain.setValueAtTime(vol * 0.1, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.03);
+        
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        
+        osc.start();
+        osc.stop(ctx.currentTime + 0.04);
+    },
+    
+    playSelect(ctx, vol) {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(500, ctx.currentTime);
+        osc.frequency.setValueAtTime(700, ctx.currentTime + 0.05);
+        
+        gain.gain.setValueAtTime(vol * 0.25, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
+        
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        
+        osc.start();
+        osc.stop(ctx.currentTime + 0.15);
+    },
+    
+    playError(ctx, vol) {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(200, ctx.currentTime);
+        osc.frequency.setValueAtTime(150, ctx.currentTime + 0.1);
+        
+        gain.gain.setValueAtTime(vol * 0.3, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+        
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        
+        osc.start();
+        osc.stop(ctx.currentTime + 0.3);
+    },
+    
+    playSuccess(ctx, vol) {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(400, ctx.currentTime);
+        osc.frequency.setValueAtTime(600, ctx.currentTime + 0.08);
+        osc.frequency.setValueAtTime(800, ctx.currentTime + 0.16);
+        
+        gain.gain.setValueAtTime(vol * 0.25, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+        
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        
+        osc.start();
+        osc.stop(ctx.currentTime + 0.35);
+    },
+    
+    playNotification(ctx, vol) {
+        // LCARS-style notification chirp
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(880, ctx.currentTime);
+        osc.frequency.setValueAtTime(1100, ctx.currentTime + 0.08);
+        
+        gain.gain.setValueAtTime(vol * 0.2, ctx.currentTime);
+        gain.gain.setValueAtTime(vol * 0.2, ctx.currentTime + 0.08);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2);
+        
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        
+        osc.start();
+        osc.stop(ctx.currentTime + 0.25);
+    },
+    
+    playTurnEnd(ctx, vol) {
+        // Turn complete - triple beep
+        [0, 0.12, 0.24].forEach((delay, i) => {
+            setTimeout(() => {
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                
+                osc.type = 'sine';
+                osc.frequency.value = 600 + i * 100;
+                
+                gain.gain.setValueAtTime(vol * 0.25, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+                
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                
+                osc.start();
+                osc.stop(ctx.currentTime + 0.12);
+            }, delay * 1000);
+        });
+    },
+    
+    // === AMBIENT SOUND IMPLEMENTATIONS ===
+    
+    playWarp(ctx, vol) {
+        // Warp drive engagement
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        const filter = ctx.createBiquadFilter();
+        
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(50, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(200, ctx.currentTime + 0.5);
+        osc.frequency.exponentialRampToValueAtTime(80, ctx.currentTime + 1.5);
+        
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(200, ctx.currentTime);
+        filter.frequency.linearRampToValueAtTime(2000, ctx.currentTime + 0.5);
+        filter.frequency.linearRampToValueAtTime(500, ctx.currentTime + 1.5);
+        
+        gain.gain.setValueAtTime(0.001, ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(vol * 0.4, ctx.currentTime + 0.3);
+        gain.gain.linearRampToValueAtTime(vol * 0.2, ctx.currentTime + 1.0);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 2.0);
+        
+        osc.connect(filter);
+        filter.connect(gain);
+        gain.connect(ctx.destination);
+        
+        osc.start();
+        osc.stop(ctx.currentTime + 2.5);
+    },
+    
+    playScan(ctx, vol) {
+        // Sensor scan sweep
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(1000, ctx.currentTime);
+        osc.frequency.linearRampToValueAtTime(3000, ctx.currentTime + 0.5);
+        osc.frequency.linearRampToValueAtTime(1000, ctx.currentTime + 1.0);
+        
+        gain.gain.setValueAtTime(vol * 0.15, ctx.currentTime);
+        gain.gain.linearRampToValueAtTime(vol * 0.1, ctx.currentTime + 0.5);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.2);
+        
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        
+        osc.start();
+        osc.stop(ctx.currentTime + 1.3);
+    },
+    
+    playComm(ctx, vol) {
+        // Communication channel open
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        
+        osc.type = 'sine';
+        
+        // Classic comm chirp pattern
+        osc.frequency.setValueAtTime(600, ctx.currentTime);
+        osc.frequency.setValueAtTime(900, ctx.currentTime + 0.05);
+        osc.frequency.setValueAtTime(600, ctx.currentTime + 0.1);
+        osc.frequency.setValueAtTime(900, ctx.currentTime + 0.15);
+        
+        gain.gain.setValueAtTime(vol * 0.2, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+        
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        
+        osc.start();
+        osc.stop(ctx.currentTime + 0.3);
+    },
+    
+    playAlert(ctx, vol) {
+        // Red alert klaxon
+        const playKlaxon = (startTime) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(400, startTime);
+            osc.frequency.linearRampToValueAtTime(600, startTime + 0.25);
+            osc.frequency.linearRampToValueAtTime(400, startTime + 0.5);
+            
+            gain.gain.setValueAtTime(vol * 0.3, startTime);
+            gain.gain.setValueAtTime(vol * 0.3, startTime + 0.4);
+            gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.5);
+            
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            
+            osc.start(startTime);
+            osc.stop(startTime + 0.55);
+        };
+        
+        playKlaxon(ctx.currentTime);
+        playKlaxon(ctx.currentTime + 0.6);
+    },
+    
+    playBuildComplete(ctx, vol) {
+        // Construction complete fanfare
+        const notes = [523, 659, 784, 1047]; // C5, E5, G5, C6
+        
+        notes.forEach((freq, i) => {
+            setTimeout(() => {
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                
+                osc.type = 'sine';
+                osc.frequency.value = freq;
+                
+                gain.gain.setValueAtTime(vol * 0.2, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2);
+                
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                
+                osc.start();
+                osc.stop(ctx.currentTime + 0.25);
+            }, i * 100);
+        });
+    },
+    
+    // Settings
+    setEnabled(enabled) {
+        this.enabled = enabled;
+    },
+    
+    setVolume(vol) {
+        this.masterVolume = Math.max(0, Math.min(1, vol));
+    }
+};
+";
+
+    public async ValueTask DisposeAsync()
+    {
+        _playSoundCallback = null;
+    }
+}

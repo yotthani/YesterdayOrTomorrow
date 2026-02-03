@@ -1,0 +1,183 @@
+/* ==============================================
+   GALACTIC STRATEGY - Cardassian Ships
+   3D Rendered Style with Nameplates
+   
+   Two sprite sheets:
+   - military_ships.png: Galor, Keldon, Combat vessels
+   - civilian_ships.png: Freighters, Support vessels
+   
+   Both: ~2000 x 1103 px, 4 columns x 4 rows
+   ============================================== */
+
+/* ==============================================
+   Base Cardassian Ship Component
+   ============================================== */
+
+.ship-card.cardassian {
+    background-repeat: no-repeat;
+    background-size: 1000px 552px; /* 50% scale default */
+}
+
+/* ==============================================
+   CARDASSIAN MILITARY SHIPS
+   Sheet: cardassian/military_ships.png
+   
+   Row 1: Galor, Keldon, Hideki, Bok'Nor (Armed)
+   Row 2: Attack Wing, Destroyer, Dreadnought, Sci-Dreadnought
+   Row 3: Hutet, Ghemor, Damar, Dukat
+   Row 4: Patrol, Escort, Fast Attack, Weapon Platform
+   ============================================== */
+
+.ship-card.cardassian.military {
+    background-image: url('/images/ships/cardassian/military_ships.png');
+}
+
+/* Row 1 */
+.ship-card.cardassian.galor           { background-position: 0 0; }
+.ship-card.cardassian.keldon          { background-position: -250px 0; }
+.ship-card.cardassian.hideki          { background-position: -500px 0; }
+.ship-card.cardassian.boknor-armed    { background-position: -750px 0; }
+
+/* Row 2 */
+.ship-card.cardassian.attack-wing     { background-position: 0 -138px; }
+.ship-card.cardassian.destroyer       { background-position: -250px -138px; }
+.ship-card.cardassian.dreadnought     { background-position: -500px -138px; }
+.ship-card.cardassian.sci-dreadnought { background-position: -750px -138px; }
+
+/* Row 3 */
+.ship-card.cardassian.hutet           { background-position: 0 -276px; }
+.ship-card.cardassian.ghemor          { background-position: -250px -276px; }
+.ship-card.cardassian.damar           { background-position: -500px -276px; }
+.ship-card.cardassian.dukat           { background-position: -750px -276px; }
+
+/* Row 4 */
+.ship-card.cardassian.patrol          { background-position: 0 -414px; }
+.ship-card.cardassian.escort          { background-position: -250px -414px; }
+.ship-card.cardassian.fast-attack     { background-position: -500px -414px; }
+.ship-card.cardassian.weapon-platform { background-position: -750px -414px; }
+
+/* ==============================================
+   CARDASSIAN CIVILIAN SHIPS
+   Sheet: cardassian/civilian_ships.png
+   
+   Row 1: Groumall, Pythus, Cargo Vessel, Mining Ship
+   Row 2: Madrone, Scout, Courier, Colony Ship
+   Row 3: Toran Shuttle, Runabout, Construction, Repair Ship
+   Row 4: Diplomatic, Yacht, Waste Transport, Survey Ship
+   ============================================== */
+
+.ship-card.cardassian.civilian {
+    background-image: url('/images/ships/cardassian/civilian_ships.png');
+}
+
+/* Row 1 */
+.ship-card.cardassian.groumall        { background-position: 0 0; }
+.ship-card.cardassian.pythus          { background-position: -250px 0; }
+.ship-card.cardassian.cargo           { background-position: -500px 0; }
+.ship-card.cardassian.mining          { background-position: -750px 0; }
+
+/* Row 2 */
+.ship-card.cardassian.madrone         { background-position: 0 -138px; }
+.ship-card.cardassian.scout           { background-position: -250px -138px; }
+.ship-card.cardassian.courier         { background-position: -500px -138px; }
+.ship-card.cardassian.colony          { background-position: -750px -138px; }
+
+/* Row 3 */
+.ship-card.cardassian.toran-shuttle   { background-position: 0 -276px; }
+.ship-card.cardassian.runabout        { background-position: -250px -276px; }
+.ship-card.cardassian.construction    { background-position: -500px -276px; }
+.ship-card.cardassian.repair          { background-position: -750px -276px; }
+
+/* Row 4 */
+.ship-card.cardassian.diplomatic      { background-position: 0 -414px; }
+.ship-card.cardassian.yacht           { background-position: -250px -414px; }
+.ship-card.cardassian.waste-transport { background-position: -500px -414px; }
+.ship-card.cardassian.survey          { background-position: -750px -414px; }
+
+/* ==============================================
+   Large Size Positions (100% scale)
+   ============================================== */
+
+.ship-card.cardassian.large {
+    background-size: 2000px 1103px;
+}
+
+/* Military Large */
+.ship-card.cardassian.large.galor           { background-position: 0 0; }
+.ship-card.cardassian.large.keldon          { background-position: -500px 0; }
+.ship-card.cardassian.large.hideki          { background-position: -1000px 0; }
+.ship-card.cardassian.large.boknor-armed    { background-position: -1500px 0; }
+
+.ship-card.cardassian.large.attack-wing     { background-position: 0 -276px; }
+.ship-card.cardassian.large.destroyer       { background-position: -500px -276px; }
+.ship-card.cardassian.large.dreadnought     { background-position: -1000px -276px; }
+.ship-card.cardassian.large.sci-dreadnought { background-position: -1500px -276px; }
+
+.ship-card.cardassian.large.hutet           { background-position: 0 -552px; }
+.ship-card.cardassian.large.ghemor          { background-position: -500px -552px; }
+.ship-card.cardassian.large.damar           { background-position: -1000px -552px; }
+.ship-card.cardassian.large.dukat           { background-position: -1500px -552px; }
+
+.ship-card.cardassian.large.patrol          { background-position: 0 -828px; }
+.ship-card.cardassian.large.escort          { background-position: -500px -828px; }
+.ship-card.cardassian.large.fast-attack     { background-position: -1000px -828px; }
+.ship-card.cardassian.large.weapon-platform { background-position: -1500px -828px; }
+
+/* ==============================================
+   Small Size Positions (25% scale)
+   ============================================== */
+
+.ship-card.cardassian.small {
+    background-size: 500px 276px;
+}
+
+.ship-card.cardassian.small.galor           { background-position: 0 0; }
+.ship-card.cardassian.small.keldon          { background-position: -125px 0; }
+.ship-card.cardassian.small.hideki          { background-position: -250px 0; }
+.ship-card.cardassian.small.boknor-armed    { background-position: -375px 0; }
+
+.ship-card.cardassian.small.attack-wing     { background-position: 0 -69px; }
+.ship-card.cardassian.small.destroyer       { background-position: -125px -69px; }
+.ship-card.cardassian.small.dreadnought     { background-position: -250px -69px; }
+.ship-card.cardassian.small.sci-dreadnought { background-position: -375px -69px; }
+
+/* ==============================================
+   Cardassian Frame Style (Amber/Orange Glow)
+   ============================================== */
+
+.ship-frame.cardassian {
+    border-color: rgba(217, 119, 6, 0.6);
+    box-shadow: 
+        0 4px 12px rgba(0, 0, 0, 0.5),
+        0 0 20px rgba(217, 119, 6, 0.3);
+}
+
+.ship-frame.cardassian.selected {
+    border-color: #f59e0b;
+    box-shadow: 
+        0 4px 12px rgba(0, 0, 0, 0.5),
+        0 0 25px rgba(245, 158, 11, 0.5);
+}
+
+/* ==============================================
+   Cardassian Ship Selection Glow
+   ============================================== */
+
+@keyframes cardassian-ship-glow {
+    0%, 100% { box-shadow: 0 0 15px rgba(217, 119, 6, 0.4); }
+    50% { box-shadow: 0 0 25px rgba(217, 119, 6, 0.6); }
+}
+
+.ship-card.cardassian.selected {
+    animation: cardassian-ship-glow 2s ease-in-out infinite;
+}
+
+/* Obsidian Order stealth effect */
+@keyframes obsidian-stealth {
+    0%, 100% { opacity: 1; filter: brightness(1); }
+    50% { opacity: 0.8; filter: brightness(0.8); }
+}
+
+.ship-card.cardassian.obsidian-order {
+    animation: obsidian-stealth 2s ease-in-out infinite;
+}

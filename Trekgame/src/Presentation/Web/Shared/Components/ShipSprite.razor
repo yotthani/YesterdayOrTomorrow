@@ -1,0 +1,191 @@
+@* ShipSprite.razor - Universal ship sprite component for all factions *@
+
+<div class="@GetContainerClasses()" @onclick="HandleClick" title="@GetTooltip()">
+    <div class="@GetSpriteClasses()"></div>
+    @if (ShowLabel)
+    {
+        <div class="ship-label">@GetDisplayName()</div>
+    }
+</div>
+
+<style>
+    .ship-sprite-container {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        transition: all 0.2s;
+    }
+    
+    .ship-sprite-container.clickable {
+        cursor: pointer;
+    }
+    
+    .ship-sprite-container.clickable:hover {
+        transform: scale(1.05);
+    }
+    
+    .ship-sprite-container.selected {
+        filter: brightness(1.2);
+    }
+    
+    /* Size variants */
+    .ship-sprite.thumb { width: 56px; height: 56px; }
+    .ship-sprite.small { width: 80px; height: 80px; }
+    .ship-sprite.medium { width: 120px; height: 120px; }
+    .ship-sprite.large { width: 180px; height: 180px; }
+    
+    .ship-sprite {
+        background-repeat: no-repeat;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    }
+    
+    /* Federation ships */
+    .ship-sprite.federation.military { background-image: url('/images/ships/federation/military_ships.png'); }
+    .ship-sprite.federation.civilian { background-image: url('/images/ships/federation/shuttles_civilian.png'); }
+    
+    /* Klingon ships */
+    .ship-sprite.klingon.military { background-image: url('/images/ships/klingon/military_ships.png'); }
+    .ship-sprite.klingon.civilian { background-image: url('/images/ships/klingon/civilian_ships.png'); }
+    
+    /* Romulan ships */
+    .ship-sprite.romulan.military { background-image: url('/images/ships/romulan/military_ships.png'); }
+    .ship-sprite.romulan.civilian { background-image: url('/images/ships/romulan/civilian_ships.png'); }
+    
+    /* Cardassian ships */
+    .ship-sprite.cardassian.military { background-image: url('/images/ships/cardassian/military_ships.png'); }
+    .ship-sprite.cardassian.civilian { background-image: url('/images/ships/cardassian/civilian_ships.png'); }
+    
+    /* Ferengi ships */
+    .ship-sprite.ferengi.military { background-image: url('/images/ships/ferengi/military_ships.png'); }
+    .ship-sprite.ferengi.civilian { background-image: url('/images/ships/ferengi/civilian_ships.png'); }
+    
+    /* Borg ships */
+    .ship-sprite.borg.military { background-image: url('/images/ships/borg/military_ships.png'); }
+    .ship-sprite.borg.civilian { background-image: url('/images/ships/borg/civilian_ships.png'); }
+    
+    /* Dominion ships */
+    .ship-sprite.dominion.military { background-image: url('/images/ships/dominion/military_ships.png'); }
+    .ship-sprite.dominion.civilian { background-image: url('/images/ships/dominion/civilian_ships.png'); }
+    
+    .ship-label {
+        margin-top: 4px;
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        color: rgba(200, 220, 255, 0.8);
+        text-align: center;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    
+    /* Faction glow effects */
+    .ship-sprite-container.federation .ship-sprite { box-shadow: 0 0 15px rgba(59, 130, 246, 0.3); }
+    .ship-sprite-container.klingon .ship-sprite { box-shadow: 0 0 15px rgba(220, 38, 38, 0.3); }
+    .ship-sprite-container.romulan .ship-sprite { box-shadow: 0 0 15px rgba(16, 185, 129, 0.3); }
+    .ship-sprite-container.cardassian .ship-sprite { box-shadow: 0 0 15px rgba(217, 119, 6, 0.3); }
+    .ship-sprite-container.ferengi .ship-sprite { box-shadow: 0 0 15px rgba(234, 179, 8, 0.3); }
+    .ship-sprite-container.borg .ship-sprite { box-shadow: 0 0 15px rgba(34, 197, 94, 0.4); }
+    .ship-sprite-container.dominion .ship-sprite { box-shadow: 0 0 15px rgba(124, 58, 237, 0.3); }
+</style>
+
+@code {
+    [Parameter] public string Faction { get; set; } = "federation";
+    [Parameter] public string ShipType { get; set; } = "galaxy";
+    [Parameter] public string Category { get; set; } = "military"; // military or civilian
+    [Parameter] public string Size { get; set; } = "medium"; // thumb, small, medium, large
+    [Parameter] public bool ShowLabel { get; set; } = false;
+    [Parameter] public bool IsSelected { get; set; } = false;
+    [Parameter] public string? DisplayName { get; set; }
+    [Parameter] public EventCallback OnClick { get; set; }
+    [Parameter] public string? CssClass { get; set; }
+
+    // Grid position (0-based, row/col for 6x3 or 4x4 grid)
+    [Parameter] public int Row { get; set; } = 0;
+    [Parameter] public int Col { get; set; } = 0;
+
+    private string GetContainerClasses()
+    {
+        var classes = new List<string> { "ship-sprite-container", Faction.ToLowerInvariant() };
+        if (IsSelected) classes.Add("selected");
+        if (OnClick.HasDelegate) classes.Add("clickable");
+        if (!string.IsNullOrEmpty(CssClass)) classes.Add(CssClass);
+        return string.Join(" ", classes);
+    }
+
+    private string GetSpriteClasses()
+    {
+        return $"ship-sprite {Faction.ToLowerInvariant()} {Category} {Size}";
+    }
+
+    private string GetSpriteStyle()
+    {
+        // Calculate background position based on grid
+        var cellWidth = Size switch
+        {
+            "thumb" => 56,
+            "small" => 80,
+            "medium" => 120,
+            "large" => 180,
+            _ => 120
+        };
+        
+        // Assuming sprite sheets are 6x3 at various scales
+        var x = -Col * cellWidth;
+        var y = -Row * cellWidth;
+        
+        return $"background-position: {x}px {y}px;";
+    }
+
+    private async Task HandleClick()
+    {
+        if (OnClick.HasDelegate)
+            await OnClick.InvokeAsync();
+    }
+
+    private string GetDisplayName()
+    {
+        if (!string.IsNullOrEmpty(DisplayName)) return DisplayName;
+        return ShipType.Replace("-", " ").Replace("_", " ");
+    }
+
+    private string GetTooltip()
+    {
+        return $"{GetDisplayName()} ({Faction})";
+    }
+
+    // Ship type to grid position mapping for common ships
+    public static readonly Dictionary<string, (int Row, int Col)> FederationMilitary = new()
+    {
+        ["constitution"] = (0, 0),
+        ["miranda"] = (0, 1),
+        ["excelsior"] = (0, 2),
+        ["galaxy"] = (0, 3),
+        ["enterprise-d"] = (0, 4),
+        ["nebula"] = (0, 5),
+        ["akira"] = (1, 1),
+        ["defiant"] = (1, 2),
+        ["sovereign"] = (1, 3),
+        ["prometheus"] = (1, 4),
+        ["nova"] = (2, 0),
+        ["steamrunner"] = (2, 1),
+        ["saber"] = (2, 2),
+        ["california"] = (2, 3),
+        ["luna"] = (2, 4),
+        ["crossfield"] = (2, 5),
+    };
+
+    public static readonly Dictionary<string, (int Row, int Col)> KlingonMilitary = new()
+    {
+        ["brel"] = (0, 0),
+        ["kvort"] = (0, 1),
+        ["d7"] = (0, 2),
+        ["ktinga"] = (0, 3),
+        ["vorcha"] = (0, 4),
+        ["raptor"] = (0, 5),
+        ["neghvar"] = (1, 1),
+        ["qang"] = (1, 5),
+    };
+}

@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>StarTrekGame.Server</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Web\StarTrekGame.Web.csproj" />
+    <ProjectReference Include="..\..\Core\Domain\StarTrekGame.Domain.csproj" />
+    <ProjectReference Include="..\..\Core\Application\StarTrekGame.Application.csproj" />
+    <ProjectReference Include="..\..\Infrastructure\StarTrekGame.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- EF Core In-Memory for prototype -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.0.2" />
+    
+    <!-- Blazor WASM hosting -->
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="10.0.2" />
+    
+    <!-- Swagger for API docs -->
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.0" />
+  </ItemGroup>
+
+</Project>

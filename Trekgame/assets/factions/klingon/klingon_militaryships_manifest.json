@@ -1,0 +1,268 @@
+{
+  "factionName": "Klingon",
+  "categoryName": "MilitaryShips",
+  "grid": {
+    "columns": 6,
+    "rows": 6,
+    "totalAssets": 36,
+    "cellSize": 360,
+    "spriteWidth": 2160,
+    "spriteHeight": 2160
+  },
+  "spriteSheetPath": "klingon_militaryships.png",
+  "generatedAt": "2026-01-31T23:49:47.561Z",
+  "assets": [
+    {
+      "row": 0,
+      "col": 0,
+      "name": "Bird of Prey B\u0027rel",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 0,
+      "col": 1,
+      "name": "Bird of Prey K\u0027vort",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 0,
+      "col": 2,
+      "name": "Vor\u0027cha Attack Cruiser",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 0,
+      "col": 3,
+      "name": "Negh\u0027Var Warship",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 0,
+      "col": 4,
+      "name": "K\u0027t\u0027inga Battlecruiser",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 0,
+      "col": 5,
+      "name": "D7 Battlecruiser",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 1,
+      "col": 0,
+      "name": "Raptor Scout",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 1,
+      "col": 1,
+      "name": "D5 Cruiser",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 1,
+      "col": 2,
+      "name": "IKS Rotarran Type",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 1,
+      "col": 3,
+      "name": "Bortas Class",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 1,
+      "col": 4,
+      "name": "Qugh Destroyer",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 1,
+      "col": 5,
+      "name": "Hegh\u0027ta Heavy Bird",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 2,
+      "col": 0,
+      "name": "Ch\u0027Tang Type",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 2,
+      "col": 1,
+      "name": "Martok\u0027s Flagship",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 2,
+      "col": 2,
+      "name": "Ning\u0027tao Escort",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 2,
+      "col": 3,
+      "name": "Somraw Raptor",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 2,
+      "col": 4,
+      "name": "M\u0027Char Fighter",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 2,
+      "col": 5,
+      "name": "Kivra Shuttle",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 3,
+      "col": 0,
+      "name": "Fek\u0027lhr Dreadnought",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 3,
+      "col": 1,
+      "name": "Sarcophagus Ship",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 3,
+      "col": 2,
+      "name": "Cleave Ship",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 3,
+      "col": 3,
+      "name": "D4 Cruiser",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 3,
+      "col": 4,
+      "name": "Chargh Type",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 3,
+      "col": 5,
+      "name": "Pach Strike Wing",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 4,
+      "col": 0,
+      "name": "Qa\u0027vak Patrol",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 4,
+      "col": 1,
+      "name": "HoH\u0027SuS Bird",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 4,
+      "col": 2,
+      "name": "Qaw\u0027Dun Bird",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 4,
+      "col": 3,
+      "name": "Mat\u0027Ha Raptor",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 4,
+      "col": 4,
+      "name": "Kurak Science",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 4,
+      "col": 5,
+      "name": "DuQwI\u0027 Fighter",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 5,
+      "col": 0,
+      "name": "Mogh Battlecruiser",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 5,
+      "col": 1,
+      "name": "Ty\u0027Gokor Type",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 5,
+      "col": 2,
+      "name": "Qu\u0027Daj Fighter",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 5,
+      "col": 3,
+      "name": "Koloth Memorial",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 5,
+      "col": 4,
+      "name": "Kor Memorial",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 5,
+      "col": 5,
+      "name": "Kang Memorial",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    }
+  ]
+}

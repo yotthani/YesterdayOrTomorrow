@@ -1,0 +1,278 @@
+{
+  "category": "Ships",
+  "description": "Military and civilian ships for all factions",
+  "factionStyles": {
+    "federation": {
+      "military": {
+        "designLanguage": "Saucer section + engineering hull + warp nacelles - VARIES by era and class",
+        "colors": "Light gray hull, red Bussard collectors, blue deflector dish, blue warp glow",
+        "features": ["Smooth hull plating", "Starfleet delta markings", "Phaser strips", "Photon torpedo launchers"],
+        "classVariants": {
+          "Constitution": "TOS ERA: CYLINDRICAL engineering hull, CIRCULAR saucer, TWO nacelles on ANGLED pylons behind saucer. Classic 1960s design. Reference: USS Enterprise NCC-1701",
+          "Galaxy": "TNG ERA: LARGE ELLIPTICAL saucer, LONG neck to stardrive section, TWO nacelles on SWEPT-BACK pylons. Massive exploration cruiser. Reference: Enterprise-D",
+          "Sovereign": "MOVIE ERA: SLEEK elongated design, ARROW-SHAPED saucer, nacelles close to hull. More aggressive than Galaxy. Reference: Enterprise-E",
+          "Intrepid": "COMPACT design, ANGULAR saucer, variable-geometry nacelles that FOLD. Small explorer. Reference: USS Voyager",
+          "Defiant": "COMPACT WARSHIP - NO saucer, NO neck, BLOCKY aggressive shape. Escort/battleship hybrid. Reference: USS Defiant DS9",
+          "Miranda": "SINGLE hull with nacelles BELOW, ROLLBAR on top with weapons pod. No separate saucer. Reference: USS Reliant",
+          "Excelsior": "SLEEK 1980s design, FLAT saucer, LONG engineering hull, graceful nacelle pylons. Reference: USS Excelsior",
+          "Nebula": "Galaxy-class components REARRANGED - saucer with SENSOR POD on top, nacelles different config",
+          "Akira": "CATAMARAN style - TWO hulls with WEAPONS POD between. Heavy carrier/cruiser"
+        },
+        "important": "Federation ships are NOT all Galaxy-class! Each era and role has distinct silhouette"
+      },
+      "civilian": {
+        "designLanguage": "Utilitarian, boxy cargo haulers or sleek transports - NO military features",
+        "colors": "Varied civilian colors - white, blue, orange. No Starfleet gray",
+        "features": ["Cargo bays", "Passenger windows", "Commercial markings", "Docking ports"],
+        "avoid": ["Weapons", "Starfleet insignia", "Warship nacelle configs", "Phaser strips"]
+      }
+    },
+    "klingon": {
+      "military": {
+        "designLanguage": "Varied aggressive designs - each class has DISTINCT silhouette",
+        "colors": "Dark green hull, red accent lights, gunmetal gray, bronze details",
+        "features": ["Disruptor cannons", "Torpedo launchers", "Cloaking device housing", "Angular aggressive lines"],
+        "classVariants": {
+          "Bird of Prey": "SMALL/MEDIUM ship with TWO SWEPT-BACK WINGS like a bird. Wings can FOLD (up=cruise, down=attack). Central body. Reference: Klingon Bird of Prey from Star Trek III",
+          "B'rel": "SMALL Bird of Prey scout. Triangular body, movable wing configuration. 12-man crew",
+          "K'Vort": "LARGE Bird of Prey, cruiser-sized. Wider wingspan than B'rel",
+          "D7": "HAMMERHEAD SHAPE: Bulbous COMMAND POD at front, LONG THIN NECK, rear BODY with TWO ANGLED NACELLES on short wings. NOT bird-shaped! Reference: TOS Klingon Battlecruiser",
+          "K't'inga": "Upgraded D7 with MORE DETAIL. Same hammerhead silhouette. Reference: Star Trek The Motion Picture",
+          "Vor'cha": "ELONGATED PREDATOR: Long POINTED NOSE, raised BRIDGE section, angular hull, weapon pods. Like an aggressive dagger. Reference: TNG/DS9 Klingon Attack Cruiser",
+          "Negh'Var": "MASSIVE DREADNOUGHT: Very WIDE BODY, multiple visible DECKS, heavy ARMOR, prominent COMMAND TOWER. Flagship. Reference: DS9 Klingon Flagship",
+          "Raptor": "SLEEK INTERCEPTOR: Needle-like nose, small forward-swept wings. Fast attack. Reference: Enterprise era"
+        },
+        "important": "Klingon ships are NOT all Bird of Prey! D7/K't'inga=hammerhead, Vor'cha=dagger, Negh'Var=massive"
+      },
+      "civilian": {
+        "designLanguage": "Rugged industrial vessels, transport barges, worn and functional",
+        "colors": "Dark industrial colors, rust, worn metal, utilitarian",
+        "features": ["Heavy construction", "Cargo containers", "Industrial equipment", "Targ cages"],
+        "avoid": ["Military wings", "Cloaking devices", "Disruptor arrays", "Sleek lines"]
+      }
+    },
+    "romulan": {
+      "military": {
+        "designLanguage": "Predatory bird aesthetic, elegant curves, GREEN hull with bird markings",
+        "colors": "Dark green hull, bronze/copper accents, bird-of-prey paint schemes",
+        "features": ["Plasma torpedo launchers", "Cloaking device", "No visible warp nacelles", "Bird hull markings"],
+        "classVariants": {
+          "D'deridex": "MASSIVE DOUBLE-HULL WARBIRD: Two hulls forming OPEN SPACE in center (negative space). Bird-head at front. Reference: TNG Romulan Warbird",
+          "Valdore": "SLEEKER single-hull warbird, more compact than D'deridex. Aggressive angles. Reference: Star Trek Nemesis",
+          "Scimitar": "MASSIVE DREADNOUGHT with WINGS, heavily armed. Thalaron weapon ship. Reference: Nemesis villain ship",
+          "Bird of Prey TOS": "SMALL compact warbird, different from Klingon BoP. Plasma weapon under hull. Reference: TOS Balance of Terror",
+          "T'Liss": "Light warbird, patrol vessel. Single hull, elegant curves",
+          "Mogai": "Heavy warbird, Valdore-type. Aggressive profile"
+        },
+        "important": "Romulan ships have NO visible nacelles - propulsion is internal. Double-hull warbirds have distinctive negative space"
+      },
+      "civilian": {
+        "designLanguage": "Secretive, nondescript vessels that could pass as neutral",
+        "colors": "Muted greens and grays, minimal markings",
+        "features": ["Hidden compartments", "Sensor baffling", "Civilian cover appearance"],
+        "avoid": ["Obvious military features", "Bird of prey markings", "Visible weapons"]
+      }
+    },
+    "cardassian": {
+      "military": {
+        "designLanguage": "INSECTOID/COBRA shape - pointed head, segmented body, ochre/brown",
+        "colors": "Brown/tan hull, yellow/amber accent lights, copper details",
+        "features": ["Spiral wave disruptors", "Hull ridges like exoskeleton", "Angular predatory design"],
+        "classVariants": {
+          "Galor": "COBRA HEAD shape: Pointed BOW, WIDE NECK section, tapering BODY. Main cruiser. Reference: DS9 Cardassian Warship",
+          "Keldon": "LARGER Galor variant with additional WEAPONS POD on dorsal. More angular",
+          "Hideki": "SMALL patrol ship, BEETLE-like. Compact fighter/scout",
+          "Hutet": "DREADNOUGHT class, massive Galor-derived design"
+        },
+        "important": "Cardassian ships look like INSECTS or COBRAS - segmented, ridged hulls, pointed bows"
+      },
+      "civilian": {
+        "designLanguage": "Industrial, efficient, utilitarian transports",
+        "colors": "Brown/tan industrial, minimal decoration",
+        "features": ["Ore processing equipment", "Labor transport capacity", "Mining gear"],
+        "avoid": ["Military weapons", "Command vessel features", "Sleek design"]
+      }
+    },
+    "ferengi": {
+      "military": {
+        "designLanguage": "Varied profit-driven designs - Marauders are crescent, but other ships differ",
+        "colors": "Orange hull, gold accents, bronze details, ostentatious wealth display",
+        "features": ["Plasma weapons", "Massive cargo holds", "Luxury captain quarters", "Profit-focused design"],
+        "classVariants": {
+          "D'Kora": "CRESCENT MOON / HORSESHOE shape - the SIGNATURE Ferengi Marauder. Curved main body with OPEN CENTER, bridge pod at one end. Reference: TNG",
+          "Marauder": "Same as D'Kora - curved crescent, open center. The classic Ferengi warship",
+          "Nagus": "YACHT-style luxury vessel - SLEEK elongated design, NOT crescent. For Grand Nagus and wealthy Ferengi",
+          "Trader": "BOXY cargo hauler - RECTANGULAR hull maximizing cargo space. Function over form",
+          "Salvage": "IRREGULAR shape with GRAPPLING ARMS and tractor beam arrays. Industrial salvage ship",
+          "Pod": "Small TEARDROP shuttle. Simple curved shape",
+          "Frigate": "ANGULAR compact warship - smaller, more aggressive than Marauder. Not crescent-shaped",
+          "Transport": "BULBOUS cargo ship - ROUND or OVAL hull for maximum storage. Like a flying warehouse",
+          "Raider": "WEDGE-shaped fast attack - pointed bow, swept wings. Built for speed and piracy"
+        },
+        "important": "Only D'Kora/Marauder class is crescent-shaped! Other Ferengi ships prioritize FUNCTION (cargo space, speed, luxury) over uniform design"
+      },
+      "civilian": {
+        "designLanguage": "Extremely varied - each ship customized for profit potential",
+        "colors": "Gold, orange, bronze - the gaudier the wealthier the owner",
+        "features": ["Massive cargo holds", "Luxury quarters", "Latinum vaults", "Trading facilities", "Custom modifications"],
+        "classVariants": {
+          "Cargo Hauler": "MASSIVE BOXY freighter - maximizes cargo volume. Orange industrial",
+          "Passenger Liner": "ELONGATED luxury ship - many windows, comfortable design",
+          "Mining Ship": "UTILITARIAN with drilling/extraction equipment. Not pretty but profitable",
+          "Shuttle": "Small personal transport - varies by owner wealth (cheap boxy to sleek luxury)"
+        },
+        "avoid": ["Uniform military design", "Impractical shapes that waste cargo space"]
+      }
+    },
+    "borg": {
+      "military": {
+        "designLanguage": "PERFECT GEOMETRIC SHAPES - cubes, spheres, no organic curves",
+        "colors": "Dark gray/black, GREEN lights and accents, no windows",
+        "features": ["Assimilation tubes", "Regeneration alcoves", "Modular construction", "No bridge"],
+        "classVariants": {
+          "Cube": "PERFECT CUBE - all sides equal. Green internal glow. Reference: TNG/VOY Borg Cube",
+          "Sphere": "PERFECT SPHERE - used for time travel, smaller than cube. Reference: First Contact",
+          "Tactical Cube": "Cube with EXTRA ARMOR plating, more weapon hardpoints. Darker",
+          "Diamond": "OCTAHEDRON shape - two pyramids base-to-base. Queen's ship",
+          "Probe": "Small rectangular scout, box shape"
+        },
+        "important": "Borg ships are GEOMETRIC - no curves, no windows, no aesthetic design. Pure function"
+      },
+      "civilian": {
+        "note": "Borg have NO civilian ships - all vessels serve the Collective"
+      }
+    },
+    "dominion": {
+      "military": {
+        "designLanguage": "ORGANIC INSECTOID shapes, purple/violet, bioluminescent",
+        "colors": "Purple/violet hull, glowing purple accents, organic appearance",
+        "features": ["Phased polaron weapons", "Organic curves", "Beetle-like hulls", "No windows"],
+        "classVariants": {
+          "Jem'Hadar Fighter": "BEETLE/SCARAB shape - compact, curved hull, small and agile. Purple. Reference: DS9",
+          "Jem'Hadar Attack Ship": "Larger beetle design, more weapons",
+          "Jem'Hadar Battlecruiser": "LARGE insectoid shape, multiple weapon pods",
+          "Battleship": "MASSIVE organic dreadnought, carrier capability"
+        },
+        "important": "Dominion ships look ORGANIC and INSECTOID - like alien beetles, not mechanical"
+      },
+      "civilian": {
+        "designLanguage": "Vorta administrative vessels, less aggressive",
+        "colors": "Purple/lavender, diplomatic appearance",
+        "features": ["Diplomatic quarters", "Ketracel-white storage", "Communication arrays"],
+        "avoid": ["Jem'Hadar military features", "Heavy weapons"]
+      }
+    },
+    "breen": {
+      "military": {
+        "designLanguage": "ASYMMETRIC angular design, cold blue/white colors, mysterious",
+        "colors": "Ice blue, white, silver metallic",
+        "features": ["Energy dampening weapons", "Unusual asymmetric design", "Cold aesthetic"],
+        "classVariants": {
+          "Chel Grett": "PRIMARY BREEN WARSHIP: Distinctive ASYMMETRIC hull with angular protrusions on one side. Medium combat vessel. Teal-blue hull with crystalline accents. NOT symmetrical.",
+          "Plesh Brek": "FAST BREEN RAIDER: Sleek asymmetric attack ship. Angular design optimized for speed. Ice-blue/teal hull with sharp jutting edges.",
+          "Sar Theln": "BREEN CARRIER: Large asymmetric hull with multiple fighter launch bays arranged unevenly. Cold blue with silver panels.",
+          "Rezreth": "BREEN DREADNOUGHT: Massive flagship. Extreme asymmetric profile - largest and most powerful Breen vessel. Ice-blue and white with crystalline weapon arrays.",
+          "Bleth Choas": "BREEN HEAVY CRUISER: Powerful asymmetric warship with heavy armor. Dark teal with ice-blue weapon accents.",
+          "Thot Command": "BREEN COMMAND VESSEL: Flag officer's cruiser. Enhanced communication arrays. Distinctive command spire. Asymmetric ice-blue design.",
+          "Frigate": "SMALL Breen patrol ship. Compact but still deliberately asymmetric. Cold blue tones.",
+          "Cruiser": "MEDIUM Breen warship. Distinctive asymmetric design with energy dampening weapon. Ice-blue with teal.",
+          "Battleship": "LARGE Breen warship. Heavily armed asymmetric hull. Multiple weapon arrays. Imposing ice-blue.",
+          "Dreadnought": "MASSIVE Breen dreadnought. Extreme asymmetric form. Bristling with energy dampener arrays."
+        },
+        "important": "Breen ships are deliberately ASYMMETRIC and mysterious-looking"
+      },
+      "civilian": {
+        "designLanguage": "Unknown - Breen are secretive",
+        "colors": "Ice blue, utilitarian"
+      }
+    },
+    "gorn": {
+      "military": {
+        "designLanguage": "REPTILIAN aesthetic, heavy armor, green/bronze",
+        "colors": "Dark green, bronze, scaled texture appearance",
+        "features": ["Heavy plasma weapons", "Thick armor", "Brutish design"],
+        "classVariants": {
+          "Vishap": "GORN VISHAP CLASS: Main combat cruiser. Heavy armored hull with SCALED TEXTURE. Prominent forward plasma weapons. Dark green/brown. Bulky, powerful silhouette.",
+          "Tuatara": "GORN TUATARA CLASS: Armored cruiser variant. Thick hull plating resembling reptilian SCALES. Multiple weapon mounts. Dark green. Compact and brutal.",
+          "Draguas": "GORN DRAGUAS CLASS: Fast heavy destroyer. More streamlined than cruisers but still massively armored. Powerful forward plasma array. Dark green/bronze.",
+          "Zilant": "GORN ZILANT CLASS: Battleship. MASSIVE armored warship. Multiple plasma cannon batteries. Thick reptilian hull plating like dragon scales. Dark green, heavy bronze accents.",
+          "Balaur": "GORN BALAUR CLASS: Dreadnought. LARGEST Gorn vessel. Multiple weapon pods giving HYDRA-like appearance. Enormous, brutally armored. Dark green.",
+          "Varanus": "GORN VARANUS CLASS: Support/repair vessel. Armored hull with medical and engineering bays. Slower but essential fleet support. Dark green.",
+          "Cruiser": "BULKY armored design, reptilian aesthetic. Reference: TOS Arena, SNW Gorn ships",
+          "Frigate": "SMALL but heavily armored Gorn patrol ship. Compact brutal design. Dark green.",
+          "Battleship": "LARGE Gorn battleship. Extremely heavy armor. Massive plasma arrays. Like a reptilian fortress.",
+          "Dreadnought": "MASSIVE Gorn dreadnought. Overwhelming firepower and armor. A mountain of weapons."
+        },
+        "important": "Gorn ships look HEAVY and ARMORED - like reptilian tanks"
+      }
+    },
+    "andorian": {
+      "military": {
+        "designLanguage": "SLEEK blue ships, antenna-like sensor arrays, elegant",
+        "colors": "Blue hull, white accents, ice-like appearance",
+        "features": ["Advanced sensors", "Fast and maneuverable", "Elegant design"],
+        "classVariants": {
+          "Kumari": "ANDORIAN KUMARI CLASS: SLEEK blue warship with prominent ANTENNA-like sensor structures extending from hull. Fast and agile. Reference: Enterprise era Andorian ships",
+          "Charal": "ANDORIAN CHARAL CLASS: Tactical escort variant. Enhanced weapons with antenna targeting arrays. Sleek blue hull. More aggressive than Kumari.",
+          "Khyzon": "ANDORIAN KHYZON CLASS: Heavy escort variant. Most heavily armed Andorian escort. Prominent antenna weapon arrays. Ice-blue hull.",
+          "Frigate": "SMALL Andorian patrol ship. Sleek compact blue hull. Antenna sensor arrays. Fast and maneuverable.",
+          "Cruiser": "MEDIUM Andorian cruiser. Elegant blue warship with antenna structures. Balanced firepower and speed.",
+          "Battleship": "LARGE Andorian battleship. Powerful blue warship with multiple antenna arrays. Heavy weapons but elegant.",
+          "Dreadnought": "MASSIVE Andorian dreadnought. Largest Imperial Guard vessel. Multiple antenna spires. Imposing ice-blue.",
+          "Carrier": "ANDORIAN carrier. Sleek blue hull with launch bays. Antenna coordination arrays."
+        }
+      }
+    },
+    "vulcan": {
+      "military": {
+        "designLanguage": "RING/CIRCULAR warp drive, logical geometric design, bronze/copper",
+        "colors": "Bronze, copper, reddish-brown hull",
+        "features": ["Circular warp ring", "Logical efficient design", "No unnecessary decoration"],
+        "classVariants": {
+          "D'Kyr": "VULCAN D'KYR CLASS: CIRCULAR WARP RING around central hull. Distinctive donut-shaped propulsion. Bronze color. Reference: Enterprise era",
+          "Suurok": "VULCAN SUUROK CLASS: Combat cruiser with ring warp drive. Bronze/copper. More weapons than typical Vulcan ships.",
+          "Sh'Raan": "VULCAN SH'RAAN CLASS: Large cruiser with ring warp design. Bronze hull. Imposing but logically designed.",
+          "Surak": "VULCAN SURAK CLASS: Named after the father of logic. Ring-nacelle cruiser. Bronze with copper details. Elegant efficiency.",
+          "T'Plana Hath": "VULCAN T'PLANA HATH TYPE: Early warp vessel design. Historical ship that made first contact with Earth. Ring warp configuration.",
+          "Frigate": "SMALL Vulcan defense ship. Compact bronze hull with small ring-shaped warp nacelle. Logical minimalist design.",
+          "Cruiser": "MEDIUM Vulcan cruiser. Bronze hull with prominent ring warp drive. Balanced and efficient.",
+          "Battleship": "LARGE Vulcan combat cruiser. Bronze/copper with large prominent ring warp drive. Ancient yet powerful.",
+          "Dreadnought": "MASSIVE Vulcan flagship. Enormous ring warp drive. Bronze/copper. Overwhelming logical precision."
+        },
+        "important": "Vulcan ships have distinctive RING-SHAPED warp drives - not nacelles"
+      }
+    }
+  },
+  "shipClasses": {
+    "military": [
+      { "id": "frigate", "name": "Frigate Escort", "size": "small", "role": "escort/patrol" },
+      { "id": "cruiser", "name": "Cruiser Combat", "size": "medium", "role": "main combat vessel" },
+      { "id": "battleship", "name": "Battleship Heavy", "size": "large", "role": "heavy assault" },
+      { "id": "carrier", "name": "Carrier Fighter", "size": "large", "role": "fighter deployment" },
+      { "id": "destroyer", "name": "Destroyer Fast", "size": "medium", "role": "fast attack" },
+      { "id": "dreadnought", "name": "Dreadnought Command", "size": "huge", "role": "fleet command" }
+    ],
+    "civilian": [
+      { "id": "transport", "name": "Transport Passenger", "size": "medium", "role": "passenger travel" },
+      { "id": "freighter", "name": "Freighter Cargo", "size": "large", "role": "cargo hauling" },
+      { "id": "shuttle", "name": "Shuttle Small", "size": "tiny", "role": "short range travel" },
+      { "id": "yacht", "name": "Yacht Luxury", "size": "small", "role": "private travel" },
+      { "id": "mining", "name": "Mining Ship Industrial", "size": "medium", "role": "resource extraction" },
+      { "id": "science", "name": "Science Vessel Research", "size": "medium", "role": "exploration/research" }
+    ]
+  },
+  "styleGuide": {
+    "material": "Claymation 3D style - handmade plasticine model look, matte hull surfaces",
+    "quality": "High-end stop-motion animation quality (Laika/Aardman style)",
+    "lighting": "Dramatic space lighting, engine glows, window lights",
+    "composition": "3/4 isometric view showing ship profile clearly",
+    "background": "Solid black (#000000) - deep space",
+    "critical": [
+      "Each faction has UNIQUE design language - no cross-contamination",
+      "Each ship CLASS within a faction has DISTINCT silhouette",
+      "Military ships have visible weapons",
+      "Civilian ships must NOT look like warships",
+      "Reference the SPECIFIC ship class, not just faction default"
+    ]
+  }
+}

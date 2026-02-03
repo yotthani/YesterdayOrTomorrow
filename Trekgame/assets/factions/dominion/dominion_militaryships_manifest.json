@@ -1,0 +1,268 @@
+{
+  "factionName": "Dominion",
+  "categoryName": "MilitaryShips",
+  "grid": {
+    "columns": 6,
+    "rows": 6,
+    "totalAssets": 36,
+    "cellSize": 360,
+    "spriteWidth": 2160,
+    "spriteHeight": 2160
+  },
+  "spriteSheetPath": "dominion_militaryships.png",
+  "generatedAt": "2026-02-01T22:15:01.372Z",
+  "assets": [
+    {
+      "row": 0,
+      "col": 0,
+      "name": "Jem\u0027Hadar Fighter",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 0,
+      "col": 1,
+      "name": "Jem\u0027Hadar Attack Ship",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 0,
+      "col": 2,
+      "name": "Jem\u0027Hadar Battle Cruiser",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 0,
+      "col": 3,
+      "name": "Jem\u0027Hadar Battleship",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 0,
+      "col": 4,
+      "name": "Jem\u0027Hadar Dreadnought",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 0,
+      "col": 5,
+      "name": "Jem\u0027Hadar Super Carrier",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 1,
+      "col": 0,
+      "name": "Jem\u0027Hadar Strike Ship",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 1,
+      "col": 1,
+      "name": "Jem\u0027Hadar Heavy Escort",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 1,
+      "col": 2,
+      "name": "Jem\u0027Hadar Vanguard",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 1,
+      "col": 3,
+      "name": "Jem\u0027Hadar Recon Ship",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 1,
+      "col": 4,
+      "name": "Dominion Battleship",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 1,
+      "col": 5,
+      "name": "Dominion Dreadnought",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 2,
+      "col": 0,
+      "name": "Dominion Command Ship",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 2,
+      "col": 1,
+      "name": "Dominion Flagship",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 2,
+      "col": 2,
+      "name": "Breen Warship Ally",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 2,
+      "col": 3,
+      "name": "Cardassian Galor Ally",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 2,
+      "col": 4,
+      "name": "Founder Vessel",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 2,
+      "col": 5,
+      "name": "Vorta Command Ship",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 3,
+      "col": 0,
+      "name": "Dominion Carrier",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 3,
+      "col": 1,
+      "name": "Dominion Heavy Cruiser",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 3,
+      "col": 2,
+      "name": "Dominion Strike Cruiser",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 3,
+      "col": 3,
+      "name": "Dominion Patrol Ship",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 3,
+      "col": 4,
+      "name": "Dominion Border Ship",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 3,
+      "col": 5,
+      "name": "Dominion Escort",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 4,
+      "col": 0,
+      "name": "Dominion Frigate",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 4,
+      "col": 1,
+      "name": "Dominion Destroyer",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 4,
+      "col": 2,
+      "name": "Dominion Interceptor",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 4,
+      "col": 3,
+      "name": "Dominion Scout",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 4,
+      "col": 4,
+      "name": "Dominion Probe",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 4,
+      "col": 5,
+      "name": "Dominion Fighter Wing",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 5,
+      "col": 0,
+      "name": "Dominion Bomber",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 5,
+      "col": 1,
+      "name": "Dominion Assault Ship",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 5,
+      "col": 2,
+      "name": "Dominion Troop Transport",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 5,
+      "col": 3,
+      "name": "Dominion Siege Ship",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 5,
+      "col": 4,
+      "name": "Dominion Mine Layer",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    },
+    {
+      "row": 5,
+      "col": 5,
+      "name": "Dominion Advanced Fighter",
+      "type": "MilitaryShips",
+      "promptUsed": ""
+    }
+  ]
+}

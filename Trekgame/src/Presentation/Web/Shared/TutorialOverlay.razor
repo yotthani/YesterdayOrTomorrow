@@ -1,0 +1,317 @@
+@using Blazored.LocalStorage
+@inject ILocalStorageService LocalStorage
+@inject NavigationManager Navigation
+
+@if (_showTutorial && _currentStep != null)
+{
+    <div class="tutorial-overlay">
+        <div class="tutorial-backdrop" @onclick="SkipTutorial"></div>
+        
+        @if (_currentStep.HighlightSelector != null)
+        {
+            <div class="tutorial-highlight" style="@GetHighlightStyle()"></div>
+        }
+        
+        <div class="tutorial-dialog @_currentStep.Position">
+            <div class="dialog-header">
+                <span class="step-indicator">Step @(_currentStepIndex + 1) of @_steps.Count</span>
+                <span class="dialog-title">@_currentStep.Title</span>
+            </div>
+            <div class="dialog-content">
+                <div class="dialog-icon">@_currentStep.Icon</div>
+                <p>@_currentStep.Content</p>
+                @if (_currentStep.Tips?.Any() == true)
+                {
+                    <ul class="dialog-tips">
+                        @foreach (var tip in _currentStep.Tips)
+                        {
+                            <li>@tip</li>
+                        }
+                    </ul>
+                }
+            </div>
+            <div class="dialog-footer">
+                @if (_currentStepIndex > 0)
+                {
+                    <button class="tutorial-btn secondary" @onclick="PreviousStep">← Back</button>
+                }
+                <button class="tutorial-btn skip" @onclick="SkipTutorial">Skip Tutorial</button>
+                @if (_currentStepIndex < _steps.Count - 1)
+                {
+                    <button class="tutorial-btn primary" @onclick="NextStep">Next →</button>
+                }
+                else
+                {
+                    <button class="tutorial-btn primary" @onclick="CompleteTutorial">🚀 Start Playing!</button>
+                }
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: @((_currentStepIndex + 1) * 100 / _steps.Count)%"></div>
+            </div>
+        </div>
+    </div>
+}
+
+<style>
+    .tutorial-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        pointer-events: auto;
+    }
+    .tutorial-backdrop {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.7);
+    }
+    .tutorial-highlight {
+        position: absolute;
+        border: 3px solid #ff9900;
+        border-radius: 8px;
+        box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.7), 0 0 20px #ff9900;
+        pointer-events: none;
+        animation: pulse-highlight 2s infinite;
+    }
+    @@keyframes pulse-highlight {
+        0%, 100% { box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.7), 0 0 20px #ff9900; }
+        50% { box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.7), 0 0 40px #ff9900; }
+    }
+    .tutorial-dialog {
+        position: absolute;
+        width: 420px;
+        background: linear-gradient(180deg, rgba(20, 30, 50, 0.98) 0%, rgba(10, 15, 25, 0.98) 100%);
+        border: 2px solid #ff9900;
+        border-radius: 12px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+        overflow: hidden;
+    }
+    .tutorial-dialog.center { top: 50%; left: 50%; transform: translate(-50%, -50%); }
+    .tutorial-dialog.top-right { top: 100px; right: 40px; }
+    .tutorial-dialog.top-left { top: 100px; left: 40px; }
+    .tutorial-dialog.bottom-right { bottom: 100px; right: 40px; }
+    .tutorial-dialog.bottom-left { bottom: 100px; left: 40px; }
+    
+    .dialog-header {
+        padding: 16px 20px;
+        background: rgba(255, 153, 0, 0.1);
+        border-bottom: 1px solid rgba(255, 153, 0, 0.3);
+    }
+    .step-indicator {
+        display: block;
+        font-size: 10px;
+        color: #7890a8;
+        letter-spacing: 1px;
+        margin-bottom: 4px;
+    }
+    .dialog-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #ff9900;
+    }
+    .dialog-content {
+        padding: 20px;
+    }
+    .dialog-icon {
+        font-size: 48px;
+        text-align: center;
+        margin-bottom: 16px;
+    }
+    .dialog-content p {
+        font-size: 14px;
+        line-height: 1.6;
+        color: #c8d4e8;
+        margin: 0;
+    }
+    .dialog-tips {
+        margin-top: 16px;
+        padding-left: 20px;
+    }
+    .dialog-tips li {
+        font-size: 12px;
+        color: #7890a8;
+        margin: 6px 0;
+    }
+    .dialog-footer {
+        display: flex;
+        gap: 10px;
+        padding: 16px 20px;
+        background: rgba(0, 0, 0, 0.2);
+    }
+    .tutorial-btn {
+        padding: 10px 20px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.15s;
+    }
+    .tutorial-btn.primary {
+        background: linear-gradient(180deg, #ff9900, #cc7700);
+        border: none;
+        color: #000;
+        margin-left: auto;
+    }
+    .tutorial-btn.primary:hover { background: linear-gradient(180deg, #ffaa22, #dd8800); }
+    .tutorial-btn.secondary {
+        background: transparent;
+        border: 1px solid rgba(255, 153, 0, 0.5);
+        color: #ff9900;
+    }
+    .tutorial-btn.secondary:hover { background: rgba(255, 153, 0, 0.1); }
+    .tutorial-btn.skip {
+        background: transparent;
+        border: 1px solid rgba(120, 144, 168, 0.5);
+        color: #7890a8;
+    }
+    .tutorial-btn.skip:hover { background: rgba(120, 144, 168, 0.1); }
+    .progress-bar {
+        height: 4px;
+        background: rgba(255, 153, 0, 0.2);
+    }
+    .progress-fill {
+        height: 100%;
+        background: #ff9900;
+        transition: width 0.3s;
+    }
+</style>
+
+@code {
+    private bool _showTutorial;
+    private int _currentStepIndex;
+    private TutorialStep? _currentStep => _steps.ElementAtOrDefault(_currentStepIndex);
+    private List<TutorialStep> _steps = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var hasSeenTutorial = await LocalStorage.GetItemAsync<bool>("hasSeenTutorial");
+        _showTutorial = !hasSeenTutorial;
+        
+        InitializeSteps();
+    }
+
+    private void InitializeSteps()
+    {
+        _steps = new List<TutorialStep>
+        {
+            new()
+            {
+                Title = "Welcome to Galactic Strategy!",
+                Icon = "🌌",
+                Content = "Take command of your faction and lead them to galactic dominance. Explore strange new worlds, build powerful fleets, and forge your empire among the stars.",
+                Position = "center"
+            },
+            new()
+            {
+                Title = "The Galaxy Map",
+                Icon = "🗺️",
+                Content = "This is your window to the galaxy. Each point represents a star system that may contain planets, resources, and opportunities for expansion.",
+                Tips = new[] { "Scroll to zoom in/out", "Click and drag to pan", "Click a system to select it" },
+                Position = "top-right",
+                HighlightSelector = ".galaxy-canvas-container"
+            },
+            new()
+            {
+                Title = "Your Fleets",
+                Icon = "🚀",
+                Content = "Fleets are your instruments of exploration and conquest. Use them to explore new systems, defend your colonies, and engage enemies.",
+                Tips = new[] { "Select a fleet and click a system to move", "Fleets take several turns to travel", "Multiple ships form stronger fleets" },
+                Position = "top-left",
+                HighlightSelector = ".outliner-fleets"
+            },
+            new()
+            {
+                Title = "Resources",
+                Icon = "💎",
+                Content = "Manage your empire's resources carefully. Credits fund your operations, while Dilithium and Duranium are essential for ship construction.",
+                Tips = new[] { "Build resource facilities to increase income", "Balance expansion with maintenance costs" },
+                Position = "top-right",
+                HighlightSelector = ".resources-bar"
+            },
+            new()
+            {
+                Title = "Research",
+                Icon = "🔬",
+                Content = "Advance your technology to unlock new ships, buildings, and abilities. Choose your research path wisely to gain strategic advantages.",
+                Tips = new[] { "Focus on military or economy based on your strategy", "Some techs have prerequisites" },
+                Position = "center"
+            },
+            new()
+            {
+                Title = "Diplomacy",
+                Icon = "🤝",
+                Content = "You're not alone in the galaxy. Other factions will compete for the same resources and territory. Form alliances, negotiate treaties, or declare war!",
+                Tips = new[] { "Trade agreements provide mutual benefits", "Watch faction relations carefully" },
+                Position = "center"
+            },
+            new()
+            {
+                Title = "Turn System",
+                Icon = "⏱️",
+                Content = "Galactic Strategy is turn-based. Issue orders to your fleets and colonies, then end your turn to see results. AI factions will also take their turns.",
+                Tips = new[] { "Review all pending orders before ending turn", "Combat resolves automatically" },
+                Position = "bottom-right",
+                HighlightSelector = ".end-turn-btn"
+            },
+            new()
+            {
+                Title = "You're Ready!",
+                Icon = "⭐",
+                Content = "You now know the basics. Start by exploring nearby systems, establishing new colonies, and building up your fleet. Good luck, Commander!",
+                Tips = new[] { "Press F1 anytime for help", "Hover over elements for tooltips" },
+                Position = "center"
+            }
+        };
+    }
+
+    private void NextStep()
+    {
+        if (_currentStepIndex < _steps.Count - 1)
+        {
+            _currentStepIndex++;
+        }
+    }
+
+    private void PreviousStep()
+    {
+        if (_currentStepIndex > 0)
+        {
+            _currentStepIndex--;
+        }
+    }
+
+    private async Task SkipTutorial()
+    {
+        await LocalStorage.SetItemAsync("hasSeenTutorial", true);
+        _showTutorial = false;
+    }
+
+    private async Task CompleteTutorial()
+    {
+        await LocalStorage.SetItemAsync("hasSeenTutorial", true);
+        _showTutorial = false;
+    }
+
+    private string GetHighlightStyle()
+    {
+        // In a full implementation, this would use JS to get the element's position
+        // For now, return empty style - the highlight would need JS interop
+        return "";
+    }
+
+    public void ShowTutorial()
+    {
+        _currentStepIndex = 0;
+        _showTutorial = true;
+        StateHasChanged();
+    }
+
+    private class TutorialStep
+    {
+        public string Title { get; set; } = "";
+        public string Icon { get; set; } = "";
+        public string Content { get; set; } = "";
+        public string[]? Tips { get; set; }
+        public string Position { get; set; } = "center";
+        public string? HighlightSelector { get; set; }
+    }
+}

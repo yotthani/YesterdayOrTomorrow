@@ -1,0 +1,933 @@
+@page "/game/exploration/{SystemId:guid}"
+@inject HttpClient Http
+@inject NavigationManager Nav
+
+<div class="system-exploration @GetFactionClass()">
+    <div class="system-header">
+        <button class="btn-back" @onclick="GoBack">← Back to Galaxy</button>
+        <div class="system-title">
+            <h1>@_system?.Name</h1>
+            <span class="star-type">@_system?.StarType Star System</span>
+        </div>
+        <div class="system-status">
+            @if (_system?.IsDeepScanned == true)
+            {
+                <span class="scan-badge deep">Deep Scanned</span>
+            }
+            else if (_system?.IsScanned == true)
+            {
+                <span class="scan-badge basic">Scanned</span>
+            }
+            else
+            {
+                <span class="scan-badge unknown">Unexplored</span>
+            }
+        </div>
+    </div>
+
+    @if (_loading)
+    {
+        <div class="loading">Analyzing system data...</div>
+    }
+    else
+    {
+        <div class="system-content">
+            <!-- System Overview -->
+            <div class="panel system-overview">
+                <div class="system-visual">
+                    <div class="star @_system?.StarType.ToLower()"></div>
+                    @for (int i = 0; i < (_system?.Planets.Count ?? 0); i++)
+                    {
+                        var planet = _system!.Planets[i];
+                        <div class="orbit" style="--orbit-size: @((i + 1) * 60 + 80)px">
+                            <div class="planet @planet.Type.ToLower()" 
+                                 title="@planet.Name"
+                                 @onclick="() => SelectPlanet(planet)">
+                                @if (planet.HasColony)
+                                {
+                                    <div class="colony-indicator"></div>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <div class="system-info">
+                    <div class="info-row">
+                        <span class="label">Planets:</span>
+                        <span class="value">@_system?.Planets.Count</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Danger Level:</span>
+                        <span class="value danger-@_system?.DangerLevel.ToLower()">@_system?.DangerLevel</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Controlling:</span>
+                        <span class="value">@(_system?.ControllingFaction ?? "Unclaimed")</span>
+                    </div>
+                </div>
+
+                @if (_fleetInSystem != null)
+                {
+                    <div class="fleet-actions">
+                        <h3>Fleet Actions</h3>
+                        @if (!_system?.IsScanned == true)
+                        {
+                            <button class="btn-action scan" @onclick="ScanSystem">
+                                🔍 Scan System
+                            </button>
+                        }
+                        else if (!_system?.IsDeepScanned == true)
+                        {
+                            <button class="btn-action deep-scan" @onclick="DeepScanSystem" 
+                                    disabled="@(!_hasScienceVessel)">
+                                🔬 Deep Scan
+                                @if (!_hasScienceVessel)
+                                {
+                                    <span class="requirement">(Requires Science Vessel)</span>
+                                }
+                            </button>
+                        }
+                    </div>
+                }
+            </div>
+
+            <!-- Planets Panel -->
+            <div class="panel planets-panel">
+                <h2>🌍 Planets</h2>
+                
+                @if (_system?.Planets.Any() == true)
+                {
+                    <div class="planets-grid">
+                        @foreach (var planet in _system.Planets)
+                        {
+                            <div class="planet-card @(planet == _selectedPlanet ? "selected" : "")"
+                                 @onclick="() => SelectPlanet(planet)">
+                                <div class="planet-header">
+                                    <span class="planet-name">@planet.Name</span>
+                                    <span class="planet-type @planet.Type.ToLower()">@planet.Type</span>
+                                </div>
+                                
+                                <div class="planet-stats">
+                                    <div class="stat">
+                                        <span class="label">Size:</span>
+                                        <span class="value">@planet.Size (@planet.Slots slots)</span>
+                                    </div>
+                                    <div class="stat">
+                                        <span class="label">Habitability:</span>
+                                        <span class="value @GetHabitabilityClass(planet.Habitability)">@planet.Habitability%</span>
+                                    </div>
+                                </div>
+
+                                @if (planet.Features.Any())
+                                {
+                                    <div class="planet-features">
+                                        @foreach (var feature in planet.Features)
+                                        {
+                                            <span class="feature @feature.Type.ToLower()">@feature.Name</span>
+                                        }
+                                    </div>
+                                }
+
+                                <div class="planet-resources">
+                                    @if (planet.HasDilithium)
+                                    {
+                                        <span class="resource strategic">💎 Dilithium</span>
+                                    }
+                                    @if (planet.HasDeuterium)
+                                    {
+                                        <span class="resource strategic">🔷 Deuterium</span>
+                                    }
+                                    @if (planet.MineralsBonus != 0)
+                                    {
+                                        <span class="resource @(planet.MineralsBonus > 0 ? "positive" : "negative")">
+                                            🔩 @(planet.MineralsBonus > 0 ? "+" : "")@planet.MineralsBonus%
+                                        </span>
+                                    }
+                                </div>
+
+                                @if (planet.HasColony)
+                                {
+                                    <button class="btn-colony" @onclick="() => GoToColony(planet.ColonyId)">
+                                        View Colony
+                                    </button>
+                                }
+                                else if (planet.Habitability >= 40)
+                                {
+                                    <button class="btn-colonize" @onclick="() => ColonizePlanet(planet)">
+                                        Colonize
+                                    </button>
+                                }
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p class="no-data">No planets detected. Perform a scan to reveal system contents.</p>
+                }
+            </div>
+
+            <!-- Anomalies Panel -->
+            <div class="panel anomalies-panel">
+                <h2>🔮 Anomalies</h2>
+
+                @if (_anomalies.Any())
+                {
+                    <div class="anomalies-list">
+                        @foreach (var anomaly in _anomalies)
+                        {
+                            <div class="anomaly-card @anomaly.Category.ToLower() @(anomaly.IsResearched ? "researched" : "")">
+                                <div class="anomaly-header">
+                                    <span class="anomaly-icon">@GetAnomalyIcon(anomaly.Category)</span>
+                                    <span class="anomaly-name">@anomaly.Name</span>
+                                    <span class="anomaly-category">@anomaly.Category</span>
+                                </div>
+
+                                @if (!anomaly.IsResearched)
+                                {
+                                    <div class="research-progress">
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" style="width: @anomaly.ProgressPercent%"></div>
+                                        </div>
+                                        <span class="progress-text">@anomaly.Progress / @anomaly.Required</span>
+                                    </div>
+
+                                    @if (_fleetInSystem != null && _hasScienceVessel)
+                                    {
+                                        <button class="btn-research" @onclick="() => ResearchAnomaly(anomaly.Id)">
+                                            🔬 Research (+@_researchPower)
+                                        </button>
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="anomaly-rewards">
+                                        <span class="completed">✅ Researched</span>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                }
+                else if (_system?.IsScanned == true)
+                {
+                    <p class="no-data">No anomalies detected in this system.</p>
+                }
+                else
+                {
+                    <p class="no-data">Scan the system to detect anomalies.</p>
+                }
+            </div>
+        </div>
+    }
+
+    <!-- Scan Result Modal -->
+    @if (_showScanResult)
+    {
+        <div class="modal-overlay" @onclick="CloseScanResult">
+            <div class="modal scan-result" @onclick:stopPropagation="true">
+                <h2>@(_scanResult?.Success == true ? "✅ Scan Complete" : "❌ Scan Failed")</h2>
+                
+                <p class="result-message">@_scanResult?.Message</p>
+
+                @if (_scanResult?.PlanetsDiscovered > 0)
+                {
+                    <div class="result-item">
+                        <span>🌍 Planets Discovered:</span>
+                        <span>@_scanResult.PlanetsDiscovered</span>
+                    </div>
+                }
+
+                @if (_scanResult?.AnomalyDiscovered == true)
+                {
+                    <div class="result-item highlight">
+                        <span>🔮 Anomaly Detected:</span>
+                        <span>@_scanResult.AnomalyName</span>
+                    </div>
+                }
+
+                @if (_scanResult?.StrategicResourcesFound > 0)
+                {
+                    <div class="result-item strategic">
+                        <span>💎 Strategic Resources Found:</span>
+                        <span>@_scanResult.StrategicResourcesFound</span>
+                    </div>
+                }
+
+                @if (_scanResult?.ResearchGained > 0)
+                {
+                    <div class="result-item research">
+                        <span>🔬 Research Gained:</span>
+                        <span>+@_scanResult.ResearchGained</span>
+                    </div>
+                }
+
+                @if (_scanResult?.DangerEncountered == true)
+                {
+                    <div class="result-item danger">
+                        <span>⚠️ Warning:</span>
+                        <span>Hazardous conditions encountered!</span>
+                    </div>
+                }
+
+                <button class="btn-close" @onclick="CloseScanResult">Continue</button>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    .system-exploration {
+        min-height: 100vh;
+        padding: 20px;
+        background: linear-gradient(135deg, #05051a 0%, #0a0a2a 100%);
+        color: white;
+    }
+
+    .system-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        padding: 15px 20px;
+        background: rgba(0,0,0,0.4);
+        border-radius: 10px;
+    }
+
+    .system-title h1 {
+        margin: 0;
+    }
+
+    .star-type {
+        color: #888;
+    }
+
+    .scan-badge {
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-size: 0.9em;
+        font-weight: bold;
+    }
+
+    .scan-badge.deep { background: #27ae60; }
+    .scan-badge.basic { background: #f39c12; }
+    .scan-badge.unknown { background: #7f8c8d; }
+
+    .system-content {
+        display: grid;
+        grid-template-columns: 400px 1fr;
+        grid-template-rows: auto 1fr;
+        gap: 20px;
+    }
+
+    .panel {
+        background: rgba(0,0,0,0.4);
+        border-radius: 15px;
+        padding: 20px;
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .system-overview {
+        grid-row: span 2;
+    }
+
+    .system-visual {
+        position: relative;
+        height: 350px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .star {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        position: absolute;
+        z-index: 10;
+        box-shadow: 0 0 40px currentColor;
+    }
+
+    .star.yellow { background: #f1c40f; color: #f1c40f; }
+    .star.orange { background: #e67e22; color: #e67e22; }
+    .star.red { background: #c0392b; color: #c0392b; }
+    .star.blue { background: #3498db; color: #3498db; }
+    .star.white { background: #ecf0f1; color: #ecf0f1; }
+
+    .orbit {
+        position: absolute;
+        width: var(--orbit-size);
+        height: var(--orbit-size);
+        border: 1px dashed rgba(255,255,255,0.2);
+        border-radius: 50%;
+        animation: rotate 20s linear infinite;
+    }
+
+    @@keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    .planet {
+        position: absolute;
+        top: -8px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+
+    .planet:hover {
+        transform: translateX(-50%) scale(1.5);
+    }
+
+    .planet.continental { background: #3498db; }
+    .planet.ocean { background: #2980b9; }
+    .planet.desert { background: #d35400; }
+    .planet.arctic { background: #bdc3c7; }
+    .planet.tropical { background: #27ae60; }
+    .planet.barren { background: #7f8c8d; }
+    .planet.gasgiant { background: #9b59b6; width: 24px; height: 24px; }
+
+    .colony-indicator {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        width: 8px;
+        height: 8px;
+        background: #2ecc71;
+        border-radius: 50%;
+        box-shadow: 0 0 5px #2ecc71;
+    }
+
+    .system-info {
+        margin-top: 20px;
+        padding: 15px;
+        background: rgba(255,255,255,0.05);
+        border-radius: 10px;
+    }
+
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .info-row:last-child {
+        border-bottom: none;
+    }
+
+    .danger-safe { color: #2ecc71; }
+    .danger-moderate { color: #f39c12; }
+    .danger-dangerous { color: #e67e22; }
+    .danger-extreme { color: #e74c3c; }
+    .danger-forbidden { color: #9b59b6; }
+
+    .fleet-actions {
+        margin-top: 20px;
+    }
+
+    .btn-action {
+        width: 100%;
+        padding: 15px;
+        margin-top: 10px;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 1.1em;
+        color: white;
+        transition: all 0.2s;
+    }
+
+    .btn-action.scan { background: #3498db; }
+    .btn-action.deep-scan { background: #9b59b6; }
+    .btn-action:hover { transform: translateY(-2px); }
+    .btn-action:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .requirement {
+        display: block;
+        font-size: 0.8em;
+        opacity: 0.8;
+    }
+
+    .planets-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 15px;
+    }
+
+    .planet-card {
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 10px;
+        padding: 15px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .planet-card:hover, .planet-card.selected {
+        border-color: #3498db;
+        background: rgba(52, 152, 219, 0.1);
+    }
+
+    .planet-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .planet-name {
+        font-weight: bold;
+    }
+
+    .planet-type {
+        padding: 3px 10px;
+        border-radius: 10px;
+        font-size: 0.8em;
+    }
+
+    .planet-type.continental { background: rgba(52, 152, 219, 0.3); }
+    .planet-type.desert { background: rgba(211, 84, 0, 0.3); }
+    .planet-type.arctic { background: rgba(189, 195, 199, 0.3); }
+    .planet-type.tropical { background: rgba(39, 174, 96, 0.3); }
+    .planet-type.gasgiant { background: rgba(155, 89, 182, 0.3); }
+
+    .planet-stats .stat {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.9em;
+        padding: 3px 0;
+    }
+
+    .planet-stats .label { color: #888; }
+
+    .planet-features {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin: 10px 0;
+    }
+
+    .feature {
+        padding: 3px 8px;
+        border-radius: 10px;
+        font-size: 0.75em;
+        background: rgba(255,255,255,0.1);
+    }
+
+    .feature.positive { background: rgba(46, 204, 113, 0.2); color: #2ecc71; }
+    .feature.negative { background: rgba(231, 76, 60, 0.2); color: #e74c3c; }
+
+    .planet-resources {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 10px;
+    }
+
+    .resource {
+        font-size: 0.85em;
+    }
+
+    .resource.strategic { color: #9b59b6; }
+    .resource.positive { color: #2ecc71; }
+    .resource.negative { color: #e74c3c; }
+
+    .btn-colony, .btn-colonize {
+        width: 100%;
+        padding: 8px;
+        margin-top: 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .btn-colony { background: #3498db; color: white; }
+    .btn-colonize { background: #27ae60; color: white; }
+
+    .anomalies-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .anomaly-card {
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 10px;
+        padding: 15px;
+    }
+
+    .anomaly-card.scientific { border-left: 3px solid #3498db; }
+    .anomaly-card.archaeological { border-left: 3px solid #f39c12; }
+    .anomaly-card.biological { border-left: 3px solid #27ae60; }
+    .anomaly-card.dangerous { border-left: 3px solid #e74c3c; }
+    .anomaly-card.precursor { border-left: 3px solid #9b59b6; }
+
+    .anomaly-card.researched {
+        opacity: 0.6;
+    }
+
+    .anomaly-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+
+    .anomaly-icon {
+        font-size: 1.5em;
+    }
+
+    .anomaly-name {
+        flex: 1;
+        font-weight: bold;
+    }
+
+    .anomaly-category {
+        font-size: 0.8em;
+        color: #888;
+    }
+
+    .research-progress {
+        margin: 10px 0;
+    }
+
+    .progress-bar {
+        height: 8px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: #3498db;
+        transition: width 0.3s;
+    }
+
+    .progress-text {
+        display: block;
+        text-align: right;
+        font-size: 0.85em;
+        color: #888;
+        margin-top: 5px;
+    }
+
+    .btn-research {
+        width: 100%;
+        padding: 10px;
+        background: #9b59b6;
+        border: none;
+        border-radius: 5px;
+        color: white;
+        cursor: pointer;
+    }
+
+    .no-data {
+        color: #888;
+        text-align: center;
+        padding: 30px;
+    }
+
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.85);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+
+    .modal {
+        background: #1a1a2e;
+        border-radius: 15px;
+        padding: 25px;
+        max-width: 450px;
+        width: 90%;
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .modal h2 {
+        margin-top: 0;
+    }
+
+    .result-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px;
+        margin: 10px 0;
+        background: rgba(255,255,255,0.05);
+        border-radius: 8px;
+    }
+
+    .result-item.highlight { background: rgba(155, 89, 182, 0.2); }
+    .result-item.strategic { background: rgba(155, 89, 182, 0.2); }
+    .result-item.research { background: rgba(52, 152, 219, 0.2); }
+    .result-item.danger { background: rgba(231, 76, 60, 0.2); color: #e74c3c; }
+
+    .btn-close, .btn-back {
+        padding: 12px 20px;
+        background: #3498db;
+        border: none;
+        border-radius: 8px;
+        color: white;
+        cursor: pointer;
+        width: 100%;
+        margin-top: 15px;
+    }
+
+    .btn-back {
+        width: auto;
+        background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .panel h2 {
+        margin-top: 0;
+        padding-bottom: 15px;
+        border-bottom: 1px solid rgba(255,255,255,0.2);
+    }
+
+    @@media (max-width: 900px) {
+        .system-content {
+            grid-template-columns: 1fr;
+        }
+        .system-overview {
+            grid-row: auto;
+        }
+    }
+</style>
+
+@code {
+    [Parameter]
+    public Guid SystemId { get; set; }
+
+    private bool _loading = true;
+    private SystemDisplay? _system;
+    private List<AnomalyDisplay> _anomalies = new();
+    private PlanetDisplay? _selectedPlanet;
+    private FleetDisplay? _fleetInSystem;
+    private bool _hasScienceVessel = true;
+    private int _researchPower = 25;
+
+    private bool _showScanResult = false;
+    private ScanResultDisplay? _scanResult;
+
+    private string _factionId = "federation";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadSystemData();
+    }
+
+    private async Task LoadSystemData()
+    {
+        _loading = true;
+        try
+        {
+            // Mock data
+            _system = new SystemDisplay
+            {
+                Id = SystemId,
+                Name = "Alpha Centauri",
+                StarType = "Yellow",
+                DangerLevel = "Moderate",
+                IsScanned = true,
+                IsDeepScanned = false,
+                ControllingFaction = "Federation",
+                Planets = new List<PlanetDisplay>
+                {
+                    new() { Id = Guid.NewGuid(), Name = "Alpha Centauri I", Type = "Desert", Size = "Medium", Slots = 12, Habitability = 45, MineralsBonus = 20 },
+                    new() { Id = Guid.NewGuid(), Name = "Alpha Centauri II", Type = "Continental", Size = "Large", Slots = 16, Habitability = 85, HasColony = true, ColonyId = Guid.NewGuid() },
+                    new() { Id = Guid.NewGuid(), Name = "Alpha Centauri III", Type = "Arctic", Size = "Small", Slots = 8, Habitability = 35, HasDeuterium = true },
+                    new() { Id = Guid.NewGuid(), Name = "Alpha Centauri IV", Type = "GasGiant", Size = "Huge", Slots = 0, Habitability = 0, HasDeuterium = true }
+                }
+            };
+
+            _anomalies = new List<AnomalyDisplay>
+            {
+                new() { Id = Guid.NewGuid(), Name = "Unusual Sensor Readings", Category = "Scientific", Progress = 45, Required = 100, IsResearched = false },
+                new() { Id = Guid.NewGuid(), Name = "Ancient Ruins", Category = "Archaeological", Progress = 0, Required = 150, IsResearched = false }
+            };
+
+            _fleetInSystem = new FleetDisplay { Id = Guid.NewGuid(), Name = "1st Exploration Fleet" };
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading system: {ex.Message}");
+        }
+        _loading = false;
+    }
+
+    private void GoBack() => Nav.NavigateTo("/game/galaxy");
+    private string GetFactionClass() => _factionId.ToLower();
+
+    private string GetHabitabilityClass(int hab) => hab switch
+    {
+        >= 70 => "high",
+        >= 40 => "medium",
+        _ => "low"
+    };
+
+    private string GetAnomalyIcon(string category) => category.ToLower() switch
+    {
+        "scientific" => "🔬",
+        "archaeological" => "🏛️",
+        "biological" => "🧬",
+        "dangerous" => "⚠️",
+        "precursor" => "✨",
+        _ => "❓"
+    };
+
+    private void SelectPlanet(PlanetDisplay planet)
+    {
+        _selectedPlanet = planet;
+    }
+
+    private void GoToColony(Guid? colonyId)
+    {
+        if (colonyId.HasValue)
+            Nav.NavigateTo($"/game/colony/{colonyId}");
+    }
+
+    private void ColonizePlanet(PlanetDisplay planet)
+    {
+        // Would show colonization modal
+    }
+
+    private async Task ScanSystem()
+    {
+        _scanResult = new ScanResultDisplay
+        {
+            Success = true,
+            Message = "System scan complete. Planetary data acquired.",
+            PlanetsDiscovered = 4,
+            AnomalyDiscovered = true,
+            AnomalyName = "Unusual Energy Signature"
+        };
+        _showScanResult = true;
+        
+        if (_system != null)
+            _system.IsScanned = true;
+    }
+
+    private async Task DeepScanSystem()
+    {
+        await Task.Delay(500);
+        _scanResult = new ScanResultDisplay
+        {
+            Success = true,
+            Message = "Deep scan reveals hidden secrets of this system!",
+            PlanetsDiscovered = 0,
+            AnomalyDiscovered = true,
+            AnomalyName = "Ancient Ruins",
+            StrategicResourcesFound = 1,
+            ResearchGained = 50
+        };
+        _showScanResult = true;
+
+        if (_system != null)
+            _system.IsDeepScanned = true;
+    }
+
+    private async Task ResearchAnomaly(Guid anomalyId)
+    {
+        var anomaly = _anomalies.FirstOrDefault(a => a.Id == anomalyId);
+        if (anomaly != null)
+        {
+            anomaly.Progress += _researchPower;
+            if (anomaly.Progress >= anomaly.Required)
+            {
+                anomaly.IsResearched = true;
+                _scanResult = new ScanResultDisplay
+                {
+                    Success = true,
+                    Message = $"Research of {anomaly.Name} complete!",
+                    ResearchGained = 100
+                };
+                _showScanResult = true;
+            }
+        }
+    }
+
+    private void CloseScanResult()
+    {
+        _showScanResult = false;
+        _scanResult = null;
+    }
+
+    // Display classes
+    public class SystemDisplay
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; } = "";
+        public string StarType { get; set; } = "";
+        public string DangerLevel { get; set; } = "";
+        public bool IsScanned { get; set; }
+        public bool IsDeepScanned { get; set; }
+        public string? ControllingFaction { get; set; }
+        public List<PlanetDisplay> Planets { get; set; } = new();
+    }
+
+    public class PlanetDisplay
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; } = "";
+        public string Type { get; set; } = "";
+        public string Size { get; set; } = "";
+        public int Slots { get; set; }
+        public int Habitability { get; set; }
+        public int MineralsBonus { get; set; }
+        public bool HasDilithium { get; set; }
+        public bool HasDeuterium { get; set; }
+        public bool HasColony { get; set; }
+        public Guid? ColonyId { get; set; }
+        public List<FeatureDisplay> Features { get; set; } = new();
+    }
+
+    public class FeatureDisplay
+    {
+        public string Name { get; set; } = "";
+        public string Type { get; set; } = "";
+    }
+
+    public class AnomalyDisplay
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; } = "";
+        public string Category { get; set; } = "";
+        public int Progress { get; set; }
+        public int Required { get; set; }
+        public bool IsResearched { get; set; }
+        public int ProgressPercent => Required > 0 ? (Progress * 100 / Required) : 0;
+    }
+
+    public class FleetDisplay
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; } = "";
+    }
+
+    public class ScanResultDisplay
+    {
+        public bool Success { get; set; }
+        public string Message { get; set; } = "";
+        public int PlanetsDiscovered { get; set; }
+        public bool AnomalyDiscovered { get; set; }
+        public string AnomalyName { get; set; } = "";
+        public int StrategicResourcesFound { get; set; }
+        public int ResearchGained { get; set; }
+        public bool DangerEncountered { get; set; }
+    }
+}

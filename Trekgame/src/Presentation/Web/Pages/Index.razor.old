@@ -1,0 +1,1848 @@
+@page "/"
+@using MudBlazor
+@using StarTrekGame.Web.Services
+@using Blazored.LocalStorage
+@inject IGameApiClient Api
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+@inject ILocalStorageService LocalStorage
+
+<PageTitle>Galactic Strategy</PageTitle>
+
+<div class="main-menu">
+    @* Dynamic Animated Galaxy Background *@
+    <div class="galaxy-backdrop">
+        @* Deep space gradient *@
+        <div class="space-depth"></div>
+        
+        @* Nebula layers *@
+        <div class="nebula-layer">
+            <div class="nebula n1"></div>
+            <div class="nebula n2"></div>
+            <div class="nebula n3"></div>
+            <div class="nebula n4"></div>
+            <div class="nebula n5"></div>
+        </div>
+        
+        @* Parallax star layers *@
+        <div class="star-layer layer-far"></div>
+        <div class="star-layer layer-mid"></div>
+        <div class="star-layer layer-near"></div>
+        
+        @* SVG Galaxy Map with stars and connections *@
+        <svg class="galaxy-map-svg" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
+            <defs>
+                @* Star glow filter *@
+                <filter id="starGlow" x="-50%" y="-50%" width="200%" height="200%">
+                    <feGaussianBlur stdDeviation="2" result="blur"/>
+                    <feMerge>
+                        <feMergeNode in="blur"/>
+                        <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                </filter>
+                
+                @* Explosion glow *@
+                <filter id="explosionGlow" x="-100%" y="-100%" width="300%" height="300%">
+                    <feGaussianBlur stdDeviation="8" result="blur"/>
+                    <feMerge>
+                        <feMergeNode in="blur"/>
+                        <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                </filter>
+                
+                @* Warp trail gradient *@
+                <linearGradient id="warpTrail" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="transparent"/>
+                    <stop offset="50%" stop-color="#4488ff"/>
+                    <stop offset="100%" stop-color="transparent"/>
+                </linearGradient>
+                
+                @* Phaser beam gradient *@
+                <linearGradient id="phaserBeam" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#ff8800"/>
+                    <stop offset="50%" stop-color="#ffcc00"/>
+                    <stop offset="100%" stop-color="#ff8800"/>
+                </linearGradient>
+                
+                @* Torpedo gradient *@
+                <radialGradient id="torpedoGlow">
+                    <stop offset="0%" stop-color="#ff4444"/>
+                    <stop offset="50%" stop-color="#ff0000"/>
+                    <stop offset="100%" stop-color="transparent"/>
+                </radialGradient>
+            </defs>
+            
+            @* Hyperlane connections *@
+            <g class="hyperlanes" opacity="0.15">
+                @foreach (var lane in _hyperlanes)
+                {
+                    <line x1="@lane.X1" y1="@lane.Y1" x2="@lane.X2" y2="@lane.Y2" 
+                          stroke="#4488ff" stroke-width="1"/>
+                }
+            </g>
+            
+            @* Star systems *@
+            <g class="star-systems">
+                @foreach (var star in _backgroundStars)
+                {
+                    <g class="star-system" transform="translate(@star.X, @star.Y)">
+                        @* Star glow *@
+                        <circle r="@(star.Size * 3)" fill="@star.Color" opacity="0.2" filter="url(#starGlow)"/>
+                        @* Star core *@
+                        <circle r="@star.Size" fill="@star.Color" class="@star.AnimationClass"/>
+                        @* Territorial ring for major systems *@
+                        @if (star.HasTerritory)
+                        {
+                            <circle r="@(star.Size * 5)" fill="none" stroke="@star.TerritoryColor" 
+                                    stroke-width="1" opacity="0.3" stroke-dasharray="2,2"
+                                    class="territory-ring"/>
+                        }
+                    </g>
+                }
+            </g>
+            
+            @* Dynamic events container - populated by JS *@
+            <g class="dynamic-events" id="dynamicEvents">
+            </g>
+        </svg>
+        
+        @* Ambient particles *@
+        <div class="particle-field" id="particleField"></div>
+        
+        @* Occasional scan line effect *@
+        <div class="scan-line"></div>
+        
+        @* Vignette overlay *@
+        <div class="vignette"></div>
+    </div>
+    
+    @* Main content *@
+    <div class="menu-content">
+        @* Logo and title *@
+        <header class="game-header">
+            <div class="logo-container">
+                <div class="logo-glow"></div>
+                <h1 class="game-title">GALACTIC STRATEGY</h1>
+            </div>
+            <p class="subtitle">A 4X Space Strategy Game in the Final Frontier</p>
+        </header>
+        
+        @* Main panels *@
+        <div class="panels-container">
+            @* Left panel - Quick Play *@
+            <section class="lcars-panel quick-play">
+                <div class="panel-header">
+                    <span class="header-text">QUICK PLAY</span>
+                    <div class="header-decoration"></div>
+                </div>
+                <div class="panel-body">
+                    @if (_loading)
+                    {
+                        <div class="loading-state">
+                            <div class="spinner"></div>
+                            <span>Scanning for games...</span>
+                        </div>
+                    }
+                    else if (_demoGame != null)
+                    {
+                        <div class="game-info">
+                            <div class="game-name">@_demoGame.Name</div>
+                            <div class="game-stats">
+                                <span class="stat">Turn @_demoGame.Turn</span>
+                                <span class="stat">@_demoGame.Factions.Count Empires</span>
+                                <span class="stat">@_demoGame.SystemCount Systems</span>
+                            </div>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label class="input-label">COMMANDER NAME</label>
+                            <input type="text" @bind="_playerName" placeholder="Enter your name" class="lcars-input" />
+                        </div>
+                        
+                        @* Available empires to take over *@
+                        @if (AvailableFactions.Any())
+                        {
+                            <div class="section-divider">
+                                <span>TAKE COMMAND OF EXISTING EMPIRE</span>
+                            </div>
+                            
+                            <div class="faction-grid">
+                                @foreach (var faction in AvailableFactions)
+                                {
+                                    var raceInfo = GetRaceInfo(faction.RaceId);
+                                    <button class="faction-card @(raceInfo.ThemeClass)" 
+                                            @onclick="() => JoinAsFaction(faction.Name)"
+                                            disabled="@string.IsNullOrWhiteSpace(_playerName)">
+                                        <div class="faction-emblem" style="background: @raceInfo.Color">@raceInfo.Icon</div>
+                                        <div class="faction-info">
+                                            <span class="faction-name">@faction.Name</span>
+                                            <span class="faction-race">@raceInfo.Name</span>
+                                        </div>
+                                        <div class="faction-bonus">@raceInfo.Bonus</div>
+                                    </button>
+                                }
+                            </div>
+                        }
+                        
+                        <div class="section-divider">
+                            <span>OR CREATE NEW EMPIRE</span>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label class="input-label">SELECT SPECIES</label>
+                            <select @bind="_selectedRace" class="lcars-select">
+                                <option value="">-- Select Species --</option>
+                                @foreach (var race in _availableRaces)
+                                {
+                                    <option value="@race.Id">@race.Name - @race.Description</option>
+                                }
+                            </select>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label class="input-label">EMPIRE NAME</label>
+                            <input type="text" @bind="_factionName" placeholder="Name your empire" class="lcars-input" />
+                        </div>
+                        
+                        <button class="lcars-button primary" @onclick="JoinGame" 
+                                disabled="@(!CanJoinGame)">
+                            ESTABLISH EMPIRE
+                        </button>
+                    }
+                    else
+                    {
+                        <div class="no-game">
+                            <p>No active games found</p>
+                            <button class="lcars-button" @onclick="CreateNewGame">
+                                CREATE NEW GALAXY
+                            </button>
+                        </div>
+                    }
+                </div>
+            </section>
+            
+            @* Right panel - Species Info *@
+            <section class="lcars-panel species-info">
+                <div class="panel-header">
+                    <span class="header-text">SPECIES DATABASE</span>
+                    <div class="header-decoration"></div>
+                </div>
+                <div class="panel-body">
+                    @if (!string.IsNullOrEmpty(_selectedRace))
+                    {
+                        var info = GetRaceInfo(_selectedRace);
+                        <div class="species-detail @info.ThemeClass">
+                            <button class="species-back-btn" @onclick="() => _selectedRace = string.Empty">
+                                ← Back to List
+                            </button>
+                            <div class="species-header">
+                                <div class="species-emblem" style="background: @info.Color">@info.Icon</div>
+                                <div class="species-title">
+                                    <h3>@info.Name</h3>
+                                    <span class="species-government">@info.Government</span>
+                                </div>
+                            </div>
+                            
+                            <p class="species-description">@info.Description</p>
+                            
+                            <div class="species-stats">
+                                <div class="stat-item">
+                                    <span class="stat-label">Homeworld</span>
+                                    <span class="stat-value">@info.Homeworld</span>
+                                </div>
+                                <div class="stat-item positive">
+                                    <span class="stat-label">Strengths</span>
+                                    <span class="stat-value">@info.Strengths</span>
+                                </div>
+                                <div class="stat-item negative">
+                                    <span class="stat-label">Weaknesses</span>
+                                    <span class="stat-value">@info.Weaknesses</span>
+                                </div>
+                            </div>
+                            
+                            <div class="species-traits">
+                                @foreach (var trait in info.Traits)
+                                {
+                                    <span class="trait-badge">@trait</span>
+                                }
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="species-list">
+                            @foreach (var race in _availableRaces)
+                            {
+                                var info = GetRaceInfo(race.Id);
+                                <div class="species-preview @info.ThemeClass" @onclick="() => _selectedRace = race.Id">
+                                    <div class="preview-emblem" style="background: @info.Color">@info.Icon</div>
+                                    <div class="preview-info">
+                                        <span class="preview-name">@info.Name</span>
+                                        <span class="preview-bonus">@info.Bonus</span>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </section>
+        </div>
+        
+        @* Footer with Fan Disclaimer *@
+        <footer class="menu-footer">
+            <div class="footer-tagline">Based on the "Thermopylae Principle" - Tactical depth over numerical superiority</div>
+            <div class="footer-disclaimer">
+                Star Trek and all related marks, logos and characters are solely owned by CBS Studios Inc. / Paramount. 
+                This fan production is not endorsed by, sponsored by, nor affiliated with CBS, Paramount Pictures, or any other Star Trek franchise. 
+                Non-commercial fan project for recreational use only.
+            </div>
+        </footer>
+    </div>
+</div>
+
+<style>
+    /* ============================================
+       DYNAMIC GALAXY BACKGROUND - MAIN MENU
+       Vibrant like No Man's Sky loading screens
+       ============================================ */
+    
+    /* Main Menu Layout */
+    .main-menu {
+        min-height: 100vh;
+        background: #030010;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    /* ===== GALAXY BACKDROP ===== */
+    .galaxy-backdrop {
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        overflow: hidden;
+    }
+    
+    /* Deep space with rich colors */
+    .space-depth {
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: 
+            radial-gradient(ellipse at 15% 85%, rgba(120, 40, 180, 0.5) 0%, transparent 45%),
+            radial-gradient(ellipse at 85% 15%, rgba(40, 120, 200, 0.4) 0%, transparent 45%),
+            radial-gradient(ellipse at 50% 0%, rgba(200, 80, 120, 0.3) 0%, transparent 50%),
+            radial-gradient(ellipse at 20% 30%, rgba(60, 180, 140, 0.25) 0%, transparent 40%),
+            radial-gradient(ellipse at 80% 70%, rgba(220, 100, 40, 0.25) 0%, transparent 40%),
+            linear-gradient(180deg, #0a0020 0%, #030010 50%, #100818 100%);
+    }
+    
+    /* ===== BRIGHT NEBULA CLOUDS ===== */
+    .nebula-layer {
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        overflow: hidden;
+    }
+    
+    .nebula {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(80px);
+        mix-blend-mode: screen;
+        animation: nebula-drift 80s ease-in-out infinite;
+    }
+    
+    .nebula.n1 {
+        width: 900px; height: 600px;
+        top: -15%; left: -10%;
+        background: radial-gradient(ellipse, rgba(180, 80, 220, 0.6) 0%, rgba(100, 40, 180, 0.3) 40%, transparent 70%);
+        animation-delay: 0s;
+    }
+    
+    .nebula.n2 {
+        width: 800px; height: 900px;
+        top: 50%; right: -15%;
+        background: radial-gradient(ellipse, rgba(60, 160, 220, 0.5) 0%, rgba(40, 100, 180, 0.3) 40%, transparent 70%);
+        animation-delay: -20s;
+        animation-duration: 100s;
+    }
+    
+    .nebula.n3 {
+        width: 700px; height: 500px;
+        top: 20%; left: 35%;
+        background: radial-gradient(ellipse, rgba(220, 120, 80, 0.4) 0%, rgba(180, 80, 40, 0.2) 40%, transparent 70%);
+        animation-delay: -40s;
+        animation-duration: 120s;
+    }
+    
+    .nebula.n4 {
+        width: 600px; height: 700px;
+        bottom: -10%; left: 15%;
+        background: radial-gradient(ellipse, rgba(80, 200, 160, 0.4) 0%, rgba(40, 150, 120, 0.2) 40%, transparent 70%);
+        animation-delay: -60s;
+        animation-duration: 90s;
+    }
+    
+    /* Extra large accent nebula */
+    .nebula.n5 {
+        width: 1200px; height: 800px;
+        top: 30%; left: -20%;
+        background: radial-gradient(ellipse, rgba(255, 100, 150, 0.2) 0%, transparent 60%);
+        animation-delay: -30s;
+        animation-duration: 150s;
+        filter: blur(100px);
+    }
+    
+    @@keyframes nebula-drift {
+        0%, 100% { transform: translate(0, 0) scale(1); }
+        25% { transform: translate(40px, -30px) scale(1.05); }
+        50% { transform: translate(-30px, 40px) scale(0.98); }
+        75% { transform: translate(20px, 20px) scale(1.02); }
+    }
+    
+    /* ===== BRIGHT STAR FIELD ===== */
+    .star-layer {
+        position: absolute;
+        top: 0; left: 0;
+        width: 200%; height: 200%;
+        background-repeat: repeat;
+    }
+    
+    /* Distant small stars - higher density and brightness */
+    .layer-far {
+        background-image: 
+            radial-gradient(1.5px 1.5px at 10% 20%, #fff, transparent),
+            radial-gradient(1px 1px at 30% 70%, #fff, transparent),
+            radial-gradient(1.5px 1.5px at 50% 40%, #aaccff, transparent),
+            radial-gradient(1px 1px at 70% 10%, #fff, transparent),
+            radial-gradient(1.5px 1.5px at 90% 60%, #ffddaa, transparent),
+            radial-gradient(1px 1px at 15% 85%, #fff, transparent),
+            radial-gradient(1.5px 1.5px at 60% 90%, #aaddff, transparent),
+            radial-gradient(1px 1px at 25% 45%, #fff, transparent),
+            radial-gradient(1px 1px at 75% 35%, #ffccaa, transparent),
+            radial-gradient(1px 1px at 45% 65%, #fff, transparent),
+            radial-gradient(1px 1px at 85% 85%, #ccddff, transparent),
+            radial-gradient(1px 1px at 5% 55%, #fff, transparent);
+        background-size: 350px 350px;
+        animation: star-drift 180s linear infinite;
+        opacity: 0.9;
+    }
+    
+    /* Medium stars - colored and brighter */
+    .layer-mid {
+        background-image:
+            radial-gradient(2px 2px at 25% 35%, #88ccff, transparent),
+            radial-gradient(2.5px 2.5px at 65% 75%, #ffaa88, transparent),
+            radial-gradient(2px 2px at 45% 15%, #ffffaa, transparent),
+            radial-gradient(2.5px 2.5px at 85% 45%, #aaffcc, transparent),
+            radial-gradient(2px 2px at 15% 65%, #ffaaff, transparent),
+            radial-gradient(2px 2px at 55% 55%, #ffffff, transparent),
+            radial-gradient(2.5px 2.5px at 35% 85%, #aaccff, transparent),
+            radial-gradient(2px 2px at 75% 25%, #ffddaa, transparent);
+        background-size: 280px 280px;
+        animation: star-drift 100s linear infinite;
+        opacity: 0.95;
+    }
+    
+    /* Bright foreground stars */
+    .layer-near {
+        background-image:
+            radial-gradient(3px 3px at 20% 60%, #ffee88, transparent),
+            radial-gradient(4px 4px at 80% 30%, #88ddff, transparent),
+            radial-gradient(3.5px 3.5px at 50% 80%, #ffaa77, transparent),
+            radial-gradient(3px 3px at 10% 20%, #ffffff, transparent),
+            radial-gradient(4px 4px at 70% 70%, #aaccff, transparent),
+            radial-gradient(3px 3px at 40% 40%, #ffcc99, transparent);
+        background-size: 450px 450px;
+        animation: star-drift 60s linear infinite;
+        opacity: 1;
+    }
+    
+    @@keyframes star-drift {
+        from { transform: translate(0, 0); }
+        to { transform: translate(-50%, -50%); }
+    }
+    
+    /* ===== SVG GALAXY MAP ===== */
+    .galaxy-map-svg {
+        position: absolute;
+        top: 50%; left: 50%;
+        width: 120%; height: 120%;
+        transform: translate(-50%, -50%);
+        opacity: 0.85;
+        animation: galaxy-rotate 600s linear infinite;
+    }
+    
+    @@keyframes galaxy-rotate {
+        from { transform: translate(-50%, -50%) rotate(0deg); }
+        to { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+    
+    .hyperlanes line {
+        animation: lane-pulse 8s ease-in-out infinite;
+    }
+    
+    .hyperlanes line:nth-child(odd) {
+        animation-delay: -4s;
+    }
+    
+    @@keyframes lane-pulse {
+        0%, 100% { opacity: 0.1; }
+        50% { opacity: 0.25; }
+    }
+    
+    .star-system {
+        transition: opacity 0.5s ease;
+    }
+    
+    .star-pulse {
+        animation: star-twinkle 3s ease-in-out infinite;
+    }
+    
+    @@keyframes star-twinkle {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.6; transform: scale(0.8); }
+    }
+    
+    .territory-ring {
+        animation: territory-rotate 60s linear infinite;
+        transform-origin: center;
+    }
+    
+    @@keyframes territory-rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+    
+    /* ===== DYNAMIC EVENT ANIMATIONS ===== */
+    
+    /* Supernova / Star Explosion */
+    .supernova {
+        animation: supernova-explode 4s ease-out forwards;
+    }
+    
+    @@keyframes supernova-explode {
+        0% { transform: scale(1); opacity: 1; }
+        10% { transform: scale(1.5); opacity: 1; filter: brightness(3); }
+        30% { transform: scale(8); opacity: 0.8; filter: brightness(5); }
+        60% { transform: scale(15); opacity: 0.4; filter: brightness(2); }
+        100% { transform: scale(25); opacity: 0; filter: brightness(1); }
+    }
+    
+    /* Ship Flying By */
+    .ship-flyby {
+        animation: ship-fly 8s linear forwards;
+    }
+    
+    @@keyframes ship-fly {
+        0% { transform: translate(0, 0) scale(0.5); opacity: 0; }
+        10% { opacity: 1; }
+        90% { opacity: 1; }
+        100% { transform: translate(var(--fly-x, 800px), var(--fly-y, 0px)) scale(0.3); opacity: 0; }
+    }
+    
+    /* Warp Flash */
+    .warp-flash {
+        animation: warp-effect 1.5s ease-out forwards;
+    }
+    
+    @@keyframes warp-effect {
+        0% { transform: scale(0.1) scaleX(1); opacity: 0; }
+        20% { transform: scale(0.3) scaleX(3); opacity: 1; }
+        40% { transform: scale(0.5) scaleX(10); opacity: 0.8; }
+        100% { transform: scale(1) scaleX(30); opacity: 0; }
+    }
+    
+    /* Phaser Fire */
+    .phaser-beam {
+        stroke-dasharray: 100;
+        stroke-dashoffset: 100;
+        animation: phaser-fire 0.8s ease-out forwards;
+    }
+    
+    @@keyframes phaser-fire {
+        0% { stroke-dashoffset: 100; opacity: 0; }
+        20% { stroke-dashoffset: 0; opacity: 1; }
+        80% { stroke-dashoffset: 0; opacity: 1; }
+        100% { stroke-dashoffset: -100; opacity: 0; }
+    }
+    
+    /* Torpedo */
+    .torpedo {
+        animation: torpedo-fly 2s linear forwards;
+    }
+    
+    @@keyframes torpedo-fly {
+        0% { transform: translate(0, 0); opacity: 1; }
+        90% { opacity: 1; }
+        100% { transform: translate(var(--torp-x, 200px), var(--torp-y, 0px)); opacity: 0; }
+    }
+    
+    /* Small Explosion (torpedo hit) */
+    .small-explosion {
+        animation: small-explode 0.6s ease-out forwards;
+    }
+    
+    @@keyframes small-explode {
+        0% { transform: scale(0.5); opacity: 1; }
+        50% { transform: scale(2); opacity: 0.8; }
+        100% { transform: scale(3); opacity: 0; }
+    }
+    
+    /* Battle Group */
+    .battle-ships {
+        animation: battle-maneuver 6s ease-in-out forwards;
+    }
+    
+    @@keyframes battle-maneuver {
+        0% { transform: translate(0, 0); }
+        25% { transform: translate(20px, -10px); }
+        50% { transform: translate(-10px, 15px); }
+        75% { transform: translate(15px, 5px); }
+        100% { transform: translate(0, 0); }
+    }
+    
+    /* Ship Warp Streak */
+    .warp-streak {
+        animation: warp-streak 0.4s ease-in forwards;
+    }
+    
+    @@keyframes warp-streak {
+        0% { transform: scaleX(1); opacity: 1; }
+        50% { transform: scaleX(20); opacity: 0.8; }
+        100% { transform: scaleX(50) translateX(100px); opacity: 0; }
+    }
+    
+    /* Planet Destruction */
+    .planet-shatter {
+        animation: planet-explode 3s ease-out forwards;
+    }
+    
+    @@keyframes planet-explode {
+        0% { transform: scale(1); opacity: 1; }
+        20% { transform: scale(1.2); filter: brightness(2); }
+        40% { transform: scale(0.8); filter: brightness(4); }
+        60% { transform: scale(3); opacity: 0.6; filter: brightness(3); }
+        100% { transform: scale(8); opacity: 0; filter: brightness(1); }
+    }
+    
+    /* ===== AMBIENT EFFECTS ===== */
+    
+    .particle-field {
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        pointer-events: none;
+    }
+    
+    .scan-line {
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, rgba(100, 200, 255, 0.1), transparent);
+        animation: scan-sweep 8s linear infinite;
+        opacity: 0;
+    }
+    
+    @@keyframes scan-sweep {
+        0%, 90%, 100% { top: -2px; opacity: 0; }
+        5% { opacity: 0.5; }
+        50% { opacity: 0.3; }
+        85% { opacity: 0; }
+        89% { top: 100%; }
+    }
+    
+    .vignette {
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.6) 100%);
+        pointer-events: none;
+    }
+    
+    /* ===== CONTENT STYLES ===== */
+    .menu-content {
+        position: relative;
+        z-index: 1;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        padding: 40px;
+    }
+    
+    /* Header */
+    .game-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+    
+    .logo-container {
+        position: relative;
+        display: inline-block;
+    }
+    
+    .logo-glow {
+        position: absolute;
+        top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+        width: 120%;
+        height: 200%;
+        background: radial-gradient(ellipse, rgba(255, 153, 0, 0.2) 0%, transparent 70%);
+        pointer-events: none;
+    }
+    
+    .game-title {
+        font-family: 'Orbitron', 'Segoe UI', sans-serif;
+        font-size: 48px;
+        font-weight: 900;
+        color: #ffcc00;
+        letter-spacing: 8px;
+        margin: 0;
+        text-shadow: 
+            0 0 30px rgba(255, 200, 0, 0.5),
+            0 0 60px rgba(255, 150, 0, 0.3);
+        animation: title-glow 4s ease-in-out infinite;
+    }
+    
+    @@keyframes title-glow {
+        0%, 100% { text-shadow: 0 0 30px rgba(255, 200, 0, 0.5), 0 0 60px rgba(255, 150, 0, 0.3); }
+        50% { text-shadow: 0 0 50px rgba(255, 200, 0, 0.7), 0 0 80px rgba(255, 150, 0, 0.5); }
+    }
+    
+    .subtitle {
+        color: #88aacc;
+        font-size: 14px;
+        font-weight: 400;
+        letter-spacing: 8px;
+        margin-top: 12px;
+        text-transform: uppercase;
+        opacity: 0.9;
+    }
+    
+    .subtitle::before {
+        content: '◆ ';
+        color: #ff9900;
+        opacity: 0.6;
+    }
+    
+    .subtitle::after {
+        content: ' ◆';
+        color: #ff9900;
+        opacity: 0.6;
+    }
+    
+    /* Panels Container */
+    .panels-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+        flex: 1;
+        max-width: 1400px;
+        margin: 0 auto;
+        width: 100%;
+    }
+    
+    @@media (max-width: 1024px) {
+        .panels-container {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    /* LCARS Panel - Glass Effect */
+    .lcars-panel {
+        background: rgba(5, 8, 20, 0.75);
+        border: 2px solid rgba(255, 153, 0, 0.8);
+        border-radius: 20px;
+        overflow: hidden;
+        backdrop-filter: blur(12px);
+        box-shadow: 
+            0 8px 32px rgba(0, 0, 0, 0.4),
+            inset 0 1px 0 rgba(255, 255, 255, 0.05),
+            0 0 40px rgba(255, 153, 0, 0.1);
+    }
+    
+    .panel-header {
+        background: linear-gradient(90deg, #ff9900 0%, #ffcc00 50%, #ff9900 100%);
+        padding: 12px 20px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        position: relative;
+    }
+    
+    .panel-header::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+    }
+    
+    .header-text {
+        color: #000;
+        font-weight: 700;
+        font-size: 16px;
+        letter-spacing: 3px;
+    }
+    
+    .header-decoration {
+        flex: 1;
+        height: 8px;
+        background: #000;
+        border-radius: 4px;
+    }
+    
+    .panel-body {
+        padding: 24px;
+    }
+    
+    /* Game Info */
+    .game-info {
+        background: rgba(30, 30, 60, 0.5);
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 20px;
+    }
+    
+    .game-name {
+        color: #ffcc00;
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+    
+    .game-stats {
+        display: flex;
+        gap: 16px;
+    }
+    
+    .game-stats .stat {
+        color: #99ccff;
+        font-size: 13px;
+    }
+    
+    /* Input Groups */
+    .input-group {
+        margin-bottom: 16px;
+    }
+    
+    .input-label {
+        display: block;
+        color: #cc99cc;
+        font-size: 11px;
+        letter-spacing: 2px;
+        margin-bottom: 6px;
+    }
+    
+    .lcars-input, .lcars-select {
+        width: 100%;
+        background: rgba(20, 20, 40, 0.8);
+        border: 2px solid #334;
+        border-radius: 8px;
+        padding: 12px 16px;
+        color: #99ccff;
+        font-size: 14px;
+        transition: all 0.2s;
+    }
+    
+    .lcars-input:focus, .lcars-select:focus {
+        outline: none;
+        border-color: #ff9900;
+    }
+    
+    .lcars-input::placeholder {
+        color: #556;
+    }
+    
+    .lcars-select option {
+        background: #1a1a2e;
+        color: #99ccff;
+    }
+    
+    /* Section Divider */
+    .section-divider {
+        text-align: center;
+        margin: 24px 0;
+        position: relative;
+    }
+    
+    .section-divider::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, #ff9900, transparent);
+    }
+    
+    .section-divider span {
+        background: rgba(10, 10, 30, 0.9);
+        padding: 0 16px;
+        position: relative;
+        color: #ff9900;
+        font-size: 11px;
+        letter-spacing: 2px;
+    }
+    
+    /* Faction Grid */
+    .faction-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+    
+    .faction-card {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: rgba(30, 30, 60, 0.6);
+        border: 1px solid #334;
+        border-radius: 10px;
+        padding: 12px 16px;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-align: left;
+    }
+    
+    .faction-card:hover:not(:disabled) {
+        border-color: #ff9900;
+        transform: translateX(4px);
+    }
+    
+    .faction-card:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+    
+    .faction-emblem {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+    }
+    
+    .faction-info {
+        flex: 1;
+    }
+    
+    .faction-name {
+        display: block;
+        color: #ffcc00;
+        font-weight: 600;
+        font-size: 14px;
+    }
+    
+    .faction-race {
+        display: block;
+        color: #888;
+        font-size: 12px;
+    }
+    
+    .faction-bonus {
+        color: #44ff44;
+        font-size: 11px;
+        background: rgba(68, 255, 68, 0.1);
+        padding: 4px 8px;
+        border-radius: 4px;
+    }
+    
+    /* LCARS Button */
+    .lcars-button {
+        display: block;
+        width: 100%;
+        background: #ff9900;
+        color: #000;
+        border: none;
+        padding: 14px 24px;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 14px;
+        letter-spacing: 2px;
+        cursor: pointer;
+        transition: all 0.2s;
+        margin-top: 16px;
+    }
+    
+    .lcars-button:hover:not(:disabled) {
+        background: #ffcc00;
+        transform: translateY(-2px);
+    }
+    
+    .lcars-button:disabled {
+        background: #444;
+        color: #888;
+        cursor: not-allowed;
+    }
+    
+    .lcars-button.primary {
+        background: #44aaff;
+    }
+    
+    .lcars-button.primary:hover:not(:disabled) {
+        background: #66ccff;
+    }
+    
+    /* Species Info Panel */
+    .species-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .species-preview {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        background: rgba(30, 30, 60, 0.5);
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: 1px solid transparent;
+    }
+    
+    .species-preview:hover {
+        border-color: #ff9900;
+        background: rgba(50, 50, 80, 0.6);
+    }
+    
+    .preview-emblem {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+    }
+    
+    .preview-info { flex: 1; }
+    
+    .preview-name {
+        display: block;
+        color: #99ccff;
+        font-weight: 600;
+        font-size: 13px;
+    }
+    
+    .preview-bonus {
+        display: block;
+        color: #888;
+        font-size: 11px;
+    }
+    
+    /* Species Detail */
+    .species-detail {
+        animation: fadeIn 0.3s ease;
+    }
+    
+    .species-back-btn {
+        background: transparent;
+        border: 1px solid #ff9900;
+        color: #ff9900;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+        margin-bottom: 16px;
+        transition: all 0.2s ease;
+    }
+    
+    .species-back-btn:hover {
+        background: #ff9900;
+        color: #000;
+    }
+    
+    @@keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .species-header {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 20px;
+    }
+    
+    .species-emblem {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+    }
+    
+    .species-title h3 {
+        color: #ffcc00;
+        font-size: 24px;
+        margin: 0;
+    }
+    
+    .species-government {
+        color: #888;
+        font-size: 12px;
+    }
+    
+    .species-description {
+        color: #99ccff;
+        font-size: 14px;
+        line-height: 1.6;
+        margin-bottom: 20px;
+    }
+    
+    .species-stats {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+    
+    .stat-item {
+        background: rgba(30, 30, 60, 0.5);
+        padding: 12px;
+        border-radius: 8px;
+    }
+    
+    .stat-item .stat-label {
+        display: block;
+        color: #888;
+        font-size: 10px;
+        letter-spacing: 1px;
+        margin-bottom: 4px;
+    }
+    
+    .stat-item .stat-value {
+        display: block;
+        color: #99ccff;
+        font-size: 13px;
+    }
+    
+    .stat-item.positive .stat-value { color: #44ff44; }
+    .stat-item.negative .stat-value { color: #ff6666; }
+    
+    .species-traits {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    
+    .trait-badge {
+        background: rgba(255, 153, 0, 0.2);
+        color: #ffaa00;
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 11px;
+        border: 1px solid rgba(255, 153, 0, 0.3);
+    }
+    
+    /* Loading State */
+    .loading-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 40px;
+        color: #888;
+    }
+    
+    .spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid #334;
+        border-top-color: #ff9900;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-bottom: 16px;
+    }
+    
+    @@keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+    
+    /* No Game */
+    .no-game {
+        text-align: center;
+        padding: 40px;
+    }
+    
+    .no-game p {
+        color: #888;
+        margin-bottom: 20px;
+    }
+    
+    /* Footer */
+    .menu-footer {
+        text-align: center;
+        padding: 20px;
+        color: #556;
+        font-size: 12px;
+        letter-spacing: 1px;
+        margin-top: auto;
+    }
+    
+    .footer-tagline {
+        color: #99aacc;
+        margin-bottom: 12px;
+        font-style: italic;
+    }
+    
+    .footer-disclaimer {
+        color: #445;
+        font-size: 10px;
+        max-width: 800px;
+        margin: 0 auto;
+        line-height: 1.5;
+        opacity: 0.8;
+    }
+    
+    /* Race Theme Classes */
+    .federation .faction-emblem, .federation .species-emblem, .federation .preview-emblem { background: #1a5fb4 !important; }
+    .klingon .faction-emblem, .klingon .species-emblem, .klingon .preview-emblem { background: #8b0000 !important; }
+    .romulan .faction-emblem, .romulan .species-emblem, .romulan .preview-emblem { background: #2e7d32 !important; }
+    .cardassian .faction-emblem, .cardassian .species-emblem, .cardassian .preview-emblem { background: #5d4037 !important; }
+    .ferengi .faction-emblem, .ferengi .species-emblem, .ferengi .preview-emblem { background: #f57c00 !important; }
+    .vulcan .faction-emblem, .vulcan .species-emblem, .vulcan .preview-emblem { background: #b71c1c !important; }
+    .breen .faction-emblem, .breen .species-emblem, .breen .preview-emblem { background: #37474f !important; }
+    .tholian .faction-emblem, .tholian .species-emblem, .tholian .preview-emblem { background: #ff6f00 !important; }
+    .gorn .faction-emblem, .gorn .species-emblem, .gorn .preview-emblem { background: #33691e !important; }
+    .bajoran .faction-emblem, .bajoran .species-emblem, .bajoran .preview-emblem { background: #6d4c41 !important; }
+</style>
+
+@* Dynamic Galaxy Events JavaScript *@
+<script suppress-error="BL9992">
+(function() {
+    // Galaxy Event Manager - Creates random animated events in the background
+    const GalaxyEvents = {
+        svg: null,
+        eventsGroup: null,
+        stars: [],
+        running: false,
+        
+        init() {
+            this.svg = document.querySelector('.galaxy-map-svg');
+            this.eventsGroup = document.getElementById('dynamicEvents');
+            if (!this.svg || !this.eventsGroup) {
+                setTimeout(() => this.init(), 500);
+                return;
+            }
+            
+            // Collect star positions from SVG
+            document.querySelectorAll('.star-system').forEach(star => {
+                const transform = star.getAttribute('transform');
+                const match = transform?.match(/translate\(([^,]+),\s*([^)]+)\)/);
+                if (match) {
+                    this.stars.push({ x: parseFloat(match[1]), y: parseFloat(match[2]) });
+                }
+            });
+            
+            this.running = true;
+            this.scheduleEvents();
+        },
+        
+        scheduleEvents() {
+            if (!this.running) return;
+            
+            // Random event every 2-6 seconds
+            const delay = 2000 + Math.random() * 4000;
+            setTimeout(() => {
+                this.spawnRandomEvent();
+                this.scheduleEvents();
+            }, delay);
+        },
+        
+        spawnRandomEvent() {
+            const events = [
+                { fn: () => this.createSupernova(), weight: 8 },
+                { fn: () => this.createShipFlyby(), weight: 25 },
+                { fn: () => this.createWarpFlash(), weight: 20 },
+                { fn: () => this.createBattle(), weight: 15 },
+                { fn: () => this.createWarpStreak(), weight: 20 },
+                { fn: () => this.createTorpedoVolley(), weight: 12 }
+            ];
+            
+            const totalWeight = events.reduce((sum, e) => sum + e.weight, 0);
+            let random = Math.random() * totalWeight;
+            
+            for (const event of events) {
+                random -= event.weight;
+                if (random <= 0) {
+                    event.fn();
+                    break;
+                }
+            }
+        },
+        
+        randomPosition() {
+            return { x: Math.random() * 1800 + 60, y: Math.random() * 960 + 60 };
+        },
+        
+        randomStar() {
+            if (this.stars.length === 0) return this.randomPosition();
+            return this.stars[Math.floor(Math.random() * this.stars.length)];
+        },
+        
+        // === EVENT CREATORS ===
+        
+        createSupernova() {
+            const pos = this.randomStar();
+            const colors = ['#ffff00', '#ff8800', '#ff4400', '#ffffff'];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            
+            const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            g.setAttribute('transform', `translate(${pos.x}, ${pos.y})`);
+            g.classList.add('supernova');
+            
+            // Explosion rings
+            for (let i = 0; i < 3; i++) {
+                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                circle.setAttribute('r', 3 + i * 2);
+                circle.setAttribute('fill', color);
+                circle.setAttribute('opacity', 0.8 - i * 0.2);
+                circle.setAttribute('filter', 'url(#explosionGlow)');
+                g.appendChild(circle);
+            }
+            
+            this.eventsGroup.appendChild(g);
+            setTimeout(() => g.remove(), 4500);
+        },
+        
+        createShipFlyby() {
+            const startX = Math.random() > 0.5 ? -50 : 1970;
+            const startY = Math.random() * 900 + 90;
+            const endX = startX < 0 ? 1970 : -50;
+            const endY = startY + (Math.random() - 0.5) * 400;
+            
+            const shipColors = ['#4488ff', '#ff4444', '#44ff44', '#ffaa00'];
+            const color = shipColors[Math.floor(Math.random() * shipColors.length)];
+            
+            const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            g.setAttribute('transform', `translate(${startX}, ${startY})`);
+            g.style.setProperty('--fly-x', `${endX - startX}px`);
+            g.style.setProperty('--fly-y', `${endY - startY}px`);
+            g.classList.add('ship-flyby');
+            
+            // Simple ship shape
+            const ship = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+            const flip = startX < 0 ? 1 : -1;
+            ship.setAttribute('points', `${flip * 8},0 ${flip * -4},-3 ${flip * -4},3`);
+            ship.setAttribute('fill', color);
+            g.appendChild(ship);
+            
+            // Engine glow trail
+            const trail = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+            trail.setAttribute('cx', flip * -8);
+            trail.setAttribute('cy', 0);
+            trail.setAttribute('rx', 6);
+            trail.setAttribute('ry', 1.5);
+            trail.setAttribute('fill', color);
+            trail.setAttribute('opacity', '0.5');
+            g.appendChild(trail);
+            
+            this.eventsGroup.appendChild(g);
+            setTimeout(() => g.remove(), 8500);
+        },
+        
+        createWarpFlash() {
+            const pos = this.randomPosition();
+            const color = Math.random() > 0.5 ? '#4488ff' : '#88aaff';
+            
+            const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            g.setAttribute('transform', `translate(${pos.x}, ${pos.y})`);
+            g.classList.add('warp-flash');
+            
+            // Warp flash ellipse
+            const flash = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+            flash.setAttribute('cx', 0);
+            flash.setAttribute('cy', 0);
+            flash.setAttribute('rx', 15);
+            flash.setAttribute('ry', 4);
+            flash.setAttribute('fill', color);
+            flash.setAttribute('filter', 'url(#explosionGlow)');
+            g.appendChild(flash);
+            
+            this.eventsGroup.appendChild(g);
+            setTimeout(() => g.remove(), 1800);
+        },
+        
+        createBattle() {
+            const pos = this.randomPosition();
+            const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            g.setAttribute('transform', `translate(${pos.x}, ${pos.y})`);
+            
+            // Two ships facing each other
+            const ship1 = this.createMiniShip(0, 0, '#4488ff', 0);
+            const ship2 = this.createMiniShip(60, 10, '#ff4444', 180);
+            g.appendChild(ship1);
+            g.appendChild(ship2);
+            
+            // Phaser beams
+            for (let i = 0; i < 3; i++) {
+                setTimeout(() => {
+                    if (!g.parentNode) return;
+                    const beam = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    beam.setAttribute('x1', 8);
+                    beam.setAttribute('y1', Math.random() * 4 - 2);
+                    beam.setAttribute('x2', 52);
+                    beam.setAttribute('y2', 10 + Math.random() * 4 - 2);
+                    beam.setAttribute('stroke', i % 2 === 0 ? '#ffaa00' : '#ff4444');
+                    beam.setAttribute('stroke-width', '1.5');
+                    beam.classList.add('phaser-beam');
+                    g.appendChild(beam);
+                    setTimeout(() => beam.remove(), 1000);
+                }, i * 800);
+            }
+            
+            this.eventsGroup.appendChild(g);
+            setTimeout(() => g.remove(), 5000);
+        },
+        
+        createMiniShip(x, y, color, rotation) {
+            const ship = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            ship.setAttribute('transform', `translate(${x}, ${y}) rotate(${rotation})`);
+            
+            const body = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+            body.setAttribute('points', '6,0 -3,-2 -3,2');
+            body.setAttribute('fill', color);
+            ship.appendChild(body);
+            
+            return ship;
+        },
+        
+        createWarpStreak() {
+            const pos = this.randomPosition();
+            const angle = Math.random() * 360;
+            const color = '#4488ff';
+            
+            const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            g.setAttribute('transform', `translate(${pos.x}, ${pos.y}) rotate(${angle})`);
+            g.classList.add('warp-streak');
+            
+            // Ship that stretches into warp
+            const ship = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+            ship.setAttribute('cx', 0);
+            ship.setAttribute('cy', 0);
+            ship.setAttribute('rx', 4);
+            ship.setAttribute('ry', 2);
+            ship.setAttribute('fill', color);
+            g.appendChild(ship);
+            
+            this.eventsGroup.appendChild(g);
+            setTimeout(() => g.remove(), 600);
+        },
+        
+        createTorpedoVolley() {
+            const pos = this.randomPosition();
+            const angle = Math.random() * Math.PI * 2;
+            const distance = 80 + Math.random() * 60;
+            
+            const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            g.setAttribute('transform', `translate(${pos.x}, ${pos.y})`);
+            
+            // Launch 3 torpedoes
+            for (let i = 0; i < 3; i++) {
+                setTimeout(() => {
+                    if (!g.parentNode) return;
+                    
+                    const torp = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                    torp.setAttribute('cx', 0);
+                    torp.setAttribute('cy', 0);
+                    torp.setAttribute('r', 2);
+                    torp.setAttribute('fill', '#ff4444');
+                    torp.style.setProperty('--torp-x', `${Math.cos(angle + (i-1)*0.1) * distance}px`);
+                    torp.style.setProperty('--torp-y', `${Math.sin(angle + (i-1)*0.1) * distance}px`);
+                    torp.classList.add('torpedo');
+                    g.appendChild(torp);
+                    
+                    // Explosion at end
+                    setTimeout(() => {
+                        const exp = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                        exp.setAttribute('cx', Math.cos(angle + (i-1)*0.1) * distance);
+                        exp.setAttribute('cy', Math.sin(angle + (i-1)*0.1) * distance);
+                        exp.setAttribute('r', 3);
+                        exp.setAttribute('fill', '#ff8844');
+                        exp.classList.add('small-explosion');
+                        g.appendChild(exp);
+                        setTimeout(() => exp.remove(), 700);
+                    }, 1800);
+                    
+                    setTimeout(() => torp.remove(), 2100);
+                }, i * 200);
+            }
+            
+            this.eventsGroup.appendChild(g);
+            setTimeout(() => g.remove(), 4000);
+        },
+        
+        stop() {
+            this.running = false;
+        }
+    };
+    
+    // Start when page loads
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => GalaxyEvents.init());
+    } else {
+        GalaxyEvents.init();
+    }
+    
+    // Cleanup when navigating away
+    window.addEventListener('beforeunload', () => GalaxyEvents.stop());
+})();
+</script>
+
+@code {
+    private bool _loading = true;
+    private GameDetailDto? _demoGame;
+    private string _playerName = "";
+    private string _selectedRace = "";
+    private string _factionName = "";
+    
+    private List<RaceOption> _availableRaces = new();
+    
+    // Background galaxy animation data
+    private List<BackgroundStar> _backgroundStars = new();
+    private List<Hyperlane> _hyperlanes = new();
+    
+    private IEnumerable<FactionSummaryDto> AvailableFactions => 
+        _demoGame?.Factions.Where(f => f.PlayerName == null && !f.IsDefeated) ?? Enumerable.Empty<FactionSummaryDto>();
+    
+    private bool CanJoinGame => 
+        !string.IsNullOrWhiteSpace(_playerName) && 
+        !string.IsNullOrWhiteSpace(_selectedRace) && 
+        !string.IsNullOrWhiteSpace(_factionName);
+    
+    protected override async Task OnInitializedAsync()
+    {
+        InitializeRaces();
+        GenerateBackgroundGalaxy();
+        await LoadDemoGame();
+    }
+    
+    private void GenerateBackgroundGalaxy()
+    {
+        var rand = new Random(42); // Fixed seed for consistent look
+        var starColors = new[] { 
+            "#ffff88", "#88ccff", "#ff8866", "#ffffff", "#ffaa44", "#aaccff",
+            "#ffddaa", "#aaddff", "#ffaaaa", "#ddddff", "#ffffcc", "#ccffff"
+        };
+        var factionColors = new[] { "#4488ff", "#ff4444", "#44ff44", "#ffaa00", "#ffcc00", "#00ffaa" };
+        
+        // Generate 90 background stars spread across the viewport for a richer galaxy
+        for (int i = 0; i < 90; i++)
+        {
+            var x = rand.Next(50, 1870);
+            var y = rand.Next(50, 1030);
+            // Vary sizes more - mostly small with some larger bright ones
+            var sizeRoll = rand.NextDouble();
+            var size = sizeRoll < 0.7 ? rand.NextDouble() * 2 + 0.5 : rand.NextDouble() * 3 + 2;
+            var color = starColors[rand.Next(starColors.Length)];
+            var hasTerritory = rand.NextDouble() > 0.88; // About 10% have territory markers
+            var territoryColor = factionColors[rand.Next(factionColors.Length)];
+            // More animation variety
+            var animRoll = rand.NextDouble();
+            var animClass = animRoll > 0.75 ? "star-pulse" : "";
+            
+            _backgroundStars.Add(new BackgroundStar(x, y, size, color, hasTerritory, territoryColor, animClass));
+        }
+        
+        // Generate hyperlanes connecting nearby stars
+        for (int i = 0; i < _backgroundStars.Count; i++)
+        {
+            var s1 = _backgroundStars[i];
+            for (int j = i + 1; j < _backgroundStars.Count; j++)
+            {
+                var s2 = _backgroundStars[j];
+                var dist = Math.Sqrt(Math.Pow(s2.X - s1.X, 2) + Math.Pow(s2.Y - s1.Y, 2));
+                
+                // Connect stars within reasonable distance (with some randomness)
+                if (dist < 180 && rand.NextDouble() > 0.55)
+                {
+                    _hyperlanes.Add(new Hyperlane(s1.X, s1.Y, s2.X, s2.Y));
+                }
+            }
+        }
+    }
+    
+    private record BackgroundStar(double X, double Y, double Size, string Color, 
+        bool HasTerritory, string TerritoryColor, string AnimationClass);
+    private record Hyperlane(double X1, double Y1, double X2, double Y2);
+    
+    private void InitializeRaces()
+    {
+        _availableRaces = new List<RaceOption>
+        {
+            new("federation", "United Federation of Planets", "Balanced exploration and diplomacy"),
+            new("klingon", "Klingon Empire", "Superior combat and ground warfare"),
+            new("romulan", "Romulan Star Empire", "Espionage and cloaking technology"),
+            new("cardassian", "Cardassian Union", "Production and resource efficiency"),
+            new("ferengi", "Ferengi Alliance", "Trade and economic dominance"),
+            new("vulcan", "Confederacy of Vulcan", "Research and scientific advancement"),
+            new("breen", "Breen Confederacy", "Mysterious military power"),
+            new("tholian", "Tholian Assembly", "Territorial defense and precision"),
+            new("gorn", "Gorn Hegemony", "Ground combat and strength"),
+            new("bajoran", "Bajoran Republic", "Spiritual resilience")
+        };
+    }
+    
+    private async Task LoadDemoGame()
+    {
+        try
+        {
+            _loading = true;
+            var games = await Api.GetGamesAsync();
+            var firstGame = games.FirstOrDefault();
+            if (firstGame != null)
+            {
+                _demoGame = await Api.GetGameAsync(firstGame.Id);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error loading games: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+    
+    private async Task JoinGame()
+    {
+        if (_demoGame == null || !CanJoinGame) return;
+        
+        try
+        {
+            var result = await Api.JoinGameAsync(_demoGame.Id, _playerName, _factionName, _selectedRace);
+            if (result != null)
+            {
+                await LocalStorage.SetItemAsync("currentGameId", _demoGame.Id);
+                await LocalStorage.SetItemAsync("currentFactionId", result.Id);
+                await LocalStorage.SetItemAsync("currentPlayerName", _playerName);
+                Snackbar.Add($"Welcome, {_playerName}! Your empire awaits.", Severity.Success);
+                Navigation.NavigateTo("/game/map");
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Failed to join game: {ex.Message}", Severity.Error);
+        }
+    }
+    
+    private async Task JoinAsFaction(string factionName)
+    {
+        if (_demoGame == null || string.IsNullOrWhiteSpace(_playerName)) return;
+        
+        try
+        {
+            var result = await Api.JoinGameAsync(_demoGame.Id, _playerName, factionName, null);
+            if (result != null)
+            {
+                await LocalStorage.SetItemAsync("currentGameId", _demoGame.Id);
+                await LocalStorage.SetItemAsync("currentFactionId", result.Id);
+                await LocalStorage.SetItemAsync("currentPlayerName", _playerName);
+                Snackbar.Add($"You have taken command of {factionName}!", Severity.Success);
+                Navigation.NavigateTo("/game/map");
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Failed to take command: {ex.Message}", Severity.Error);
+        }
+    }
+    
+    private async Task CreateNewGame()
+    {
+        try
+        {
+            var newGame = await Api.CreateGameAsync("New Galaxy", 50);
+            if (newGame != null)
+            {
+                _demoGame = newGame;
+                Snackbar.Add("New galaxy created!", Severity.Success);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Failed to create game: {ex.Message}", Severity.Error);
+        }
+    }
+    
+    private RaceInfo GetRaceInfo(string? raceId)
+    {
+        return raceId?.ToLower() switch
+        {
+            "federation" or "terran" => new RaceInfo(
+                "United Federation of Planets",
+                "A union of planetary governments united by shared principles of universal liberty, rights, and equality.",
+                "Democracy",
+                "Earth",
+                "#1a5fb4",
+                "federation",
+                "+15% Research, +20% Diplomacy",
+                "Research, Diplomacy",
+                "-5% Military",
+                new[] { "Explorers", "Diplomatic", "Diverse" },
+                "🌟",
+                "images/portraits/federation.png"
+            ),
+            "klingon" or "warrior" => new RaceInfo(
+                "Klingon Empire",
+                "A proud warrior race driven by honor and conquest. Glory in battle is the highest achievement.",
+                "Autocracy",
+                "Qo'noS",
+                "#8b0000",
+                "klingon",
+                "+20% Combat, +25% Ground",
+                "Space Combat, Ground Combat",
+                "-15% Diplomacy, -10% Trade",
+                new[] { "Warriors", "Honorbound", "Aggressive" },
+                "⚔️",
+                "images/portraits/klingon.png"
+            ),
+            "romulan" => new RaceInfo(
+                "Romulan Star Empire",
+                "A secretive and cunning empire built on intrigue and military might. Masters of deception.",
+                "Oligarchy",
+                "Romulus",
+                "#2e7d32",
+                "romulan",
+                "+30% Espionage, +10% Combat",
+                "Espionage, Cloaking",
+                "-10% Diplomacy",
+                new[] { "Cunning", "Secretive", "Cloaking Experts" },
+                "🦅",
+                "images/portraits/romulan.png"
+            ),
+            "cardassian" => new RaceInfo(
+                "Cardassian Union",
+                "A militaristic civilization with a strong emphasis on duty, family, and order above all.",
+                "Autocracy",
+                "Cardassia Prime",
+                "#5d4037",
+                "cardassian",
+                "+15% Production, +15% Espionage",
+                "Production, Colonization",
+                "No significant weaknesses",
+                new[] { "Industrious", "Resourceful", "Orderly" },
+                "🏛️",
+                "images/portraits/cardassian.png"
+            ),
+            "ferengi" or "merchant" => new RaceInfo(
+                "Ferengi Alliance",
+                "A commerce-driven civilization where profit is the highest virtue. The Rules of Acquisition guide all.",
+                "Plutocracy",
+                "Ferenginar",
+                "#f57c00",
+                "ferengi",
+                "+40% Trade, +10% Diplomacy",
+                "Trade, Economics",
+                "-20% Military, -30% Ground",
+                new[] { "Merchants", "Opportunistic", "Cowardly" },
+                "💰",
+                "images/portraits/ferengi.png"
+            ),
+            "vulcan" or "logician" => new RaceInfo(
+                "Confederacy of Vulcan",
+                "A logical and pacifist species dedicated to the pursuit of knowledge and emotional control.",
+                "Technocracy",
+                "Vulcan",
+                "#b71c1c",
+                "vulcan",
+                "+30% Research, +10% Ground",
+                "Research, Logic",
+                "-15% Military",
+                new[] { "Logical", "Pacifist", "Long-Lived" },
+                "🖖",
+                "images/portraits/vulcan.png"
+            ),
+            "breen" => new RaceInfo(
+                "Breen Confederacy",
+                "A mysterious, aggressive species known for their refrigeration suits and brutal tactics.",
+                "Confederacy",
+                "Breen",
+                "#37474f",
+                "breen",
+                "+15% Combat, +10% Espionage",
+                "Combat, Mystery",
+                "-20% Diplomacy",
+                new[] { "Mysterious", "Aggressive", "Cold Adapted" },
+                "❄️",
+                "images/portraits/breen.png"
+            ),
+            "tholian" => new RaceInfo(
+                "Tholian Assembly",
+                "A xenophobic crystalline species known for their precise territorial nature and web technology.",
+                "Hive Mind",
+                "Tholia",
+                "#ff6f00",
+                "tholian",
+                "+20% Combat, +15% Production",
+                "Defense, Production",
+                "-40% Diplomacy, -50% Trade",
+                new[] { "Xenophobic", "Crystalline", "Precise" },
+                "💎"
+            ),
+            "gorn" => new RaceInfo(
+                "Gorn Hegemony",
+                "A powerful reptilian species known for their immense strength and territorial nature.",
+                "Autocracy",
+                "Gornar",
+                "#33691e",
+                "gorn",
+                "+30% Ground Combat, +10% Military",
+                "Ground Combat, Strength",
+                "-10% Research, -15% Diplomacy",
+                new[] { "Powerful", "Territorial", "Slow Metabolism" },
+                "🦎"
+            ),
+            "bajoran" => new RaceInfo(
+                "Bajoran Republic",
+                "A spiritual people recently freed from occupation, fiercely independent and resilient.",
+                "Theocracy",
+                "Bajor",
+                "#6d4c41",
+                "bajoran",
+                "+10% Diplomacy, +5% Research",
+                "Spirituality, Resilience",
+                "-10% Military, -5% Colonization",
+                new[] { "Spiritual", "Resilient", "Underdog" },
+                "☀️"
+            ),
+            _ => new RaceInfo(
+                "Unknown Species",
+                "No data available.",
+                "Unknown",
+                "Unknown",
+                "#666666",
+                "",
+                "Unknown",
+                "Unknown",
+                "Unknown",
+                Array.Empty<string>(),
+                "❓"
+            )
+        };
+    }
+    
+    private record RaceOption(string Id, string Name, string Description);
+    
+    private record RaceInfo(
+        string Name,
+        string Description,
+        string Government,
+        string Homeworld,
+        string Color,
+        string ThemeClass,
+        string Bonus,
+        string Strengths,
+        string Weaknesses,
+        string[] Traits,
+        string Icon = "🌟",
+        string Portrait = ""  // Path to portrait image, e.g., "images/portraits/federation.png"
+    );
+}

@@ -1,0 +1,195 @@
+@* BorgShip.razor - Ship display component for Borg Collective vessels *@
+
+<div class="@GetContainerClasses()" @onclick="HandleClick">
+    <div class="@GetShipClasses()"></div>
+    @if (ShowNameplate)
+    {
+        <div class="ship-nameplate borg-nameplate">
+            <span class="ship-name">@GetDisplayName()</span>
+            <span class="ship-class-icon">🔲</span>
+        </div>
+    }
+</div>
+
+<style>
+    .ship-container.borg-ship {
+        display: inline-flex;
+        flex-direction: column;
+        background: linear-gradient(180deg, #1a1f1a 0%, #0a0f0a 100%);
+        border: 1px solid #2a3a2a;
+        border-radius: 6px;
+        overflow: hidden;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+        transition: all 0.2s;
+    }
+    
+    .ship-container.borg-ship:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+        border-color: rgba(34, 197, 94, 0.5);
+    }
+    
+    .ship-container.borg-ship.selected {
+        border-color: #22c55e;
+        box-shadow: 0 0 25px rgba(34, 197, 94, 0.5);
+    }
+    
+    .borg-nameplate {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 12px;
+        background: linear-gradient(180deg, #3a4a3a 0%, #2a352a 50%, #1a251a 100%);
+        border-top: 1px solid #4a5a4a;
+    }
+    
+    .borg-nameplate .ship-name {
+        font-size: 10px;
+        font-weight: 700;
+        color: #22c55e;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        text-shadow: 0 0 5px rgba(34, 197, 94, 0.5);
+    }
+    
+    .borg-nameplate .ship-class-icon {
+        width: 22px;
+        height: 22px;
+        background: linear-gradient(180deg, #2a3a2a 0%, #1a251a 100%);
+        border: 2px solid #22c55e;
+        border-radius: 2px; /* Square for Borg */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        box-shadow: 0 0 8px rgba(34, 197, 94, 0.4);
+    }
+</style>
+
+@code {
+    [Parameter] public string ShipType { get; set; } = "cube";
+    [Parameter] public string Size { get; set; } = "medium";
+    [Parameter] public string Category { get; set; } = "military";
+    [Parameter] public bool ShowNameplate { get; set; } = false;
+    [Parameter] public bool IsSelected { get; set; } = false;
+    [Parameter] public bool IsActive { get; set; } = false;
+    [Parameter] public bool IsRegenerating { get; set; } = false;
+    [Parameter] public string? DisplayName { get; set; }
+    [Parameter] public EventCallback<string> OnClick { get; set; }
+    [Parameter] public string? CssClass { get; set; }
+
+    private string GetContainerClasses()
+    {
+        var classes = new List<string> { "ship-container", "borg-ship" };
+        if (IsSelected) classes.Add("selected");
+        if (OnClick.HasDelegate) classes.Add("clickable");
+        if (!string.IsNullOrEmpty(CssClass)) classes.Add(CssClass);
+        return string.Join(" ", classes);
+    }
+
+    private string GetShipClasses()
+    {
+        var classes = new List<string> { "ship-card", "borg", Category, ShipType.ToLowerInvariant() };
+        if (!string.IsNullOrEmpty(Size)) classes.Add(Size);
+        if (IsActive) classes.Add("active");
+        if (IsRegenerating) classes.Add("regenerating");
+        return string.Join(" ", classes);
+    }
+
+    private async Task HandleClick()
+    {
+        if (OnClick.HasDelegate)
+            await OnClick.InvokeAsync(ShipType);
+    }
+
+    private string GetDisplayName()
+    {
+        if (!string.IsNullOrEmpty(DisplayName)) return DisplayName;
+        return ShipType.ToLowerInvariant() switch
+        {
+            // Military - Capital
+            "cube" => "Cube",
+            "sphere" => "Sphere",
+            "diamond" => "Diamond",
+            "tactical-cube" => "Tactical Cube",
+            "fusion-cube" => "Fusion Cube",
+            "queens-vessel" => "Queen's Vessel",
+            // Military - Combat
+            "probe" => "Probe",
+            "scout" => "Scout Ship",
+            "interceptor" => "Interceptor",
+            "assimilator" => "Assimilator",
+            // Military - Support
+            "construction" => "Construction",
+            "mining-drone" => "Mining Drone",
+            "transport-sphere" => "Transport Sphere",
+            "repair-drone" => "Repair Drone",
+            "shuttle" => "Shuttle",
+            "freighter" => "Freighter",
+            // Civilian/Infrastructure
+            "assembler" => "Assembler",
+            "construction-platform" => "Construction Platform",
+            "resource-barge" => "Resource Barge",
+            "storage-silo" => "Storage Silo",
+            "transport-node" => "Transport Node",
+            "fuel-processor" => "Fuel Processor",
+            "builder-drone" => "Builder Drone",
+            "maintenance-tender" => "Maintenance Tender",
+            "data-relay" => "Data Relay",
+            "survey-probe" => "Survey Probe",
+            "sensor-platform" => "Sensor Platform",
+            "waste-transport" => "Waste Transport",
+            "support-craft" => "Support Craft",
+            "colony-matrix" => "Colony Matrix",
+            "integration-node" => "Integration Node",
+            "processing-node" => "Processing Node",
+            _ => ShipType
+        };
+    }
+
+    // Ship data - Resistance is futile
+    public static readonly ShipData[] MilitaryShips = new[]
+    {
+        // Capital - Devastating
+        new ShipData("cube", "Cube", "Capital", 25, 30, 8, 4, true),
+        new ShipData("tactical-cube", "Tactical Cube", "Capital", 35, 35, 10, 3, true),
+        new ShipData("fusion-cube", "Fusion Cube", "Capital", 30, 32, 9, 3, true),
+        new ShipData("diamond", "Diamond", "Command", 20, 25, 12, 5, true),
+        new ShipData("queens-vessel", "Queen's Vessel", "Command", 22, 28, 15, 6, true),
+        // Medium
+        new ShipData("sphere", "Sphere", "Cruiser", 15, 18, 6, 6, true),
+        new ShipData("transport-sphere", "Transport Sphere", "Transport", 8, 15, 4, 5, true),
+        new ShipData("assimilator", "Assimilator", "Assault", 18, 16, 5, 5, true),
+        // Light
+        new ShipData("probe", "Probe", "Scout", 5, 4, 8, 9, false),
+        new ShipData("scout", "Scout Ship", "Scout", 8, 6, 6, 8, true),
+        new ShipData("interceptor", "Interceptor", "Fighter", 10, 5, 2, 9, true),
+        // Support
+        new ShipData("construction", "Construction", "Industrial", 4, 8, 4, 4, true),
+        new ShipData("mining-drone", "Mining Drone", "Industrial", 3, 5, 2, 5, false),
+        new ShipData("repair-drone", "Repair Drone", "Support", 2, 6, 3, 5, false),
+        new ShipData("shuttle", "Shuttle", "Shuttle", 3, 3, 1, 6, false),
+        new ShipData("freighter", "Freighter", "Freighter", 4, 8, 2, 4, true),
+    };
+
+    public static readonly ShipData[] InfrastructureShips = new[]
+    {
+        new ShipData("assembler", "Assembler", "Industrial", 2, 6, 3, 4, false),
+        new ShipData("construction-platform", "Construction Platform", "Station", 3, 10, 4, 0, false),
+        new ShipData("resource-barge", "Resource Barge", "Freighter", 2, 8, 1, 3, false),
+        new ShipData("storage-silo", "Storage Silo", "Station", 1, 12, 2, 0, false),
+        new ShipData("transport-node", "Transport Node", "Transport", 2, 6, 2, 5, false),
+        new ShipData("fuel-processor", "Fuel Processor", "Industrial", 2, 8, 3, 0, false),
+        new ShipData("builder-drone", "Builder Drone", "Drone", 1, 4, 2, 6, false),
+        new ShipData("maintenance-tender", "Maintenance Tender", "Support", 2, 5, 3, 5, false),
+        new ShipData("data-relay", "Data Relay", "Station", 1, 6, 8, 0, false),
+        new ShipData("survey-probe", "Survey Probe", "Scout", 1, 3, 6, 7, false),
+        new ShipData("sensor-platform", "Sensor Platform", "Station", 2, 5, 10, 0, false),
+        new ShipData("colony-matrix", "Colony Matrix", "Colonizer", 3, 10, 5, 3, false),
+        new ShipData("integration-node", "Integration Node", "Station", 4, 8, 6, 0, false),
+        new ShipData("processing-node", "Processing Node", "Industrial", 2, 7, 4, 0, false),
+    };
+
+    // CanRegenerate = has adaptive shielding
+    public record ShipData(string Type, string Name, string Class, int Attack, int Defense, int Science, int Speed, bool CanRegenerate);
+}

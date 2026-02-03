@@ -1,0 +1,185 @@
+@* RomulanShip.razor - Ship display component for Romulan vessels *@
+
+<div class="@GetContainerClasses()" @onclick="HandleClick">
+    <div class="@GetShipClasses()"></div>
+    @if (ShowNameplate)
+    {
+        <div class="ship-nameplate romulan-nameplate">
+            <span class="ship-name">@GetDisplayName()</span>
+            <span class="ship-class-icon">🦅</span>
+        </div>
+    }
+</div>
+
+<style>
+    .ship-container.romulan-ship {
+        display: inline-flex;
+        flex-direction: column;
+        background: linear-gradient(180deg, #252d2d 0%, #151a1a 100%);
+        border: 1px solid #354545;
+        border-radius: 6px;
+        overflow: hidden;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+        transition: all 0.2s;
+    }
+    
+    .ship-container.romulan-ship:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+        border-color: rgba(16, 185, 129, 0.5);
+    }
+    
+    .ship-container.romulan-ship.selected {
+        border-color: #10b981;
+        box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+    }
+    
+    .romulan-nameplate {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 12px;
+        background: linear-gradient(180deg, #5a7a6a 0%, #3a5a4a 50%, #2a4035 100%);
+        border-top: 1px solid #6a8a7a;
+    }
+    
+    .romulan-nameplate .ship-name {
+        font-size: 10px;
+        font-weight: 700;
+        color: #0a1510;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        text-shadow: 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+    
+    .romulan-nameplate .ship-class-icon {
+        width: 22px;
+        height: 22px;
+        background: linear-gradient(180deg, #6a8a7a 0%, #4a6a5a 100%);
+        border: 2px solid #2a4035;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+    }
+</style>
+
+@code {
+    [Parameter] public string ShipType { get; set; } = "dderidex";
+    [Parameter] public string Size { get; set; } = "medium";
+    [Parameter] public string Category { get; set; } = "military";
+    [Parameter] public bool ShowNameplate { get; set; } = false;
+    [Parameter] public bool IsSelected { get; set; } = false;
+    [Parameter] public bool IsCloaked { get; set; } = false;
+    [Parameter] public string? DisplayName { get; set; }
+    [Parameter] public EventCallback<string> OnClick { get; set; }
+    [Parameter] public string? CssClass { get; set; }
+
+    private string GetContainerClasses()
+    {
+        var classes = new List<string> { "ship-container", "romulan-ship" };
+        if (IsSelected) classes.Add("selected");
+        if (OnClick.HasDelegate) classes.Add("clickable");
+        if (!string.IsNullOrEmpty(CssClass)) classes.Add(CssClass);
+        return string.Join(" ", classes);
+    }
+
+    private string GetShipClasses()
+    {
+        var classes = new List<string> { "ship-card", "romulan", Category, ShipType.ToLowerInvariant() };
+        if (!string.IsNullOrEmpty(Size)) classes.Add(Size);
+        if (IsCloaked) classes.Add("cloaking");
+        return string.Join(" ", classes);
+    }
+
+    private async Task HandleClick()
+    {
+        if (OnClick.HasDelegate)
+            await OnClick.InvokeAsync(ShipType);
+    }
+
+    private string GetDisplayName()
+    {
+        if (!string.IsNullOrEmpty(DisplayName)) return DisplayName;
+        return ShipType.ToLowerInvariant() switch
+        {
+            // Military - Warbirds
+            "dderidex" => "D'deridex",
+            "valdore" => "Valdore",
+            "mogai" => "Mogai",
+            "scimitar" => "Scimitar",
+            "bird-of-prey" => "Bird-of-Prey",
+            // Military - Light
+            "scout" or "scout-alt" => "Scout",
+            "science-vessel" => "Science Vessel",
+            "drone" => "Drone Ship",
+            "d7-variant" => "D7 Variant",
+            "tliss" => "T'Liss",
+            "tvaro" or "tvaro-alt" => "T'Varo",
+            "dhelan" => "Dhelan",
+            "harpy" => "Harpy",
+            "griffin" => "Griffin",
+            "hathos" => "Hathos",
+            "vastam" => "Vastam",
+            // Civilian
+            "shuttle" => "Shuttle",
+            "runabout" => "Runabout",
+            "transport" => "Transport",
+            "freighter" => "Freighter",
+            "science" => "Science Ship",
+            "courier" => "Courier",
+            "colony" or "colony-alt" => "Colony Ship",
+            "mining" => "Mining Vessel",
+            "repair" or "repair-alt" => "Repair Ship",
+            "trawler" => "Trawler",
+            "cargo" => "Cargo Ship",
+            "diplomatic" => "Diplomatic",
+            "yacht" => "Yacht",
+            "barge" => "Barge",
+            "survey" => "Survey Ship",
+            _ => ShipType
+        };
+    }
+
+    // Ship data
+    public static readonly ShipData[] MilitaryShips = new[]
+    {
+        // Warbirds (Capital)
+        new ShipData("dderidex", "D'deridex", "Warbird", 14, 12, 4, 5, true),
+        new ShipData("valdore", "Valdore", "Warbird", 13, 11, 4, 6, true),
+        new ShipData("mogai", "Mogai", "Warbird", 12, 10, 3, 6, true),
+        new ShipData("scimitar", "Scimitar", "Dreadnought", 20, 15, 5, 4, true),
+        // Birds of Prey (Light)
+        new ShipData("bird-of-prey", "Bird-of-Prey", "Bird of Prey", 8, 5, 2, 8, true),
+        new ShipData("tliss", "T'Liss", "Bird of Prey", 7, 4, 2, 9, true),
+        new ShipData("tvaro", "T'Varo", "Bird of Prey", 9, 5, 2, 8, true),
+        // Destroyers/Escorts
+        new ShipData("dhelan", "Dhelan", "Destroyer", 10, 7, 2, 7, true),
+        new ShipData("harpy", "Harpy", "Escort", 8, 6, 2, 8, true),
+        new ShipData("griffin", "Griffin", "Destroyer", 9, 7, 2, 7, true),
+        new ShipData("hathos", "Hathos", "Cruiser", 11, 9, 3, 6, true),
+        new ShipData("vastam", "Vastam", "Cruiser", 10, 8, 3, 6, true),
+        // Support
+        new ShipData("scout", "Scout", "Scout", 4, 3, 4, 9, true),
+        new ShipData("science-vessel", "Science Vessel", "Science", 3, 4, 6, 6, true),
+        new ShipData("drone", "Drone Ship", "Drone", 6, 2, 1, 7, false),
+        new ShipData("d7-variant", "D7 Variant", "Battlecruiser", 10, 8, 2, 5, true),
+    };
+
+    public static readonly ShipData[] CivilianShips = new[]
+    {
+        new ShipData("shuttle", "Shuttle", "Shuttle", 1, 1, 0, 7, false),
+        new ShipData("runabout", "Runabout", "Shuttle", 2, 2, 1, 6, false),
+        new ShipData("transport", "Transport", "Transport", 1, 3, 0, 5, false),
+        new ShipData("freighter", "Freighter", "Freighter", 2, 3, 0, 4, false),
+        new ShipData("science", "Science Ship", "Science", 2, 2, 5, 5, false),
+        new ShipData("courier", "Courier", "Courier", 2, 1, 0, 9, true),
+        new ShipData("colony", "Colony Ship", "Colonizer", 1, 4, 1, 3, false),
+        new ShipData("mining", "Mining Vessel", "Industrial", 2, 3, 1, 3, false),
+        new ShipData("repair", "Repair Ship", "Support", 1, 3, 2, 4, false),
+        new ShipData("diplomatic", "Diplomatic", "Diplomatic", 2, 4, 2, 5, true),
+    };
+
+    public record ShipData(string Type, string Name, string Class, int Attack, int Defense, int Science, int Speed, bool CanCloak);
+}
