@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 100" fill="none">
+  <!-- Andorian Bracket Left: Flowing curved bracket -->
+  <defs>
+    <linearGradient id="andorianBracketBlue" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#88CCFF"/>
+      <stop offset="100%" style="stop-color:#4499DD"/>
+    </linearGradient>
+  </defs>
+
+  <path d="
+    M 30 0
+    L 30 15
+    Q 15 15 15 30
+    L 15 70
+    Q 15 85 30 85
+    L 30 100
+    L 0 100
+    L 0 0
+    Z
+  " fill="url(#andorianBracketBlue)"/>
+</svg>

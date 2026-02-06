@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" fill="none">
+  <!-- Ferengi Panel Frame: Bronze frame with gold accents and hexagonal corners -->
+  <defs>
+    <linearGradient id="ferengiFrameBronze" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8B6914"/>
+      <stop offset="50%" style="stop-color:#5C4A0F"/>
+      <stop offset="100%" style="stop-color:#8B6914"/>
+    </linearGradient>
+    <linearGradient id="ferengiFrameGold" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#D4A017"/>
+      <stop offset="50%" style="stop-color:#FFD700"/>
+      <stop offset="100%" style="stop-color:#D4A017"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Top bar with beveled corners -->
+  <path d="
+    M 30 0
+    L 770 0
+    L 800 30
+    L 800 50
+    L 0 50
+    L 0 30
+    Z
+  " fill="url(#ferengiFrameBronze)"/>
+
+  <!-- Left sidebar -->
+  <path d="
+    M 0 30
+    L 30 0
+    L 80 0
+    L 80 600
+    L 0 600
+    Z
+  " fill="url(#ferengiFrameBronze)"/>
+
+  <!-- Bottom bar -->
+  <path d="
+    M 0 550
+    L 800 550
+    L 800 570
+    L 770 600
+    L 30 600
+    L 0 570
+    Z
+  " fill="url(#ferengiFrameBronze)"/>
+
+  <!-- Right sidebar -->
+  <path d="
+    M 720 50
+    L 800 50
+    L 800 570
+    L 770 600
+    L 720 600
+    Z
+  " fill="url(#ferengiFrameBronze)"/>
+
+  <!-- Gold trim lines -->
+  <line x1="80" y1="50" x2="720" y2="50" stroke="url(#ferengiFrameGold)" stroke-width="2"/>
+  <line x1="80" y1="550" x2="720" y2="550" stroke="url(#ferengiFrameGold)" stroke-width="2"/>
+
+  <!-- Corner hexagons -->
+  <polygon points="40,25 50,18 60,25 60,35 50,42 40,35" fill="url(#ferengiFrameGold)"/>
+  <polygon points="740,25 750,18 760,25 760,35 750,42 740,35" fill="url(#ferengiFrameGold)"/>
+  <polygon points="40,565 50,558 60,565 60,575 50,582 40,575" fill="url(#ferengiFrameGold)"/>
+  <polygon points="740,565 750,558 760,565 760,575 750,582 740,575" fill="url(#ferengiFrameGold)"/>
+</svg>

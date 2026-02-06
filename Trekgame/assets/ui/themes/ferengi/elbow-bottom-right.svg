@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <!-- Ferengi Elbow Bottom-Right -->
+  <defs>
+    <linearGradient id="ferengiBronze" x1="100%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" style="stop-color:#D4A017"/>
+      <stop offset="50%" style="stop-color:#8B6914"/>
+      <stop offset="100%" style="stop-color:#5C4A0F"/>
+    </linearGradient>
+    <linearGradient id="ferengiGold" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#D4A017"/>
+      <stop offset="100%" style="stop-color:#FFD700"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Main elbow -->
+  <path d="
+    M 160 0
+    L 200 0
+    L 200 200
+    L 0 200
+    L 0 160
+    L 135 160
+    L 160 135
+    L 160 0
+    Z
+  " fill="url(#ferengiBronze)"/>
+
+  <!-- Gold trim line -->
+  <path d="M 145 160 L 160 145" stroke="url(#ferengiGold)" stroke-width="3"/>
+
+  <!-- Small hexagon accent -->
+  <polygon points="161,167 168,162 175,167 175,175 168,180 161,175" fill="url(#ferengiGold)"/>
+</svg>

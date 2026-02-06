@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 40" fill="none">
+  <!-- Dominion Button: Organic pill with flowing edges -->
+  <defs>
+    <linearGradient id="dominionBtnPurple" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#8A5AAA"/>
+      <stop offset="100%" style="stop-color:#5A3A7A"/>
+    </linearGradient>
+    <linearGradient id="dominionBtnGold" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#C89030"/>
+      <stop offset="50%" style="stop-color:#E8C060"/>
+      <stop offset="100%" style="stop-color:#C89030"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Organic pill shape -->
+  <path d="
+    M 20 0
+    Q 60 -3 100 0
+    Q 120 5 120 20
+    Q 120 35 100 40
+    Q 60 43 20 40
+    Q 0 35 0 20
+    Q 0 5 20 0
+    Z
+  " fill="url(#dominionBtnPurple)"/>
+
+  <!-- Inner glow line -->
+  <path d="
+    M 25 8
+    Q 60 5 95 8
+  " fill="none" stroke="url(#dominionBtnGold)" stroke-width="2" stroke-linecap="round"/>
+</svg>

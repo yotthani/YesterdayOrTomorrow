@@ -1,53 +1,91 @@
+using System.Net.Http;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace AssetGenerator.Services;
 
 /// <summary>
-/// Service for loading prompt definitions from JSON files.
-/// Allows easy editing of prompts without modifying code.
+/// Service for loading prompt definitions from JSON files via HTTP.
+/// Works with Blazor WebAssembly by loading from wwwroot/data/prompts/.
 /// </summary>
 public class PromptDataService
 {
-    private readonly string _dataPath;
+    private readonly HttpClient _httpClient;
+    private readonly string _basePath;
     private Dictionary<string, JsonDocument> _jsonDocs = new();
     private bool _isLoaded = false;
+    private List<string> _loadErrors = new();
 
-    public PromptDataService(string? dataPath = null)
+    // List of known JSON files to load
+    private static readonly string[] KnownJsonFiles = new[]
     {
-        _dataPath = dataPath ?? Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "Prompts");
+        "Ships", "Buildings", "Structures", "Troops", "Portraits",
+        "FactionLeaders", "FactionSymbols", "SpecialCharacters", "EventCharacters",
+        "Planets", "Stars", "Anomalies", "GalaxyTiles", "SystemElements",
+        "HouseSymbols", "UIElements", "Vehicles"
+    };
+
+    public PromptDataService(HttpClient httpClient, string basePath = "data/prompts")
+    {
+        _httpClient = httpClient;
+        _basePath = basePath;
     }
 
     /// <summary>
-    /// Load all prompt JSON files from the data directory
+    /// Check if data was loaded successfully
+    /// </summary>
+    public bool IsLoaded => _isLoaded;
+
+    /// <summary>
+    /// Get any errors that occurred during loading
+    /// </summary>
+    public IReadOnlyList<string> LoadErrors => _loadErrors;
+
+    /// <summary>
+    /// Load all prompt JSON files from wwwroot via HTTP
     /// </summary>
     public async Task LoadAsync()
     {
         if (_isLoaded) return;
 
-        if (!Directory.Exists(_dataPath))
-        {
-            Console.WriteLine($"Prompt data directory not found: {_dataPath}");
-            return;
-        }
+        _loadErrors.Clear();
+        var loadedCount = 0;
 
-        foreach (var file in Directory.GetFiles(_dataPath, "*.json"))
+        foreach (var fileName in KnownJsonFiles)
         {
+            var url = $"{_basePath}/{fileName}.json";
             try
             {
-                var json = await File.ReadAllTextAsync(file);
-                var doc = JsonDocument.Parse(json);
-                var category = Path.GetFileNameWithoutExtension(file).ToLower();
-                _jsonDocs[category] = doc;
-                Console.WriteLine($"Loaded prompt data: {category}");
+                var response = await _httpClient.GetAsync(url);
+                if (response.IsSuccessStatusCode)
+                {
+                    var json = await response.Content.ReadAsStringAsync();
+                    var doc = JsonDocument.Parse(json);
+                    _jsonDocs[fileName.ToLower()] = doc;
+                    loadedCount++;
+                    Console.WriteLine($"[PromptData] Loaded: {fileName}");
+                }
+                else
+                {
+                    var error = $"[PromptData] Failed to load {fileName}: HTTP {(int)response.StatusCode}";
+                    Console.WriteLine(error);
+                    _loadErrors.Add(error);
+                }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error loading {file}: {ex.Message}");
+                var error = $"[PromptData] Error loading {fileName}: {ex.Message}";
+                Console.WriteLine(error);
+                _loadErrors.Add(error);
             }
         }
 
         _isLoaded = true;
+        Console.WriteLine($"[PromptData] Loaded {loadedCount}/{KnownJsonFiles.Length} prompt files");
+
+        if (loadedCount == 0)
+        {
+            Console.WriteLine("[PromptData] WARNING: No JSON files loaded! Prompt generation will use fallbacks.");
+        }
     }
 
     /// <summary>
@@ -143,7 +181,7 @@ public class PromptDataService
             sb.AppendLine($"- Design: {design.GetString()}");
         if (data.TryGetProperty("colors", out var colors))
             sb.AppendLine($"- Colors: {colors.GetString()}");
-        
+
         if (data.TryGetProperty("features", out var features))
         {
             sb.AppendLine("- Features:");
@@ -237,21 +275,34 @@ public class PromptDataService
 
         var lowerName = assetName.ToLower();
 
+        // Find the asset with the MOST matching keywords (best match)
+        JsonElement? bestMatch = null;
+        int bestMatchCount = 0;
+
         foreach (var asset in assets.EnumerateArray())
         {
             if (asset.TryGetProperty("match", out var match))
             {
+                int matchCount = 0;
                 foreach (var m in match.EnumerateArray())
                 {
-                    if (lowerName.Contains(m.GetString()?.ToLower() ?? ""))
+                    var keyword = m.GetString()?.ToLower() ?? "";
+                    if (!string.IsNullOrEmpty(keyword) && lowerName.Contains(keyword))
                     {
-                        return asset;
+                        matchCount++;
                     }
+                }
+
+                // Only consider if at least one match
+                if (matchCount > 0 && matchCount > bestMatchCount)
+                {
+                    bestMatchCount = matchCount;
+                    bestMatch = asset;
                 }
             }
         }
 
-        return null;
+        return bestMatch;
     }
 
     /// <summary>
@@ -540,7 +591,7 @@ public class PromptDataService
     public List<string> GetAssetNames(string category)
     {
         var names = new List<string>();
-        
+
         if (!_jsonDocs.TryGetValue(category.ToLower(), out var doc))
             return names;
 

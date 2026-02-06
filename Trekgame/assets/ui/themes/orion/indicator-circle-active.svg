@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" fill="none">
+  <!-- Orion Indicator Circle Active: Ornate circular indicator (active/lit state) -->
+  <defs>
+    <linearGradient id="orionIndActiveGreen" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#44DD66"/>
+      <stop offset="100%" style="stop-color:#33AA55"/>
+    </linearGradient>
+    <radialGradient id="orionIndActiveGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#FFE066"/>
+      <stop offset="60%" style="stop-color:#FFCC00"/>
+      <stop offset="100%" style="stop-color:#CC9900"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Outer glow effect -->
+  <circle cx="15" cy="15" r="14" fill="url(#orionIndActiveGreen)"/>
+
+  <!-- Active glowing center -->
+  <circle cx="15" cy="15" r="10" fill="url(#orionIndActiveGlow)"/>
+
+  <!-- Bright center highlight -->
+  <circle cx="13" cy="13" r="4" fill="#FFFFFF" opacity="0.3"/>
+
+  <!-- Decorative dots around the edge (brighter when active) -->
+  <circle cx="15" cy="3" r="1.5" fill="#FFE066"/>
+  <circle cx="15" cy="27" r="1.5" fill="#FFE066"/>
+  <circle cx="3" cy="15" r="1.5" fill="#FFE066"/>
+  <circle cx="27" cy="15" r="1.5" fill="#FFE066"/>
+</svg>

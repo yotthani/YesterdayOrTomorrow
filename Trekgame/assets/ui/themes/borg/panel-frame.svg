@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" fill="none">
+  <!-- Borg Panel Frame: Industrial grid with circuit lines -->
+  <defs>
+    <linearGradient id="borgFrameMetal" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2A3A3A"/>
+      <stop offset="100%" style="stop-color:#1A2A2A"/>
+    </linearGradient>
+    <linearGradient id="borgFrameGreen" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#1A3A1A"/>
+      <stop offset="50%" style="stop-color:#3A6A3A"/>
+      <stop offset="100%" style="stop-color:#1A3A1A"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Top bar -->
+  <rect x="0" y="0" width="800" height="50" fill="url(#borgFrameMetal)"/>
+
+  <!-- Left sidebar -->
+  <rect x="0" y="0" width="80" height="600" fill="url(#borgFrameMetal)"/>
+
+  <!-- Bottom bar -->
+  <rect x="0" y="550" width="800" height="50" fill="url(#borgFrameMetal)"/>
+
+  <!-- Right sidebar -->
+  <rect x="720" y="50" width="80" height="500" fill="url(#borgFrameMetal)"/>
+
+  <!-- Circuit lines -->
+  <line x1="80" y1="50" x2="720" y2="50" stroke="url(#borgFrameGreen)" stroke-width="2"/>
+  <line x1="80" y1="550" x2="720" y2="550" stroke="url(#borgFrameGreen)" stroke-width="2"/>
+  <line x1="80" y1="50" x2="80" y2="550" stroke="#2A5A2A" stroke-width="2"/>
+  <line x1="720" y1="50" x2="720" y2="550" stroke="#2A5A2A" stroke-width="2"/>
+
+  <!-- Corner nodes -->
+  <circle cx="80" cy="50" r="6" fill="#3A6A3A"/>
+  <circle cx="80" cy="50" r="3" fill="#0a0f0a"/>
+  <circle cx="720" cy="50" r="6" fill="#3A6A3A"/>
+  <circle cx="720" cy="50" r="3" fill="#0a0f0a"/>
+  <circle cx="80" cy="550" r="6" fill="#3A6A3A"/>
+  <circle cx="80" cy="550" r="3" fill="#0a0f0a"/>
+  <circle cx="720" cy="550" r="6" fill="#3A6A3A"/>
+  <circle cx="720" cy="550" r="3" fill="#0a0f0a"/>
+
+  <!-- Grid lines on sidebar -->
+  <line x1="20" y1="100" x2="60" y2="100" stroke="#2A5A2A" stroke-width="1" opacity="0.5"/>
+  <line x1="20" y1="200" x2="60" y2="200" stroke="#2A5A2A" stroke-width="1" opacity="0.5"/>
+  <line x1="20" y1="300" x2="60" y2="300" stroke="#2A5A2A" stroke-width="1" opacity="0.5"/>
+  <line x1="20" y1="400" x2="60" y2="400" stroke="#2A5A2A" stroke-width="1" opacity="0.5"/>
+  <line x1="20" y1="500" x2="60" y2="500" stroke="#2A5A2A" stroke-width="1" opacity="0.5"/>
+</svg>

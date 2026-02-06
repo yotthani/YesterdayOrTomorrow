@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 40" fill="none">
+  <!-- Dominion Bar Horizontal with wave -->
+  <defs>
+    <linearGradient id="dominionBarPurple" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#4A2A5A"/>
+      <stop offset="50%" style="stop-color:#6A3A8A"/>
+      <stop offset="100%" style="stop-color:#4A2A5A"/>
+    </linearGradient>
+    <linearGradient id="dominionBarGold" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#C89030"/>
+      <stop offset="50%" style="stop-color:#E8C060"/>
+      <stop offset="100%" style="stop-color:#C89030"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Bar with organic wave edges -->
+  <path d="
+    M 0 5
+    Q 75 0 150 5
+    Q 225 10 300 5
+    L 300 35
+    Q 225 40 150 35
+    Q 75 30 0 35
+    Z
+  " fill="url(#dominionBarPurple)"/>
+
+  <!-- Gold accent line -->
+  <path d="M 20 20 Q 150 15 280 20" fill="none" stroke="url(#dominionBarGold)" stroke-width="2"/>
+</svg>

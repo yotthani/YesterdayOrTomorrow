@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" fill="none">
+  <!-- Andorian Indicator Circle: Ice crystal indicator -->
+  <defs>
+    <linearGradient id="andorianIndicatorBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#88CCFF"/>
+      <stop offset="100%" style="stop-color:#4499DD"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Outer circle -->
+  <circle cx="15" cy="15" r="12" fill="none" stroke="url(#andorianIndicatorBlue)" stroke-width="3"/>
+
+  <!-- Ice crystal shape inside -->
+  <path d="M 15 5 L 15 25 M 7 10 L 23 20 M 23 10 L 7 20" stroke="url(#andorianIndicatorBlue)" stroke-width="1" opacity="0.5"/>
+</svg>

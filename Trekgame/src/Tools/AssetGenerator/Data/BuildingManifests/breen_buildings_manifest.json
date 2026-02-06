@@ -1,0 +1,160 @@
+{
+  "factionName": "Breen",
+  "categoryName": "Buildings",
+  "architectureStyle": {
+    "description": "Mysterious, cold, refrigerated - designed for beings who never remove their environmental suits",
+    "keyElements": [
+      "Ice-crystal aesthetic - faceted, angular, cold",
+      "Teal and ice-blue coloring throughout",
+      "Cooling systems and cryo-tech visible everywhere",
+      "Completely sealed structures - no one knows what's inside",
+      "Asymmetrical, alien design unlike Alpha Quadrant species",
+      "Helmet-like building shapes echoing Breen refrigeration suits",
+      "No windows in the traditional sense - opaque viewports at best"
+    ],
+    "colors": "Ice-blue, teal, white, silver metallic, frost-white accents",
+    "materials": "Cryogenic alloys, ice-resistant composites, thermal insulation"
+  },
+  "buildings": [
+    {
+      "name": "Confederacy Command",
+      "category": "Government",
+      "description": "Central authority of the mysterious Breen Confederacy - opaque and inscrutable"
+    },
+    {
+      "name": "Thot's Citadel",
+      "category": "Government",
+      "description": "Fortress residence of the Breen military commander - imposing and cold"
+    },
+    {
+      "name": "Council Dome",
+      "category": "Government",
+      "description": "Assembly hall where masked leaders make decisions no outsider can understand"
+    },
+    {
+      "name": "Colonial Administration",
+      "category": "Government",
+      "description": "Governance facility for Breen territorial holdings in frozen conditions"
+    },
+    {
+      "name": "Cryo Barracks",
+      "category": "Military",
+      "description": "Refrigerated quarters maintaining optimal Breen temperature for soldiers"
+    },
+    {
+      "name": "Military Academy",
+      "category": "Military",
+      "description": "Training facility producing disciplined Breen soldiers in extreme cold"
+    },
+    {
+      "name": "Weapons Factory",
+      "category": "Military",
+      "description": "Manufacturing Breen energy weapons including devastating energy dampeners"
+    },
+    {
+      "name": "Energy Dampener Plant",
+      "category": "Military",
+      "description": "Producing the technology that disabled entire fleets at Chin'toka"
+    },
+    {
+      "name": "Defense Tower",
+      "category": "Military",
+      "description": "Ice-crystal fortification with concealed weapons protecting installations"
+    },
+    {
+      "name": "Prison Complex",
+      "category": "Military",
+      "description": "Detention facility where conditions are lethal for non-Breen species"
+    },
+    {
+      "name": "Interrogation Center",
+      "category": "Intelligence",
+      "description": "Extracting information through methods unknown to outside species"
+    },
+    {
+      "name": "Intelligence HQ",
+      "category": "Intelligence",
+      "description": "Spy operations conducted behind those inscrutable helmets"
+    },
+    {
+      "name": "Ship Assembly",
+      "category": "Production",
+      "description": "Building the organic-looking Breen warships in frozen docks"
+    },
+    {
+      "name": "Ice Mining Station",
+      "category": "Production",
+      "description": "Extracting resources from frozen worlds comfortable for Breen"
+    },
+    {
+      "name": "Manufacturing Complex",
+      "category": "Production",
+      "description": "Producing goods in sub-zero conditions unsurvivable by most species"
+    },
+    {
+      "name": "Refrigeration Hub",
+      "category": "Energy",
+      "description": "Climate control systems maintaining optimal Breen comfort levels"
+    },
+    {
+      "name": "Power Plant",
+      "category": "Energy",
+      "description": "Energy generation for the frigid civilization's needs"
+    },
+    {
+      "name": "Geothermal Station",
+      "category": "Energy",
+      "description": "Paradoxically harvesting heat and converting it to usable power"
+    },
+    {
+      "name": "Cryo Research Lab",
+      "category": "Research",
+      "description": "Studying cold-based technology and cryogenic applications"
+    },
+    {
+      "name": "Technology Center",
+      "category": "Research",
+      "description": "Developing Breen innovations in frozen laboratory conditions"
+    },
+    {
+      "name": "Communication Tower",
+      "category": "Infrastructure",
+      "description": "Encrypted Breen communications relay using unknown protocols"
+    },
+    {
+      "name": "Sensor Station",
+      "category": "Infrastructure",
+      "description": "Monitoring surrounding space for threats and opportunities"
+    },
+    {
+      "name": "Transport Hub",
+      "category": "Infrastructure",
+      "description": "Movement center designed for beings who never remove their suits"
+    },
+    {
+      "name": "Medical Facility",
+      "category": "Medical",
+      "description": "Healthcare adapted for Breen physiology - a complete mystery to outsiders"
+    },
+    {
+      "name": "Habitat Module",
+      "category": "Housing",
+      "description": "Temperature-controlled housing for Breen families - if they have families"
+    },
+    {
+      "name": "Cultural Center",
+      "category": "Religion",
+      "description": "Breen traditions remain completely unknown to the outside galaxy"
+    },
+    {
+      "name": "Diplomatic Station",
+      "category": "Commerce",
+      "description": "Rare meeting place for Breen negotiations with outsiders"
+    },
+    {
+      "name": "Market Station",
+      "category": "Commerce",
+      "description": "Trade facilities for mysterious Breen commerce"
+    }
+  ]
+}

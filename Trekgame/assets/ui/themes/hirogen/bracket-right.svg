@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 100" fill="none">
+  <defs>
+    <linearGradient id="hirogenBracketGreen" x1="100%" y1="0%" x2="0%" y2="0%">
+      <stop offset="0%" style="stop-color:#557755"/>
+      <stop offset="100%" style="stop-color:#334433"/>
+    </linearGradient>
+  </defs>
+  <path d="M 0 0 L 30 0 L 30 100 L 0 100 L 0 85 L 18 82 L 20 70 L 18 50 L 20 30 L 18 18 L 0 15 Z" fill="url(#hirogenBracketGreen)"/>
+</svg>

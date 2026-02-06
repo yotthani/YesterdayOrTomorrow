@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 30" fill="none">
+  <!-- Klingon Data Cell Wide: Wider angular data display -->
+  <defs>
+    <linearGradient id="klingonCellYellow" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFCC00"/>
+      <stop offset="100%" style="stop-color:#CC9900"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Wide angular data cell -->
+  <path d="
+    M 8 0
+    L 192 0
+    L 200 8
+    L 200 22
+    L 192 30
+    L 8 30
+    L 0 22
+    L 0 8
+    Z
+  " fill="url(#klingonCellYellow)"/>
+</svg>

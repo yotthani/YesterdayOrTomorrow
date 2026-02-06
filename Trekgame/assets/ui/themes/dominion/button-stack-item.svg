@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 35" fill="none">
+  <!-- Dominion Button Stack Item -->
+  <defs>
+    <linearGradient id="dominionStackPurple" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#7A4A9A"/>
+      <stop offset="100%" style="stop-color:#5A3A7A"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Organic button -->
+  <path d="
+    M 12 0
+    Q 75 -2 138 0
+    Q 150 5 150 17.5
+    Q 150 30 138 35
+    Q 75 37 12 35
+    Q 0 30 0 17.5
+    Q 0 5 12 0
+    Z
+  " fill="url(#dominionStackPurple)"/>
+</svg>

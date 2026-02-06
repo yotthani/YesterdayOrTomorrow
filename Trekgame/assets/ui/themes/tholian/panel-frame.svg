@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" fill="none">
+  <!-- Tholian Panel Frame: Hexagonal crystalline structure -->
+  <defs>
+    <linearGradient id="tholianFrameOrange" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF6633"/>
+      <stop offset="100%" style="stop-color:#CC4411"/>
+    </linearGradient>
+    <linearGradient id="tholianAccentYellow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#CC4411"/>
+      <stop offset="50%" style="stop-color:#FFAA44"/>
+      <stop offset="100%" style="stop-color:#CC4411"/>
+    </linearGradient>
+    <pattern id="tholianHexPattern" width="30" height="26" patternUnits="userSpaceOnUse">
+      <path d="M 15 0 L 30 7.5 L 30 19.5 L 15 26 L 0 19.5 L 0 7.5 Z" fill="none" stroke="#FFAA44" stroke-width="0.5" opacity="0.3"/>
+    </pattern>
+    <filter id="crystalGlow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Top bar with hexagonal profile -->
+  <path d="
+    M 0 0 L 150 0 L 165 15 L 300 15 L 315 0 L 485 0 L 500 15 L 635 15 L 650 0 L 800 0 L 800 50 L 0 50 Z
+  " fill="url(#tholianFrameOrange)"/>
+
+  <!-- Left sidebar hexagonal -->
+  <path d="
+    M 0 0 L 90 0 L 90 130 L 80 145 L 90 160 L 90 290 L 80 305 L 90 320 L 90 450 L 80 465 L 90 480 L 90 600 L 0 600 Z
+  " fill="url(#tholianFrameOrange)"/>
+
+  <!-- Bottom bar -->
+  <path d="
+    M 0 550 L 800 550 L 800 600 L 650 600 L 635 585 L 500 585 L 485 600 L 315 600 L 300 585 L 165 585 L 150 600 L 0 600 Z
+  " fill="url(#tholianFrameOrange)"/>
+
+  <!-- Right sidebar -->
+  <path d="
+    M 710 50 L 800 50 L 800 600 L 710 600 L 710 480 L 720 465 L 710 450 L 710 320 L 720 305 L 710 290 L 710 160 L 720 145 L 710 130 Z
+  " fill="url(#tholianFrameOrange)"/>
+
+  <!-- Hex pattern overlay -->
+  <rect x="5" y="55" width="85" height="490" fill="url(#tholianHexPattern)"/>
+
+  <!-- Crystal web lines -->
+  <line x1="95" y1="55" x2="705" y2="55" stroke="#FFAA44" stroke-width="1" opacity="0.6" filter="url(#crystalGlow)"/>
+  <line x1="95" y1="545" x2="705" y2="545" stroke="#FFAA44" stroke-width="1" opacity="0.6" filter="url(#crystalGlow)"/>
+</svg>

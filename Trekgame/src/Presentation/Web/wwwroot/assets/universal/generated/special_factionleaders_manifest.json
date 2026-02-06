@@ -3,20 +3,22 @@
   "categoryName": "FactionLeaders",
   "grid": {
     "columns": 4,
-    "rows": 4,
-    "totalAssets": 16,
+    "rows": 5,
+    "totalAssets": 20,
     "cellSize": 360,
     "spriteWidth": 1440,
-    "spriteHeight": 1440
+    "spriteHeight": 1800
   },
-  "spriteSheetPath": "special_factionleaders.png",
-  "generatedAt": "2026-01-30T23:11:44.708Z",
+  "spriteSheetPath": "special_factionleaders_spritesheet.png",
+  "generatedAt": "2026-02-04T20:07:35.395Z",
   "assets": [
     {
       "row": 0,
       "col": 0,
       "name": "Leader Federation President Human Male",
       "type": "FactionLeaders",
+      "category": null,
+      "description": null,
       "promptUsed": ""
     },
     {
@@ -24,6 +26,8 @@
       "col": 1,
       "name": "Leader Klingon Chancellor Male",
       "type": "FactionLeaders",
+      "category": null,
+      "description": null,
       "promptUsed": ""
     },
     {
@@ -31,6 +35,8 @@
       "col": 2,
       "name": "Leader Romulan Praetor Male",
       "type": "FactionLeaders",
+      "category": null,
+      "description": null,
       "promptUsed": ""
     },
     {
@@ -38,6 +44,8 @@
       "col": 3,
       "name": "Leader Cardassian Legate Male",
       "type": "FactionLeaders",
+      "category": null,
+      "description": null,
       "promptUsed": ""
     },
     {
@@ -45,6 +53,8 @@
       "col": 0,
       "name": "Leader Ferengi Grand Nagus Male",
       "type": "FactionLeaders",
+      "category": null,
+      "description": null,
       "promptUsed": ""
     },
     {
@@ -52,6 +62,8 @@
       "col": 1,
       "name": "Leader Dominion Female Changeling Founder",
       "type": "FactionLeaders",
+      "category": null,
+      "description": null,
       "promptUsed": ""
     },
     {
@@ -59,69 +71,125 @@
       "col": 2,
       "name": "Leader Borg Queen Female",
       "type": "FactionLeaders",
+      "category": null,
+      "description": null,
       "promptUsed": ""
     },
     {
       "row": 1,
       "col": 3,
-      "name": "Leader Breen Thot Armored",
+      "name": "Leader Breen Thot Modern",
       "type": "FactionLeaders",
+      "category": null,
+      "description": null,
       "promptUsed": ""
     },
     {
       "row": 2,
       "col": 0,
+      "name": "Leader Breen Thot Classic",
+      "type": "FactionLeaders",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 2,
+      "col": 1,
+      "name": "Leader Breen Thot Revealed Face",
+      "type": "FactionLeaders",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 2,
+      "col": 2,
+      "name": "Leader Hirogen Alpha Hunter Male",
+      "type": "FactionLeaders",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 2,
+      "col": 3,
       "name": "Leader Gorn Hegemony King Male",
       "type": "FactionLeaders",
-      "promptUsed": ""
-    },
-    {
-      "row": 2,
-      "col": 1,
-      "name": "Leader Andorian Chancellor Female",
-      "type": "FactionLeaders",
-      "promptUsed": ""
-    },
-    {
-      "row": 2,
-      "col": 2,
-      "name": "Leader Vulcan High Command Admiral Male",
-      "type": "FactionLeaders",
-      "promptUsed": ""
-    },
-    {
-      "row": 2,
-      "col": 3,
-      "name": "Leader Trill Symbiosis President Female",
-      "type": "FactionLeaders",
+      "category": null,
+      "description": null,
       "promptUsed": ""
     },
     {
       "row": 3,
       "col": 0,
-      "name": "Leader Bajoran Kai Female Religious",
+      "name": "Leader Andorian Chancellor Female",
       "type": "FactionLeaders",
+      "category": null,
+      "description": null,
       "promptUsed": ""
     },
     {
       "row": 3,
       "col": 1,
-      "name": "Leader Tholian Assembly Commander",
+      "name": "Leader Vulcan High Command Admiral Male",
       "type": "FactionLeaders",
+      "category": null,
+      "description": null,
       "promptUsed": ""
     },
     {
       "row": 3,
       "col": 2,
-      "name": "Leader Orion Syndicate Boss Female",
+      "name": "Leader Trill Symbiosis President Female",
       "type": "FactionLeaders",
+      "category": null,
+      "description": null,
       "promptUsed": ""
     },
     {
       "row": 3,
       "col": 3,
+      "name": "Leader Bajoran Kai Female Religious",
+      "type": "FactionLeaders",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 4,
+      "col": 0,
+      "name": "Leader Tholian Assembly Commander",
+      "type": "FactionLeaders",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 4,
+      "col": 1,
+      "name": "Leader Orion Syndicate Boss Female",
+      "type": "FactionLeaders",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 4,
+      "col": 2,
       "name": "Leader Independent Mercenary Captain",
       "type": "FactionLeaders",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 4,
+      "col": 3,
+      "name": "Leader Nausicaan Raider Captain",
+      "type": "FactionLeaders",
+      "category": null,
+      "description": null,
       "promptUsed": ""
     }
   ]

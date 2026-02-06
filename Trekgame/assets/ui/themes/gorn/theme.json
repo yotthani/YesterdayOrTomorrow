@@ -1,0 +1,47 @@
+{
+  "id": "gorn",
+  "name": "Gorn Hegemony",
+  "description": "Gorn interface system - Reptilian strength, territorial dominance",
+  "faction": "gorn",
+  "fonts": {
+    "primary": {
+      "family": "Gorn Script",
+      "fallback": "Impact, Arial Black, sans-serif",
+      "file": "fonts/gorn-script.ttf",
+      "weight": "bold",
+      "letterSpacing": "0.02em",
+      "textTransform": "uppercase"
+    },
+    "secondary": {
+      "family": "Gorn Text",
+      "fallback": "Arial Narrow, Tahoma, sans-serif",
+      "file": "fonts/gorn-text.ttf",
+      "weight": "normal",
+      "letterSpacing": "0.01em"
+    },
+    "display": {
+      "family": "Gorn Runes",
+      "fallback": "Gorn Script, Impact, sans-serif",
+      "file": "fonts/gorn-runes.ttf",
+      "weight": "bold",
+      "letterSpacing": "0.03em",
+      "comment": "Ancient Gorn script for ceremonial displays"
+    }
+  },
+  "colors": {
+    "primary": "#669944",
+    "secondary": "#445522",
+    "accent": "#88BB55",
+    "highlight": "#AADD77",
+    "alert": "#CC4422",
+    "success": "#88BB55",
+    "background": "#1A1A0A",
+    "text": "#CCDD99",
+    "textDark": "#1A1A0A"
+  },
+  "styles": {
+    "cornerRadius": "scaled",
+    "borderStyle": "reptilian",
+    "animationStyle": "powerful"
+  }
+}

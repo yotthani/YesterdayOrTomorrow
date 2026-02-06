@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 35" fill="none">
+  <!-- LCARS Button Stack Item: Individual button in a vertical stack menu -->
+  <defs>
+    <linearGradient id="lcarsStackBtn" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#CC99CC"/>
+      <stop offset="100%" style="stop-color:#9966CC"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Rectangular button with slight rounding -->
+  <rect x="0" y="0" width="150" height="35" rx="3" ry="3" fill="url(#lcarsStackBtn)"/>
+</svg>

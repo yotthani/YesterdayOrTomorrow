@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 80" fill="none">
+  <defs>
+    <linearGradient id="breenHeaderGrey" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#8899AA"/>
+      <stop offset="100%" style="stop-color:#556677"/>
+    </linearGradient>
+  </defs>
+
+  <path d="
+    M 0 15 L 15 0 L 150 0 L 160 10 L 250 10 L 260 0 L 340 0 L 350 10 L 440 10 L 450 0 L 585 0 L 600 15 L 600 80 L 0 80 Z
+  " fill="url(#breenHeaderGrey)"/>
+
+  <line x1="20" y1="60" x2="580" y2="60" stroke="#AABBCC" stroke-width="1" opacity="0.4"/>
+</svg>

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" fill="none">
+  <defs>
+    <linearGradient id="gornAccent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#88BB55"/>
+      <stop offset="100%" style="stop-color:#AADD77"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Claw mark accent -->
+  <path d="M 5 35 L 15 10 L 12 8" fill="none" stroke="url(#gornAccent)" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 12 38 L 22 13 L 19 11" fill="none" stroke="url(#gornAccent)" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 19 40 L 29 15 L 26 13" fill="none" stroke="url(#gornAccent)" stroke-width="3" stroke-linecap="round"/>
+</svg>

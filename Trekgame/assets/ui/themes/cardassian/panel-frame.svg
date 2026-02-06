@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" fill="none">
+  <!-- Cardassian Panel Frame: Nested curved frame with oval accents -->
+  <defs>
+    <linearGradient id="cardassianFrameBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#5A7B8C"/>
+      <stop offset="100%" style="stop-color:#2A4A5A"/>
+    </linearGradient>
+    <linearGradient id="cardassianFrameOrange" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#CC6633"/>
+      <stop offset="50%" style="stop-color:#FF9944"/>
+      <stop offset="100%" style="stop-color:#CC6633"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Outer frame with curved corners -->
+  <!-- Top bar -->
+  <path d="
+    M 60 0
+    L 740 0
+    Q 800 0 800 30
+    L 800 50
+    L 0 50
+    L 0 30
+    Q 0 0 60 0
+    Z
+  " fill="url(#cardassianFrameBlue)"/>
+
+  <!-- Left sidebar -->
+  <path d="
+    M 0 30
+    L 0 570
+    Q 0 600 30 600
+    L 80 600
+    L 80 0
+    L 30 0
+    Q 0 0 0 30
+    Z
+  " fill="url(#cardassianFrameBlue)"/>
+
+  <!-- Bottom bar -->
+  <path d="
+    M 0 550
+    L 800 550
+    L 800 570
+    Q 800 600 740 600
+    L 60 600
+    Q 0 600 0 570
+    Z
+  " fill="url(#cardassianFrameBlue)"/>
+
+  <!-- Right sidebar -->
+  <path d="
+    M 720 50
+    L 800 50
+    L 800 570
+    Q 800 600 770 600
+    L 720 600
+    Z
+  " fill="url(#cardassianFrameBlue)"/>
+
+  <!-- Top center decorative element -->
+  <ellipse cx="400" cy="25" rx="60" ry="15" fill="url(#cardassianFrameOrange)"/>
+  <ellipse cx="400" cy="25" rx="40" ry="10" fill="#0a1015"/>
+
+  <!-- Inner curved cutouts -->
+  <path d="M 80 50 Q 100 70 120 50" fill="none" stroke="url(#cardassianFrameOrange)" stroke-width="2"/>
+  <path d="M 680 50 Q 700 70 720 50" fill="none" stroke="url(#cardassianFrameOrange)" stroke-width="2"/>
+  <path d="M 80 550 Q 100 530 120 550" fill="none" stroke="url(#cardassianFrameOrange)" stroke-width="2"/>
+  <path d="M 680 550 Q 700 530 720 550" fill="none" stroke="url(#cardassianFrameOrange)" stroke-width="2"/>
+</svg>

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 40" fill="none">
+  <!-- Romulan Cap Right: Angled end cap -->
+  <defs>
+    <linearGradient id="romulanCapGreen" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00CC99"/>
+      <stop offset="100%" style="stop-color:#006655"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Angled right cap -->
+  <path d="
+    M 0 0
+    L 20 0
+    L 30 10
+    L 30 30
+    L 20 40
+    L 0 40
+    Z
+  " fill="url(#romulanCapGreen)"/>
+</svg>

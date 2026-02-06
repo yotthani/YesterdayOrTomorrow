@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 80" fill="none">
+  <!-- Gorn Header Frame -->
+  <defs>
+    <linearGradient id="gornHeaderGreen" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#669944"/>
+      <stop offset="100%" style="stop-color:#445522"/>
+    </linearGradient>
+  </defs>
+
+  <path d="
+    M 0 10
+    L 10 0
+    L 590 0
+    L 600 10
+    L 600 80
+    L 0 80
+    Z
+  " fill="url(#gornHeaderGreen)"/>
+
+  <!-- Scale pattern along bottom -->
+  <path d="
+    M 0 75
+    L 30 70
+    L 60 75
+    L 90 70
+    L 120 75
+    L 150 70
+    L 180 75
+    L 210 70
+    L 240 75
+    L 270 70
+    L 300 75
+    L 330 70
+    L 360 75
+    L 390 70
+    L 420 75
+    L 450 70
+    L 480 75
+    L 510 70
+    L 540 75
+    L 570 70
+    L 600 75
+    L 600 80
+    L 0 80
+    Z
+  " fill="#88BB55" opacity="0.3"/>
+</svg>

@@ -1,0 +1,47 @@
+{
+  "id": "hirogen",
+  "name": "Hirogen Hunters",
+  "description": "Hirogen interface system - Primal, trophy-driven, hunter culture",
+  "faction": "hirogen",
+  "fonts": {
+    "primary": {
+      "family": "Hirogen Runes",
+      "fallback": "Copperplate, Impact, sans-serif",
+      "file": "fonts/hirogen-runes.ttf",
+      "weight": "bold",
+      "letterSpacing": "0.03em",
+      "textTransform": "uppercase"
+    },
+    "secondary": {
+      "family": "Hirogen Text",
+      "fallback": "Palatino, Georgia, serif",
+      "file": "fonts/hirogen-text.ttf",
+      "weight": "normal",
+      "letterSpacing": "0.02em"
+    },
+    "display": {
+      "family": "Hirogen Glyphs",
+      "fallback": "Hirogen Runes, Copperplate, sans-serif",
+      "file": "fonts/hirogen-glyphs.ttf",
+      "weight": "bold",
+      "letterSpacing": "0.04em",
+      "comment": "Ancient Hirogen hunter glyphs"
+    }
+  },
+  "colors": {
+    "primary": "#557755",
+    "secondary": "#334433",
+    "accent": "#AA8855",
+    "highlight": "#CCAA77",
+    "alert": "#AA4444",
+    "success": "#77AA55",
+    "background": "#0A0F0A",
+    "text": "#BBCCAA",
+    "textDark": "#0A0F0A"
+  },
+  "styles": {
+    "cornerRadius": "rugged",
+    "borderStyle": "trophy",
+    "animationStyle": "stalking"
+  }
+}

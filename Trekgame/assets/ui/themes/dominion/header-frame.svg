@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 60" fill="none">
+  <!-- Dominion Header Frame: Flowing organic header -->
+  <defs>
+    <linearGradient id="dominionHeaderPurple" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#4A2A5A"/>
+      <stop offset="50%" style="stop-color:#7A4A9A"/>
+      <stop offset="100%" style="stop-color:#4A2A5A"/>
+    </linearGradient>
+    <linearGradient id="dominionHeaderGold" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#C89030"/>
+      <stop offset="50%" style="stop-color:#E8C060"/>
+      <stop offset="100%" style="stop-color:#C89030"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Organic header shape -->
+  <path d="
+    M 10 5
+    Q 100 0 200 5
+    Q 300 10 390 5
+    Q 400 10 400 30
+    Q 400 50 390 55
+    Q 300 60 200 55
+    Q 100 50 10 55
+    Q 0 50 0 30
+    Q 0 10 10 5
+    Z
+  " fill="url(#dominionHeaderPurple)"/>
+
+  <!-- Gold accent wave -->
+  <path d="M 30 15 Q 200 10 370 15" fill="none" stroke="url(#dominionHeaderGold)" stroke-width="3"/>
+  <path d="M 30 45 Q 200 50 370 45" fill="none" stroke="url(#dominionHeaderGold)" stroke-width="3"/>
+
+  <!-- Center droplet (Founder symbol) -->
+  <ellipse cx="200" cy="30" rx="15" ry="10" fill="url(#dominionHeaderGold)"/>
+  <ellipse cx="200" cy="30" rx="8" ry="5" fill="#120a18"/>
+</svg>

@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 80" fill="none">
+  <!-- Vulcan Header Frame: Geometric symmetrical header -->
+  <defs>
+    <linearGradient id="vulcanHeaderCopper" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#DD8844"/>
+      <stop offset="100%" style="stop-color:#AA6633"/>
+    </linearGradient>
+    <linearGradient id="vulcanHeaderAccent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#AA6633"/>
+      <stop offset="50%" style="stop-color:#FFBB77"/>
+      <stop offset="100%" style="stop-color:#AA6633"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Main header bar -->
+  <path d="
+    M 20 0
+    L 580 0
+    L 600 20
+    L 600 80
+    L 0 80
+    L 0 20
+    Z
+  " fill="url(#vulcanHeaderCopper)"/>
+
+  <!-- IDIC triangle accent center -->
+  <path d="M 280 0 L 300 20 L 320 0 Z" fill="url(#vulcanHeaderAccent)"/>
+
+  <!-- Symmetrical corner accents -->
+  <rect x="5" y="60" width="40" height="15" fill="#FFBB77" opacity="0.5"/>
+  <rect x="555" y="60" width="40" height="15" fill="#FFBB77" opacity="0.5"/>
+</svg>

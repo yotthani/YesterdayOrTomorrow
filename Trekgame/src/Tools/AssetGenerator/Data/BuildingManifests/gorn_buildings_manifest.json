@@ -1,0 +1,160 @@
+{
+  "factionName": "Gorn",
+  "categoryName": "Buildings",
+  "architectureStyle": {
+    "description": "Massive, brutal, reptilian - built for large cold-blooded beings who value strength",
+    "keyElements": [
+      "Oversized everything - Gorn are much larger than humans",
+      "Heavy, brutalist construction to support massive weight",
+      "Rock and cave integration - Gorn appreciate natural stone",
+      "Heating elements visible - cold-blooded species need warmth",
+      "Dark green and brown coloring matching Gorn scales",
+      "Combat arenas and gladiatorial features common",
+      "Minimal decoration - function over form"
+    ],
+    "colors": "Dark green, brown, bronze, copper, rock gray",
+    "materials": "Heavy stone, reinforced metal, volcanic rock, heat-conductive materials"
+  },
+  "buildings": [
+    {
+      "name": "Hegemony Command",
+      "category": "Government",
+      "description": "Ruling center of the Gorn Hegemony - massive and imposing like its reptilian masters"
+    },
+    {
+      "name": "King's Throne Hall",
+      "category": "Government",
+      "description": "Massive chamber where the Gorn ruler holds court on an oversized throne"
+    },
+    {
+      "name": "Clan Council Chamber",
+      "category": "Government",
+      "description": "Meeting place for Gorn clan leaders to settle disputes through negotiation or combat"
+    },
+    {
+      "name": "Colonial Administration",
+      "category": "Government",
+      "description": "Governance for Gorn territorial expansion - built to intimidate subject races"
+    },
+    {
+      "name": "Warrior Barracks",
+      "category": "Military",
+      "description": "Quarters scaled for massive Gorn soldiers with heated sleeping areas"
+    },
+    {
+      "name": "Military Academy",
+      "category": "Military",
+      "description": "Training grounds for young Gorn warriors emphasizing strength and endurance"
+    },
+    {
+      "name": "Weapons Forge",
+      "category": "Military",
+      "description": "Smithy creating heavy Gorn armaments suited for powerful reptilian warriors"
+    },
+    {
+      "name": "Defense Tower",
+      "category": "Military",
+      "description": "Fortification built to withstand any assault, manned by intimidating Gorn guards"
+    },
+    {
+      "name": "Prison Complex",
+      "category": "Military",
+      "description": "Detention for enemies - the Gorn's size advantage makes escape nearly impossible"
+    },
+    {
+      "name": "Combat Arena",
+      "category": "Recreation",
+      "description": "Grand stadium where Gorn settle disputes and provide entertainment through combat"
+    },
+    {
+      "name": "Gladiator Hall",
+      "category": "Recreation",
+      "description": "Housing and training facility for champion fighters in gladiatorial games"
+    },
+    {
+      "name": "Trophy Hall",
+      "category": "Religion",
+      "description": "Displaying conquests and victories - trophies from worthy opponents"
+    },
+    {
+      "name": "Ship Assembly",
+      "category": "Production",
+      "description": "Building vessels scaled for massive Gorn crew with reinforced structures"
+    },
+    {
+      "name": "Power Plant",
+      "category": "Energy",
+      "description": "Energy generation including heating systems for cold-blooded population"
+    },
+    {
+      "name": "Heat Generation Hub",
+      "category": "Energy",
+      "description": "Climate control keeping temperatures comfortable for reptilian physiology"
+    },
+    {
+      "name": "Mining Complex",
+      "category": "Production",
+      "description": "Resource extraction using legendary Gorn strength and endurance"
+    },
+    {
+      "name": "Ore Processing",
+      "category": "Production",
+      "description": "Refining raw materials into construction and war materials"
+    },
+    {
+      "name": "Hatchery Station",
+      "category": "FoodProduction",
+      "description": "Egg incubation facility for Gorn reproduction under controlled conditions"
+    },
+    {
+      "name": "Hunting Preserve",
+      "category": "FoodProduction",
+      "description": "Game reserve where Gorn satisfy predatory instincts and gather food"
+    },
+    {
+      "name": "Food Processing",
+      "category": "FoodProduction",
+      "description": "Preparing meat for Gorn carnivore diet - no vegetables here"
+    },
+    {
+      "name": "Technology Center",
+      "category": "Research",
+      "description": "Gorn scientific advancement - don't underestimate reptilian intelligence"
+    },
+    {
+      "name": "Medical Research",
+      "category": "Research",
+      "description": "Studying Gorn biology and health for their unique reptilian physiology"
+    },
+    {
+      "name": "Communication Tower",
+      "category": "Infrastructure",
+      "description": "Subspace relay for Hegemony communications across their territory"
+    },
+    {
+      "name": "Transport Terminal",
+      "category": "Infrastructure",
+      "description": "Transit built for massive Gorn physiology with reinforced floors"
+    },
+    {
+      "name": "Medical Facility",
+      "category": "Medical",
+      "description": "Healthcare adapted for reptilian biology with temperature controls"
+    },
+    {
+      "name": "Trade Hub",
+      "category": "Commerce",
+      "description": "Commercial exchange with other species - Gorn drive hard bargains"
+    },
+    {
+      "name": "Embassy",
+      "category": "Commerce",
+      "description": "Representation of Gorn interests abroad - imposing architecture"
+    },
+    {
+      "name": "Clan Hall",
+      "category": "Religion",
+      "description": "Meeting place for extended Gorn families and clan gatherings"
+    }
+  ]
+}

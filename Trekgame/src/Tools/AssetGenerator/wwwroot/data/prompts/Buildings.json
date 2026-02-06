@@ -1,0 +1,75 @@
+{
+  "category": "Buildings",
+  "description": "Planetary buildings and structures for all factions",
+  "factionStyles": {
+    "federation": {
+      "aesthetic": "Clean, modern, utopian architecture",
+      "colors": "White, light gray, blue accents, glass",
+      "features": ["Large windows", "Green spaces", "Sustainable design"],
+      "materials": "Polished metal, transparent aluminum, gardens"
+    },
+    "klingon": {
+      "aesthetic": "Fortress-like, imposing, angular",
+      "colors": "Dark stone, red accents, metal spikes",
+      "features": ["Defensive walls", "Battle flags", "Trophy displays"],
+      "materials": "Dark stone, heavy metal, leather banners"
+    },
+    "romulan": {
+      "aesthetic": "Elegant but intimidating, classical columns",
+      "colors": "Green marble, silver, dark stone",
+      "features": ["Hidden rooms", "Surveillance systems", "Grand entrances"],
+      "materials": "Polished stone, metal, concealed technology"
+    },
+    "cardassian": {
+      "aesthetic": "Brutalist, functional, oppressive",
+      "colors": "Brown, tan, gray concrete",
+      "features": ["Security checkpoints", "Surveillance towers", "Minimal windows"],
+      "materials": "Concrete, metal, reinforced structures"
+    },
+    "ferengi": {
+      "aesthetic": "Ostentatious, commercial, gaudy",
+      "colors": "Gold, orange, neon signs",
+      "features": ["Advertising everywhere", "Vault doors", "Luxury displays"],
+      "materials": "Gold plating, glass showcases, latinum decorations"
+    },
+    "borg": {
+      "aesthetic": "Technological, geometric, alien",
+      "colors": "Black, dark green glow",
+      "features": ["No windows", "Regeneration alcoves", "Assimilation chambers"],
+      "materials": "Dark metal, circuitry, organic-tech hybrid"
+    },
+    "dominion": {
+      "aesthetic": "Organic, purple, Founder worship",
+      "colors": "Purple, violet, bioluminescent",
+      "features": ["Curved organic shapes", "Ketracel-white dispensers", "Founder shrines"],
+      "materials": "Organic-looking materials, bio-architecture"
+    }
+  },
+  "buildingTypes": [
+    { "id": "headquarters", "name": "Headquarters Command", "role": "Faction command center", "size": "large" },
+    { "id": "barracks", "name": "Barracks Military", "role": "Troop training/housing", "size": "medium" },
+    { "id": "factory", "name": "Factory Industrial", "role": "Production facility", "size": "large" },
+    { "id": "research", "name": "Research Lab Science", "role": "Technology research", "size": "medium" },
+    { "id": "power", "name": "Power Plant Energy", "role": "Energy generation", "size": "medium" },
+    { "id": "shipyard", "name": "Shipyard Orbital", "role": "Ship construction", "size": "huge" },
+    { "id": "academy", "name": "Academy Training", "role": "Officer training", "size": "large" },
+    { "id": "hospital", "name": "Hospital Medical", "role": "Medical facility", "size": "medium" },
+    { "id": "embassy", "name": "Embassy Diplomatic", "role": "Diplomatic relations", "size": "medium" },
+    { "id": "marketplace", "name": "Marketplace Trade", "role": "Commerce center", "size": "medium" },
+    { "id": "defense", "name": "Defense Platform", "role": "Planetary defense", "size": "large" },
+    { "id": "spaceport", "name": "Spaceport Landing", "role": "Ship landing/cargo", "size": "large" }
+  ],
+  "styleGuide": {
+    "material": "Claymation 3D style, architectural detail",
+    "quality": "High-end stop-motion animation quality",
+    "lighting": "Daytime lighting with building shadows",
+    "composition": "3/4 view showing building exterior",
+    "background": "Solid black (#000000)",
+    "critical": [
+      "Each faction has DISTINCT architectural style",
+      "Building purpose should be visually clear",
+      "Faction symbols/colors visible on buildings",
+      "Scale appropriate to building type"
+    ]
+  }
+}

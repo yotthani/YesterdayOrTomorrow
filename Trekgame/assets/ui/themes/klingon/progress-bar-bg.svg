@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 20" fill="none">
+  <!-- Klingon Progress Bar Background: Angular container -->
+  <defs>
+    <linearGradient id="klingonProgressBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#330000"/>
+      <stop offset="100%" style="stop-color:#220000"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Angular progress container -->
+  <path d="
+    M 10 0
+    L 190 0
+    L 200 10
+    L 190 20
+    L 10 20
+    L 0 10
+    Z
+  " fill="url(#klingonProgressBg)"/>
+</svg>

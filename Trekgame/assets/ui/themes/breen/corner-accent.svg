@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" fill="none">
+  <defs>
+    <linearGradient id="breenAccent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#AABBCC"/>
+      <stop offset="100%" style="stop-color:#DDEEFF"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Frost crystal accent -->
+  <path d="M 20 5 L 25 20 L 40 20 L 28 28 L 32 40 L 20 32 L 8 40 L 12 28 L 0 20 L 15 20 Z" fill="url(#breenAccent)" opacity="0.7"/>
+</svg>

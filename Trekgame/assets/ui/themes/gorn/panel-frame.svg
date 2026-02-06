@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" fill="none">
+  <!-- Gorn Panel Frame: Reptilian scale-inspired with angular organic edges -->
+  <defs>
+    <linearGradient id="gornFrameGreen" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#669944"/>
+      <stop offset="100%" style="stop-color:#445522"/>
+    </linearGradient>
+    <linearGradient id="gornAccentLight" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#445522"/>
+      <stop offset="50%" style="stop-color:#88BB55"/>
+      <stop offset="100%" style="stop-color:#445522"/>
+    </linearGradient>
+    <pattern id="gornScalePattern" width="20" height="18" patternUnits="userSpaceOnUse">
+      <path d="M 0 9 Q 10 0 20 9 Q 10 18 0 9" fill="none" stroke="#88BB55" stroke-width="0.5" opacity="0.3"/>
+    </pattern>
+  </defs>
+
+  <!-- Top bar with jagged edge -->
+  <path d="
+    M 0 0
+    L 800 0
+    L 800 45
+    L 750 50
+    L 700 45
+    L 650 50
+    L 600 45
+    L 550 50
+    L 500 45
+    L 450 50
+    L 400 45
+    L 350 50
+    L 300 45
+    L 250 50
+    L 200 45
+    L 150 50
+    L 100 45
+    L 50 50
+    L 0 45
+    Z
+  " fill="url(#gornFrameGreen)"/>
+
+  <!-- Left sidebar with scale edge -->
+  <path d="
+    M 0 0
+    L 90 0
+    L 95 50
+    L 90 100
+    L 95 150
+    L 90 200
+    L 95 250
+    L 90 300
+    L 95 350
+    L 90 400
+    L 95 450
+    L 90 500
+    L 95 550
+    L 90 600
+    L 0 600
+    Z
+  " fill="url(#gornFrameGreen)"/>
+
+  <!-- Bottom bar with jagged edge -->
+  <path d="
+    M 0 555
+    L 50 550
+    L 100 555
+    L 150 550
+    L 200 555
+    L 250 550
+    L 300 555
+    L 350 550
+    L 400 555
+    L 450 550
+    L 500 555
+    L 550 550
+    L 600 555
+    L 650 550
+    L 700 555
+    L 750 550
+    L 800 555
+    L 800 600
+    L 0 600
+    Z
+  " fill="url(#gornFrameGreen)"/>
+
+  <!-- Right sidebar -->
+  <path d="
+    M 705 50
+    L 710 100
+    L 705 150
+    L 710 200
+    L 705 250
+    L 710 300
+    L 705 350
+    L 710 400
+    L 705 450
+    L 710 500
+    L 705 550
+    L 800 550
+    L 800 50
+    Z
+  " fill="url(#gornFrameGreen)"/>
+
+  <!-- Scale pattern overlay on frame -->
+  <rect x="5" y="5" width="85" height="590" fill="url(#gornScalePattern)" opacity="0.5"/>
+
+  <!-- Claw mark accents -->
+  <path d="M 95 60 L 120 80 L 95 70 L 115 90" fill="none" stroke="#88BB55" stroke-width="2" opacity="0.7"/>
+  <path d="M 705 540 L 680 520 L 705 530 L 685 510" fill="none" stroke="#88BB55" stroke-width="2" opacity="0.7"/>
+</svg>

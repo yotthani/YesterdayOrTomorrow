@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 200" fill="none">
+  <!-- Andorian Separator Vertical: Ice-inspired separator -->
+  <defs>
+    <linearGradient id="andorianSepBlue" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#4499DD" stop-opacity="0"/>
+      <stop offset="20%" style="stop-color:#88CCFF"/>
+      <stop offset="50%" style="stop-color:#AAEEFF"/>
+      <stop offset="80%" style="stop-color:#88CCFF"/>
+      <stop offset="100%" style="stop-color:#4499DD" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="4" y="0" width="2" height="200" fill="url(#andorianSepBlue)"/>
+</svg>

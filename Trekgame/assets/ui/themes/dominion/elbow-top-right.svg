@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <!-- Dominion Elbow Top-Right -->
+  <defs>
+    <linearGradient id="dominionPurple" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#8A5AAA"/>
+      <stop offset="100%" style="stop-color:#4A2A5A"/>
+    </linearGradient>
+    <linearGradient id="dominionGold" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#C89030"/>
+      <stop offset="100%" style="stop-color:#D4A030"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Main elbow with organic curve -->
+  <path d="
+    M 0 0
+    L 200 0
+    L 200 200
+    L 160 200
+    Q 160 120 160 80
+    Q 160 40 120 40
+    L 0 40
+    Z
+  " fill="url(#dominionPurple)"/>
+
+  <!-- Golden accent curve -->
+  <path d="
+    M 140 40
+    Q 155 55 155 70
+  " fill="none" stroke="url(#dominionGold)" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- Droplet accent -->
+  <ellipse cx="170" cy="25" rx="8" ry="6" fill="url(#dominionGold)" opacity="0.8"/>
+</svg>

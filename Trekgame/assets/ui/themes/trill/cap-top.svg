@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 30" fill="none">
+  <!-- Trill Cap Top: Organic flowing top end cap -->
+  <defs>
+    <linearGradient id="trillCapTeal" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#3D8080"/>
+      <stop offset="100%" style="stop-color:#55AAAA"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Organic rounded top cap -->
+  <path d="
+    M 0 30
+    Q 5 5, 25 0
+    Q 45 5, 50 30
+    Z
+  " fill="url(#trillCapTeal)"/>
+</svg>

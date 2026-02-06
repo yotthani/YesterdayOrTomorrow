@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 40" fill="none">
+  <!-- Borg Button: Industrial rectangular with circuit edge -->
+  <defs>
+    <linearGradient id="borgBtnMetal" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#3A4A4A"/>
+      <stop offset="100%" style="stop-color:#1A2A2A"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Main button - rectangular -->
+  <rect x="0" y="0" width="120" height="40" fill="url(#borgBtnMetal)"/>
+
+  <!-- Green circuit border -->
+  <rect x="2" y="2" width="116" height="36" fill="none" stroke="#2A5A2A" stroke-width="2"/>
+
+  <!-- Corner nodes -->
+  <circle cx="6" cy="6" r="3" fill="#4A8A4A"/>
+  <circle cx="114" cy="6" r="3" fill="#4A8A4A"/>
+  <circle cx="6" cy="34" r="3" fill="#4A8A4A"/>
+  <circle cx="114" cy="34" r="3" fill="#4A8A4A"/>
+</svg>

@@ -70,6 +70,273 @@
         "founder": "Orange waxy skin, morphing edges"
       },
       "aesthetic": "Genetically engineered, loyal, dangerous"
+    },
+    "breen": {
+      "species": ["Breen"],
+      "uniforms": {
+        "soldier_modern": "Sleek dark metallic armor with flat helmet, cyan visor slit",
+        "soldier_classic": "Sand/tan leather armor with elongated snout helmet, green visor",
+        "officer_revealed": "Dark metal armor with open helmet showing reptilian face behind green energy barrier"
+      },
+      "aesthetic": "Mysterious, cold, industrial",
+      "variants": {
+        "modern": {
+          "default": true,
+          "helmet": "SLEEK FLAT dark gunmetal helmet, thin CYAN/TEAL visor slit, NO snout",
+          "armor": "Dark metallic segmented plates, gunmetal gray/black",
+          "face": "NOT visible - helmet fully closed"
+        },
+        "classic": {
+          "helmet": "Sand/tan colored, ELONGATED SNOUT breather, wide GREEN visor",
+          "armor": "Leather tunic in sand/tan, crossed bandoliers, large shoulder pads",
+          "face": "NOT visible - helmet fully closed"
+        },
+        "revealed": {
+          "helmet": "Open-face with GREEN ENERGY BARRIER that CONTOURS TO FACE SHAPE",
+          "armor": "Dark gunmetal with bronze/gold accents, industrial tubes",
+          "face": "REPTILIAN face visible - flat nose merging into forehead plate, scaly skin, glowing eyes"
+        }
+      },
+      "criticalNotes": "Default: modern variant. For 'revealed': energy barrier follows face contours (not flat), face is REPTILIAN (not human) with flat nose extending into forehead plate."
+    },
+    "gorn": {
+      "species": ["Gorn"],
+      "uniforms": {
+        "warrior": "Bronze armor plates, minimal coverage",
+        "commander": "Ceremonial armor with status symbols",
+        "civilian": "Light armor or leather harness"
+      },
+      "aesthetic": "Reptilian, massive, predatory",
+      "features": ["Green scaly skin", "Multi-faceted eyes", "Massive clawed hands", "Powerful build"]
+    },
+    "andorian": {
+      "species": ["Andorian"],
+      "uniforms": {
+        "imperial_guard": "Ice-blue military uniform, silver trim",
+        "officer": "Blue/white dress uniform with rank insignia",
+        "civilian": "Blue-toned casual clothing"
+      },
+      "aesthetic": "Passionate, aggressive, honorable",
+      "features": ["Ice-blue skin", "White hair", "Two antennae on forehead"]
+    },
+    "vulcan": {
+      "species": ["Vulcan"],
+      "uniforms": {
+        "high_command": "Bronze/rust robes or uniform",
+        "science": "Simple robes, IDIC symbol",
+        "civilian": "Desert-toned robes"
+      },
+      "aesthetic": "Logical, serene, ancient wisdom",
+      "features": ["Pointed ears", "Arched eyebrows", "Severe expression", "No emotion"]
+    },
+    "trill": {
+      "species": ["Trill"],
+      "uniforms": {
+        "officer": "Federation-compatible uniform (if joined)",
+        "guardian": "Symbiosis Commission robes",
+        "civilian": "Elegant practical clothing"
+      },
+      "aesthetic": "Balanced, wise, centuries of experience",
+      "features": ["Spots running from temples down neck", "Humanoid appearance"]
+    },
+    "bajoran": {
+      "species": ["Bajoran"],
+      "uniforms": {
+        "militia": "Tan/brown military uniform",
+        "vedek": "Orange religious robes",
+        "civilian": "Earth-toned practical clothing"
+      },
+      "aesthetic": "Spiritual, resilient, determined",
+      "features": ["Nose ridges (horizontal ridges across bridge)", "Earring on right ear"]
+    },
+    "tholian": {
+      "species": ["Tholian"],
+      "uniforms": {
+        "warrior": "Environmental suit if visible",
+        "commander": "Enhanced crystalline suit"
+      },
+      "aesthetic": "Crystalline, alien, incomprehensible",
+      "features": ["Faceted crystalline body", "Internal glow", "Non-humanoid"]
+    },
+    "orion": {
+      "species": ["Orion"],
+      "uniforms": {
+        "syndicate": "Dark green/black with gold accents",
+        "pirate": "Practical raider gear",
+        "civilian": "Luxurious or seductive clothing"
+      },
+      "aesthetic": "Seductive, dangerous, criminal",
+      "features": ["Green skin", "Often alluring appearance", "Syndicate markings"]
+    },
+    "hirogen": {
+      "species": ["Hirogen"],
+      "uniforms": {
+        "hunter_armored": "SILVER-BLUE metallic full body armor with FULL HELMET, narrow visor slit, respirator mask",
+        "hunter_partial_mask": "SILVER-BLUE armor with RESPIRATOR MASK on lower face, upper skull/eyes visible",
+        "hunter_unmasked": "BRONZE/OLIVE hunting armor, face fully visible showing dual-lobed skull",
+        "alpha": "Enhanced SILVER-BLUE armor with elaborate trophy decorations, alpha status markings",
+        "beta": "Standard SILVER-BLUE hunting gear, fewer trophies"
+      },
+      "aesthetic": "Predatory, massive, trophy-obsessed hunters",
+      "cranialStructure": [
+        "ENLARGED DUAL-LOBED CRANIUM - two distinct BULGING LOBES on top of skull (KEY FEATURE!)",
+        "Head is OVERSIZED compared to humans",
+        "Completely BALD - no hair on head or face"
+      ],
+      "facialFeatures": [
+        "FLAT NOSE - almost no nasal bridge, nostrils sit FLUSH with face (like reptile/Saurian)",
+        "NO LIPS - mouth is a lipless reptilian slit",
+        "HEAVY BROW RIDGES protruding over deep-set predatory eyes",
+        "Strong angular jaw"
+      ],
+      "skin": [
+        "SCALED/PEBBLED TEXTURE like Gila monster skin",
+        "TAN/BEIGE to OLIVE coloring with darker MOTTLED patches",
+        "Rough, weathered, bumpy texture"
+      ],
+      "armorVariants": {
+        "full_helmet": {
+          "description": "FULL-FACE HUNTING HELMET covering entire head",
+          "helmet": "SILVER-BLUE metallic, angular predatory shape, narrow horizontal visor slit with amber glow",
+          "respirator": "Ribbed metal grille over mouth/nose, tubes connecting to suit",
+          "armor": "SILVER-BLUE metallic segmented plates, battle-worn finish"
+        },
+        "partial_mask": {
+          "description": "Upper skull visible, lower face covered by respirator mask",
+          "visible": "Dual-lobed cranium, brow ridges, eyes, scaled skin on forehead",
+          "mask": "SILVER-BLUE metallic respirator covering nose and mouth",
+          "armor": "SILVER-BLUE metallic body armor"
+        },
+        "unmasked": {
+          "description": "Face fully visible, no helmet or mask",
+          "visible": "Full dual-lobed skull, flat nose, lipless mouth, all facial features",
+          "armor": "BRONZE/OLIVE hunting armor matching skin tones"
+        }
+      },
+      "features": [
+        "DUAL-LOBED SKULL (two bulges on top of head)",
+        "FLAT NOSE (flush with face, no bridge)",
+        "NO LIPS (reptilian mouth)",
+        "PEBBLED/SCALED SKIN (Gila monster texture)",
+        "MASSIVE BUILD (tower over humans)",
+        "Trophy decorations on armor"
+      ],
+      "criticalNotes": "HEAD SHAPE is iconic: TWO BULGING LOBES on skull. NOSE is FLAT against face. NO LIPS. Skin like Gila monster. Silver-blue armor when suited, bronze/olive when unarmored."
+    },
+    "betazoid": {
+      "species": ["Betazoid"],
+      "uniforms": {
+        "formal": "Flowing elegant robes in purples, lavenders, and silvers",
+        "starfleet": "Standard Starfleet uniform (if serving in fleet)",
+        "ceremonial": "Elaborate traditional Betazoid gowns/robes",
+        "casual": "Sophisticated civilian clothing in soft colors"
+      },
+      "aesthetic": "Elegant, serene, sophisticated, telepathic",
+      "features": [
+        "SOLID BLACK EYES - completely black, no visible iris or pupil (KEY FEATURE!)",
+        "Humanoid appearance nearly identical to humans except for eyes",
+        "Elegant, refined features",
+        "Serene, empathic expression"
+      ],
+      "criticalNotes": "BLACK EYES are the key distinguishing feature. Otherwise very human-like. Telepathic/empathic. Often female leaders (matriarchal). Purple/lavender color scheme."
+    },
+    "maquis": {
+      "species": ["Human", "Bajoran", "Vulcan", "Mixed"],
+      "uniforms": {
+        "fighter": "Rugged civilian clothing - leather jackets, practical gear",
+        "leader": "Worn but dignified civilian clothes, leadership bearing",
+        "combat": "Tactical civilian gear, visible weapons",
+        "undercover": "Nondescript civilian clothing for blending in"
+      },
+      "aesthetic": "Resistance fighter, rugged, determined, anti-establishment",
+      "features": [
+        "Mixed species appearance (Human, Bajoran, or other Federation species)",
+        "Battle-worn, weathered look",
+        "Scars or signs of hard living common",
+        "Determined, defiant expression"
+      ],
+      "criticalNotes": "NO Starfleet uniforms - they rejected Starfleet. Earth tones: browns, greens, blacks. Resistance/guerrilla aesthetic. Passionate freedom fighters."
+    },
+    "pirates": {
+      "species": ["Human", "Bolian", "Tellarite", "Lurian", "Yridian", "Pakled", "Dosi", "Boslic", "Alien"],
+      "speciesNotes": "IMPORTANT: Do NOT use Nausicaans or Orions - they have their own factions. Use diverse lesser-known species.",
+      "uniforms": {
+        "commander": "Dark military-style uniform with medals, corrupted admiral aesthetic",
+        "captain": "Impressive dark armor or uniform, commanding presence",
+        "raider": "Stolen/scavenged armor pieces, dark colors, tactical gear",
+        "crew": "Basic raider gear, visible weapons, practical clothing",
+        "merchant": "Seedy civilian clothing, hidden weapons"
+      },
+      "aesthetic": "Dangerous, intimidating, criminal - military discipline gone dark",
+      "speciesVariants": {
+        "human": "Scarred, rough humans - often ex-military or criminals",
+        "bolian": "Blue-skinned with vertical ridge down center of face",
+        "tellarite": "Porcine features, snout-like nose, stocky build",
+        "lurian": "Large head, wide-set eyes, no visible ears (like Morn)",
+        "yridian": "Wrinkled grayish skin, information brokers turned pirates",
+        "pakled": "Heavy-set, simple appearance but cunning",
+        "dosi": "Aggressive traders from Gamma Quadrant",
+        "boslic": "Humanoid with slight forehead ridges, often female",
+        "alien": "Generic alien - unusual skin color or minor prosthetics"
+      },
+      "features": [
+        "Mixed diverse species - NOT Nausicaan or Orion",
+        "Scars, tattoos, rough features",
+        "Intimidating, ruthless expression",
+        "Visible weapons and trophies",
+        "Dark colors: black, dark gray, deep red"
+      ],
+      "criticalNotes": "DO NOT USE Nausicaans (they have own faction) or Orions (they have own faction). Use diverse species: humans, Bolians, Tellarites, Lurians, Yridians, etc. Leader is human in dark military uniform. Dark, militaristic criminal aesthetic."
+    },
+    "species8472": {
+      "species": ["Species 8472", "Undine"],
+      "uniforms": {
+        "warrior": "No clothing - organic bio-armor/exoskeleton",
+        "leader": "More elaborate bio-armor patterns",
+        "infiltrator": "Can mimic humanoid forms when disguised"
+      },
+      "aesthetic": "Terrifying, alien, organic, bioluminescent",
+      "features": [
+        "TRIPEDAL - three legs",
+        "THREE ARMS",
+        "ELONGATED HEAD with MULTIPLE EYES",
+        "NO VISIBLE MOUTH - telepathic communication",
+        "GRAY-PURPLE SKIN",
+        "Extremely tall and thin",
+        "Organic exoskeleton"
+      ],
+      "criticalNotes": "NOT humanoid at all. Tripedal (3 legs), 3 arms, multiple eyes, no mouth. Gray-purple skin. From fluidic space. Terrifying alien appearance."
+    },
+    "nausicaan": {
+      "species": ["Nausicaan"],
+      "uniforms": {
+        "chieftain": "Heavy ceremonial armor with trophies, intimidating presence",
+        "warrior": "Rough leather and metal armor, practical combat gear",
+        "mercenary": "Mismatched functional armor, visible weapons",
+        "raider": "Light tactical gear for quick raids"
+      },
+      "aesthetic": "Predator-like alien mercenary (NOT orc-like!)",
+      "physicalFeatures": {
+        "height": "VERY TALL - over 2 meters, lean and imposing",
+        "build": "LEAN but muscular - athletic predator build, NOT bulky orc",
+        "skull": "ELONGATED HIGH-DOMED SKULL sloping backward (Predator-like)",
+        "tusks": "TWO TUSKS curving UPWARD from LOWER JAW (KEY FEATURE!)",
+        "eyes": "DEEP-SET small eyes under heavy brow ridge",
+        "cheekbones": "PROMINENT angular CHEEKBONES - gaunt face",
+        "skin": "GRAY or TAN leathery skin texture (NOT green!)",
+        "hair": "Completely BALD - no hair at all"
+      },
+      "features": [
+        "TWO TUSKS curving UP from lower jaw (KEY FEATURE!)",
+        "ELONGATED SKULL - high forehead sloping back like Predator",
+        "VERY TALL (2m+) and LEAN - athletic not bulky",
+        "Deep-set small eyes, prominent angular cheekbones",
+        "GRAY/TAN leathery skin (NOT green, NOT orc)",
+        "Completely BALD",
+        "Menacing mercenary expression",
+        "Think: Predator movie alien meets mercenary"
+      ],
+      "criticalNotes": "NOT an orc! Predator-like appearance: elongated skull sloping back, prominent cheekbones, deep-set eyes. TWO TUSKS curving upward from lower jaw. GRAY/TAN skin (not green). Very tall and LEAN (not bulky). Bald. Dangerous mercenary aesthetic."
     }
   },
   "portraitTypes": [

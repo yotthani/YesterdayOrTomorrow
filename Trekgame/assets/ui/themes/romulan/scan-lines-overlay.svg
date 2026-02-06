@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <!-- Romulan Scan Lines Overlay: Adds that CRT/scan effect -->
+  <defs>
+    <pattern id="scanLines" x="0" y="0" width="100" height="4" patternUnits="userSpaceOnUse">
+      <line x1="0" y1="0" x2="100" y2="0" stroke="#00FFCC" stroke-width="0.5" opacity="0.1"/>
+      <line x1="0" y1="2" x2="100" y2="2" stroke="#00FFCC" stroke-width="0.3" opacity="0.05"/>
+    </pattern>
+  </defs>
+
+  <!-- Apply scan line pattern -->
+  <rect x="0" y="0" width="100" height="100" fill="url(#scanLines)"/>
+</svg>

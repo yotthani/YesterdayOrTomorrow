@@ -1,0 +1,25 @@
+{
+  "category": "Planets",
+  "description": "Planet types for star systems",
+  "assets": [
+    { "id": "desert_arid", "name": "Planet Desert Arid", "match": ["desert", "arid"], "prompt": { "type": "Desert Planet", "features": ["Sandy tan/orange surface", "Minimal cloud cover", "Dry riverbeds visible", "Rocky outcrops"], "reference": "Vulcan, Tatooine-style" }},
+    { "id": "ocean_water", "name": "Planet Ocean Water World", "match": ["ocean", "water"], "prompt": { "type": "Ocean Planet", "features": ["Deep blue surface", "95%+ water coverage", "White cloud swirls", "Small island chains"], "reference": "Pacific world" }},
+    { "id": "jungle_tropical", "name": "Planet Jungle Tropical", "match": ["jungle", "tropical"], "prompt": { "type": "Jungle Planet", "features": ["Lush green surface", "Dense vegetation visible", "Rivers and lakes", "Humid atmosphere"], "reference": "Amazon from space" }},
+    { "id": "ice_frozen", "name": "Planet Ice Frozen", "match": ["ice", "frozen"], "prompt": { "type": "Ice Planet", "features": ["White/blue surface", "Polar caps covering most", "Glacial formations", "Thin atmosphere"], "reference": "Andoria, Hoth-style" }},
+    { "id": "volcanic_lava", "name": "Planet Volcanic Lava", "match": ["volcanic", "lava"], "prompt": { "type": "Volcanic Planet", "features": ["Dark surface with red/orange lava flows", "Active volcanoes", "Smoke plumes", "Hellish appearance"], "reference": "Mustafar-style" }},
+    { "id": "gas_giant", "name": "Planet Gas Giant Banded", "match": ["gas giant", "banded"], "prompt": { "type": "Gas Giant", "features": ["Massive scale", "Colored atmospheric bands", "Storm systems visible", "No solid surface"], "reference": "Jupiter-style" }},
+    { "id": "terran_earth", "name": "Planet Terran Earth-like", "match": ["terran", "earth"], "prompt": { "type": "Class M Planet", "features": ["Blue oceans", "Green/brown landmasses", "White clouds", "Breathable atmosphere"], "reference": "Earth, Risa" }},
+    { "id": "barren_rocky", "name": "Planet Barren Rocky", "match": ["barren", "rocky"], "prompt": { "type": "Barren Planet", "features": ["Gray/brown rocky surface", "Crater impacts", "No atmosphere", "Dead world"], "reference": "Moon, Mercury-style" }},
+    { "id": "toxic_acid", "name": "Planet Toxic Acidic", "match": ["toxic", "acid"], "prompt": { "type": "Toxic Planet", "features": ["Sickly yellow/green atmosphere", "Corrosive clouds", "Hostile environment", "Chemical surface"], "reference": "Venus-style" }},
+    { "id": "crystalline", "name": "Planet Crystalline", "match": ["crystalline", "crystal"], "prompt": { "type": "Crystalline Planet", "features": ["Glittering surface", "Crystal formations", "Refracting light", "Exotic minerals"], "reference": "Gem world" }},
+    { "id": "ringed_saturn", "name": "Planet Ringed Saturn-type", "match": ["ringed", "saturn"], "prompt": { "type": "Ringed Planet", "features": ["Prominent ring system", "Ice/rock rings", "Multiple ring bands", "Gas or rocky core"], "reference": "Saturn-style" }},
+    { "id": "dead_post", "name": "Planet Dead Post-apocalyptic", "match": ["dead", "apocalyptic"], "prompt": { "type": "Dead Planet", "features": ["Scarred surface", "Signs of past civilization", "Nuclear winter", "Ruins visible"], "reference": "Post-war world" }}
+  ],
+  "styleGuide": {
+    "material": "Spherical planet with realistic surface textures",
+    "quality": "High detail, visible from orbit",
+    "lighting": "Star illumination from one side, terminator visible",
+    "composition": "Full planet view, slight 3/4 angle",
+    "background": "Solid black (#000000) - space"
+  }
+}

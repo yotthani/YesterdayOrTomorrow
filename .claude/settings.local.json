@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dotnet build:*)",
+      "Bash(ls:*)",
+      "Bash(dir:*)",
+      "Bash(done)",
+      "WebFetch(domain:memory-alpha.fandom.com)",
+      "WebFetch(domain:stowiki.net)",
+      "Bash(copy \"C:\\\\Work\\\\Sources\\\\github\\\\YesterdayOrTomorrow\\\\Trekgame\\\\src\\\\Tools\\\\AssetGenerator\\\\Data\\\\Prompts\\\\FactionLeaders.json\" \"C:\\\\Work\\\\Sources\\\\github\\\\YesterdayOrTomorrow\\\\Trekgame\\\\src\\\\Tools\\\\AssetGenerator\\\\wwwroot\\\\data\\\\prompts\\\\FactionLeaders.json\")"
+    ]
+  }
+}

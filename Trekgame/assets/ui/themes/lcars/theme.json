@@ -1,0 +1,45 @@
+{
+  "id": "lcars",
+  "name": "LCARS",
+  "description": "Federation Library Computer Access/Retrieval System interface",
+  "faction": "federation",
+  "fonts": {
+    "primary": {
+      "family": "LCARS",
+      "fallback": "Helvetica Neue Condensed, Arial Narrow, sans-serif",
+      "file": "fonts/lcars.ttf",
+      "weight": "bold",
+      "letterSpacing": "0.05em"
+    },
+    "secondary": {
+      "family": "LCARS",
+      "fallback": "Helvetica Neue, Arial, sans-serif",
+      "file": "fonts/lcars.ttf",
+      "weight": "normal",
+      "letterSpacing": "0.02em"
+    },
+    "display": {
+      "family": "LCARS Display",
+      "fallback": "Courier New, monospace",
+      "file": "fonts/lcars-display.ttf",
+      "weight": "normal",
+      "letterSpacing": "0.1em"
+    }
+  },
+  "colors": {
+    "primary": "#CC9966",
+    "secondary": "#FFCC99",
+    "accent": "#FF9966",
+    "highlight": "#9999FF",
+    "alert": "#FF6666",
+    "success": "#66CC99",
+    "background": "#000000",
+    "text": "#FFCC99",
+    "textDark": "#000000"
+  },
+  "styles": {
+    "cornerRadius": "large",
+    "borderStyle": "rounded",
+    "animationStyle": "smooth"
+  }
+}

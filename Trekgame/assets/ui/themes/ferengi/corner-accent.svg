@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60" fill="none">
+  <!-- Ferengi Corner Accent: L-shape with gold hexagon -->
+  <defs>
+    <linearGradient id="ferengiCornerBronze" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#A67C1A"/>
+      <stop offset="100%" style="stop-color:#5C4A0F"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Angular corner -->
+  <path d="
+    M 0 0
+    L 60 0
+    L 60 12
+    L 12 12
+    L 12 60
+    L 0 60
+    Z
+  " fill="url(#ferengiCornerBronze)"/>
+
+  <!-- Gold hexagon accent -->
+  <polygon points="30,25 38,20 46,25 46,35 38,40 30,35" fill="#FFD700"/>
+</svg>

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 200" fill="none">
+  <!-- LCARS Vertical Separator: Thin vertical line element -->
+  <defs>
+    <linearGradient id="lcarsSepTan" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#CC9966"/>
+      <stop offset="50%" style="stop-color:#FFCC99"/>
+      <stop offset="100%" style="stop-color:#CC9966"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Rounded separator line -->
+  <rect x="0" y="0" width="8" height="200" rx="4" ry="4" fill="url(#lcarsSepTan)"/>
+</svg>

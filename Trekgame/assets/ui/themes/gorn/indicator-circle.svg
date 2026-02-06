@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" fill="none">
+  <defs>
+    <linearGradient id="gornIndicatorGreen" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#669944"/>
+      <stop offset="100%" style="stop-color:#445522"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Hexagonal reptilian shape -->
+  <path d="
+    M 15 3
+    L 26 10
+    L 26 20
+    L 15 27
+    L 4 20
+    L 4 10
+    Z
+  " fill="none" stroke="url(#gornIndicatorGreen)" stroke-width="3"/>
+
+  <!-- Inner scale pattern -->
+  <path d="M 10 12 Q 15 10 20 12 Q 15 14 10 12" fill="url(#gornIndicatorGreen)" opacity="0.5"/>
+</svg>

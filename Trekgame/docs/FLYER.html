@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrekGame - The Final Strategy Frontier</title>
+    <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;700&family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --lcars-orange: #ff9900; --lcars-lavender: #cc99ff; --lcars-blue: #99ccff;
+            --lcars-peach: #ffcc99; --lcars-tan: #cc9966; --lcars-red: #cc0000;
+            --lcars-gold: #ffcc00; --lcars-green: #00aa44; --bg-dark: #000010;
+            --bg-panel: rgba(10, 10, 30, 0.95);
+        }
+        body { font-family: 'Roboto', sans-serif; background: var(--bg-dark); color: #fff; line-height: 1.6; }
+
+        /* Hero */
+        .hero {
+            min-height: 100vh;
+            background: radial-gradient(ellipse at 20% 50%, rgba(100, 50, 150, 0.15) 0%, transparent 50%),
+                        radial-gradient(ellipse at 80% 30%, rgba(50, 100, 150, 0.1) 0%, transparent 40%),
+                        linear-gradient(180deg, #000020 0%, #000010 50%, #000008 100%);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            text-align: center; padding: 40px 20px; position: relative; overflow: hidden;
+        }
+        .hero::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+            background: linear-gradient(90deg, var(--lcars-orange), var(--lcars-lavender), var(--lcars-blue), var(--lcars-orange)); }
+        .hero-stars { position: absolute; inset: 0;
+            background-image: radial-gradient(2px 2px at 20px 30px, white, transparent),
+                radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.8), transparent),
+                radial-gradient(1px 1px at 90px 40px, white, transparent),
+                radial-gradient(2px 2px at 160px 120px, rgba(255,255,255,0.9), transparent);
+            background-size: 350px 200px; animation: twinkle 8s ease-in-out infinite; }
+        @keyframes twinkle { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+        .logo { position: relative; z-index: 1; }
+        .logo h1 { font-family: 'Antonio', sans-serif; font-size: 5rem; font-weight: 700; font-style: italic;
+            color: var(--lcars-orange); text-shadow: 0 0 40px rgba(255, 153, 0, 0.5), 0 0 80px rgba(255, 153, 0, 0.3); letter-spacing: 4px; }
+        .logo .subtitle { font-family: 'Orbitron', sans-serif; font-size: 1.2rem; color: var(--lcars-peach);
+            letter-spacing: 8px; text-transform: uppercase; margin-top: 10px; }
+        .logo .community { margin-top: 20px; font-size: 0.9rem; color: var(--lcars-lavender); }
+        .logo .yot-badge { display: inline-block; background: linear-gradient(135deg, var(--lcars-gold), var(--lcars-orange));
+            color: #000; padding: 4px 16px; border-radius: 4px; font-weight: 700; margin-right: 8px; }
+        .version-badge { margin-top: 30px; padding: 8px 24px; background: rgba(255, 153, 0, 0.2);
+            border: 1px solid var(--lcars-orange); border-radius: 20px; font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem; color: var(--lcars-orange); }
+        .cta-button { margin-top: 40px; padding: 16px 48px; background: linear-gradient(180deg, var(--lcars-orange) 0%, #cc6600 100%);
+            border: none; border-radius: 30px; color: #000; font-family: 'Orbitron', sans-serif; font-size: 1.1rem;
+            font-weight: 700; letter-spacing: 2px; cursor: pointer; text-decoration: none; display: inline-block;
+            transition: all 0.3s ease; box-shadow: 0 4px 20px rgba(255, 153, 0, 0.4); }
+        .cta-button:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(255, 153, 0, 0.6); }
+
+        /* Sections */
+        section { padding: 80px 20px; max-width: 1400px; margin: 0 auto; }
+        .section-title { font-family: 'Orbitron', sans-serif; font-size: 2rem; color: var(--lcars-orange);
+            text-align: center; margin-bottom: 50px; position: relative; }
+        .section-title::after { content: ''; display: block; width: 100px; height: 3px;
+            background: linear-gradient(90deg, transparent, var(--lcars-orange), transparent); margin: 20px auto 0; }
+        .section-subtitle { text-align: center; color: var(--lcars-peach); font-size: 1.1rem; margin-top: -30px; margin-bottom: 40px; }
+
+        /* Asset Showcase */
+        .asset-showcase { background: linear-gradient(180deg, rgba(20, 20, 50, 0.3), transparent, rgba(20, 20, 50, 0.3)); padding: 60px 0; }
+        .asset-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 30px; max-width: 1400px; margin: 0 auto; padding: 0 20px; }
+        .asset-card { background: var(--bg-panel); border-radius: 12px; overflow: hidden; border: 1px solid rgba(255, 153, 0, 0.3); transition: all 0.3s ease; }
+        .asset-card:hover { transform: translateY(-5px); border-color: var(--lcars-orange); box-shadow: 0 15px 40px rgba(255, 153, 0, 0.2); }
+        .asset-image { width: 100%; height: 220px; object-fit: cover; object-position: top left; border-bottom: 2px solid var(--lcars-orange); }
+        .asset-info { padding: 20px; }
+        .asset-info h3 { font-family: 'Orbitron', sans-serif; font-size: 1rem; color: var(--lcars-orange); margin-bottom: 8px; }
+        .asset-info p { font-size: 0.9rem; color: var(--lcars-peach); }
+        .asset-tags { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+        .asset-tag { font-size: 0.7rem; padding: 4px 10px; background: rgba(255, 153, 0, 0.15); border: 1px solid rgba(255, 153, 0, 0.3); border-radius: 12px; color: var(--lcars-gold); }
+
+        /* Features Grid */
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+        .feature-card { background: var(--bg-panel); border: 1px solid rgba(255, 153, 0, 0.3); border-radius: 12px; padding: 30px;
+            transition: all 0.3s ease; position: relative; overflow: hidden; }
+        .feature-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--lcars-orange); }
+        .feature-card:hover { transform: translateY(-5px); border-color: var(--lcars-orange); box-shadow: 0 10px 40px rgba(255, 153, 0, 0.2); }
+        .feature-card.implemented::before { background: var(--lcars-green); }
+        .feature-card.planned::before { background: var(--lcars-lavender); }
+        .feature-card.future::before { background: var(--lcars-blue); }
+        .feature-status { position: absolute; top: 15px; right: 15px; font-size: 0.65rem; padding: 3px 10px; border-radius: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+        .feature-status.implemented { background: rgba(0, 170, 68, 0.3); color: #44ff88; }
+        .feature-status.planned { background: rgba(204, 153, 255, 0.3); color: #cc99ff; }
+        .feature-status.future { background: rgba(153, 204, 255, 0.3); color: #99ccff; }
+        .feature-icon { font-size: 2.5rem; margin-bottom: 15px; }
+        .feature-card h3 { font-family: 'Orbitron', sans-serif; font-size: 1.2rem; color: var(--lcars-orange); margin-bottom: 15px; }
+        .feature-card p { color: var(--lcars-peach); font-size: 0.95rem; }
+        .feature-list { list-style: none; margin-top: 15px; }
+        .feature-list li { padding: 5px 0; color: var(--lcars-blue); font-size: 0.9rem; }
+        .feature-list li::before { content: '▸ '; color: var(--lcars-lavender); }
+
+        /* Factions */
+        .factions-section { background: linear-gradient(180deg, transparent, rgba(20, 20, 40, 0.5), transparent); }
+        .factions-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 20px; }
+        .faction-card { text-align: center; padding: 25px 15px; background: var(--bg-panel); border-radius: 12px; border: 2px solid transparent; transition: all 0.3s ease; }
+        .faction-card:hover { transform: scale(1.05); }
+        .faction-card.federation { border-color: #4488ff; }
+        .faction-card.klingon { border-color: #cc0000; }
+        .faction-card.romulan { border-color: #00aa44; }
+        .faction-card.cardassian { border-color: #cc8822; }
+        .faction-card.ferengi { border-color: #ddaa00; }
+        .faction-card.borg { border-color: #00ffaa; }
+        .faction-card.dominion { border-color: #aa66cc; }
+        .faction-emblem { width: 60px; height: 60px; margin: 0 auto 15px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; }
+        .faction-card.federation .faction-emblem { background: rgba(68, 136, 255, 0.3); }
+        .faction-card.klingon .faction-emblem { background: rgba(204, 0, 0, 0.3); }
+        .faction-card.romulan .faction-emblem { background: rgba(0, 170, 68, 0.3); }
+        .faction-card.cardassian .faction-emblem { background: rgba(204, 136, 34, 0.3); }
+        .faction-card.ferengi .faction-emblem { background: rgba(221, 170, 0, 0.3); }
+        .faction-card.borg .faction-emblem { background: rgba(0, 255, 170, 0.3); }
+        .faction-card.dominion .faction-emblem { background: rgba(170, 102, 204, 0.3); }
+        .faction-name { font-family: 'Orbitron', sans-serif; font-size: 0.9rem; color: #fff; margin-bottom: 5px; }
+        .faction-trait { font-size: 0.75rem; color: var(--lcars-tan); }
+
+        /* Scenarios */
+        .scenarios-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 25px; }
+        .scenario-card { background: var(--bg-panel); border-radius: 12px; padding: 25px; border: 1px solid rgba(153, 204, 255, 0.3); transition: all 0.3s ease; }
+        .scenario-card:hover { border-color: var(--lcars-blue); box-shadow: 0 10px 30px rgba(153, 204, 255, 0.15); }
+        .scenario-header { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+        .scenario-icon { font-size: 2rem; }
+        .scenario-title { font-family: 'Orbitron', sans-serif; font-size: 1.1rem; color: var(--lcars-blue); }
+        .scenario-era { font-size: 0.75rem; color: var(--lcars-lavender); }
+        .scenario-desc { font-size: 0.9rem; color: var(--lcars-peach); margin-bottom: 12px; }
+        .scenario-factions { display: flex; gap: 8px; flex-wrap: wrap; }
+        .scenario-faction { font-size: 0.7rem; padding: 3px 10px; border-radius: 10px; background: rgba(100, 150, 255, 0.15); color: var(--lcars-blue); }
+
+        /* Roadmap */
+        .roadmap-section { background: linear-gradient(180deg, rgba(20, 20, 50, 0.3), transparent); }
+        .roadmap-timeline { position: relative; max-width: 800px; margin: 0 auto; }
+        .roadmap-timeline::before { content: ''; position: absolute; left: 50%; top: 0; bottom: 0; width: 2px;
+            background: linear-gradient(180deg, var(--lcars-green), var(--lcars-orange), var(--lcars-lavender), var(--lcars-blue)); }
+        .roadmap-item { display: flex; margin-bottom: 40px; }
+        .roadmap-item:nth-child(odd) { flex-direction: row-reverse; }
+        .roadmap-content { width: 45%; padding: 20px; background: var(--bg-panel); border-radius: 12px; border: 1px solid rgba(255, 153, 0, 0.3); }
+        .roadmap-version { font-family: 'Orbitron', sans-serif; font-size: 1rem; color: var(--lcars-orange); margin-bottom: 10px; }
+        .roadmap-features { list-style: none; }
+        .roadmap-features li { padding: 4px 0; font-size: 0.85rem; color: var(--lcars-peach); }
+        .roadmap-features li::before { content: '◆ '; color: var(--lcars-lavender); }
+
+        /* Tech Stack */
+        .tech-section { text-align: center; }
+        .tech-badges { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; }
+        .tech-badge { padding: 10px 20px; background: rgba(100, 150, 255, 0.1); border: 1px solid rgba(100, 150, 255, 0.3); border-radius: 20px; font-size: 0.85rem; color: var(--lcars-blue); }
+
+        /* Footer */
+        footer { background: rgba(0, 0, 20, 0.8); border-top: 1px solid rgba(255, 153, 0, 0.2); padding: 40px 20px; text-align: center; }
+        .footer-links { display: flex; justify-content: center; gap: 30px; margin-bottom: 20px; }
+        .footer-links a { color: var(--lcars-orange); text-decoration: none; font-size: 0.9rem; }
+        .footer-links a:hover { text-decoration: underline; }
+        .disclaimer { font-size: 0.75rem; color: var(--lcars-tan); max-width: 600px; margin: 0 auto; }
+
+        @media (max-width: 768px) {
+            .logo h1 { font-size: 3rem; }
+            .logo .subtitle { font-size: 0.9rem; letter-spacing: 4px; }
+            .section-title { font-size: 1.5rem; }
+            .asset-grid { grid-template-columns: 1fr; }
+            .roadmap-timeline::before { left: 20px; }
+            .roadmap-item, .roadmap-item:nth-child(odd) { flex-direction: column; padding-left: 50px; }
+            .roadmap-content { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <section class="hero">
+        <div class="hero-stars"></div>
+        <div class="logo">
+            <h1>TrekGame</h1>
+            <p class="subtitle">The Final Strategy Frontier</p>
+            <p class="community"><span class="yot-badge">YOT</span> Yesterday or Tomorrow Community</p>
+            <div class="version-badge">Version 1.31.0</div>
+        </div>
+        <a href="#features" class="cta-button">EXPLORE THE GALAXY</a>
+    </section>
+
+    <section class="asset-showcase">
+        <h2 class="section-title">GAME ASSETS</h2>
+        <p class="section-subtitle">Original artwork created for the Star Trek experience</p>
+        <div class="asset-grid">
+            <div class="asset-card">
+                <img src="flyer-assets/federation_ships.png" alt="Federation Ships" class="asset-image">
+                <div class="asset-info">
+                    <h3>FEDERATION STARSHIPS</h3>
+                    <p>Constitution, Miranda, Excelsior, Galaxy, Defiant, Intrepid and more iconic vessels</p>
+                    <div class="asset-tags"><span class="asset-tag">Military</span><span class="asset-tag">12+ Classes</span><span class="asset-tag">Sprite Sheet</span></div>
+                </div>
+            </div>
+            <div class="asset-card">
+                <img src="flyer-assets/klingon_ships.png" alt="Klingon Ships" class="asset-image">
+                <div class="asset-info">
+                    <h3>KLINGON WARSHIPS</h3>
+                    <p>D7 Battlecruiser, Bird of Prey, Vor'cha, Negh'Var - the might of the Empire</p>
+                    <div class="asset-tags"><span class="asset-tag">Military</span><span class="asset-tag">8+ Classes</span><span class="asset-tag">Sprite Sheet</span></div>
+                </div>
+            </div>
+            <div class="asset-card">
+                <img src="flyer-assets/planets.png" alt="Planets" class="asset-image">
+                <div class="asset-info">
+                    <h3>PLANETARY BODIES</h3>
+                    <p>Terran worlds, desert planets, arctic moons, gas giants, and more</p>
+                    <div class="asset-tags"><span class="asset-tag">Colonizable</span><span class="asset-tag">8 Types</span><span class="asset-tag">Resources</span></div>
+                </div>
+            </div>
+            <div class="asset-card">
+                <img src="flyer-assets/portraits.png" alt="Race Portraits" class="asset-image">
+                <div class="asset-info">
+                    <h3>SPECIES PORTRAITS</h3>
+                    <p>Detailed character portraits for all major and minor species</p>
+                    <div class="asset-tags"><span class="asset-tag">Leaders</span><span class="asset-tag">Diplomats</span><span class="asset-tag">Admirals</span></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="features">
+        <h2 class="section-title">GAME FEATURES</h2>
+        <p class="section-subtitle">Current features and planned additions</p>
+        <div class="features-grid">
+            <div class="feature-card implemented"><span class="feature-status implemented">✓ Live</span><div class="feature-icon">🌌</div><h3>GALAXY EXPLORATION</h3><p>Navigate a procedurally generated galaxy with dozens of star systems connected by hyperlanes.</p><ul class="feature-list"><li>Canvas-based Stellaris-style map</li><li>Multiple star types</li><li>Fog of war system</li><li>Smooth pan & zoom controls</li></ul></div>
+            <div class="feature-card implemented"><span class="feature-status implemented">✓ Live</span><div class="feature-icon">🏠</div><h3>COLONY MANAGEMENT</h3><p>Build and develop colonies with a grid-based district system.</p><ul class="feature-list"><li>5 building categories</li><li>Construction queues</li><li>Population growth</li><li>Resource production chains</li></ul></div>
+            <div class="feature-card implemented"><span class="feature-status implemented">✓ Live</span><div class="feature-icon">🚀</div><h3>FLEET COMMAND</h3><p>Build powerful fleets with iconic Star Trek ship classes.</p><ul class="feature-list"><li>Multiple ship classes per faction</li><li>Fleet movement orders</li><li>Combat stances</li><li>Detailed ship statistics</li></ul></div>
+            <div class="feature-card planned"><span class="feature-status planned">v1.40</span><div class="feature-icon">🔬</div><h3>RESEARCH & TECHNOLOGY</h3><p>Advance your civilization through a comprehensive technology tree.</p><ul class="feature-list"><li>Multiple research paths</li><li>Faction-specific technologies</li><li>Unlockable ship classes</li><li>Advanced buildings</li></ul></div>
+            <div class="feature-card planned"><span class="feature-status planned">v1.40</span><div class="feature-icon">🤝</div><h3>DIPLOMACY</h3><p>Forge alliances, negotiate treaties, or declare war on rival factions.</p><ul class="feature-list"><li>Treaty negotiations</li><li>Trade agreements</li><li>Non-aggression pacts</li><li>Alliance systems</li></ul></div>
+            <div class="feature-card planned"><span class="feature-status planned">v1.50</span><div class="feature-icon">💰</div><h3>TRADE SYSTEM</h3><p>Establish trade routes and economic dominance across the quadrant.</p><ul class="feature-list"><li>Trade route management</li><li>Resource exchange</li><li>Ferengi commerce rules</li><li>Black market access</li></ul></div>
+            <div class="feature-card planned"><span class="feature-status planned">v1.50</span><div class="feature-icon">⚡</div><h3>RANDOM EVENTS</h3><p>Experience dynamic galaxy events inspired by Star Trek episodes.</p><ul class="feature-list"><li>Anomaly discoveries</li><li>First contact scenarios</li><li>Crisis events</li><li>Diplomatic incidents</li></ul></div>
+            <div class="feature-card future"><span class="feature-status future">v2.0</span><div class="feature-icon">⚔️</div><h3>TACTICAL COMBAT</h3><p>Engage in strategic ship-to-ship combat with detailed damage systems.</p><ul class="feature-list"><li>Turn-based resolution</li><li>Ship abilities & specials</li><li>Fleet formations</li><li>Retreat mechanics</li></ul></div>
+            <div class="feature-card future"><span class="feature-status future">v2.0</span><div class="feature-icon">🕵️</div><h3>ESPIONAGE</h3><p>Deploy intelligence operatives for covert operations.</p><ul class="feature-list"><li>Spy networks</li><li>Sabotage missions</li><li>Technology theft</li><li>Counter-intelligence</li></ul></div>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="section-title">SCENARIOS</h2>
+        <p class="section-subtitle">Play through iconic eras of Star Trek history</p>
+        <div class="scenarios-grid">
+            <div class="scenario-card"><div class="scenario-header"><span class="scenario-icon">🌟</span><div><div class="scenario-title">Birth of the Federation</div><div class="scenario-era">2161 - Coalition Era</div></div></div><p class="scenario-desc">Unite Earth, Vulcan, Andoria, and Tellar against the Romulan threat. Establish the United Federation of Planets.</p><div class="scenario-factions"><span class="scenario-faction">Earth</span><span class="scenario-faction">Vulcan</span><span class="scenario-faction">Andoria</span><span class="scenario-faction">Romulan Star Empire</span></div></div>
+            <div class="scenario-card"><div class="scenario-header"><span class="scenario-icon">⚔️</span><div><div class="scenario-title">The Cold War</div><div class="scenario-era">2260s - TOS Era</div></div></div><p class="scenario-desc">Navigate the tense political landscape between the Federation, Klingon Empire, and Romulan Star Empire.</p><div class="scenario-factions"><span class="scenario-faction">Federation</span><span class="scenario-faction">Klingon Empire</span><span class="scenario-faction">Romulan Star Empire</span></div></div>
+            <div class="scenario-card"><div class="scenario-header"><span class="scenario-icon">🕊️</span><div><div class="scenario-title">The Khitomer Accords</div><div class="scenario-era">2290s - Movie Era</div></div></div><p class="scenario-desc">Forge peace with the Klingon Empire following the Praxis disaster. A new era of cooperation begins.</p><div class="scenario-factions"><span class="scenario-faction">Federation</span><span class="scenario-faction">Klingon Empire</span><span class="scenario-faction">Romulan Star Empire</span><span class="scenario-faction">Cardassian Union</span></div></div>
+            <div class="scenario-card"><div class="scenario-header"><span class="scenario-icon">🛡️</span><div><div class="scenario-title">Dominion War</div><div class="scenario-era">2370s - DS9 Era</div></div></div><p class="scenario-desc">Face the greatest threat the Alpha Quadrant has ever known. The Dominion has arrived.</p><div class="scenario-factions"><span class="scenario-faction">Federation</span><span class="scenario-faction">Klingon Empire</span><span class="scenario-faction">Dominion</span><span class="scenario-faction">Cardassian Union</span></div></div>
+            <div class="scenario-card"><div class="scenario-header"><span class="scenario-icon">⬛</span><div><div class="scenario-title">Borg Incursion</div><div class="scenario-era">2360s-2370s</div></div></div><p class="scenario-desc">Resistance is futile. Defend against the unstoppable Borg Collective invasion.</p><div class="scenario-factions"><span class="scenario-faction">Federation</span><span class="scenario-faction">Borg Collective</span><span class="scenario-faction">Romulan Star Empire</span></div></div>
+            <div class="scenario-card"><div class="scenario-header"><span class="scenario-icon">🌀</span><div><div class="scenario-title">Delta Quadrant</div><div class="scenario-era">2370s - VOY Era</div></div></div><p class="scenario-desc">Lost 70,000 light years from home. Navigate unknown space filled with new species and dangers.</p><div class="scenario-factions"><span class="scenario-faction">USS Voyager</span><span class="scenario-faction">Kazon</span><span class="scenario-faction">Vidiians</span><span class="scenario-faction">Borg</span></div></div>
+        </div>
+    </section>
+
+    <section class="factions-section">
+        <h2 class="section-title">PLAYABLE FACTIONS</h2>
+        <div class="factions-grid">
+            <div class="faction-card federation"><div class="faction-emblem">🖖</div><div class="faction-name">Federation</div><div class="faction-trait">Exploration & Diplomacy</div></div>
+            <div class="faction-card klingon"><div class="faction-emblem">⚔️</div><div class="faction-name">Klingon Empire</div><div class="faction-trait">Honor & Combat</div></div>
+            <div class="faction-card romulan"><div class="faction-emblem">🦅</div><div class="faction-name">Romulan Empire</div><div class="faction-trait">Espionage & Cloaking</div></div>
+            <div class="faction-card cardassian"><div class="faction-emblem">🔱</div><div class="faction-name">Cardassian Union</div><div class="faction-trait">Order & Control</div></div>
+            <div class="faction-card ferengi"><div class="faction-emblem">💎</div><div class="faction-name">Ferengi Alliance</div><div class="faction-trait">Trade & Profit</div></div>
+            <div class="faction-card borg"><div class="faction-emblem">⬛</div><div class="faction-name">Borg Collective</div><div class="faction-trait">Assimilation & Tech</div></div>
+            <div class="faction-card dominion"><div class="faction-emblem">🔮</div><div class="faction-name">Dominion</div><div class="faction-trait">Order & Obedience</div></div>
+        </div>
+    </section>
+
+    <section class="roadmap-section">
+        <h2 class="section-title">DEVELOPMENT ROADMAP</h2>
+        <div class="roadmap-timeline">
+            <div class="roadmap-item"><div class="roadmap-content"><div class="roadmap-version">v1.31 - Current</div><ul class="roadmap-features"><li>Galaxy Map with Canvas rendering</li><li>Colony Management system</li><li>Fleet Management & Movement</li><li>System View with elliptical orbits</li><li>Faction-specific UI themes (LCARS)</li></ul></div></div>
+            <div class="roadmap-item"><div class="roadmap-content"><div class="roadmap-version">v1.40 - Q1 2025</div><ul class="roadmap-features"><li>Research Tree implementation</li><li>Diplomacy system</li><li>Turn processing engine</li><li>Combat resolution</li></ul></div></div>
+            <div class="roadmap-item"><div class="roadmap-content"><div class="roadmap-version">v1.50 - Q2 2025</div><ul class="roadmap-features"><li>Trade & Economy system</li><li>Random Events engine</li><li>Save/Load functionality</li><li>Sound effects & Music</li></ul></div></div>
+            <div class="roadmap-item"><div class="roadmap-content"><div class="roadmap-version">v2.0 - Q3 2025</div><ul class="roadmap-features"><li>Multiplayer support</li><li>AI opponents</li><li>Campaign scenarios</li><li>Victory conditions</li></ul></div></div>
+        </div>
+    </section>
+
+    <section class="tech-section">
+        <h2 class="section-title">TECHNOLOGY</h2>
+        <div class="tech-badges"><span class="tech-badge">Blazor WebAssembly</span><span class="tech-badge">ASP.NET Core 8</span><span class="tech-badge">Entity Framework</span><span class="tech-badge">SignalR</span><span class="tech-badge">HTML5 Canvas</span><span class="tech-badge">MudBlazor</span></div>
+    </section>
+
+    <footer>
+        <div class="footer-links"><a href="CHANGELOG.md">Changelog</a><a href="DOCUMENTATION.md">Documentation</a><a href="https://github.com/yot-community/trekgame">GitHub</a></div>
+        <p class="disclaimer">Star Trek and related marks are trademarks of CBS Studios Inc.<br>TrekGame is a fan project by the YOT community for educational and entertainment purposes.</p>
+    </footer>
+</body>
+</html>

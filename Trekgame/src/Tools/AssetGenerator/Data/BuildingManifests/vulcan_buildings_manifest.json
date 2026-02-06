@@ -1,0 +1,175 @@
+{
+  "factionName": "Vulcan",
+  "categoryName": "Buildings",
+  "architectureStyle": {
+    "description": "Logical, desert-adapted - ancient temple aesthetics meeting advanced technology",
+    "keyElements": [
+      "Desert-temple inspired architecture like Mount Seleya",
+      "Bronze, copper, rust-red coloring matching Vulcan's Forge",
+      "Logical geometric forms with no wasted space",
+      "IDIC symbols incorporated throughout design",
+      "Ancient stone combined with hidden advanced technology",
+      "Meditation gardens and contemplation spaces",
+      "NO ostentation - logic dictates simplicity"
+    ],
+    "colors": "Bronze, copper, rust-red, sand colors, subtle green accents",
+    "materials": "Desert stone, polished metal, heat-resistant ceramics, living rock"
+  },
+  "buildings": [
+    {
+      "name": "High Command",
+      "category": "Government",
+      "description": "Logical administration of Vulcan affairs with efficient, austere design"
+    },
+    {
+      "name": "Council Chambers",
+      "category": "Government",
+      "description": "Assembly hall where logic prevails over emotion in all deliberations"
+    },
+    {
+      "name": "Science Academy",
+      "category": "Government",
+      "description": "Prestigious institution governing Vulcan knowledge and scientific standards"
+    },
+    {
+      "name": "Colonial Directorate",
+      "category": "Government",
+      "description": "Logical expansion of Vulcan settlements based on resource efficiency"
+    },
+    {
+      "name": "Mount Seleya Temple",
+      "category": "Religion",
+      "description": "Ancient sacred site where katra ceremonies and fal-tor-pan are performed"
+    },
+    {
+      "name": "Kolinahr Monastery",
+      "category": "Religion",
+      "description": "Retreat for purging all remaining emotion through intensive mental discipline"
+    },
+    {
+      "name": "Meditation Garden",
+      "category": "Religion",
+      "description": "Tranquil space for mental discipline amid carefully arranged desert plants"
+    },
+    {
+      "name": "Shrine of Surak",
+      "category": "Religion",
+      "description": "Temple honoring the father of Vulcan logic and peaceful philosophy"
+    },
+    {
+      "name": "Kir'Shara Repository",
+      "category": "Religion",
+      "description": "Sacred archive housing Surak's original writings and teachings"
+    },
+    {
+      "name": "Katric Ark Chamber",
+      "category": "Religion",
+      "description": "Storing the living spirits of ancient masters for future generations"
+    },
+    {
+      "name": "IDIC Monument",
+      "category": "Religion",
+      "description": "Grand symbol of Infinite Diversity in Infinite Combinations philosophy"
+    },
+    {
+      "name": "Vulcan Science Institute",
+      "category": "Research",
+      "description": "Premier research facility producing groundbreaking logical discoveries"
+    },
+    {
+      "name": "Mind Sciences Lab",
+      "category": "Research",
+      "description": "Studying telepathy, mind melds, and katra transfer techniques"
+    },
+    {
+      "name": "Astrophysics Center",
+      "category": "Research",
+      "description": "Logical exploration of stellar phenomena and cosmic mysteries"
+    },
+    {
+      "name": "Medical Research",
+      "category": "Research",
+      "description": "Studying Vulcan copper-based biology and inter-species medicine"
+    },
+    {
+      "name": "Academy of Sciences",
+      "category": "Education",
+      "description": "Training young Vulcans in logic, science, and mental disciplines"
+    },
+    {
+      "name": "Learning Center",
+      "category": "Education",
+      "description": "Primary education in Vulcan disciplines starting with emotional control"
+    },
+    {
+      "name": "Martial Arts Temple",
+      "category": "Education",
+      "description": "Teaching Suus Mahna combat and the famous nerve pinch technique"
+    },
+    {
+      "name": "V'Shar Headquarters",
+      "category": "Intelligence",
+      "description": "Vulcan intelligence service conducting logical espionage operations"
+    },
+    {
+      "name": "Defense Installation",
+      "category": "Military",
+      "description": "Protection is logical, designed with minimal aggression but maximum effectiveness"
+    },
+    {
+      "name": "Security Center",
+      "category": "Military",
+      "description": "Maintaining order through logical means and non-violent resolution"
+    },
+    {
+      "name": "Geothermal Plant",
+      "category": "Energy",
+      "description": "Tapping the desert planet's internal heat for efficient energy"
+    },
+    {
+      "name": "Solar Collection Array",
+      "category": "Energy",
+      "description": "Harvesting abundant energy from the 40 Eridani system's star"
+    },
+    {
+      "name": "Ship Construction",
+      "category": "Production",
+      "description": "Building vessels with elegant efficiency and logical design"
+    },
+    {
+      "name": "Water Reclamation",
+      "category": "Production",
+      "description": "Essential resource management on the desert world - every drop conserved"
+    },
+    {
+      "name": "Healing Center",
+      "category": "Medical",
+      "description": "Medical care combined with mental disciplines for complete recovery"
+    },
+    {
+      "name": "Agricultural Complex",
+      "category": "FoodProduction",
+      "description": "Vegetarian food production - Vulcans don't consume animal flesh"
+    },
+    {
+      "name": "Transport Hub",
+      "category": "Infrastructure",
+      "description": "Logical movement of people and goods with maximum efficiency"
+    },
+    {
+      "name": "Communications Center",
+      "category": "Infrastructure",
+      "description": "Subspace relay for measured, logical discourse across space"
+    },
+    {
+      "name": "Diplomatic Compound",
+      "category": "Commerce",
+      "description": "Hosting visitors with Vulcan hospitality - efficient and welcoming"
+    },
+    {
+      "name": "Market District",
+      "category": "Commerce",
+      "description": "Trade conducted with logical fairness and no emotional haggling"
+    }
+  ]
+}

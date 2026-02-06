@@ -1,0 +1,176 @@
+{
+  "factionName": "Tholian",
+  "categoryName": "Buildings",
+  "architectureStyle": {
+    "description": "Crystalline, geometric, extreme heat - designed for silicon-based beings in 450+ Kelvin environments",
+    "keyElements": [
+      "Buildings look like cut gems and crystals",
+      "Faceted surfaces with geometric precision",
+      "Amber, orange, gold coloring with translucent elements",
+      "Extreme heat environment - lethal to most species",
+      "Hexagonal and triangular patterns dominate",
+      "Web-like connecting structures between buildings",
+      "No windows in traditional sense - crystalline walls",
+      "Completely alien, non-humanoid design aesthetic"
+    ],
+    "colors": "Amber, orange, gold, crystal-clear, ruby red accents",
+    "materials": "Grown crystals, faceted minerals, heat-resistant matrices, web-silk composites"
+  },
+  "buildings": [
+    {
+      "name": "Assembly Nexus",
+      "category": "Government",
+      "description": "Ruling body of the xenophobic Tholian Assembly in crystalline splendor"
+    },
+    {
+      "name": "Territorial Command",
+      "category": "Government",
+      "description": "Coordinating defense of Tholian space from all intruders"
+    },
+    {
+      "name": "Colonial Lattice",
+      "category": "Government",
+      "description": "Administration for crystalline settlements in extreme heat environments"
+    },
+    {
+      "name": "Diplomatic Prism",
+      "category": "Government",
+      "description": "Rare contact point for communication with inferior species"
+    },
+    {
+      "name": "Web Generator Station",
+      "category": "Military",
+      "description": "Producing the famous energy webs that trap enemy ships"
+    },
+    {
+      "name": "Defense Lattice",
+      "category": "Military",
+      "description": "Crystalline fortification grown from the ground, nearly indestructible"
+    },
+    {
+      "name": "Military Hive",
+      "category": "Military",
+      "description": "Barracks adapted for 450+ Kelvin temperatures lethal to intruders"
+    },
+    {
+      "name": "Weapons Crystal",
+      "category": "Military",
+      "description": "Manufacturing armaments from precision-grown combat crystals"
+    },
+    {
+      "name": "Web Anchor",
+      "category": "Military",
+      "description": "Ground station for planetary defense web deployment"
+    },
+    {
+      "name": "Prison Matrix",
+      "category": "Military",
+      "description": "Detention in temperatures lethal to most carbon-based species"
+    },
+    {
+      "name": "Crystal Growth Chamber",
+      "category": "Production",
+      "description": "Cultivating structural crystals for construction and technology"
+    },
+    {
+      "name": "Heat Forge",
+      "category": "Production",
+      "description": "Manufacturing in temperatures that would melt most metals"
+    },
+    {
+      "name": "Ship Construction",
+      "category": "Production",
+      "description": "Building geometric Tholian vessels with crystalline precision"
+    },
+    {
+      "name": "Resource Extraction",
+      "category": "Production",
+      "description": "Mining rare crystals and minerals for Tholian technology"
+    },
+    {
+      "name": "Material Synthesis",
+      "category": "Production",
+      "description": "Creating specialized crystalline compounds through heat manipulation"
+    },
+    {
+      "name": "Power Lattice",
+      "category": "Energy",
+      "description": "Energy generation for crystalline civilization through heat conversion"
+    },
+    {
+      "name": "Thermal Core",
+      "category": "Energy",
+      "description": "Maintaining the extreme temperatures Tholians require to survive"
+    },
+    {
+      "name": "Science Crystal",
+      "category": "Research",
+      "description": "Research conducted at temperatures impossible for other species"
+    },
+    {
+      "name": "Technology Nexus",
+      "category": "Research",
+      "description": "Developing Tholian innovations in crystalline laboratories"
+    },
+    {
+      "name": "Interphasic Research",
+      "category": "Research",
+      "description": "Studying the mysterious Tholian connection to other dimensions"
+    },
+    {
+      "name": "Web Technology Center",
+      "category": "Research",
+      "description": "Improving the famous Tholian web to trap ever-larger vessels"
+    },
+    {
+      "name": "Communication Spire",
+      "category": "Infrastructure",
+      "description": "Tholian subspace relay using incomprehensible crystalline protocols"
+    },
+    {
+      "name": "Transit Lattice",
+      "category": "Infrastructure",
+      "description": "Movement through crystalline structures via heat-resistant corridors"
+    },
+    {
+      "name": "Sensor Array",
+      "category": "Infrastructure",
+      "description": "Detecting intrusion into jealously guarded Tholian territory"
+    },
+    {
+      "name": "Medical Lattice",
+      "category": "Medical",
+      "description": "Healthcare for silicon-based lifeforms in extreme conditions"
+    },
+    {
+      "name": "Habitation Crystal",
+      "category": "Housing",
+      "description": "Housing grown from crystalline structures at lethal temperatures"
+    },
+    {
+      "name": "Cultural Matrix",
+      "category": "Religion",
+      "description": "Tholian traditions incomprehensible to carbon-based observers"
+    },
+    {
+      "name": "Memorial Spire",
+      "category": "Religion",
+      "description": "Crystal monument honoring fallen Tholians in geometric patterns"
+    },
+    {
+      "name": "Territorial Marker",
+      "category": "Special",
+      "description": "Crystalline beacon clearly stating: Keep Out of Tholian space"
+    },
+    {
+      "name": "Diplomatic Holding",
+      "category": "Special",
+      "description": "Cooled chamber allowing rare meetings with alien visitors"
+    },
+    {
+      "name": "Trade Portal",
+      "category": "Commerce",
+      "description": "Rare commerce with outside species through temperature barriers"
+    }
+  ]
+}

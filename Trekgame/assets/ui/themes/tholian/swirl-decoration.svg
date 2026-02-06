@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <!-- Tholian decoration: Web pattern -->
+  <defs>
+    <linearGradient id="tholianDecoOrange" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFAA44"/>
+      <stop offset="100%" style="stop-color:#FF6633"/>
+    </linearGradient>
+    <filter id="webGlowDeco">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Tholian web - hexagonal grid -->
+  <path d="M 50 10 L 85 30 L 85 70 L 50 90 L 15 70 L 15 30 Z" fill="none" stroke="url(#tholianDecoOrange)" stroke-width="2" filter="url(#webGlowDeco)"/>
+
+  <!-- Inner hexagon -->
+  <path d="M 50 25 L 72 38 L 72 62 L 50 75 L 28 62 L 28 38 Z" fill="none" stroke="url(#tholianDecoOrange)" stroke-width="2" filter="url(#webGlowDeco)"/>
+
+  <!-- Center -->
+  <path d="M 50 40 L 60 45 L 60 55 L 50 60 L 40 55 L 40 45 Z" fill="url(#tholianDecoOrange)" opacity="0.7"/>
+
+  <!-- Web strands connecting -->
+  <line x1="50" y1="10" x2="50" y2="25" stroke="#FFAA44" stroke-width="1"/>
+  <line x1="85" y1="30" x2="72" y2="38" stroke="#FFAA44" stroke-width="1"/>
+  <line x1="85" y1="70" x2="72" y2="62" stroke="#FFAA44" stroke-width="1"/>
+  <line x1="50" y1="90" x2="50" y2="75" stroke="#FFAA44" stroke-width="1"/>
+  <line x1="15" y1="70" x2="28" y2="62" stroke="#FFAA44" stroke-width="1"/>
+  <line x1="15" y1="30" x2="28" y2="38" stroke="#FFAA44" stroke-width="1"/>
+</svg>

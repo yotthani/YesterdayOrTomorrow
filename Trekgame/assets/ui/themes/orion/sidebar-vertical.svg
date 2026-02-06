@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 400" fill="none">
+  <!-- Orion Sidebar Vertical: Ornate vertical sidebar with flowing curves -->
+  <defs>
+    <linearGradient id="orionSideGreen" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#227744"/>
+      <stop offset="50%" style="stop-color:#33AA55"/>
+      <stop offset="100%" style="stop-color:#227744"/>
+    </linearGradient>
+    <linearGradient id="orionSideGold" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFCC00"/>
+      <stop offset="50%" style="stop-color:#FFE066"/>
+      <stop offset="100%" style="stop-color:#FFCC00"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Main sidebar body with curved edges -->
+  <path d="
+    M 10 0
+    Q 0 0 0 20
+    L 0 380
+    Q 0 400 10 400
+    L 70 400
+    Q 80 400 80 380
+    L 80 20
+    Q 80 0 70 0
+    Z
+  " fill="url(#orionSideGreen)"/>
+
+  <!-- Top gold ornament -->
+  <path d="
+    M 30 10
+    Q 40 5 50 10
+    Q 55 15 50 20
+    Q 40 25 30 20
+    Q 25 15 30 10
+  " fill="url(#orionSideGold)"/>
+
+  <!-- Center gold flourish -->
+  <path d="
+    M 35 180
+    Q 40 170 45 180
+    L 50 200
+    Q 45 220 40 220
+    Q 35 220 30 200
+    Z
+  " fill="url(#orionSideGold)"/>
+
+  <!-- Bottom gold ornament -->
+  <path d="
+    M 30 380
+    Q 40 385 50 380
+    Q 55 375 50 370
+    Q 40 365 30 370
+    Q 25 375 30 380
+  " fill="url(#orionSideGold)"/>
+
+  <!-- Left edge accent line -->
+  <rect x="2" y="40" width="3" height="320" rx="1.5" fill="url(#orionSideGold)" opacity="0.5"/>
+</svg>

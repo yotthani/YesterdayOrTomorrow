@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 20" fill="none">
+  <!-- Ferengi Progress Bar Fill: Gold glow -->
+  <defs>
+    <linearGradient id="ferengiProgressFill" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#8B6914"/>
+      <stop offset="50%" style="stop-color:#FFD700"/>
+      <stop offset="100%" style="stop-color:#8B6914"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Hexagonal progress fill -->
+  <path d="
+    M 8 0
+    L 192 0
+    L 200 10
+    L 192 20
+    L 8 20
+    L 0 10
+    Z
+  " fill="url(#ferengiProgressFill)"/>
+</svg>

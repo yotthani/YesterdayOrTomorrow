@@ -169,6 +169,15 @@
     .faction-section.borg h2 { color: #4ade80; }
     .faction-section.dominion h2 { color: #a78bfa; }
     .faction-section.ferengi h2 { color: #fcd34d; }
+    .faction-section.breen h2 { color: #7dd3fc; }
+    .faction-section.gorn h2 { color: #86efac; }
+    .faction-section.andorian h2 { color: #93c5fd; }
+    .faction-section.vulcan h2 { color: #fdba74; }
+    .faction-section.tholian h2 { color: #fca5a5; }
+    .faction-section.trill h2 { color: #c4b5fd; }
+    .faction-section.bajoran h2 { color: #fcd34d; }
+    .faction-section.orion h2 { color: #86efac; }
+    .faction-section.hirogen h2 { color: #d4a574; }
     .faction-section.universal h2 { color: #94a3b8; }
     
     /* Category Section */
@@ -344,7 +353,22 @@
     
     .symbol-card.vulcan { border-color: #cc7733; }
     .symbol-card.vulcan:hover { background: rgba(204, 119, 51, 0.15); }
-    
+
+    .symbol-card.trill { border-color: #9988cc; }
+    .symbol-card.trill:hover { background: rgba(153, 136, 204, 0.15); }
+
+    .symbol-card.bajoran { border-color: #cc9944; }
+    .symbol-card.bajoran:hover { background: rgba(204, 153, 68, 0.15); }
+
+    .symbol-card.tholian { border-color: #cc5555; }
+    .symbol-card.tholian:hover { background: rgba(204, 85, 85, 0.15); }
+
+    .symbol-card.orion { border-color: #44aa44; }
+    .symbol-card.orion:hover { background: rgba(68, 170, 68, 0.15); }
+
+    .symbol-card.hirogen { border-color: #aa7755; }
+    .symbol-card.hirogen:hover { background: rgba(170, 119, 85, 0.15); }
+
     /* Symbol hover preview - larger image popup */
     .symbol-preview {
         bottom: auto;
@@ -479,7 +503,37 @@
             new("Military Ships", "/assets/factions/ferengi/ferengi_militaryships_spritesheet.png", 6, 6, 360, GetFerengiMilitaryShipNames()),
             new("Buildings", "/assets/factions/ferengi/ferengi_buildings_spritesheet.png", 8, 6, 360),
         };
-        
+
+        // Breen
+        _factionAssets["Breen"] = new List<AssetCategory>
+        {
+            new("Military Ships", "/assets/factions/breen/breen_militaryships_spritesheet.png", 6, 6, 360),
+        };
+
+        // Gorn
+        _factionAssets["Gorn"] = new List<AssetCategory>
+        {
+            new("Military Ships", "/assets/factions/gorn/gorn_militaryships_spritesheet.png", 6, 6, 360),
+        };
+
+        // Andorian
+        _factionAssets["Andorian"] = new List<AssetCategory>
+        {
+            new("Military Ships", "/assets/factions/andorian/andorian_militaryships_spritesheet.png", 6, 6, 360),
+        };
+
+        // Vulcan
+        _factionAssets["Vulcan"] = new List<AssetCategory>
+        {
+            new("Military Ships", "/assets/factions/vulcan/vulcan_militaryships_spritesheet.png", 6, 6, 360),
+        };
+
+        // Tholian
+        _factionAssets["Tholian"] = new List<AssetCategory>
+        {
+            new("Military Ships", "/assets/factions/tholian/tholian_militaryships_spritesheet.png", 6, 6, 360),
+        };
+
         // Universal assets (without leaders - those go to Factions tab)
         _universalAssets = new List<AssetCategory>
         {
@@ -488,13 +542,14 @@
             new("Special Characters", "/assets/universal/generated/special_specialcharacters_spritesheet.png", 4, 4, 360, GetSpecialCharacterNames()),
         };
         
-        // Faction Leaders (for Factions tab)
-        _factionLeaders = new AssetCategory("Faction Leaders", "/assets/universal/special_factionleaders_spritesheet.png", 4, 4, 360);
+        // Faction Leaders (for Factions tab) - 4x5 = 20 leaders
+        _factionLeaders = new AssetCategory("Faction Leaders", "/assets/universal/generated/special_factionleaders_spritesheet.png", 4, 5, 360);
         _factionLeaderNames = GetFactionLeaderNames();
         
-        // Faction Symbols (SVGs) - all 11 game factions
+        // Faction Symbols (SVGs) - all game factions with available symbols
         _factionSymbols = new Dictionary<string, string>
         {
+            // Major Powers
             ["Federation"] = "/assets/universal/symbols/federation.svg",
             ["Klingon"] = "/assets/universal/symbols/klingon.svg",
             ["Romulan"] = "/assets/universal/symbols/romulan.svg",
@@ -502,10 +557,23 @@
             ["Ferengi"] = "/assets/universal/symbols/ferengi.svg",
             ["Borg"] = "/assets/universal/symbols/borg.svg",
             ["Dominion"] = "/assets/universal/symbols/dominion.svg",
+            // Minor Powers
             ["Breen"] = "/assets/universal/symbols/breen.svg",
             ["Gorn"] = "/assets/universal/symbols/gorn.svg",
             ["Andorian"] = "/assets/universal/symbols/andorian.svg",
             ["Vulcan"] = "/assets/universal/symbols/vulcan.svg",
+            ["Trill"] = "/assets/universal/symbols/trill.svg",
+            ["Bajoran"] = "/assets/universal/symbols/bajoran.svg",
+            ["Tholian"] = "/assets/universal/symbols/tholian.svg",
+            ["Orion"] = "/assets/universal/symbols/orion.svg",
+            ["Hirogen"] = "/assets/universal/symbols/hirogen.svg",
+            ["Betazoid"] = "/assets/universal/symbols/betazoid.svg",
+            // Rebel / Independent Groups
+            ["Maquis"] = "/assets/universal/symbols/maquis.svg",
+            ["Pirates"] = "/assets/universal/symbols/pirates.svg",
+            ["Nausicaan"] = "/assets/universal/symbols/nausicaan.svg",
+            // Exotic / Extradimensional
+            ["Species 8472"] = "/assets/universal/symbols/species8472.svg",
         };
     }
     
@@ -549,6 +617,15 @@
         "Cardassian" => "Cardassian Union",
         "Dominion" => "The Dominion",
         "Ferengi" => "Ferengi Alliance",
+        "Breen" => "Breen Confederacy",
+        "Gorn" => "Gorn Hegemony",
+        "Andorian" => "Andorian Empire",
+        "Vulcan" => "Vulcan High Command",
+        "Tholian" => "Tholian Assembly",
+        "Trill" => "Trill Symbiosis",
+        "Bajoran" => "Bajoran Republic",
+        "Orion" => "Orion Syndicate",
+        "Hirogen" => "Hirogen Hunters",
         _ => faction
     };
     
@@ -593,6 +670,15 @@
         "Cardassian" => "🟠",
         "Dominion" => "💜",
         "Ferengi" => "🟡",
+        "Breen" => "🧊",
+        "Gorn" => "🦎",
+        "Andorian" => "💙",
+        "Vulcan" => "🖖",
+        "Tholian" => "💎",
+        "Trill" => "🔷",
+        "Bajoran" => "🙏",
+        "Orion" => "💚",
+        "Hirogen" => "🎯",
         _ => "⚪"
     };
     
@@ -605,6 +691,15 @@
         "Cardassian" => Icons.Material.Filled.Shield,
         "Dominion" => Icons.Material.Filled.Hub,
         "Ferengi" => Icons.Material.Filled.AttachMoney,
+        "Breen" => Icons.Material.Filled.AcUnit,
+        "Gorn" => Icons.Material.Filled.Pets,
+        "Andorian" => Icons.Material.Filled.Sensors,
+        "Vulcan" => Icons.Material.Filled.Psychology,
+        "Tholian" => Icons.Material.Filled.Diamond,
+        "Trill" => Icons.Material.Filled.Brightness5,
+        "Bajoran" => Icons.Material.Filled.Church,
+        "Orion" => Icons.Material.Filled.Nightlife,
+        "Hirogen" => Icons.Material.Filled.GpsFixed,
         _ => Icons.Material.Filled.Star
     };
     
@@ -711,9 +806,15 @@
     
     private string[] GetFactionLeaderNames() => new[]
     {
+        // Row 1
         "Federation President", "Klingon Chancellor", "Romulan Praetor", "Cardassian Legate",
-        "Ferengi Grand Nagus", "Dominion Founder", "Borg Queen", "Breen Thot",
-        "Gorn King", "Andorian Chancellor", "Vulcan Admiral", "Trill President",
-        "Bajoran Kai", "Tholian Commander", "Orion Syndicate Boss", "Mercenary Captain"
+        // Row 2
+        "Ferengi Grand Nagus", "Dominion Founder", "Borg Queen", "Breen Thot Modern",
+        // Row 3
+        "Breen Thot Classic", "Breen Thot Revealed", "Hirogen Alpha Hunter", "Gorn King",
+        // Row 4
+        "Andorian Chancellor", "Vulcan Admiral", "Trill President", "Bajoran Kai",
+        // Row 5
+        "Tholian Commander", "Orion Syndicate Boss", "Mercenary Captain", "Nausicaan Raider"
     };
 }

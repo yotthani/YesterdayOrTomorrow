@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 50" fill="none">
+  <!-- Orion Button Pill: Luxurious curved button with gold trim -->
+  <defs>
+    <linearGradient id="orionBtnGreen" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#44BB66"/>
+      <stop offset="50%" style="stop-color:#33AA55"/>
+      <stop offset="100%" style="stop-color:#227744"/>
+    </linearGradient>
+    <linearGradient id="orionBtnGold" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#CC9900"/>
+      <stop offset="50%" style="stop-color:#FFCC00"/>
+      <stop offset="100%" style="stop-color:#CC9900"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Outer gold trim -->
+  <path d="
+    M 25 0
+    Q 0 0 0 25
+    Q 0 50 25 50
+    L 175 50
+    Q 200 50 200 25
+    Q 200 0 175 0
+    Z
+  " fill="url(#orionBtnGold)"/>
+
+  <!-- Inner green button -->
+  <path d="
+    M 27 3
+    Q 5 3 5 25
+    Q 5 47 27 47
+    L 173 47
+    Q 195 47 195 25
+    Q 195 3 173 3
+    Z
+  " fill="url(#orionBtnGreen)"/>
+
+  <!-- Decorative flourish left -->
+  <ellipse cx="20" cy="25" rx="4" ry="10" fill="url(#orionBtnGold)" opacity="0.6"/>
+
+  <!-- Decorative flourish right -->
+  <ellipse cx="180" cy="25" rx="4" ry="10" fill="url(#orionBtnGold)" opacity="0.6"/>
+</svg>

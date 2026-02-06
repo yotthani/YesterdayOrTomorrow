@@ -1,0 +1,340 @@
+{
+  "factionName": "Breen",
+  "categoryName": "MilitaryShips",
+  "grid": {
+    "columns": 6,
+    "rows": 6,
+    "totalAssets": 36,
+    "cellSize": 360,
+    "spriteWidth": 2160,
+    "spriteHeight": 2160
+  },
+  "spriteSheetPath": "breen_militaryships.png",
+  "generatedAt": "2026-02-04T20:05:39.745Z",
+  "assets": [
+    {
+      "row": 0,
+      "col": 0,
+      "name": "Chel Grett Cruiser",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 0,
+      "col": 1,
+      "name": "Plesh Brek Raider",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 0,
+      "col": 2,
+      "name": "Sar Theln Carrier",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 0,
+      "col": 3,
+      "name": "Rezreth Dreadnought",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 0,
+      "col": 4,
+      "name": "Bleth Choas Heavy Cruiser",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 0,
+      "col": 5,
+      "name": "Chel Boalg Warship",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 1,
+      "col": 0,
+      "name": "Breen Frigate",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 1,
+      "col": 1,
+      "name": "Breen Destroyer",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 1,
+      "col": 2,
+      "name": "Breen Light Cruiser",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 1,
+      "col": 3,
+      "name": "Breen Battlecruiser",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 1,
+      "col": 4,
+      "name": "Breen Patrol Ship",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 1,
+      "col": 5,
+      "name": "Breen Scout",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 2,
+      "col": 0,
+      "name": "Breen Interceptor",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 2,
+      "col": 1,
+      "name": "Breen Fighter",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 2,
+      "col": 2,
+      "name": "Breen Assault Ship",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 2,
+      "col": 3,
+      "name": "Breen Strike Cruiser",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": "MANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: The spaceship must look like a handmade physical model made of plasticine clay with a subtle comic-like shader. Realistic metallic hull texture with a non-glossy, soft clay finish. High-end stop-motion animation quality (Laika/Aardman style). Very detailed panel lines, windows, and technical details.\nProportions (CRUCIAL - FOLLOW EXACTLY): Accurate to the ship class design. Maintain correct proportions and EXACT number of components as specified.\nLighting: Soft, cinematic studio lighting that emphasizes the clay texture and model quality. No harsh digital shine. Subtle glow from windows and engines.\nCamera/Perspective (CRITICAL - MUST FOLLOW EXACTLY):\n- DIRECTION: Ship flies toward LOWER-LEFT, engines point UPPER-RIGHT\n- Camera at TOP-RIGHT corner looking DOWN at ship\n- Ship\u0027s FRONT/NOSE/BOW = BOTTOM-LEFT of image\n- Ship\u0027s BACK/ENGINES/STERN = TOP-RIGHT of image\n- Visible: TOP surface \u002B LEFT (port) side of ship\n- Nacelles/engines appear in upper-right quadrant\n- Ship\u0027s bow/front appears in lower-left quadrant\n- Like viewing from 2 o\u0027clock position above the ship\n- Angle: 30-45 degrees above horizontal\n- DO NOT flip or mirror - nose MUST be lower-left!\nBackground: Solid black background (#000000).\nDetails: Glowing windows, engine glow, subtle weathering, Tholian faction markings, weapon arrays visible.\n\n\nTHOLIAN SHIPS DESIGN:\n- Design: CRYSTALLINE GEOMETRIC POLYHEDRON shapes. Ships look like cut gemstones or crystals. Sharp angular facets. Completely alien non-humanoid design.\n- Colors: AMBER/ORANGE crystalline hull, RED internal glow, YELLOW energy veins. Like molten glass or volcanic crystal\n- Features:\n  * FACETED CRYSTALLINE hull surfaces\n  * Sharp geometric angles\n  * Internal energy glow visible through hull\n  * Web-spinner arrays\n  * Non-humanoid completely alien design\nIMPORTANT: Tholian ships are CRYSTALLINE GEOMETRIC SHAPES - faceted like cut gemstones, NOT smooth curves. Completely ALIEN design.\n\n\nSHIP CLASS SPECIFIC DESIGN: MEDIUM Tholian cruiser. Faceted crystalline polyhedron. Amber with red core. Web-capable.\n\nTHOLIAN DESIGN: Crystalline geometric shapes. Web-spinning capability. Extreme heat environments. Faceted surfaces like gems. Amber/orange coloring.\n\nSubject: Single Tholian military warship, Breen Strike Cruiser class.\nDesign Language: Crystalline geometric forms, faceted surfaces, web-spinner motifs, extreme heat aesthetic\nColor Scheme: Amber, orange, gold, crystalline translucent, volcanic red glow\n\nCRITICAL RULES:\n1. Follow the EXACT GEOMETRY specified above\n2. Do NOT add extra nacelles or components\n3. Count components carefully before generating\n4. Ship MUST face BOTTOM-LEFT, engines toward TOP-RIGHT\n\n**single spacecraft miniature model, rendered in high-quality stylized claymation 3D style, game asset, isometric view, ship facing bottom-left**\n--no funny, thumbprints, exaggerated features, multiple ships, fleet, grid, shiny plastic, CGI look, action figure, base, stand, table surface, tilt-shift, blurry background, frame, border, text, label, pedestal, extra engines, wrong number of nacelles, stacked hulls, ship facing right, ship facing up, frontal view, rear view, organic curves, Federation saucer"
+    },
+    {
+      "row": 2,
+      "col": 4,
+      "name": "Breen Torpedo Ship",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 2,
+      "col": 5,
+      "name": "Breen Siege Cruiser",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": "MANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: The spaceship must look like a handmade physical model made of plasticine clay with a subtle comic-like shader. Realistic metallic hull texture with a non-glossy, soft clay finish. High-end stop-motion animation quality (Laika/Aardman style). Very detailed panel lines, windows, and technical details.\nProportions (CRUCIAL - FOLLOW EXACTLY): Accurate to the ship class design. Maintain correct proportions and EXACT number of components as specified.\nLighting: Soft, cinematic studio lighting that emphasizes the clay texture and model quality. No harsh digital shine. Subtle glow from windows and engines.\nCamera/Perspective (CRITICAL - MUST FOLLOW EXACTLY):\n- DIRECTION: Ship flies toward LOWER-LEFT, engines point UPPER-RIGHT\n- Camera at TOP-RIGHT corner looking DOWN at ship\n- Ship\u0027s FRONT/NOSE/BOW = BOTTOM-LEFT of image\n- Ship\u0027s BACK/ENGINES/STERN = TOP-RIGHT of image\n- Visible: TOP surface \u002B LEFT (port) side of ship\n- Nacelles/engines appear in upper-right quadrant\n- Ship\u0027s bow/front appears in lower-left quadrant\n- Like viewing from 2 o\u0027clock position above the ship\n- Angle: 30-45 degrees above horizontal\n- DO NOT flip or mirror - nose MUST be lower-left!\nBackground: Solid black background (#000000).\nDetails: Glowing windows, engine glow, subtle weathering, Tholian faction markings, weapon arrays visible.\n\n\nTHOLIAN SHIPS DESIGN:\n- Design: CRYSTALLINE GEOMETRIC POLYHEDRON shapes. Ships look like cut gemstones or crystals. Sharp angular facets. Completely alien non-humanoid design.\n- Colors: AMBER/ORANGE crystalline hull, RED internal glow, YELLOW energy veins. Like molten glass or volcanic crystal\n- Features:\n  * FACETED CRYSTALLINE hull surfaces\n  * Sharp geometric angles\n  * Internal energy glow visible through hull\n  * Web-spinner arrays\n  * Non-humanoid completely alien design\nIMPORTANT: Tholian ships are CRYSTALLINE GEOMETRIC SHAPES - faceted like cut gemstones, NOT smooth curves. Completely ALIEN design.\n\n\nSHIP CLASS SPECIFIC DESIGN: MEDIUM Tholian cruiser. Faceted crystalline polyhedron. Amber with red core. Web-capable.\n\nTHOLIAN DESIGN: Crystalline geometric shapes. Web-spinning capability. Extreme heat environments. Faceted surfaces like gems. Amber/orange coloring.\n\nSubject: Single Tholian military warship, Breen Siege Cruiser class.\nDesign Language: Crystalline geometric forms, faceted surfaces, web-spinner motifs, extreme heat aesthetic\nColor Scheme: Amber, orange, gold, crystalline translucent, volcanic red glow\n\nCRITICAL RULES:\n1. Follow the EXACT GEOMETRY specified above\n2. Do NOT add extra nacelles or components\n3. Count components carefully before generating\n4. Ship MUST face BOTTOM-LEFT, engines toward TOP-RIGHT\n\n**single spacecraft miniature model, rendered in high-quality stylized claymation 3D style, game asset, isometric view, ship facing bottom-left**\n--no funny, thumbprints, exaggerated features, multiple ships, fleet, grid, shiny plastic, CGI look, action figure, base, stand, table surface, tilt-shift, blurry background, frame, border, text, label, pedestal, extra engines, wrong number of nacelles, stacked hulls, ship facing right, ship facing up, frontal view, rear view, organic curves, Federation saucer"
+    },
+    {
+      "row": 3,
+      "col": 0,
+      "name": "Breen Command Ship",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 3,
+      "col": 1,
+      "name": "Breen Flagship",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 3,
+      "col": 2,
+      "name": "Energy Dampener Cruiser",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 3,
+      "col": 3,
+      "name": "Breen Fast Attack",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 3,
+      "col": 4,
+      "name": "Breen Border Patrol",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 3,
+      "col": 5,
+      "name": "Breen Escort",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 4,
+      "col": 0,
+      "name": "Breen Corvette",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": "MANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: The spaceship must look like a handmade physical model made of plasticine clay with a subtle comic-like shader. Realistic metallic hull texture with a non-glossy, soft clay finish. High-end stop-motion animation quality (Laika/Aardman style). Very detailed panel lines, windows, and technical details.\nProportions (CRUCIAL - FOLLOW EXACTLY): Accurate to the ship class design. Maintain correct proportions and EXACT number of components as specified.\nLighting: Soft, cinematic studio lighting that emphasizes the clay texture and model quality. No harsh digital shine. Subtle glow from windows and engines.\nCamera/Perspective (CRITICAL - MUST FOLLOW EXACTLY):\n- DIRECTION: Ship flies toward LOWER-LEFT, engines point UPPER-RIGHT\n- Camera at TOP-RIGHT corner looking DOWN at ship\n- Ship\u0027s FRONT/NOSE/BOW = BOTTOM-LEFT of image\n- Ship\u0027s BACK/ENGINES/STERN = TOP-RIGHT of image\n- Visible: TOP surface \u002B LEFT (port) side of ship\n- Nacelles/engines appear in upper-right quadrant\n- Ship\u0027s bow/front appears in lower-left quadrant\n- Like viewing from 2 o\u0027clock position above the ship\n- Angle: 30-45 degrees above horizontal\n- DO NOT flip or mirror - nose MUST be lower-left!\nBackground: Solid black background (#000000).\nDetails: Glowing windows, engine glow, subtle weathering, Tholian faction markings, weapon arrays visible.\n\n\nTHOLIAN SHIPS DESIGN:\n- Design: CRYSTALLINE GEOMETRIC POLYHEDRON shapes. Ships look like cut gemstones or crystals. Sharp angular facets. Completely alien non-humanoid design.\n- Colors: AMBER/ORANGE crystalline hull, RED internal glow, YELLOW energy veins. Like molten glass or volcanic crystal\n- Features:\n  * FACETED CRYSTALLINE hull surfaces\n  * Sharp geometric angles\n  * Internal energy glow visible through hull\n  * Web-spinner arrays\n  * Non-humanoid completely alien design\nIMPORTANT: Tholian ships are CRYSTALLINE GEOMETRIC SHAPES - faceted like cut gemstones, NOT smooth curves. Completely ALIEN design.\n\n\nTHOLIAN DESIGN: Crystalline geometric shapes. Web-spinning capability. Extreme heat environments. Faceted surfaces like gems. Amber/orange coloring.\n\nSubject: Single Tholian military warship, Breen Corvette class.\nDesign Language: Crystalline geometric forms, faceted surfaces, web-spinner motifs, extreme heat aesthetic\nColor Scheme: Amber, orange, gold, crystalline translucent, volcanic red glow\n\nCRITICAL RULES:\n1. Follow the EXACT GEOMETRY specified above\n2. Do NOT add extra nacelles or components\n3. Count components carefully before generating\n4. Ship MUST face BOTTOM-LEFT, engines toward TOP-RIGHT\n\n**single spacecraft miniature model, rendered in high-quality stylized claymation 3D style, game asset, isometric view, ship facing bottom-left**\n--no funny, thumbprints, exaggerated features, multiple ships, fleet, grid, shiny plastic, CGI look, action figure, base, stand, table surface, tilt-shift, blurry background, frame, border, text, label, pedestal, extra engines, wrong number of nacelles, stacked hulls, ship facing right, ship facing up, frontal view, rear view, organic curves, Federation saucer"
+    },
+    {
+      "row": 4,
+      "col": 1,
+      "name": "Breen Gunship",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 4,
+      "col": 2,
+      "name": "Thot Command Cruiser",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 4,
+      "col": 3,
+      "name": "Breen Mine Layer",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 4,
+      "col": 4,
+      "name": "Breen Blockade Runner",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 4,
+      "col": 5,
+      "name": "Breen Stealth Ship",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 5,
+      "col": 0,
+      "name": "Breen Intelligence Vessel",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 5,
+      "col": 1,
+      "name": "Breen Troop Transport",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 5,
+      "col": 2,
+      "name": "Cryo Assault Ship",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": "MANDATORY STYLE GUIDE:\nMaterial \u0026 Texture: The spaceship must look like a handmade physical model made of plasticine clay with a subtle comic-like shader. Realistic metallic hull texture with a non-glossy, soft clay finish. High-end stop-motion animation quality (Laika/Aardman style). Very detailed panel lines, windows, and technical details.\nProportions (CRUCIAL - FOLLOW EXACTLY): Accurate to the ship class design. Maintain correct proportions and EXACT number of components as specified.\nLighting: Soft, cinematic studio lighting that emphasizes the clay texture and model quality. No harsh digital shine. Subtle glow from windows and engines.\nCamera/Perspective (CRITICAL - MUST FOLLOW EXACTLY):\n- DIRECTION: Ship flies toward LOWER-LEFT, engines point UPPER-RIGHT\n- Camera at TOP-RIGHT corner looking DOWN at ship\n- Ship\u0027s FRONT/NOSE/BOW = BOTTOM-LEFT of image\n- Ship\u0027s BACK/ENGINES/STERN = TOP-RIGHT of image\n- Visible: TOP surface \u002B LEFT (port) side of ship\n- Nacelles/engines appear in upper-right quadrant\n- Ship\u0027s bow/front appears in lower-left quadrant\n- Like viewing from 2 o\u0027clock position above the ship\n- Angle: 30-45 degrees above horizontal\n- DO NOT flip or mirror - nose MUST be lower-left!\nBackground: Solid black background (#000000).\nDetails: Glowing windows, engine glow, subtle weathering, Tholian faction markings, weapon arrays visible.\n\n\nTHOLIAN SHIPS DESIGN:\n- Design: CRYSTALLINE GEOMETRIC POLYHEDRON shapes. Ships look like cut gemstones or crystals. Sharp angular facets. Completely alien non-humanoid design.\n- Colors: AMBER/ORANGE crystalline hull, RED internal glow, YELLOW energy veins. Like molten glass or volcanic crystal\n- Features:\n  * FACETED CRYSTALLINE hull surfaces\n  * Sharp geometric angles\n  * Internal energy glow visible through hull\n  * Web-spinner arrays\n  * Non-humanoid completely alien design\nIMPORTANT: Tholian ships are CRYSTALLINE GEOMETRIC SHAPES - faceted like cut gemstones, NOT smooth curves. Completely ALIEN design.\n\n\nSHIP CLASS SPECIFIC DESIGN: LARGE Tholian warship. Multiple faceted sections. Amber crystalline hull. Powerful web arrays.\n\nTHOLIAN DESIGN: Crystalline geometric shapes. Web-spinning capability. Extreme heat environments. Faceted surfaces like gems. Amber/orange coloring.\n\nSubject: Single Tholian military warship, Cryo Assault Ship class.\nDesign Language: Crystalline geometric forms, faceted surfaces, web-spinner motifs, extreme heat aesthetic\nColor Scheme: Amber, orange, gold, crystalline translucent, volcanic red glow\n\nCRITICAL RULES:\n1. Follow the EXACT GEOMETRY specified above\n2. Do NOT add extra nacelles or components\n3. Count components carefully before generating\n4. Ship MUST face BOTTOM-LEFT, engines toward TOP-RIGHT\n\n**single spacecraft miniature model, rendered in high-quality stylized claymation 3D style, game asset, isometric view, ship facing bottom-left**\n--no funny, thumbprints, exaggerated features, multiple ships, fleet, grid, shiny plastic, CGI look, action figure, base, stand, table surface, tilt-shift, blurry background, frame, border, text, label, pedestal, extra engines, wrong number of nacelles, stacked hulls, ship facing right, ship facing up, frontal view, rear view, organic curves, Federation saucer"
+    },
+    {
+      "row": 5,
+      "col": 3,
+      "name": "Breen Defense Ship",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 5,
+      "col": 4,
+      "name": "Breen Battle Carrier",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 5,
+      "col": 5,
+      "name": "Breen Super Dreadnought",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    }
+  ]
+}

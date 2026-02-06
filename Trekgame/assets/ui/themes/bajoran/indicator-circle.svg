@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" fill="none">
+  <!-- Bajoran Indicator Circle: Spiritual orb indicator (inactive) -->
+  <defs>
+    <radialGradient id="bajoranOrbBrown" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#AA7744"/>
+      <stop offset="100%" style="stop-color:#886633"/>
+    </radialGradient>
+    <radialGradient id="bajoranOrbInner" cx="30%" cy="30%" r="50%">
+      <stop offset="0%" style="stop-color:#996644"/>
+      <stop offset="100%" style="stop-color:#775533"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Outer ring -->
+  <circle cx="15" cy="15" r="14" fill="url(#bajoranOrbBrown)"/>
+
+  <!-- Inner orb -->
+  <circle cx="15" cy="15" r="10" fill="url(#bajoranOrbInner)"/>
+
+  <!-- Subtle highlight -->
+  <ellipse cx="12" cy="12" rx="4" ry="3" fill="#AA7744" opacity="0.4"/>
+</svg>

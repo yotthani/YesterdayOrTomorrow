@@ -1,0 +1,47 @@
+{
+  "id": "vulcan",
+  "name": "Vulcan High Command",
+  "description": "Vulcan interface system - Logic, precision, symmetry",
+  "faction": "vulcan",
+  "fonts": {
+    "primary": {
+      "family": "Vulcan Script",
+      "fallback": "Optima, Trebuchet MS, sans-serif",
+      "file": "fonts/vulcan-script.ttf",
+      "weight": "normal",
+      "letterSpacing": "0.04em",
+      "textTransform": "uppercase"
+    },
+    "secondary": {
+      "family": "Vulcan Text",
+      "fallback": "Optima, Georgia, serif",
+      "file": "fonts/vulcan-text.ttf",
+      "weight": "normal",
+      "letterSpacing": "0.02em"
+    },
+    "display": {
+      "family": "Vulcan Calligraphy",
+      "fallback": "Vulcan Script, Optima, sans-serif",
+      "file": "fonts/vulcan-calligraphy.ttf",
+      "weight": "normal",
+      "letterSpacing": "0.06em",
+      "comment": "Traditional Vulcan calligraphy for ceremonial displays"
+    }
+  },
+  "colors": {
+    "primary": "#DD8844",
+    "secondary": "#AA6633",
+    "accent": "#FFBB77",
+    "highlight": "#FFD4A8",
+    "alert": "#FF6600",
+    "success": "#88AA66",
+    "background": "#1A1208",
+    "text": "#FFCC99",
+    "textDark": "#2A1A0A"
+  },
+  "styles": {
+    "cornerRadius": "geometric",
+    "borderStyle": "precise",
+    "animationStyle": "measured"
+  }
+}

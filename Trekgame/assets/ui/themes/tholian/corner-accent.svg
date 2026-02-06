@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" fill="none">
+  <defs>
+    <linearGradient id="tholianAccent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFAA44"/>
+      <stop offset="100%" style="stop-color:#FFDD88"/>
+    </linearGradient>
+    <filter id="webGlow">
+      <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Tholian web pattern -->
+  <path d="M 5 20 L 20 5 L 35 20 L 20 35 Z" fill="none" stroke="url(#tholianAccent)" stroke-width="2" filter="url(#webGlow)"/>
+  <path d="M 20 5 L 20 35 M 5 20 L 35 20" stroke="url(#tholianAccent)" stroke-width="1" filter="url(#webGlow)"/>
+</svg>

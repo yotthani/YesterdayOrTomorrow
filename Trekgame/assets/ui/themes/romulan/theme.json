@@ -1,0 +1,47 @@
+{
+  "id": "romulan",
+  "name": "Romulan Star Empire",
+  "description": "Romulan Tal Shiar intelligence interface system",
+  "faction": "romulan",
+  "fonts": {
+    "primary": {
+      "family": "Romulan",
+      "fallback": "Eurostile, Century Gothic, sans-serif",
+      "file": "fonts/romulan.ttf",
+      "weight": "normal",
+      "letterSpacing": "0.08em",
+      "textTransform": "uppercase"
+    },
+    "secondary": {
+      "family": "Romulan Text",
+      "fallback": "Trebuchet MS, Arial, sans-serif",
+      "file": "fonts/romulan-text.ttf",
+      "weight": "normal",
+      "letterSpacing": "0.03em"
+    },
+    "display": {
+      "family": "Rihannsu",
+      "fallback": "Romulan, Eurostile, sans-serif",
+      "file": "fonts/rihannsu.ttf",
+      "weight": "bold",
+      "letterSpacing": "0.1em",
+      "comment": "Traditional Romulan script for decorative use"
+    }
+  },
+  "colors": {
+    "primary": "#00CC99",
+    "secondary": "#008866",
+    "accent": "#CC33CC",
+    "highlight": "#00FFCC",
+    "alert": "#FF3399",
+    "success": "#00FF99",
+    "background": "#000a0a",
+    "text": "#00FFCC",
+    "textDark": "#001a1a"
+  },
+  "styles": {
+    "cornerRadius": "angular-elegant",
+    "borderStyle": "beveled",
+    "animationStyle": "sleek"
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "id": "borg",
+  "name": "Borg Collective",
+  "description": "Borg Collective neural interface system",
+  "faction": "borg",
+  "fonts": {
+    "primary": {
+      "family": "Borg",
+      "fallback": "Consolas, Courier New, monospace",
+      "file": "fonts/borg.ttf",
+      "weight": "normal",
+      "letterSpacing": "0.1em",
+      "textTransform": "uppercase"
+    },
+    "secondary": {
+      "family": "Borg Text",
+      "fallback": "Lucida Console, Monaco, monospace",
+      "file": "fonts/borg-text.ttf",
+      "weight": "normal",
+      "letterSpacing": "0.05em"
+    },
+    "display": {
+      "family": "Borg Symbols",
+      "fallback": "Borg, Consolas, monospace",
+      "file": "fonts/borg-symbols.ttf",
+      "weight": "normal",
+      "letterSpacing": "0.08em",
+      "comment": "Borg designation symbols"
+    }
+  },
+  "colors": {
+    "primary": "#2A5A2A",
+    "secondary": "#1A3A1A",
+    "accent": "#4A8A4A",
+    "highlight": "#6AAA6A",
+    "alert": "#8ACA8A",
+    "success": "#4A8A4A",
+    "background": "#0a0f0a",
+    "text": "#5A8A5A",
+    "textDark": "#0a150a",
+    "glow": "#3A7A3A",
+    "metal": "#3A4A4A"
+  },
+  "styles": {
+    "cornerRadius": "industrial",
+    "borderStyle": "grid",
+    "animationStyle": "pulse"
+  }
+}

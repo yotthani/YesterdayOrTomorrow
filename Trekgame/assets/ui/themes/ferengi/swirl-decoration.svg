@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <!-- Ferengi Decoration: Gold coin/latinum inspired -->
+  <defs>
+    <linearGradient id="ferengiCoinOuter" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8B6914"/>
+      <stop offset="100%" style="stop-color:#5C4A0F"/>
+    </linearGradient>
+    <linearGradient id="ferengiCoinInner" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFD700"/>
+      <stop offset="50%" style="stop-color:#D4A017"/>
+      <stop offset="100%" style="stop-color:#FFD700"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Outer ring (coin shape) -->
+  <circle cx="50" cy="50" r="45" fill="url(#ferengiCoinOuter)"/>
+  <circle cx="50" cy="50" r="38" fill="#1a1408"/>
+
+  <!-- Inner gold ring -->
+  <circle cx="50" cy="50" r="32" fill="none" stroke="url(#ferengiCoinInner)" stroke-width="3"/>
+
+  <!-- Center hexagon (latinum bar) -->
+  <polygon points="50,25 68,37 68,63 50,75 32,63 32,37" fill="url(#ferengiCoinInner)"/>
+  <polygon points="50,32 60,40 60,60 50,68 40,60 40,40" fill="#1a1408"/>
+</svg>

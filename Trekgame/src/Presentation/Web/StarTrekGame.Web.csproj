@@ -5,18 +5,82 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <RootNamespace>StarTrekGame.Web</RootNamespace>
+    <!-- Path to shared assets folder (relative to this project) -->
+    <SharedAssetsPath>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)\..\..\..\assets'))</SharedAssetsPath>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.2" PrivateAssets="all" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="10.0.2" />
-    
+
     <!-- Rich UI Components -->
     <PackageReference Include="MudBlazor" Version="8.15.0" />
-    
+
     <!-- Local Storage -->
     <PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
   </ItemGroup>
+
+  <!-- Clean and copy shared assets to wwwroot/assets during build -->
+  <Target Name="CleanSharedAssets" BeforeTargets="CopySharedAssets">
+    <Message Text="Cleaning wwwroot/assets before copy..." Importance="high" />
+
+    <!-- Remove existing assets directory to ensure clean state (removes old/renamed files) -->
+    <RemoveDir Directories="$(MSBuildProjectDirectory)\wwwroot\assets" Condition="Exists('$(MSBuildProjectDirectory)\wwwroot\assets')" />
+  </Target>
+
+  <Target Name="CopySharedAssets" BeforeTargets="Build" DependsOnTargets="CleanSharedAssets">
+    <Message Text="Copying shared assets from $(SharedAssetsPath) to wwwroot/assets..." Importance="high" />
+
+    <!-- Create assets directory -->
+    <MakeDir Directories="$(MSBuildProjectDirectory)\wwwroot\assets" />
+
+    <!-- Copy all files from shared assets folder -->
+    <ItemGroup>
+      <SharedAssetFiles Include="$(SharedAssetsPath)\**\*.*" />
+    </ItemGroup>
+
+    <Copy SourceFiles="@(SharedAssetFiles)"
+          DestinationFiles="@(SharedAssetFiles->'$(MSBuildProjectDirectory)\wwwroot\assets\%(RecursiveDir)%(Filename)%(Extension)')"
+          SkipUnchangedFiles="false" />
+
+    <Message Text="Copied %(SharedAssetFiles.Count) asset files." Importance="high" />
+  </Target>
+
+  <!-- Copy universal images to wwwroot/images for backward compatibility -->
+  <Target Name="CopyUniversalImages" BeforeTargets="Build" DependsOnTargets="CopySharedAssets">
+    <Message Text="Copying universal images to wwwroot/images..." Importance="high" />
+
+    <!-- Create images subdirectories -->
+    <MakeDir Directories="$(MSBuildProjectDirectory)\wwwroot\images\backgrounds" Condition="!Exists('$(MSBuildProjectDirectory)\wwwroot\images\backgrounds')" />
+    <MakeDir Directories="$(MSBuildProjectDirectory)\wwwroot\images\emblems" Condition="!Exists('$(MSBuildProjectDirectory)\wwwroot\images\emblems')" />
+    <MakeDir Directories="$(MSBuildProjectDirectory)\wwwroot\images\ui" Condition="!Exists('$(MSBuildProjectDirectory)\wwwroot\images\ui')" />
+
+    <!-- Copy backgrounds from assets/universal/backgrounds to wwwroot/images/backgrounds -->
+    <ItemGroup>
+      <BackgroundFiles Include="$(SharedAssetsPath)\universal\backgrounds\*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(BackgroundFiles)"
+          DestinationFolder="$(MSBuildProjectDirectory)\wwwroot\images\backgrounds"
+          SkipUnchangedFiles="true" />
+
+    <!-- Copy symbols/emblems from assets/universal/symbols to wwwroot/images/emblems -->
+    <ItemGroup>
+      <EmblemFiles Include="$(SharedAssetsPath)\universal\symbols\*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(EmblemFiles)"
+          DestinationFolder="$(MSBuildProjectDirectory)\wwwroot\images\emblems"
+          SkipUnchangedFiles="true" />
+
+    <!-- Copy UI elements from assets/universal/ui to wwwroot/images/ui -->
+    <ItemGroup>
+      <UIFiles Include="$(SharedAssetsPath)\universal\ui\*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(UIFiles)"
+          DestinationFolder="$(MSBuildProjectDirectory)\wwwroot\images\ui"
+          SkipUnchangedFiles="true" />
+
+    <Message Text="Universal images copied to wwwroot/images." Importance="high" />
+  </Target>
 
 </Project>

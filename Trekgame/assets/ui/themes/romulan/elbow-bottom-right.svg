@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <!-- Romulan Elbow Bottom-Right -->
+  <defs>
+    <linearGradient id="romulanGreen" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#006655"/>
+      <stop offset="100%" style="stop-color:#00FFCC"/>
+    </linearGradient>
+    <linearGradient id="romulanAccent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#990099"/>
+      <stop offset="100%" style="stop-color:#CC33CC"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Main elbow -->
+  <path d="
+    M 160 0
+    L 200 0
+    L 200 200
+    L 0 200
+    L 0 160
+    L 130 160
+    L 160 130
+    L 160 0
+    Z
+  " fill="url(#romulanGreen)"/>
+
+  <!-- V-shaped accent line -->
+  <path d="
+    M 110 160
+    L 130 145
+    L 150 160
+  " fill="none" stroke="url(#romulanAccent)" stroke-width="3"/>
+</svg>

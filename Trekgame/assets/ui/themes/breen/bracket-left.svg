@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 100" fill="none">
+  <defs>
+    <linearGradient id="breenBracketGrey" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#8899AA"/>
+      <stop offset="100%" style="stop-color:#556677"/>
+    </linearGradient>
+  </defs>
+
+  <path d="M 30 0 L 30 15 L 12 15 L 10 20 L 12 30 L 10 50 L 12 70 L 10 80 L 12 85 L 30 85 L 30 100 L 0 100 L 0 0 Z" fill="url(#breenBracketGrey)"/>
+</svg>

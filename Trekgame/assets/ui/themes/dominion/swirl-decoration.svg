@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <!-- Dominion Decoration: Founder/Great Link inspired liquid shape -->
+  <defs>
+    <linearGradient id="dominionLiquidGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#E8C060"/>
+      <stop offset="50%" style="stop-color:#D4A030"/>
+      <stop offset="100%" style="stop-color:#C89030"/>
+    </linearGradient>
+    <linearGradient id="dominionLiquidPurple" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#6A3A8A"/>
+      <stop offset="100%" style="stop-color:#4A2A5A"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Outer organic shape (Great Link pool) -->
+  <path d="
+    M 50 10
+    Q 80 15 85 40
+    Q 90 65 70 80
+    Q 50 95 30 80
+    Q 10 65 15 40
+    Q 20 15 50 10
+    Z
+  " fill="url(#dominionLiquidPurple)"/>
+
+  <!-- Inner liquid (Founder) -->
+  <path d="
+    M 50 25
+    Q 70 28 72 45
+    Q 75 62 60 70
+    Q 45 78 35 65
+    Q 25 52 30 40
+    Q 35 28 50 25
+    Z
+  " fill="url(#dominionLiquidGold)"/>
+
+  <!-- Center shimmer -->
+  <ellipse cx="50" cy="50" rx="12" ry="10" fill="#FFE8A0" opacity="0.6"/>
+</svg>

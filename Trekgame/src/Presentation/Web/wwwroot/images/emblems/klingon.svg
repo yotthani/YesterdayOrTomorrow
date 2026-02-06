@@ -1,90 +1,475 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
-  <defs>
-    <linearGradient id="klingonRed" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#dc143c"/>
-      <stop offset="50%" stop-color="#8b0000"/>
-      <stop offset="100%" stop-color="#4a0000"/>
-    </linearGradient>
-    <linearGradient id="klingonMetal" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#c0c0c0"/>
-      <stop offset="25%" stop-color="#e8e8e8"/>
-      <stop offset="50%" stop-color="#a0a0a0"/>
-      <stop offset="75%" stop-color="#d0d0d0"/>
-      <stop offset="100%" stop-color="#808080"/>
-    </linearGradient>
-    <linearGradient id="klingonGold" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#ffd700"/>
-      <stop offset="50%" stop-color="#b8860b"/>
-      <stop offset="100%" stop-color="#8b6914"/>
-    </linearGradient>
-    <filter id="klingonGlow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="3" result="blur"/>
-      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
-    <filter id="innerShadow">
-      <feOffset dx="2" dy="2"/>
-      <feGaussianBlur stdDeviation="2"/>
-      <feComposite in2="SourceAlpha" operator="arithmetic" k2="-1" k3="1"/>
-      <feColorMatrix type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.5 0"/>
-      <feBlend in2="SourceGraphic"/>
-    </filter>
-  </defs>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="-400 -1150 6200 6200" width="600" height="600">
+
+  <style>
+    @font-face {
+      font-family: 'Orbitron';
+      src: url('data:font/truetype;base64,d09GMgABAAAAAC0UABQAAAAAZZgAACylAAIAQgAAAAAAAAAAAAAAAAAAAAAAAAAAGoF/G5sKHCg/SFZBUoFtBmA/U1RBVHQnJgCEWC9gEQgK0jy+JjC6IgE2AiQDhWwLgngABCAFh0AHg2MMBxuvWAXcGLph4wAyg38gitLIiiMDwcYBkExOSf4/JE9krAd7kdgJMpRElVemhaMgaNFybrDh1MN3N1MNDxJLjwSxdMbin78lY8WKHJnE4mV3uukRveVCBzMuTCn1dcdoTDxySYiv/623z8xVYM2N5YmY5i9FXBWDSLfmKFFBSVTowU8C/UNpoQpptHJ7kATEkEAoCYHwELHVhpFiKQ3xKdXSvhb1n2/qH/+69T8hIQnYaCoRlShsK1h3O26LF3fvq/2rlMoxr9Ti3lZtbC/qigXtSAtdagANuW+ud2B3J8BHyQdmWXSkq1xy977SLTsWnhh43mev7L7kt9uxLcKBERi/p6YazfF4g58j9LwM7j5BKVoUklJsVJGgmSQU1USb0jWteojHdqGCbbCZYvhPc9Z/Saft/jeTSQ+QFAhzjgPbZoHpbKvvWBh0J8kC/b2pZvs+lnsCyTubuJAqcXRwyJd6UY6pqDxqPf3u/3+x2P/xQWAJmggEmUcAyZEWS3KGhNJ+UAGAI+l0IQQ65QVIhUw5pFB63F7sHLsUahdNd5079539f6evVO9coh8UtZu1rIHhTKNLup3+yP+hxOjHXbZRY4oKWBJ1bcPCwBAC6ztfq3nSbs9MF1ojhDA+YUwwueufpT6WmuDOxCqOBuP1e8eYZskav6pZLJF5womEWtvlEDSHnP6rjUYBy1gBqUAkKwQBNtsjFxB44tvV1y807ZlbWFz1rgVC4Ug0Fk+up9KZbC4vFoqljU2pLGOstBHLcYMw0RtqmYZmc4uFZ8XbXxgUHh0/USKTp+QRRqGcpCuvBIVAJzEoolHYCB68CGFEoYjjhiKdD4pC/iiKBaIoFYqi1kQUnSQouqWi6C8PxQjFKKbQopiuCsV8JhRBray5yUnWCOAhn5hV4FpWPhzmXzfXwgEDIPQ/AgQ173Z9LRyHq9sxMocQ/qRyOxYGIDiInA8PJduNpu84nJFzhnoy/6L8C7aOIq/7ay/X9a/rRHc2vnbBGRZlX6MtrGVkyXfuoGBI+74fJly01ewfNh5Rsv2NDMNkTElLfmNLfiSAMA86YFzbVhSURboInatu5ahyMXCsjQXtcnAI3CVX1YrIFQawMQoOGA8PcOEJAYQIRgRiIIbk3SlsgOhlQ0Heb2IQ1KLVSVY4CH53OTlQd5h2UB8Uh8ADZ/94f21frHf3ofuHVvK/vHu+O7c7sFu2k+8Ct99ut2wXbMO33ps9G+PGef37esc6bw3z85V05b9yXDYtiQtL395bek2712AtKdf8nEVpTHhG87+8NRR1KFw8+Agj2nhO3Hng8jQBj58AgT4lFCZchEgi0ZKIScmkSZchE41g5CugpFZCQ6uMjp5B9TC+Nd8ym1kzDDypyhajvxDjQxQl4ClHMSeZBeSdAIuGCW0RWSGgL3hmYoptvrKdMR1cFl5nLbyRxMV+Lxn2E/CkY9hNC0olh3LJaut2Jw1Qq2ngbBVdMn5b6cB9mwMN4D5ODG+etgr0AabKeNBnZZIwn/teATCestjNo9kNKGhL6WkZWIvp3MZYtY4D9maAMHqkerwJ5Ju1VPlbjZT5dg5toW6iL54NPJshStKkfKLT8fuZlJ07mpwSb6eVzzbpwCR4mM+DSVPA1k0lF3U8prO/NgVpsEx1tywWOR5vbihJXw6jAZxqSWzVeVKO2mRUdL1Mts5G+ZQ14vJFWpQZfYjQyDSBMzC2p7N4r0vdzIS81njY0+DtUlDYOlkJzlq6YuNNL5q+knHlLHcLLy36ythcK/tTB8fTg4Vkmr0tpLOvYL8iGI5gp2wDU6iD0wMXcbu2GOYzqzIb6LNK0nDxwvRCe4sNfm7LApnYJKPBPkjLzn4XiD8BPhomf7mSwL4XU+xYFJSaf6fD5CSHxyrWNwq3IohtFX0Z35ufakmGajzfHSxu69DhL6NXvNmPnd60A9K38ylLiV5d/vzbUYy6kHApoGeqODhLqHATjJNBRFToi5RxSj7iaNKmGNDOUKhoMNkMYDBM8ZbIDnd86xjLSdkqVjPQ3t5gHZapuRjd5pcHCyDKYhi4ZWGl26oYujqRW0LnMvm2m3teKaSvQqdAGfJNTdqguqG6VY5kKRwbNID575avzCAaOEtX/Ee96Fmyh7hUCCmY95KB+bG0ntgsHdDXAjliwFy5Zs/9jm6FrFLS+RENjbXAZmWRwLsbvpW0Rz/LzFRFQVdiVgi0wI82dKD7cXMHG1szPZvVX0/YmftlFvMYcqmp9+LyErI2DSinYzNYvo6TZYuV3B6bKMzqATDX0k5GhilNRWe8SiqQIfTl6zEooJKXlbElQMcOWFefRKAXSW0Jm8imDbmafowgkCF02Tv56xRVO347TRse0TrilrbybrbmY5/MIkZLgfNhMHdHjfONIvX6EIyt2+NQI4NO/vlko4kDo7kfHS9JQHzv08MdpWoHsvaedDwN5TJHyfvQ0slgggLpXUkOrZpzC78J/ZJOL5sDlDIA+TaDvhOICEnyPJyOCZlHvCVMOvVYjSbhh4zVnMgPwWvmmSqfG4aNNBRZBZRK8VHKu5kqBkiGQqJADLJRhFSES9ZUUTv5gwnq842k+EPIkuj5NzlZP5Uos7gYSl1X909y2n4unM6noEc9VgkE0FOaxho3tFQHxtOp58lQG4WEAjLwJtwMqbyE/RmgbpVZPiuZiQPfm8gINCKKFkFL5NZGQgtOx5uV8wqcWLmSAdUyQbVTtlYG2jyEQNwJAAEapa4YM2ZV7xug8pNmNdVYjOqHEmn7cablfxfD0MvCGTtPyNRf+QIDd+wH9MYA6X+2QfrE86PwCeXjyJvsavOGPMyKKtNySKyQEKgLHrmX+5zGI9V1PYpkIPcESAfZCrtALFGcEDFzzMQgO0nXk0w8tqIBZPGcBco2McdoOo/vcxc55+LAMJBYoPIEmEhojS/H8eGF535KkGRGraCkLylmeKZTx/MAnvQpsNJJMKmIAio11CwBNNSy6HUkA1jtUNDaROqL7i+YEtnESlBmqpR1mDwa4QKwtNSn7ID5xfiakRMPBWC1QKa01xRp4+OIN96BS7lCaVWmbdQc5llaLBzIJJoA0A/oDfhIoikT1qayDgzHOYocr3AZoCClFaubeJMZMouQZn4zpvqq4wDzGzIFBNXMEyH+wmPOxz3LvuJX2OKSLIjzkjk2hEORl/G9DTFX+el49iQg6gwuPWuXlubqER6Oznjw8hr8oHPGD7m8XxMf31CXs44tqL2lAvrJ5WWi8BSjK2+GWYAf/h8JfHED7/I463cjll9RGYAAqEB1A5msEAQHAWKxgFRWq+5WmSkAPlL5iySWxRpQInIY1L2AAIiSX/UFWo2uNnwXmDrzfEtvdyDYDzojHNP33IX3u+3gX/atEHIjIkSzuz8wKEADsaxT/rLbqADgJ2aLokKsyeY4qMkJZ5xzQZchL/zmLxKZuhKm7tXTet6U1trJPMtz43nyBDxfXrNg3P8yIFOoOCX2adJWZ6XrejzxyhvFnUoUvOEZniuPS95h4CF6AQllKDidVsg0Jvjvo7QkLUovS69IA6uz7v8DbnygfaC6/+vL1UDhByY65EvgcwDg47GScImPKFIA6Qn/3k6ba4vFdjmiyVbLLLfIHjOtMcMSs8x2yAEHzXf0K9D6jo9vzv/x03+VpVZb78zXo09kKxy30mHbzbPTbhdZLGCLQmNjYOHgJYoDEURy48yFq0944xPw4WWfUEGChYhSKl6MWBPFSZBIIpVcshR5suXIpTCJSqFiRfarUq5CpRq+JqOASFYIsVh4Jh7W4SuZ0CkEkZJLbFEw5y5xRMODS1wx4MElHjHhYUy8YlWwxXf/zx2ShQDcAyArgXvBWwO+U6DDQf4EgEKFTmQkXGS3lDmepZL5KFVoR5vVCLIUbHceozZWoOQEtbSX2bQXbkl0QEcqk5KquCJyNl0LQ0YIuECxSgi7w3C3qYywEaTOcWFNWtfciluO4n028pxLntoXGqk51an5dBSZImrsd3mprWYFNcfdLU3i+Ljmo1STlniv0SYycdBa2hsfqDGMwyhYHt/Fv4Y2VkSq15asutTugpNx7VSwq+ZHMdYJ09SPW41U9teOHWuzn/PqF5jVzmc677infV3TtKHdUon1jjfckF9y9N7o8r2NI6+MQ59xHTC2RPP09G9712o/adEwCrTw4VOL2maTFMHQaDdE4sSKl0j05BDZg/GyX4idbXs+tYidEz/soty1jgPkluwcK5652Hx4KmHX4PU+qrhXxqob1rdRQyj92TTCvBeBqoj9V6WQInpzCqdyOg0DH9JDveUl6TwovPowclmBw5SBQdEhPeI+MxwcXh42A0OltnXRLLVU6n9hww0+GcB6awSf7c9PQgd/6gbB+tB65EKJ9H3QfYN1iTqU/DapVmd/oSAqsDr8sYODsfBiPdf3CqErtw5jHB3nSNvu7P5ZfUS7OggMD4H1IqiuRrtDOASn/0BAYDmClwUvYbLzFsL1HgUGP7852udgbYbOCJXXDNIueNbvZI2J99NJIo6hQung2nZuPBqM1s5bydtdm/EY33lf3TewbCFJlPezcq5u9E3yI0PRjqXMBSkULYKVz560RKXekA6v4TU65rIsdQ0VuUMJDTb2LbZOm6owYB7YVKZBpHGZoiiBA9otqHSnQ2WdsqM0hAuCQZJQAzIUEbJkHOa+foRHw+qK0qWk2NZOwlS/DI80ZMTQiuglj03b5ZWxIr2TYcKMH6396iXZEX4CLwOoQabwxdsew3gaQSUXwaKC73AnJO3bBodZF8r1aHWAroNFI5jmwfb6oizBhKyIXHGW4NE1OOAkzFIsshn8dmwG8xHi0onmy4LlQMrwPoW4wgDjnXqBry7kldu0kLN3TepmByzKA4rKEFxoZiVlqSicxOnzeLsBXofeiViWbnRBprkqM/5pDD5hPN17+PUeYPDqor7Ux+0tXfp2yKeKHFoIJRnsF0+dyzZ/Kdo17U+NfJQb8Xx8VsmYZXlfnshcQ4TJAaEiRsmN/eflLNZmvLJpNL5LFk2Zrz1bsGOnBbI8sbSXRJrA9IzIFdyHmLhzKOrU3CY5nHcRGN+vHG8BR9McNwpVBNm0tJDi0AeGhybMTe7iMkrdXJLK8SbIMxwn3XGbPM6dlJbClDYKA3nSSdHiAykUs562fT8vPIoi1N5BkGmBbqYXcsedkVEF8tszTVhuvCKrjNjeOROHKSKn9TAuGUMgCJv5VoxRBtDyWzs6brak2FdFyNswqzLGTWKWH8Q83iQ4plFySTKt47nl1BohwRnZvzfbVy4u2rMr3UsorMco1mhAcbaXCbjn7O9Dr/TDfqv90tPb31Rco+mN/fatgqtrRctnOwLL+y0UKR9gwDx9DD6dDxxIQcSsu3vBWbEo1bOSNZyyJ71EOeEwEpoaoxn+zyQ6lr2BYbNZNirZ2+563bt/SPQqDmFf83xJQw2GXN9guHaG6iW/lZoeCyZTrLCMGWYb67uQMT07Z5JONYvJpmWl8zjZOpZu0vu7tbXbuUW1ucne3A1yj2I3TNHe98xtURKh79BrdKDr0fjLaDp0FHEq/rCJ/5pvGuar6BHBI+g8ZTA4FZzXeRQQgaXRNlr8axfp+lVMr5e9gwqbbHx3rHjZdgfDpLwStyaBrGpq3pU3sZF2KTvlJkfB2Z41QBXZCpwQZK8l8gpawaw1WxDXrXrJXyny/tYnutfb4nkgkjo0XbkGT9pT2MU5dYpY25wLiO2mkyhDuglLQ9odbcwSOy+Wjs2raBWzJvP73j6xihJWBFVQ+uZw3ychtoeeN5dGTLcpsCw9jambNqctYeaHo+wGM91ahFaD9swd0UKXwnuN6fNo1sPGdKn4mj/5ffw/NfwRo30n47nlnD6dP87LscR7riJQTZ/T+ynZ9qOL4SdnqkMtO95NnktzH8N+jWMhvl/HHjOsinzMFdPddNJctGKqjgrYtb/GHezrKqmbZ5pXsrcLAbDtUvRKeiSlRbpbouqkU19VpAkEgwoKfEnVv/7/+Fe1EBzVO+30RTXYGTcmO5eMLyk53GxEwNTAhh5fjogWvobF730/T1PBGSADgk5JxwC98Kilm0Cr6x6mx3rWFy6qLmP3T+QQPvvrv1tJTrFzQwQrcm2RSjfhszT8STSFEw6rkQ82ovlyXj/pnzVIBrFeQFtOsPAasRogsmTtJXaxwGL4QM59vhkG7IAoLBcMmwSdN0r+j/z3Fhu/BmM4F1UvVJEe5ovEt6QRTBJp8rqQ7yAdlvt1IBJyIqfbQMiG9L4El96C+XPG5ypzVcDSCKwaDgZgcBe+5/d99beRYvFseVR1k9pXBDi0nCwvKyWlEEH+0YrSDrqD08h5Y+wOpj/29g5z1B00QXbfCFT94iBFW55hOMgfrlUN22ICbjxkVdhui/oGgYPkFhd96xe938b5Bt8u1H2LA4H90ftsJDo6yKWQFDfYsUN+JBnJxQrb+LEo9EIXdGUUAXasiFgoBNjsGy43UX/Q//FgQItgZiaZuaMWe2bqHdphfaNjBQgtXU6u/Uf+m95N95N+XyGEekO7dxYgSaZhv0s/L41YhhH4SqZqa7vUZrzXerC18Kksdejlo5cIBvXG540HZbz87MqzauqNx1sfynjlu8vfYdM3WFKM+XbS7oTWsFajt4cIdX/Mz5Hclo1TpvEX3uhvbMELR4rfcGlYuaffH66D333qcHgGc+2i6iuv67oRCwcEk47imIeDXMJVohzTv1ibYURN0AZbnsNw2PnR4bbOMmurQ3ez7ox7cq58V6AZFmx1MGQsDXA/qubzwXtcGi7+6VLx3TpSd+mlPVYrTM57Ek+FyFJULx1i1C69kVM5nuKbWAKLAsLOXtpmv2amqPg6HqWFERWoZd7ofk4F7KCMuhi7EVPK72Bx/Lu39x/HjUN98egc/dGY5RqHCUY7y07EHvYIDnGhxf1rx6kTJFrPvglFvkXAAkp5aS+EAYJjTQ9EY7dp1AIMkFKPbAmi/nnI6dabEP7KdjFvsECWIdW33PBsh9iHsCW29EM15D69CMzcEbDtAQIFLBN/HKeCcyuP2ObbwAx0i7zIBdIPBNkqx9ktj62xD/lQEnpLJKesQdtEd/ozPi7ncp08uW6enk5cTzdsiIM0uHD2umCXnA2hO8j2dSHuOeuDC2dJQopmIBdRlnIyN+XZEXIj+iAdc9C2ldaQ6X3HXnIx0kJmojY4lPse1l1fG7BgeDu5surNZKinGTaWsd7paGFyvxCwNHxPZvDRi508iSdiQLiPJrkMl1+H4JE6Pq6v73LwZ833h+RmHWekjNwiDBHMc60NbUaCAl2GgzJx6GnJ8wOBKUCEni2CrFBO2D8fmVDGbOlB3EeQJQRRH0AKm6gHaHjcJPhPlHrk0I0DpVuQuBD1HwaY5xO7WBgg2zx4w4yEga7dAzKsIqt+afQg7t4GK1nKa/REX6ln9OVJc6R3zDtOBae8iWmqbCJNNar8HXmHCfVoWBy1QPHxFy8lS98z7y2b5H3D4J3FlsUjfxnoPkN9xzt9sOPXjrf54TsaSEM7fy4L9rQHp5LT/kunt471OlPPtZLT+u8QJqEd7Ppo+ziN7Hb4gejf6In+pnXzQvgaZwGbYYutkPwl3tQQzZtugqYy7NxGtm0n23eRXTvBW5sayq13dz7wMlat1a81RG6/v/WewtBogyTGTo0+JY4fUl75rSxODWJLbO63HGhBSdKF5Fey/lsttrCx/jttQ54W4P+HlxS/SkGgX6VPk5d/qiDVy50XEiD8BMth7Ci6WH1PwZ4eVJZvsqVuzhbk8x2P8BgAi2Nvq+/B2VrAZyUYsgqknfySKxiCz811nbaSaW/ZOXV154vm132mGtX8xRRYVLd8OHG+sZYDzKHTvnvIuShoRZQOofN2crk5+mhGIIGdny1n5UjWSnJkcU7asqy/3/l+TX9jV2b6AIhhaAJfgB1qQkcn/69G6m7CXsGerwnlhiJ0foIbUExWrFfgyN3lVPEKGwSn3QRRL3B1exVhbwoJs2skwGvdgrc0fwWCDyjX0fhA3jX30zAxtiq+Ch7vnD9WRVbERMuS+1KVvCTAgL+aZ5RcKBVG+UriAu+1xx9BWJQkAbU33x25PjugOINsCKzyUYDN9XPAqufXvGH21wbt2uvQ9Ub1JmRXtLgZtBjTQlmjjlFWq2MkFtex4vSa16t5zRsYa4MQ10FMSKNsFLwEyh6Vp+xWeRLXXsfqTbXCSl2FXYVdhSKSlQ0iGiETqNGilglku/Y66nqjelNMPOzAR5WlJgGFKAKBbIvriGfV6bv+sLwGN+yrgxa/DqIghVIklI1DhVNWlUJVIJDt2utIvUnoKuUmAyhEMQhkW1xHwhitpgFBKtv9kL+OpUs6R/wZh248GkM3efiDsrn5fw3Qceb2zVmy6O9bZMFPagkAQMZ7xIH26FOs3lJvoqU+dOnnxcxXm6VezEI94yGknu5WEyQmuBGtk4t+zsERWvkZAlo5DzEl2tHPE+E8S59Sb6kzkffWi3iWTc8eCWpb27f4LVW9JKLwvFIR89VaUPIgnNX2ip+Gdb3QmuB6OEIZwKeep5sg8CP4tXIW6m21oyaJiFFo8Vmquq2QWFR0OwzZ4qcjwluLp6GmkY6ibjEvtYAK25NMbTVPp/SeFOB/XgRN8fhyP14djbmlQuarDuOgAEFA9rsMIAcBL/mEIsRKkixTlR1Ou2jA1370hkiKvdRGlszQUUUdXWZmbbbHkou5nq/yQ37PcN6Xlcqr5DLV5npUj+uXelf/NrSlo9qrYzu9c1vdjT2rF/byXtube2ff66/6v4VSpdqI48QZ4hzxTuIDxBeJv6qXlEtdJ+4SY8QUMU9ECVkZK3cqjyhPKj+u/KzyK8pvKZ36R3pETyvTJG4WyU+R3yf/YP5hBsxLZtBcI91kmCJuU2Fl13lfzhXfwrtyPVdIZ0LyWfbmWC7kbmYTTDr/2lZp82vspu5rS+91sRLN+BFBAsnkoKSWBaxnLy1c4Dr3CE/N+mZs5TateVfXvtkFH77+W3/gc2YKDDZWuYxTXeVW93rUVs95Vd6Zm+enf2AHJwJ9HGAyhPTGYFAYYnoDmoqBDxixfvo+KGTkwqVbfCIMbhscXLA4nJi/gKyCH7y7F4eGFoOg6IfNTY2Ud8sBa2ya+wbADoYBnRibN+Lwua9quQwP4PKJs8PDS1vOVtsCDPXe7rPVsIUj2bYmzHrjC2gx8raQS6iEw/ZiUz3+7rMsOFXisCyPji7zNSLTD39e3JAqVHYLDX19VpibAysySY8iwY4jAbUYaJ7ociOiTp1ygMYyP0TKkcMfK/TbQ7j+0sXTp/vq/8C/gDmG8MbRrChuE8gWfa0GFVqfegpVArUAfypWqM4ZjZCU54reUXeWdioI9gv8UJnTCrsMcNKJmxaA/blaHZgpBZE+HG2hUYAHGjxd+z9AmOhz4nSLv4BCxy8b/on09VmXtzfSAB6s5hiUBrc5YQvCFn4h6iOD7y5ZrfyPPQJj3nXAXj1EncDBvgKIfqfKMbtN5g6a01B4M19HclylmqXp80mHg+/HtmxBiofQibCFhR/wBtSA6R/2Y39hPA8w5batdCObff5gSXgV6OFPyCa5U/5cxJGhrCDb4CBSjPMU7fCHhj0sYDns7C3roZaTAn9gSDEy4v40pSBXwsf+zj7YnirpLAGqsIGAjLz23rvZs07tiYw+88RhBZZ8ooXVVQkpvYO8E3d40hzVFKN+KS94V3ftUiqOKVVAWy6th1G7ACT3rp8FIQvLfaI+09IH0MDubLUWbKps2/tlzocdBNh3L06F19thJNnAyat0spARlFR61pA6zBX4znNbl0dGlpsSdttDJby1to51LMd/hUinT7ecROTO2MLCmugvID9rCvKWLc0qE0fosxVfVoB5BFvwIRgCGtR1ODbEONWRHdkATTf7qyisDnX1Lt2E1cLz8LUfUQImX+ctjF+7+Fw2e6tkex62wx+LrPGUXIV61sr3rYMbqQ+SkxUV82r1JeIgjxQd8AjBEaR4BJ0Ibv7AizTYN8lvtr38cJvVyiMoezj15qQcAcOXAPUNuZa3w+82kWL/0BBSTGQjNKQ8NyrAOv8/kpuSMHJyOShJ7AjnVFOpddUFCYFbZ2uU6CiRmkWcQlzTt6VPXE/Kw8NL8r9ePXxk2TNsPnGmRzalaYo/3ZCdhF3+qLqYFBatHHDrrKbX51qtfEtGNehvkgdcQJQkMWBOx+ZmjuuvLApGCjiOla5hwTBTMkE4VYKESsuslEnrrFAEiaU5IERzP+BYAAxSDvX9FWRtpMwm88NlOc6J64xCsV9IfGvW4xOBgXSA9YOfDUrSlqjQDKIKyEkIix0ObnsjoZQjT7rKz78MdRnXQdI18OfMdaEzC8tZuBanSogXYPTUCrgA+Nm+eFED42gvoIJH/LgyytRrqCxUkOV4iF15rZ2Mc5WB0+8HoqJQjzwHnW1bJ5KHJblwgbz072gGlJ54gjqoFeMKO5sDrrYfG90BQSy5Me5aETJBMyKG2QQn5XrOXEXlj0J+6uQhiwVGa5x/3eO43AxBTCuV13J1gecxqxU6HkP7WYuLoO21BMtNWFIKentbOixI3YKxHCoBY76H5DLByAlz99LZqV8OBavu3ImbzyC177jhUQxIg5QzAXGjIslbNS/VQopGg2A8KWFeEoMJGbmCJ+XCfs5yONzfYoKcNgwBot9ct7bP9P1a0TP/fjW7IyljjvEYyhQ7+ZnqEeskIVmutJCNRCiJc6QN4Z7U8+aqGSKDJPCkBbVJFNQVUczEqFRqMJPK9CxXTU4KMSBw4t3qMNe3mAs4PmnNTBSLMSiWNVssFMpi0Fk1ZnseNcUXF31ZoYiCouA2pShZrU2VPyD64FBfa+MsXT7GiMwtmizGvRCKx8gqxukBd+7R+fOPtsdlOScWLvVX/4lJIZrdBLN2FCcYJu29cMGrRdTWSSOKJXZGA2eRllt2OEkqTYAL3wtX1HRKAhaWhyUxCNqN3YlYDsT7RsCgDPKzTckvUBmqy0H+y5CnnWytsOqXA41H8hz1K9SjfwSCruwuSCA/zBfwPXPVmT8AAjONbLibJCeUyiu4TXXYYBw6OsbBpt6B5t7AT18KK53qhgqKY0tMplV96ENdoHPxtsGeurryq8qxhko8rwphkmSHPzIHXyj2uFwm7+Y4zdB3FKBMT/M+XWLc84HY4PnOu5ke+DX82jy6dJ60+a/ILqtxdj/H8UhZ2dIaiBZ4XYgGWhsr+/23wdMc2vnHL31peODxEl9s0yAJFD4KO9773rVZdrkBGx+HDvb2VWuTlNE2p1Ddj+VCZ3hJIPUx4o7F3N66Y7WqhpaWUkoe5IZQlGUhPTcHNRHOXLWrBbo0m/Jicu2RkYIzZ8wPBwYexiaef37CfAZV64ye8DpdmM3Hou6A28mK0a5zqjzb3CzuQN61KCTT2dwGSWJqaz2AJX92/771aXDDOvTAb/67yOJWuacIPXZ5rrfdsKVtah2roFtz2GEbYj1z95iZdBrE2F79y2dkl2s139xcqVta3EkHTwZGM4wmV5WkjHSf5Zy1JRd3N5UxmVR43kVLAu9SsoOYV1Un7gZEifBegFL4F7ytfWCbAWI1AirYBqHa+PQQqJQp9bdajFsoAAFWsL7idwBsdZFSSVxPxHJIyicSawx3knjtmpFYs7kQ/FiBQHeuuQH04l2kymAjArTWJpNWUSiOPfvsmEmNc8U0IyQSwoylh5crKxnLHRzH1ghCEhtKXHXY/p2iAorz37XLIKcHDs1bE4aj43XooQ1R5fKRI2w9JfGkTsXcYLxFUXhNlulQgTCI7Ce4pbfTAL1PUeUfaEYTehfSxHgdyjiFgzyn5OBbWjbozxaNr92pKNM24CqIDIC1P9ZgoAjOIbeiKBSKywj/S4DZ9fVZel9on6bYtLezs3rtImCvyHjcwMECVmFy4CqZIHRFbqrV9DF6iUy6TjiTq5FUbTDE6cDU48fZb8SWiPcBCBKenO4sKspWa5maFLMMkxUn55s/IIh3704vQX0qdfBg3c6nD4IBGFTz4EFu6l4Vk8kYq+5NZR+8BPXPhQMAehsPosZf05ubMb+t+9IgkC/DSUMisUlcPL5n7tSp+wNsA9V+zhw6dO9eTQ3ib63VRto4gUTbcIhKyxGqOU6d59XqcR4RNhrG8hekmYPXZpDCplbhsnAfwb4fzJ3i8Ocx2btTElla41FQho5qnQo3O4yIC2e8LAqgPuU67yOSo/5Omyg2b+s+dqx7m54GkltXNVJo/t2DIwGFGOtJJEVKIDc6dF2M3f5x8yUxXU5NYtzMM3VhuHDGG6W3s1xd6Y9qcNleVnlZCFvz+XHtaLIePdrdbf+AXdYajt2uinsvQLi+oSgZKVQhev+Pckdx2cXRgnk4l3PJQAYJ348cTJhl8emmpU3HbxLFyiP/6cHTSDvxF+r8K2ttp1i2450f/7h6MZgvX1sI5KSrBAw526IE1e3RcuHa9a2ffHfnx+nUzJXB3zWQWaTTh6cRyx1cr3Len9m8UuKIEgdzHfpeYhkuy3Rc/ubw1vA+I5EeSsaqii4POZMiLWVW12trQ/wT+r8Yjm9IXI1ZTDGhUylIT5eiI5ruUtNuTcSpTYzTjZ5mYWre2uxpnGYzk21BB7kI+ipFQkZSO3gZ4iykJEuceHbdJFSQo/IIBxpuT5XAx4JTNmOBJc3UjHact/gnTtP4hHupUUcuIj6XJ416iu80usZJZmI+EInGBh6uNRryzY4xkmjLXJp5MPCl0F9FtxzvROdo7kpc9MeLCJJ9ZzHuv7Y6agbbWP0PkYfsaNjR0ZVSL8fKHh91Iy0WcKhZBNKfDKfvredeOTat6VZ255zMTTLhflUpfC1661aUmeRgTky+fq3MK4jYTLY6ctFSZVlMA2Zh678qRLJcXJOgrUpoajloaRKqbLzmc6ZJXlSrV9Tqu3JzJnMtw+sJMfHQV+XqtvTxV5ALqTOyzxIU5supQMXTMVsEdF8K1OH5Amto4KmVlTZ4bK5J8qh2AGYMwrP9eYbj2ZLV5jGwoZ1fhmZyS6ZGpG5oMRu1NTU91gq8kdxd8ripY1DfGdyyM3Es3DXk0PMJ+y8e8bogmKtpaqwTHaD4obq0Lxjs+9jLF8c6L778sXfYO98h+Jbmn37JJ8x7Q+FLh7zzwuHDP/nT80/3p58cHiUaTmMPj45P0uXHKUGIrIvRlFhQTyumouJ6REA7Oo84/vKMq/kzf3Ec2aFWewlTqWfEnYy+ktFVqqE1cnR+6NOuu/NTd12f/pAjU+DsjL4toCDcyCtznhQgpmoRdJa4YxQGCtwJMHkWT0Qic4qyGH35Cb1vX3JJ+TmFS8gKG42GWtMmTjRihf85552eZ8K5kttd2goY+vJ8SnUU3/3gXol8sMrEsxJdTyafV+uvTTTs7FnDwEA06vFMT0y42ZPyJLlYVrEi1dq6nwPnfh5VkJFx9chy1ee18PoGX/knJsfGvE8uQOMnXnir1bqjY9mbQJUv5rRbrt69O3aVXa7iKzbNbfMwrIlOe3CL4ELWFdbgwjRzc6up+Wga5qDlxRcnS4VUsb3/ApGX2aepM1ZoWls1FRbZ45EtDof+zuMVd4QeEffKnTtabeTef/97L5Ift8Bh8xo0785v2scMeC/0FsiHD+r2wsP67TzC7PYfUF46ehAZDic3PDn1thWJ5am1Na02X/38Gm8/iTJtGatMCY9RCC8b/shlupBMFmitVh8tKiTSYCAlRTFK0/8KiUShvOQjHeHG4e0XfkVtoqohEdGpvN6FherFPJjovEkPUufqNz9EbFlo/dvIWxBZy6pq5ZdFpfN/N42Mq2Fuc7x2odwzBKma7Sb6D4D4efhPLcbnJWHCN8tafwnw9HJMFcBnr7v+8ukhVz27E7BQAAh873/CnETB/yayl06frHvmD4aWi3vWwisQtVh8i8Rgc1Jx9RH6kp3oKWXEGiQFJLaWA6GhgB6NodPEtv0uvE9Mi19vAlHJSi2qXYDMPLb9vUfUXwyRwk+8lp18uRYKbl+8N1aUiDon0rHsEFU7aaTOi4CuQy51phKS2eo90HEBtYtIt8j+UALKoKDTz2+driWeYIJndS9RXWBapzIutWwXWduIMo4FXdYqtCVik+vNnKd57cxpCeGFbcHVIhDFS0QtjV56KUq3i+243FMsfelIsbWJtfYXEkQY5KCbhgxFVGLxuTi9sZ/vEZ/UQePTYN38xK098WoUlnIwJU5knMWEzyV8ERlPFEcRZUtL3SFq0ToMp1rItVSkCd+RUsEs3mtcHA58TjqDV83Cb0eCeskvJ42tM18gKu/pao7fekZfyxO2cpxr3xPaYqK2iGqJmJwXlD+D0EygK6gHLUetoPi3J4vSSzfxKgxIyEU6PxBkI17+8B4DQlDAPRi2dLPZDlyVThQXKzRiuMDveaDDQmQuhBXhci3XvVKEDTKTHzZJTpxlWar7JeHU+naWgI+3USV1k6JIfT6siXQtbOBwe9gk2qGwhYezVXa7ZxOHdLPCLtmKwh6SicNecnH/8nykAoPUK6VnVs+kVhApI60y1XYu2bSCpXVapsc3o1v21PzgMsrV0C8oG+msKWxmWaixIStWlWtYSu3Wq1TFfNUfOuvECSltUKaevmSZORSswTJKy2R8YpVC5EqRlRARq/IBZ8vUUxR4fRw7SnnCBQs91w8Lb4LndT/e4uXIlSNZfEu5UDlgyUSmznQy+sapSJtiDJ78IpQvlI7nKcvg4GWxjMQUQBXpb5DHf3yi4TFXSe/KTFFK08uY1AgpZsoZr1yb1Cq3UEU90352ACGeqXXocHjDMHnj+mV5UrwkTzGHVo2B4uoL8k8TCGbFabOhXcL9aO4BcrW7r1SLMq3W8eFLx4+/cg881PGzT2Y+8rlOXT91hIzvZ18hXLcelfq0OSFCpCgi0WL0G1BlUKw48RL8ZCI5vWpGBrVq7JPc0WSqNHUjFZ/9/JQDZRli1miqKT+/5BebhzYNMd1Ms8ww20mMfAUUllNSmWOe+eYqVGSSYj+7ZLLxHDktwu2nujzBjMUmzQTH2XANgQOWGoNFtCT2+JhII5EYxymnSZ1x1jnn2eJBixLNdiPYwYEf/G4UD98ntEaSYxS7LVQyNmKKJbY44oqHg2RWe+yFJ556uZryRB8aKgm1SX5db3rj5hGhMaP+QbTa8v9WbHKU9uYUszJsEb4sKxllvm/ULeXh0Reo/3/4VqsBAAA=') format('truetype');
+      font-weight: bold;
+    }
+  </style>
+<defs>
+  <!-- === BLADE GOLD === -->
+  <linearGradient id="kGoldBase" x1="30%" y1="0%" x2="70%" y2="100%">
+    <stop offset="0%" stop-color="#f5e6a0"/>
+    <stop offset="10%" stop-color="#e8d070"/>
+    <stop offset="25%" stop-color="#c49c35"/>
+    <stop offset="40%" stop-color="#8a6818"/>
+    <stop offset="55%" stop-color="#c49c35"/>
+    <stop offset="70%" stop-color="#f5e6a0"/>
+    <stop offset="85%" stop-color="#a07820"/>
+    <stop offset="100%" stop-color="#5a3c0c"/>
+  </linearGradient>
+  <linearGradient id="kGoldH" x1="0%" y1="0%" x2="100%" y2="0%">
+    <stop offset="0%" stop-color="#2a1a06"/>
+    <stop offset="8%" stop-color="#5a3c0c"/>
+    <stop offset="18%" stop-color="#c49c35"/>
+    <stop offset="28%" stop-color="#f5e6a0"/>
+    <stop offset="35%" stop-color="#e8d070"/>
+    <stop offset="45%" stop-color="#8a6818"/>
+    <stop offset="55%" stop-color="#c49c35"/>
+    <stop offset="65%" stop-color="#f5e6a0"/>
+    <stop offset="75%" stop-color="#c49c35"/>
+    <stop offset="85%" stop-color="#7a5815"/>
+    <stop offset="100%" stop-color="#2a1a06"/>
+  </linearGradient>
+  <linearGradient id="kGoldV" x1="0%" y1="0%" x2="0%" y2="100%">
+    <stop offset="0%" stop-color="#ffe880" stop-opacity="0.4"/>
+    <stop offset="15%" stop-color="#c49c35" stop-opacity="0.1"/>
+    <stop offset="30%" stop-color="#f5e6a0" stop-opacity="0.3"/>
+    <stop offset="50%" stop-color="#5a3c0c" stop-opacity="0"/>
+    <stop offset="70%" stop-color="#e8d070" stop-opacity="0.25"/>
+    <stop offset="100%" stop-color="#f5e6a0" stop-opacity="0.35"/>
+  </linearGradient>
+  <linearGradient id="kGoldSpec" x1="20%" y1="5%" x2="80%" y2="95%">
+    <stop offset="0%" stop-color="#ffffff" stop-opacity="0.3"/>
+    <stop offset="20%" stop-color="#ffe880" stop-opacity="0.15"/>
+    <stop offset="40%" stop-color="#ffffff" stop-opacity="0.08"/>
+    <stop offset="60%" stop-color="#ffe880" stop-opacity="0.2"/>
+    <stop offset="100%" stop-color="#c49c35" stop-opacity="0"/>
+  </linearGradient>
   
-  <!-- Background -->
-  <circle cx="100" cy="100" r="95" fill="#0a0000"/>
+  <!-- === WINE GEMSTONE === -->
+  <linearGradient id="kWineBase" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%" stop-color="#7a1228"/>
+    <stop offset="25%" stop-color="#5a0c1c"/>
+    <stop offset="50%" stop-color="#6a1025"/>
+    <stop offset="75%" stop-color="#4a0816"/>
+    <stop offset="100%" stop-color="#3a060e"/>
+  </linearGradient>
+  <linearGradient id="kWineH" x1="0%" y1="0%" x2="100%" y2="0%">
+    <stop offset="0%" stop-color="#2a0308"/>
+    <stop offset="15%" stop-color="#4a0812"/>
+    <stop offset="35%" stop-color="#6a0e20"/>
+    <stop offset="50%" stop-color="#7a1228"/>
+    <stop offset="65%" stop-color="#6a0e20"/>
+    <stop offset="85%" stop-color="#4a0812"/>
+    <stop offset="100%" stop-color="#2a0308"/>
+  </linearGradient>
+  <linearGradient id="kWineV" x1="0%" y1="0%" x2="0%" y2="100%">
+    <stop offset="0%" stop-color="#8a1830" stop-opacity="0.4"/>
+    <stop offset="30%" stop-color="#3a060e" stop-opacity="0"/>
+    <stop offset="50%" stop-color="#9a2038" stop-opacity="0.3"/>
+    <stop offset="70%" stop-color="#3a060e" stop-opacity="0"/>
+    <stop offset="100%" stop-color="#55091a" stop-opacity="0.25"/>
+  </linearGradient>
+  <linearGradient id="kWineSpec" x1="25%" y1="10%" x2="75%" y2="90%">
+    <stop offset="0%" stop-color="#ff6080" stop-opacity="0.15"/>
+    <stop offset="25%" stop-color="#ffffff" stop-opacity="0.08"/>
+    <stop offset="50%" stop-color="#cc3050" stop-opacity="0.1"/>
+    <stop offset="100%" stop-color="#550a18" stop-opacity="0"/>
+  </linearGradient>
   
-  <!-- Outer ring with red glow -->
-  <circle cx="100" cy="100" r="92" fill="none" stroke="url(#klingonRed)" stroke-width="6" filter="url(#klingonGlow)"/>
+  <!-- === RING GOLD (base) === -->
+  <linearGradient id="kChakGold" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%" stop-color="#e8d070"/>
+    <stop offset="15%" stop-color="#c49c35"/>
+    <stop offset="30%" stop-color="#a07820"/>
+    <stop offset="50%" stop-color="#c49c35"/>
+    <stop offset="65%" stop-color="#e8d070"/>
+    <stop offset="80%" stop-color="#8a6818"/>
+    <stop offset="100%" stop-color="#5a3c0c"/>
+  </linearGradient>
   
-  <!-- Inner decorative ring -->
-  <circle cx="100" cy="100" r="82" fill="none" stroke="#8b0000" stroke-width="2"/>
+  <!-- Chevron gold (rich varied gold, not flat) -->
+  <linearGradient id="kChevGold" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%" stop-color="#c48838"/>
+    <stop offset="25%" stop-color="#a06825"/>
+    <stop offset="50%" stop-color="#b87830"/>
+    <stop offset="75%" stop-color="#9a5820"/>
+    <stop offset="100%" stop-color="#c08035"/>
+  </linearGradient>
   
-  <!-- THE TREFOIL - Klingon Empire Symbol -->
-  <!-- Upper blade (pointing up) -->
-  <path d="M100,18 
-           C105,18 112,25 115,35
-           L108,75 
-           C106,82 100,90 100,90
-           C100,90 94,82 92,75
-           L85,35
-           C88,25 95,18 100,18Z" 
-        fill="url(#klingonMetal)" stroke="#8b0000" stroke-width="2" filter="url(#innerShadow)"/>
+  <!-- Mini symbol gold -->
+  <linearGradient id="kSymGold" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%" stop-color="#d49848"/>
+    <stop offset="30%" stop-color="#a87030"/>
+    <stop offset="60%" stop-color="#c48838"/>
+    <stop offset="100%" stop-color="#986020"/>
+  </linearGradient>
   
-  <!-- Lower-left blade -->
-  <path d="M28,145
-           C25,140 25,132 30,125
-           L70,95
-           C76,91 82,90 85,92
-           C85,92 82,100 80,105
-           L55,150
-           C48,158 38,155 28,145Z"
-        fill="url(#klingonMetal)" stroke="#8b0000" stroke-width="2" filter="url(#innerShadow)"/>
+  <!-- Nebula -->
+  <radialGradient id="kNeb" cx="0.45" cy="0.48" r="0.55" fx="0.40" fy="0.42">
+    <stop offset="0%" stop-color="#2a0808"/><stop offset="20%" stop-color="#3a0c0c"/>
+    <stop offset="40%" stop-color="#4a1010"/><stop offset="55%" stop-color="#350a0a"/>
+    <stop offset="70%" stop-color="#451212"/><stop offset="100%" stop-color="#180404"/>
+  </radialGradient>
+  <radialGradient id="kNC1" cx="0.3" cy="0.35" r="0.45">
+    <stop offset="0%" stop-color="#7a2020" stop-opacity="0.6"/>
+    <stop offset="40%" stop-color="#5a1414" stop-opacity="0.35"/>
+    <stop offset="100%" stop-color="#1a0404" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="kNC2" cx="0.7" cy="0.6" r="0.4">
+    <stop offset="0%" stop-color="#6a1818" stop-opacity="0.55"/>
+    <stop offset="40%" stop-color="#4a0e0e" stop-opacity="0.3"/>
+    <stop offset="100%" stop-color="#1a0404" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="kNC3" cx="0.5" cy="0.7" r="0.35">
+    <stop offset="0%" stop-color="#8a2828" stop-opacity="0.5"/>
+    <stop offset="40%" stop-color="#5a1414" stop-opacity="0.25"/>
+    <stop offset="100%" stop-color="#0a0202" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="kW1" cx="0.4" cy="0.3" r="0.25">
+    <stop offset="0%" stop-color="#c04040" stop-opacity="0.3"/>
+    <stop offset="100%" stop-color="#4a1010" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="kW2" cx="0.6" cy="0.75" r="0.2">
+    <stop offset="0%" stop-color="#b03030" stop-opacity="0.25"/>
+    <stop offset="100%" stop-color="#3a0a0a" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="kPl1" cx="0.35" cy="0.35" r="0.6">
+    <stop offset="0%" stop-color="#d06848"/><stop offset="40%" stop-color="#b04830"/><stop offset="100%" stop-color="#4a1810"/>
+  </radialGradient>
   
-  <!-- Lower-right blade -->
-  <path d="M172,145
-           C175,140 175,132 170,125
-           L130,95
-           C124,91 118,90 115,92
-           C115,92 118,100 120,105
-           L145,150
-           C152,158 162,155 172,145Z"
-        fill="url(#klingonMetal)" stroke="#8b0000" stroke-width="2" filter="url(#innerShadow)"/>
+  <!-- Text -->
+  <linearGradient id="kTG" x1="0%" y1="0%" x2="0%" y2="100%">
+    <stop offset="0%" stop-color="#f5e6a0"/><stop offset="30%" stop-color="#d4a830"/>
+    <stop offset="50%" stop-color="#c49520"/><stop offset="70%" stop-color="#e8c040"/>
+    <stop offset="100%" stop-color="#a07818"/>
+  </linearGradient>
   
-  <!-- Center hub -->
-  <circle cx="100" cy="95" r="18" fill="url(#klingonRed)" stroke="url(#klingonGold)" stroke-width="4"/>
-  <circle cx="100" cy="95" r="10" fill="url(#klingonGold)"/>
-  <circle cx="100" cy="95" r="5" fill="#8b0000"/>
+  <!-- === FILTERS === -->
+  <filter id="kE20" x="-5%" y="-5%" width="110%" height="110%"><feMorphology operator="erode" radius="20"/></filter>
+  <filter id="kE16" x="-5%" y="-5%" width="110%" height="110%"><feMorphology operator="erode" radius="16"/></filter>
+  <filter id="kE30" x="-5%" y="-5%" width="110%" height="110%"><feMorphology operator="erode" radius="30"/></filter>
+  <filter id="kE25" x="-5%" y="-5%" width="110%" height="110%"><feMorphology operator="erode" radius="25"/></filter>
   
-  <!-- Decorative spikes on blades -->
-  <g fill="url(#klingonGold)">
-    <polygon points="100,30 104,45 100,40 96,45"/>
-    <polygon points="50,125 60,132 55,138 48,130"/>
-    <polygon points="150,125 140,132 145,138 152,130"/>
+  <!-- Blade bevel -->
+  <filter id="kBB" x="-8%" y="-8%" width="116%" height="116%">
+    <feGaussianBlur in="SourceAlpha" stdDeviation="4" result="b"/>
+    <feSpecularLighting in="b" surfaceScale="16" specularConstant="1.3" specularExponent="35" lighting-color="#ffe880" result="s">
+      <feDistantLight azimuth="225" elevation="35"/>
+    </feSpecularLighting>
+    <feComposite in="s" in2="SourceAlpha" operator="in" result="sc"/>
+    <feComposite in="SourceGraphic" in2="sc" operator="arithmetic" k1="0" k2="1" k3="0.55" k4="0"/>
+  </filter>
+  
+  <!-- Ring bevel (convex dome) -->
+  <filter id="kRB" x="-4%" y="-4%" width="108%" height="108%">
+    <feGaussianBlur in="SourceAlpha" stdDeviation="5" result="b"/>
+    <feSpecularLighting in="b" surfaceScale="12" specularConstant="1.0" specularExponent="18" lighting-color="#ffe880" result="s">
+      <feDistantLight azimuth="225" elevation="28"/>
+    </feSpecularLighting>
+    <feComposite in="s" in2="SourceAlpha" operator="in" result="sc"/>
+    <feComposite in="SourceGraphic" in2="sc" operator="arithmetic" k1="0" k2="1" k3="0.4" k4="0"/>
+  </filter>
+  
+  <!-- Chevron bevel (raised inset, strong 3D) -->
+  <filter id="kChevBev" x="-15%" y="-15%" width="130%" height="130%">
+    <feGaussianBlur in="SourceAlpha" stdDeviation="1.5" result="b"/>
+    <feSpecularLighting in="b" surfaceScale="10" specularConstant="1.1" specularExponent="25" lighting-color="#ffc070" result="s">
+      <feDistantLight azimuth="225" elevation="40"/>
+    </feSpecularLighting>
+    <feComposite in="s" in2="SourceAlpha" operator="in" result="sc"/>
+    <feComposite in="SourceGraphic" in2="sc" operator="arithmetic" k1="0" k2="1" k3="0.45" k4="0"/>
+  </filter>
+  
+  <!-- Mini symbol bevel -->
+  <filter id="kSymBev" x="-20%" y="-20%" width="140%" height="140%">
+    <feGaussianBlur in="SourceAlpha" stdDeviation="1" result="b"/>
+    <feSpecularLighting in="b" surfaceScale="8" specularConstant="1.0" specularExponent="30" lighting-color="#ffc070" result="s">
+      <feDistantLight azimuth="225" elevation="45"/>
+    </feSpecularLighting>
+    <feComposite in="s" in2="SourceAlpha" operator="in" result="sc"/>
+    <feComposite in="SourceGraphic" in2="sc" operator="arithmetic" k1="0" k2="1" k3="0.4" k4="0"/>
+  </filter>
+  
+  
+  <!-- Wine gemstone raised volume (applied after erode) -->
+  <filter id="kGV" x="-8%" y="-8%" width="116%" height="116%">
+    <feGaussianBlur in="SourceAlpha" stdDeviation="6" result="b"/>
+    <feSpecularLighting in="b" surfaceScale="8" specularConstant="0.7" specularExponent="20" lighting-color="#ffb0b0" result="s">
+      <feDistantLight azimuth="225" elevation="40"/>
+    </feSpecularLighting>
+    <feComposite in="s" in2="SourceAlpha" operator="in" result="sc"/>
+    <feComposite in="SourceGraphic" in2="sc" operator="arithmetic" k1="0" k2="1" k3="0.3" k4="0"/>
+  </filter>
+
+  <!-- Glows -->
+  <filter id="kG1" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="22"/></filter>
+  <filter id="kG2" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="10"/></filter>
+  <filter id="kG3" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="4"/></filter>
+  <filter id="kDS" x="-10%" y="-10%" width="130%" height="130%">
+    <feGaussianBlur in="SourceAlpha" stdDeviation="18" result="sh"/>
+    <feOffset dx="5" result="so"/><feFlood flood-color="#000" flood-opacity="0.7" result="c"/>
+    <feComposite in="c" in2="so" operator="in" result="sd"/>
+    <feMerge><feMergeNode in="sd"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <filter id="kEG" x="-5%" y="-5%" width="110%" height="110%">
+    <feMorphology operator="dilate" radius="2" in="SourceAlpha" result="f"/>
+    <feGaussianBlur in="f" stdDeviation="2" result="bl"/>
+    <feFlood flood-color="#ffe880" flood-opacity="0.3" result="c"/>
+    <feComposite in="c" in2="bl" operator="in" result="g"/>
+    <feMerge><feMergeNode in="g"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  
+  <!-- Clips -->
+  <clipPath id="kNC"><circle cx="2700" cy="2850" r="1370"/></clipPath>
+  <clipPath id="kRC">
+    <path d="M 4370 2850 A 1670 1670 0 1 1 1030 2850 A 1670 1670 0 1 1 4370 2850 Z
+             M 4070 2850 A 1370 1370 0 1 0 1330 2850 A 1370 1370 0 1 0 4070 2850 Z" fill-rule="evenodd"/>
+  </clipPath>
+  
+  <!-- Text arcs in ring gaps -->
+  <path id="tL" d="M 1332 2432 A 1430 1430 0 0 1 2164 1524" fill="none"/>
+  <path id="tR" d="M 3657 1787 A 1430 1430 0 0 1 4129 2800" fill="none"/>
+  <path id="tB" d="M 1777 4169 A 1610 1610 0 0 0 3623 4169" fill="none"/>
+
+  <!-- Incised/Carved engrave filter (from reference) -->
+  <filter id="kCarve" x="-5%" y="-5%" width="110%" height="110%">
+    <feFlood flood-color="#000000" flood-opacity="0.85" result="shadowColor"/>
+    <feComposite operator="out" in="shadowColor" in2="SourceGraphic" result="inverse"/>
+    <feGaussianBlur in="inverse" stdDeviation="3" result="blurredInverse"/>
+    <feOffset in="blurredInverse" dx="3" result="offsetShadow"/>
+    <feComposite operator="in" in="offsetShadow" in2="SourceGraphic" result="innerShadow"/>
+    <feMerge>
+      <feMergeNode in="SourceGraphic"/>
+      <feMergeNode in="innerShadow"/>
+    </feMerge>
+  </filter>
+</defs>
+
+<!-- === RED GLOW === -->
+<g>
+  <animate attributeName="opacity" values="0.4;0.7;0.4" dur="3.5s" repeatCount="indefinite" calcMode="spline" keySplines="0.4 0 0.6 1;0.4 0 0.6 1"/>
+  <circle cx="2700" cy="2850" r="1520" fill="none" stroke="#881010" stroke-width="55" filter="url(#kG1)" opacity="0.6"/>
+  <circle cx="2700" cy="2850" r="1520" fill="none" stroke="#cc1818" stroke-width="40" filter="url(#kG2)" opacity="0.5"/>
+  <circle cx="2700" cy="2850" r="1520" fill="none" stroke="#ff3030" stroke-width="22" filter="url(#kG3)" opacity="0.3"/>
+</g>
+
+<!-- === RED NEBULA === -->
+<g clip-path="url(#kNC)">
+  <circle cx="2700" cy="2850" r="2000" fill="url(#kNeb)"/>
+  <circle cx="2300" cy="2550" r="1400" fill="url(#kNC1)"/>
+  <circle cx="3200" cy="3100" r="1200" fill="url(#kNC2)"/>
+  <circle cx="2700" cy="3250" r="1100" fill="url(#kNC3)"/>
+  <circle cx="2450" cy="2450" r="800" fill="url(#kW1)"/>
+  <circle cx="3050" cy="3350" r="650" fill="url(#kW2)"/>
+  <circle cx="2100" cy="2350" r="7" fill="#ffffff" opacity="1.0"/>
+  <circle cx="3400" cy="2450" r="6" fill="#ffe8e0" opacity="1.0"/>
+  <circle cx="2400" cy="3500" r="8" fill="#ffffff" opacity="1.0"/>
+  <circle cx="3250" cy="3400" r="6" fill="#ffe0d0" opacity="0.95"/>
+  <circle cx="1800" cy="2700" r="7" fill="#ffffff" opacity="1.0"/>
+  <circle cx="3550" cy="2930" r="6" fill="#ffe8e0" opacity="1.0"/>
+  <circle cx="2250" cy="3200" r="6" fill="#ffffff" opacity="1.0"/>
+  <circle cx="2950" cy="2150" r="6" fill="#ffe0d0" opacity="0.95"/>
+  <circle cx="1950" cy="3350" r="6" fill="#ffe8e0" opacity="1.0"/>
+  <circle cx="2550" cy="2300" r="6" fill="#ffffff" opacity="1.0"/>
+  <g><animate attributeName="opacity" values="0.5;1.0;0.5" dur="2.8s" repeatCount="indefinite"/>
+    <circle cx="2200" cy="2570" r="9" fill="#ffffff"/>
+    <circle cx="3550" cy="2370" r="8" fill="#ffe8e0"/>
   </g>
+  <g><animate attributeName="opacity" values="0.7;0.3;0.7" dur="4.1s" repeatCount="indefinite"/>
+    <circle cx="3020" cy="3550" r="8" fill="#ffffff"/>
+    <circle cx="1850" cy="3010" r="7" fill="#ffe0d0"/>
+  </g>
+  <circle cx="3650" cy="2200" r="120" fill="#d04030" opacity="0.2" filter="url(#kG2)"/>
+  <circle cx="3650" cy="2200" r="90" fill="url(#kPl1)" opacity="0.9"/>
+  <circle cx="1900" cy="3550" r="95" fill="#c03828" opacity="0.2" filter="url(#kG2)"/>
+  <circle cx="1900" cy="3550" r="65" fill="url(#kPl1)" opacity="0.8"/>
+
   
-  <!-- Text arc -->
-  <path id="klingonArc" d="M 35,170 Q 100,200 165,170" fill="none"/>
-  <text fill="url(#klingonRed)" font-family="Arial Black, sans-serif" font-size="12" letter-spacing="3">
-    <textPath href="#klingonArc" startOffset="50%" text-anchor="middle">KLINGON EMPIRE</textPath>
-  </text>
+  <!-- Extra nebula stars -->
+  <circle cx="2526" cy="2553" r="4" fill="#ffffff" opacity="0.66"/>
+  <circle cx="3633" cy="1906" r="7" fill="#ffffff" opacity="0.77"/>
+  <circle cx="1783" cy="2445" r="4" fill="#ffffff" opacity="0.80"/>
+  <circle cx="3698" cy="2364" r="7" fill="#fff0e8" opacity="0.77"/>
+  <circle cx="3813" cy="2689" r="3" fill="#ffe8e0" opacity="0.90"/>
+  <circle cx="3131" cy="2943" r="5" fill="#ffe0d0" opacity="0.66"/>
+  <circle cx="1818" cy="1929" r="6" fill="#ffe0d0" opacity="0.64"/>
+  <circle cx="3872" cy="2633" r="3" fill="#ffd8c8" opacity="0.89"/>
+  <circle cx="1911" cy="3100" r="3" fill="#ffd8c8" opacity="0.82"/>
+  <circle cx="2881" cy="3914" r="4" fill="#ffffff" opacity="0.88"/>
+  <circle cx="2333" cy="2735" r="3" fill="#ffffff" opacity="0.94"/>
+  <circle cx="2956" cy="2688" r="6" fill="#ffe0d0" opacity="0.85"/>
+  <circle cx="2066" cy="3066" r="5" fill="#ffe0d0" opacity="0.68"/>
+  <circle cx="3587" cy="2552" r="4" fill="#ffe0d0" opacity="0.78"/>
+  <circle cx="3681" cy="2449" r="5" fill="#ffffff" opacity="0.94"/>
+  <circle cx="2338" cy="1681" r="5" fill="#ffffff" opacity="0.76"/>
+  <circle cx="2264" cy="3873" r="5" fill="#fff0e8" opacity="0.69"/>
+  <circle cx="3020" cy="3429" r="4" fill="#ffe8e0" opacity="0.71"/>
+  <circle cx="2476" cy="3944" r="6" fill="#fff0e8" opacity="0.96"/>
+  <circle cx="2882" cy="2448" r="4" fill="#ffffff" opacity="0.80"/>
+  <circle cx="2055" cy="3279" r="7" fill="#fff0e8" opacity="0.63"/>
+  <circle cx="3840" cy="3467" r="7" fill="#ffd8c8" opacity="0.70"/>
+  <circle cx="3599" cy="2642" r="5" fill="#fff0e8" opacity="0.64"/>
+  <circle cx="2047" cy="3408" r="3" fill="#ffe0d0" opacity="0.98"/>
+  <circle cx="3450" cy="2281" r="7" fill="#ffe0d0" opacity="0.97"/>
+  <circle cx="2214" cy="2176" r="5" fill="#ffd8c8" opacity="0.91"/>
+  <circle cx="3853" cy="2877" r="6" fill="#ffe0d0" opacity="0.61"/>
+  <circle cx="2659" cy="2530" r="3" fill="#ffd8c8" opacity="0.70"/>
+  <circle cx="3390" cy="1833" r="7" fill="#ffe8e0" opacity="0.91"/>
+  <circle cx="3346" cy="3801" r="4" fill="#ffd8c8" opacity="0.71"/>
+  <circle cx="3133" cy="2417" r="7" fill="#ffe8e0" opacity="0.90"/>
+  <circle cx="2676" cy="3184" r="5" fill="#ffd8c8" opacity="0.78"/>
+  <circle cx="3249" cy="2045" r="4" fill="#ffe0d0" opacity="0.69"/>
+  <circle cx="3668" cy="2492" r="7" fill="#ffffff" opacity="0.69"/>
+  <circle cx="2337" cy="1826" r="3" fill="#ffffff" opacity="0.94"/>
+  <circle cx="3605" cy="2624" r="7" fill="#ffffff" opacity="0.8">
+    <animate attributeName="opacity" values="0.4;1.0;0.4" dur="3.7s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="2377" cy="3858" r="6" fill="#ffffff" opacity="0.8">
+    <animate attributeName="opacity" values="0.4;1.0;0.4" dur="3.8s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="3436" cy="2645" r="8" fill="#ffffff" opacity="0.8">
+    <animate attributeName="opacity" values="0.4;1.0;0.4" dur="4.0s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="2279" cy="2036" r="5" fill="#ffffff" opacity="0.8">
+    <animate attributeName="opacity" values="0.4;1.0;0.4" dur="3.6s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="2951" cy="3384" r="8" fill="#ffffff" opacity="0.8">
+    <animate attributeName="opacity" values="0.4;1.0;0.4" dur="3.2s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="1721" cy="2053" r="5" fill="#ffffff" opacity="0.8">
+    <animate attributeName="opacity" values="0.4;1.0;0.4" dur="3.0s" repeatCount="indefinite"/>
+  </circle>
+  <!-- Bright star cross-flares -->
+  <g opacity="0.8">
+    <line x1="2100" y1="2350" x2="2100" y2="2350" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity="0.6">
+      <animate attributeName="x1" values="2092,2108,2092" dur="3s" repeatCount="indefinite"/>
+      <animate attributeName="x2" values="2108,2092,2108" dur="3s" repeatCount="indefinite"/>
+    </line>
+    <line x1="3400" y1="2450" x2="3400" y2="2450" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity="0.5">
+      <animate attributeName="y1" values="2442,2458,2442" dur="2.5s" repeatCount="indefinite"/>
+      <animate attributeName="y2" values="2458,2442,2458" dur="2.5s" repeatCount="indefinite"/>
+    </line>
+  </g>
+</g>
+
+<!-- === OPAQUE RING BAND === -->
+<g clip-path="url(#kRC)">
+  <circle cx="2700" cy="2850" r="1680" fill="#1a0808"/>
+</g>
+
+<!-- === CONVEX DOMED RING (v5 style + dome) === -->
+<!-- Gold ring body with dome bevel -->
+<circle cx="2700" cy="2850" r="1520" fill="none" stroke="url(#kChakGold)" stroke-width="300" filter="url(#kRB)"/>
+
+<!-- Dome highlight bands (convex center brighter) -->
+<circle cx="2700" cy="2850" r="1520" fill="none" stroke="#f5e6a0" stroke-width="12" opacity="0.18"/>
+<circle cx="2700" cy="2850" r="1535" fill="none" stroke="#e8d070" stroke-width="6" opacity="0.12"/>
+<circle cx="2700" cy="2850" r="1505" fill="none" stroke="#e8d070" stroke-width="6" opacity="0.12"/>
+<!-- Darken edges for dome falloff -->
+<circle cx="2700" cy="2850" r="1655" fill="none" stroke="#2a1a06" stroke-width="30" opacity="0.25"/>
+<circle cx="2700" cy="2850" r="1385" fill="none" stroke="#2a1a06" stroke-width="30" opacity="0.25"/>
+
+<!-- Bat'leth crescent ornaments (polygon) -->
+<g>
+
+    <path d="M 2371.5 1304.5 L 2422.0 1273.1 L 2474.4 1244.8 L 2528.8 1221.0 L 2584.8 1203.0 L 2642.1 1191.8 L 2700.0 1188.0 L 2757.9 1191.8 L 2815.2 1203.0 L 2871.2 1221.0 L 2925.6 1244.8 L 2978.0 1273.1 L 3028.5 1304.5 L 3028.5 1304.5 L 2972.8 1302.9 L 2917.5 1302.7 L 2862.6 1303.3 L 2808.1 1304.1 L 2754.0 1304.7 L 2700.0 1305.0 L 2646.0 1304.7 L 2591.9 1304.1 L 2537.4 1303.3 L 2482.5 1302.7 L 2427.2 1302.9 L 2371.5 1304.5 Z" fill="none" stroke="#1a0a02" stroke-width="2" opacity="0.10"/>
+    <path d="M 2371.5 1304.5 L 2422.0 1273.1 L 2474.4 1244.8 L 2528.8 1221.0 L 2584.8 1203.0 L 2642.1 1191.8 L 2700.0 1188.0 L 2757.9 1191.8 L 2815.2 1203.0 L 2871.2 1221.0 L 2925.6 1244.8 L 2978.0 1273.1 L 3028.5 1304.5 L 3028.5 1304.5 L 2972.8 1302.9 L 2917.5 1302.7 L 2862.6 1303.3 L 2808.1 1304.1 L 2754.0 1304.7 L 2700.0 1305.0 L 2646.0 1304.7 L 2591.9 1304.1 L 2537.4 1303.3 L 2482.5 1302.7 L 2427.2 1302.9 L 2371.5 1304.5 Z" fill="url(#kChevGold)" filter="url(#kChevBev)" stroke="none"/>
+    <path d="M 3150.2 1330.3 L 3198.4 1316.0 L 3246.3 1307.3 L 3292.2 1307.3 L 3334.5 1318.2 L 3372.1 1340.4 L 3404.6 1372.8 L 3432.3 1412.9 L 3456.3 1457.1 L 3456.3 1457.1 L 3415.2 1446.3 L 3374.7 1435.4 L 3335.3 1423.1 L 3297.0 1408.7 L 3259.7 1391.8 L 3223.2 1372.6 L 3186.8 1351.7 L 3150.2 1330.3 Z" fill="none" stroke="#1a0a02" stroke-width="1.5" opacity="0.08"/>
+    <path d="M 3150.2 1330.3 L 3198.4 1316.0 L 3246.3 1307.3 L 3292.2 1307.3 L 3334.5 1318.2 L 3372.1 1340.4 L 3404.6 1372.8 L 3432.3 1412.9 L 3456.3 1457.1 L 3456.3 1457.1 L 3415.2 1446.3 L 3374.7 1435.4 L 3335.3 1423.1 L 3297.0 1408.7 L 3259.7 1391.8 L 3223.2 1372.6 L 3186.8 1351.7 L 3150.2 1330.3 Z" fill="url(#kSymGold)" filter="url(#kSymBev)" stroke="none"/>
+    <path d="M 3560.5 1524.9 L 3618.4 1538.4 L 3675.5 1555.4 L 3730.8 1577.0 L 3783.2 1604.0 L 3831.6 1636.5 L 3875.2 1674.8 L 3913.5 1718.4 L 3946.0 1766.8 L 3973.0 1819.2 L 3994.6 1874.5 L 4011.6 1931.6 L 4025.1 1989.5 L 4025.1 1989.5 L 3986.8 1948.9 L 3947.9 1909.7 L 3908.7 1871.2 L 3869.6 1833.3 L 3830.8 1795.5 L 3792.5 1757.5 L 3754.5 1719.2 L 3716.7 1680.4 L 3678.8 1641.3 L 3640.3 1602.1 L 3601.1 1563.2 L 3560.5 1524.9 Z" fill="none" stroke="#1a0a02" stroke-width="2" opacity="0.10"/>
+    <path d="M 3560.5 1524.9 L 3618.4 1538.4 L 3675.5 1555.4 L 3730.8 1577.0 L 3783.2 1604.0 L 3831.6 1636.5 L 3875.2 1674.8 L 3913.5 1718.4 L 3946.0 1766.8 L 3973.0 1819.2 L 3994.6 1874.5 L 4011.6 1931.6 L 4025.1 1989.5 L 4025.1 1989.5 L 3986.8 1948.9 L 3947.9 1909.7 L 3908.7 1871.2 L 3869.6 1833.3 L 3830.8 1795.5 L 3792.5 1757.5 L 3754.5 1719.2 L 3716.7 1680.4 L 3678.8 1641.3 L 3640.3 1602.1 L 3601.1 1563.2 L 3560.5 1524.9 Z" fill="url(#kChevGold)" filter="url(#kChevBev)" stroke="none"/>
+    <path d="M 4092.9 2093.7 L 4137.1 2117.7 L 4177.2 2145.4 L 4209.6 2177.9 L 4231.8 2215.5 L 4242.7 2257.8 L 4242.7 2303.7 L 4234.0 2351.6 L 4219.7 2399.8 L 4219.7 2399.8 L 4198.3 2363.2 L 4177.4 2326.8 L 4158.2 2290.3 L 4141.3 2253.0 L 4126.9 2214.7 L 4114.6 2175.3 L 4103.7 2134.8 L 4092.9 2093.7 Z" fill="none" stroke="#1a0a02" stroke-width="1.5" opacity="0.08"/>
+    <path d="M 4092.9 2093.7 L 4137.1 2117.7 L 4177.2 2145.4 L 4209.6 2177.9 L 4231.8 2215.5 L 4242.7 2257.8 L 4242.7 2303.7 L 4234.0 2351.6 L 4219.7 2399.8 L 4219.7 2399.8 L 4198.3 2363.2 L 4177.4 2326.8 L 4158.2 2290.3 L 4141.3 2253.0 L 4126.9 2214.7 L 4114.6 2175.3 L 4103.7 2134.8 L 4092.9 2093.7 Z" fill="url(#kSymGold)" filter="url(#kSymBev)" stroke="none"/>
+    <path d="M 4245.5 2521.5 L 4276.9 2572.0 L 4305.2 2624.4 L 4329.0 2678.8 L 4347.0 2734.8 L 4358.2 2792.1 L 4362.0 2850.0 L 4358.2 2907.9 L 4347.0 2965.2 L 4329.0 3021.2 L 4305.2 3075.6 L 4276.9 3128.0 L 4245.5 3178.5 L 4245.5 3178.5 L 4247.1 3122.8 L 4247.3 3067.5 L 4246.7 3012.6 L 4245.9 2958.1 L 4245.3 2904.0 L 4245.0 2850.0 L 4245.3 2796.0 L 4245.9 2741.9 L 4246.7 2687.4 L 4247.3 2632.5 L 4247.1 2577.2 L 4245.5 2521.5 Z" fill="none" stroke="#1a0a02" stroke-width="2" opacity="0.10"/>
+    <path d="M 4245.5 2521.5 L 4276.9 2572.0 L 4305.2 2624.4 L 4329.0 2678.8 L 4347.0 2734.8 L 4358.2 2792.1 L 4362.0 2850.0 L 4358.2 2907.9 L 4347.0 2965.2 L 4329.0 3021.2 L 4305.2 3075.6 L 4276.9 3128.0 L 4245.5 3178.5 L 4245.5 3178.5 L 4247.1 3122.8 L 4247.3 3067.5 L 4246.7 3012.6 L 4245.9 2958.1 L 4245.3 2904.0 L 4245.0 2850.0 L 4245.3 2796.0 L 4245.9 2741.9 L 4246.7 2687.4 L 4247.3 2632.5 L 4247.1 2577.2 L 4245.5 2521.5 Z" fill="url(#kChevGold)" filter="url(#kChevBev)" stroke="none"/>
+    <path d="M 4219.7 3300.2 L 4234.0 3348.4 L 4242.7 3396.3 L 4242.7 3442.2 L 4231.8 3484.5 L 4209.6 3522.1 L 4177.2 3554.6 L 4137.1 3582.3 L 4092.9 3606.3 L 4092.9 3606.3 L 4103.7 3565.2 L 4114.6 3524.7 L 4126.9 3485.3 L 4141.3 3447.0 L 4158.2 3409.7 L 4177.4 3373.2 L 4198.3 3336.8 L 4219.7 3300.2 Z" fill="none" stroke="#1a0a02" stroke-width="1.5" opacity="0.08"/>
+    <path d="M 4219.7 3300.2 L 4234.0 3348.4 L 4242.7 3396.3 L 4242.7 3442.2 L 4231.8 3484.5 L 4209.6 3522.1 L 4177.2 3554.6 L 4137.1 3582.3 L 4092.9 3606.3 L 4092.9 3606.3 L 4103.7 3565.2 L 4114.6 3524.7 L 4126.9 3485.3 L 4141.3 3447.0 L 4158.2 3409.7 L 4177.4 3373.2 L 4198.3 3336.8 L 4219.7 3300.2 Z" fill="url(#kSymGold)" filter="url(#kSymBev)" stroke="none"/>
+    <path d="M 4025.1 3710.5 L 4011.6 3768.4 L 3994.6 3825.5 L 3973.0 3880.8 L 3946.0 3933.2 L 3913.5 3981.6 L 3875.2 4025.2 L 3831.6 4063.5 L 3783.2 4096.0 L 3730.8 4123.0 L 3675.5 4144.6 L 3618.4 4161.6 L 3560.5 4175.1 L 3560.5 4175.1 L 3601.1 4136.8 L 3640.3 4097.9 L 3678.8 4058.7 L 3716.7 4019.6 L 3754.5 3980.8 L 3792.5 3942.5 L 3830.8 3904.5 L 3869.6 3866.7 L 3908.7 3828.8 L 3947.9 3790.3 L 3986.8 3751.1 L 4025.1 3710.5 Z" fill="none" stroke="#1a0a02" stroke-width="2" opacity="0.10"/>
+    <path d="M 4025.1 3710.5 L 4011.6 3768.4 L 3994.6 3825.5 L 3973.0 3880.8 L 3946.0 3933.2 L 3913.5 3981.6 L 3875.2 4025.2 L 3831.6 4063.5 L 3783.2 4096.0 L 3730.8 4123.0 L 3675.5 4144.6 L 3618.4 4161.6 L 3560.5 4175.1 L 3560.5 4175.1 L 3601.1 4136.8 L 3640.3 4097.9 L 3678.8 4058.7 L 3716.7 4019.6 L 3754.5 3980.8 L 3792.5 3942.5 L 3830.8 3904.5 L 3869.6 3866.7 L 3908.7 3828.8 L 3947.9 3790.3 L 3986.8 3751.1 L 4025.1 3710.5 Z" fill="url(#kChevGold)" filter="url(#kChevBev)" stroke="none"/>
+    <path d="M 3456.3 4242.9 L 3432.3 4287.1 L 3404.6 4327.2 L 3372.1 4359.6 L 3334.5 4381.8 L 3292.2 4392.7 L 3246.3 4392.7 L 3198.4 4384.0 L 3150.2 4369.7 L 3150.2 4369.7 L 3186.8 4348.3 L 3223.2 4327.4 L 3259.7 4308.2 L 3297.0 4291.3 L 3335.3 4276.9 L 3374.7 4264.6 L 3415.2 4253.7 L 3456.3 4242.9 Z" fill="none" stroke="#1a0a02" stroke-width="1.5" opacity="0.08"/>
+    <path d="M 3456.3 4242.9 L 3432.3 4287.1 L 3404.6 4327.2 L 3372.1 4359.6 L 3334.5 4381.8 L 3292.2 4392.7 L 3246.3 4392.7 L 3198.4 4384.0 L 3150.2 4369.7 L 3150.2 4369.7 L 3186.8 4348.3 L 3223.2 4327.4 L 3259.7 4308.2 L 3297.0 4291.3 L 3335.3 4276.9 L 3374.7 4264.6 L 3415.2 4253.7 L 3456.3 4242.9 Z" fill="url(#kSymGold)" filter="url(#kSymBev)" stroke="none"/>
+    <path d="M 3028.5 4395.5 L 2978.0 4426.9 L 2925.6 4455.2 L 2871.2 4479.0 L 2815.2 4497.0 L 2757.9 4508.2 L 2700.0 4512.0 L 2642.1 4508.2 L 2584.8 4497.0 L 2528.8 4479.0 L 2474.4 4455.2 L 2422.0 4426.9 L 2371.5 4395.5 L 2371.5 4395.5 L 2427.2 4397.1 L 2482.5 4397.3 L 2537.4 4396.7 L 2591.9 4395.9 L 2646.0 4395.3 L 2700.0 4395.0 L 2754.0 4395.3 L 2808.1 4395.9 L 2862.6 4396.7 L 2917.5 4397.3 L 2972.8 4397.1 L 3028.5 4395.5 Z" fill="none" stroke="#1a0a02" stroke-width="2" opacity="0.10"/>
+    <path d="M 3028.5 4395.5 L 2978.0 4426.9 L 2925.6 4455.2 L 2871.2 4479.0 L 2815.2 4497.0 L 2757.9 4508.2 L 2700.0 4512.0 L 2642.1 4508.2 L 2584.8 4497.0 L 2528.8 4479.0 L 2474.4 4455.2 L 2422.0 4426.9 L 2371.5 4395.5 L 2371.5 4395.5 L 2427.2 4397.1 L 2482.5 4397.3 L 2537.4 4396.7 L 2591.9 4395.9 L 2646.0 4395.3 L 2700.0 4395.0 L 2754.0 4395.3 L 2808.1 4395.9 L 2862.6 4396.7 L 2917.5 4397.3 L 2972.8 4397.1 L 3028.5 4395.5 Z" fill="url(#kChevGold)" filter="url(#kChevBev)" stroke="none"/>
+    <path d="M 2249.8 4369.7 L 2201.6 4384.0 L 2153.7 4392.7 L 2107.8 4392.7 L 2065.5 4381.8 L 2027.9 4359.6 L 1995.4 4327.2 L 1967.7 4287.1 L 1943.7 4242.9 L 1943.7 4242.9 L 1984.8 4253.7 L 2025.3 4264.6 L 2064.7 4276.9 L 2103.0 4291.3 L 2140.3 4308.2 L 2176.8 4327.4 L 2213.2 4348.3 L 2249.8 4369.7 Z" fill="none" stroke="#1a0a02" stroke-width="1.5" opacity="0.08"/>
+    <path d="M 2249.8 4369.7 L 2201.6 4384.0 L 2153.7 4392.7 L 2107.8 4392.7 L 2065.5 4381.8 L 2027.9 4359.6 L 1995.4 4327.2 L 1967.7 4287.1 L 1943.7 4242.9 L 1943.7 4242.9 L 1984.8 4253.7 L 2025.3 4264.6 L 2064.7 4276.9 L 2103.0 4291.3 L 2140.3 4308.2 L 2176.8 4327.4 L 2213.2 4348.3 L 2249.8 4369.7 Z" fill="url(#kSymGold)" filter="url(#kSymBev)" stroke="none"/>
+    <path d="M 1839.5 4175.1 L 1781.6 4161.6 L 1724.5 4144.6 L 1669.2 4123.0 L 1616.8 4096.0 L 1568.4 4063.5 L 1524.8 4025.2 L 1486.5 3981.6 L 1454.0 3933.2 L 1427.0 3880.8 L 1405.4 3825.5 L 1388.4 3768.4 L 1374.9 3710.5 L 1374.9 3710.5 L 1413.2 3751.1 L 1452.1 3790.3 L 1491.3 3828.8 L 1530.4 3866.7 L 1569.2 3904.5 L 1607.5 3942.5 L 1645.5 3980.8 L 1683.3 4019.6 L 1721.2 4058.7 L 1759.7 4097.9 L 1798.9 4136.8 L 1839.5 4175.1 Z" fill="none" stroke="#1a0a02" stroke-width="2" opacity="0.10"/>
+    <path d="M 1839.5 4175.1 L 1781.6 4161.6 L 1724.5 4144.6 L 1669.2 4123.0 L 1616.8 4096.0 L 1568.4 4063.5 L 1524.8 4025.2 L 1486.5 3981.6 L 1454.0 3933.2 L 1427.0 3880.8 L 1405.4 3825.5 L 1388.4 3768.4 L 1374.9 3710.5 L 1374.9 3710.5 L 1413.2 3751.1 L 1452.1 3790.3 L 1491.3 3828.8 L 1530.4 3866.7 L 1569.2 3904.5 L 1607.5 3942.5 L 1645.5 3980.8 L 1683.3 4019.6 L 1721.2 4058.7 L 1759.7 4097.9 L 1798.9 4136.8 L 1839.5 4175.1 Z" fill="url(#kChevGold)" filter="url(#kChevBev)" stroke="none"/>
+    <path d="M 1307.1 3606.3 L 1262.9 3582.3 L 1222.8 3554.6 L 1190.4 3522.1 L 1168.2 3484.5 L 1157.3 3442.2 L 1157.3 3396.3 L 1166.0 3348.4 L 1180.3 3300.2 L 1180.3 3300.2 L 1201.7 3336.8 L 1222.6 3373.2 L 1241.8 3409.7 L 1258.7 3447.0 L 1273.1 3485.3 L 1285.4 3524.7 L 1296.3 3565.2 L 1307.1 3606.3 Z" fill="none" stroke="#1a0a02" stroke-width="1.5" opacity="0.08"/>
+    <path d="M 1307.1 3606.3 L 1262.9 3582.3 L 1222.8 3554.6 L 1190.4 3522.1 L 1168.2 3484.5 L 1157.3 3442.2 L 1157.3 3396.3 L 1166.0 3348.4 L 1180.3 3300.2 L 1180.3 3300.2 L 1201.7 3336.8 L 1222.6 3373.2 L 1241.8 3409.7 L 1258.7 3447.0 L 1273.1 3485.3 L 1285.4 3524.7 L 1296.3 3565.2 L 1307.1 3606.3 Z" fill="url(#kSymGold)" filter="url(#kSymBev)" stroke="none"/>
+    <path d="M 1154.5 3178.5 L 1123.1 3128.0 L 1094.8 3075.6 L 1071.0 3021.2 L 1053.0 2965.2 L 1041.8 2907.9 L 1038.0 2850.0 L 1041.8 2792.1 L 1053.0 2734.8 L 1071.0 2678.8 L 1094.8 2624.4 L 1123.1 2572.0 L 1154.5 2521.5 L 1154.5 2521.5 L 1152.9 2577.2 L 1152.7 2632.5 L 1153.3 2687.4 L 1154.1 2741.9 L 1154.7 2796.0 L 1155.0 2850.0 L 1154.7 2904.0 L 1154.1 2958.1 L 1153.3 3012.6 L 1152.7 3067.5 L 1152.9 3122.8 L 1154.5 3178.5 Z" fill="none" stroke="#1a0a02" stroke-width="2" opacity="0.10"/>
+    <path d="M 1154.5 3178.5 L 1123.1 3128.0 L 1094.8 3075.6 L 1071.0 3021.2 L 1053.0 2965.2 L 1041.8 2907.9 L 1038.0 2850.0 L 1041.8 2792.1 L 1053.0 2734.8 L 1071.0 2678.8 L 1094.8 2624.4 L 1123.1 2572.0 L 1154.5 2521.5 L 1154.5 2521.5 L 1152.9 2577.2 L 1152.7 2632.5 L 1153.3 2687.4 L 1154.1 2741.9 L 1154.7 2796.0 L 1155.0 2850.0 L 1154.7 2904.0 L 1154.1 2958.1 L 1153.3 3012.6 L 1152.7 3067.5 L 1152.9 3122.8 L 1154.5 3178.5 Z" fill="url(#kChevGold)" filter="url(#kChevBev)" stroke="none"/>
+    <path d="M 1180.3 2399.8 L 1166.0 2351.6 L 1157.3 2303.7 L 1157.3 2257.8 L 1168.2 2215.5 L 1190.4 2177.9 L 1222.8 2145.4 L 1262.9 2117.7 L 1307.1 2093.7 L 1307.1 2093.7 L 1296.3 2134.8 L 1285.4 2175.3 L 1273.1 2214.7 L 1258.7 2253.0 L 1241.8 2290.3 L 1222.6 2326.8 L 1201.7 2363.2 L 1180.3 2399.8 Z" fill="none" stroke="#1a0a02" stroke-width="1.5" opacity="0.08"/>
+    <path d="M 1180.3 2399.8 L 1166.0 2351.6 L 1157.3 2303.7 L 1157.3 2257.8 L 1168.2 2215.5 L 1190.4 2177.9 L 1222.8 2145.4 L 1262.9 2117.7 L 1307.1 2093.7 L 1307.1 2093.7 L 1296.3 2134.8 L 1285.4 2175.3 L 1273.1 2214.7 L 1258.7 2253.0 L 1241.8 2290.3 L 1222.6 2326.8 L 1201.7 2363.2 L 1180.3 2399.8 Z" fill="url(#kSymGold)" filter="url(#kSymBev)" stroke="none"/>
+    <path d="M 1374.9 1989.5 L 1388.4 1931.6 L 1405.4 1874.5 L 1427.0 1819.2 L 1454.0 1766.8 L 1486.5 1718.4 L 1524.8 1674.8 L 1568.4 1636.5 L 1616.8 1604.0 L 1669.2 1577.0 L 1724.5 1555.4 L 1781.6 1538.4 L 1839.5 1524.9 L 1839.5 1524.9 L 1798.9 1563.2 L 1759.7 1602.1 L 1721.2 1641.3 L 1683.3 1680.4 L 1645.5 1719.2 L 1607.5 1757.5 L 1569.2 1795.5 L 1530.4 1833.3 L 1491.3 1871.2 L 1452.1 1909.7 L 1413.2 1948.9 L 1374.9 1989.5 Z" fill="none" stroke="#1a0a02" stroke-width="2" opacity="0.10"/>
+    <path d="M 1374.9 1989.5 L 1388.4 1931.6 L 1405.4 1874.5 L 1427.0 1819.2 L 1454.0 1766.8 L 1486.5 1718.4 L 1524.8 1674.8 L 1568.4 1636.5 L 1616.8 1604.0 L 1669.2 1577.0 L 1724.5 1555.4 L 1781.6 1538.4 L 1839.5 1524.9 L 1839.5 1524.9 L 1798.9 1563.2 L 1759.7 1602.1 L 1721.2 1641.3 L 1683.3 1680.4 L 1645.5 1719.2 L 1607.5 1757.5 L 1569.2 1795.5 L 1530.4 1833.3 L 1491.3 1871.2 L 1452.1 1909.7 L 1413.2 1948.9 L 1374.9 1989.5 Z" fill="url(#kChevGold)" filter="url(#kChevBev)" stroke="none"/>
+    <path d="M 1943.7 1457.1 L 1967.7 1412.9 L 1995.4 1372.8 L 2027.9 1340.4 L 2065.5 1318.2 L 2107.8 1307.3 L 2153.7 1307.3 L 2201.6 1316.0 L 2249.8 1330.3 L 2249.8 1330.3 L 2213.2 1351.7 L 2176.8 1372.6 L 2140.3 1391.8 L 2103.0 1408.7 L 2064.7 1423.1 L 2025.3 1435.4 L 1984.8 1446.3 L 1943.7 1457.1 Z" fill="none" stroke="#1a0a02" stroke-width="1.5" opacity="0.08"/>
+    <path d="M 1943.7 1457.1 L 1967.7 1412.9 L 1995.4 1372.8 L 2027.9 1340.4 L 2065.5 1318.2 L 2107.8 1307.3 L 2153.7 1307.3 L 2201.6 1316.0 L 2249.8 1330.3 L 2249.8 1330.3 L 2213.2 1351.7 L 2176.8 1372.6 L 2140.3 1391.8 L 2103.0 1408.7 L 2064.7 1423.1 L 2025.3 1435.4 L 1984.8 1446.3 L 1943.7 1457.1 Z" fill="url(#kSymGold)" filter="url(#kSymBev)" stroke="none"/>
+</g>
+
+<!-- Sharp edges -->
+<circle cx="2700" cy="2850" r="1668" fill="none" stroke="#f5e6a0" stroke-width="2" opacity="0.6"/>
+<circle cx="2700" cy="2850" r="1670" fill="none" stroke="#1a0e02" stroke-width="2.5"/>
+<circle cx="2700" cy="2850" r="1372" fill="none" stroke="#e8d070" stroke-width="2" opacity="0.5"/>
+<circle cx="2700" cy="2850" r="1370" fill="none" stroke="#1a0e02" stroke-width="2.5"/>
+
+<!-- === KLINGON BLADES === -->
+<g transform="translate(2700,2850) scale(9.5) translate(-251,-397)" filter="url(#kDS)">
+  <g filter="url(#kEG)">
+    <path d="M316.636322,308.261414 C321.471313,315.687927 320.314758,322.042511 315.993744,329.234955 C296.917114,360.988403 278.327209,393.034546 259.614441,425.005981 C257.113678,429.278656 254.962357,433.754364 252.567841,438.091156 C250.289536,442.217529 248.921906,442.361206 246.343826,438.337555 C236.137405,422.408356 225.854996,406.521729 215.988495,390.382294 C203.254547,369.552307 190.957397,348.455658 178.313080,327.570129 C175.837219,323.480560 175.616196,319.781799 177.325836,315.340790 C182.741852,301.271881 188.198593,287.199036 192.949600,272.898468 C199.799835,252.279129 207.118423,231.722778 212.299438,210.662872 C220.370697,177.854477 226.991608,144.682541 233.869858,111.590416 C237.012741,96.469643 239.630173,81.219673 241.870804,65.938118 C243.450546,55.164047 243.988342,44.237526 245.003799,33.380230 C245.433075,28.790327 245.894257,24.203407 247.412735,19.324734 C248.286285,24.050556 249.282516,28.757519 250.012512,33.505417 C253.437134,55.779629 256.098511,78.197044 260.328156,100.315552 C266.640045,133.322906 273.635254,166.215027 281.152100,198.969742 C284.699707,214.428375 289.995850,229.497391 294.751068,244.664139 C299.987762,261.366760 305.431152,278.006226 310.966339,294.612579 C312.479675,299.152954 314.645966,303.475708 316.636322,308.261414 Z" fill="url(#kGoldBase)" filter="url(#kBB)"/>
+    <path d="M316.636322,308.261414 C321.471313,315.687927 320.314758,322.042511 315.993744,329.234955 C296.917114,360.988403 278.327209,393.034546 259.614441,425.005981 C257.113678,429.278656 254.962357,433.754364 252.567841,438.091156 C250.289536,442.217529 248.921906,442.361206 246.343826,438.337555 C236.137405,422.408356 225.854996,406.521729 215.988495,390.382294 C203.254547,369.552307 190.957397,348.455658 178.313080,327.570129 C175.837219,323.480560 175.616196,319.781799 177.325836,315.340790 C182.741852,301.271881 188.198593,287.199036 192.949600,272.898468 C199.799835,252.279129 207.118423,231.722778 212.299438,210.662872 C220.370697,177.854477 226.991608,144.682541 233.869858,111.590416 C237.012741,96.469643 239.630173,81.219673 241.870804,65.938118 C243.450546,55.164047 243.988342,44.237526 245.003799,33.380230 C245.433075,28.790327 245.894257,24.203407 247.412735,19.324734 C248.286285,24.050556 249.282516,28.757519 250.012512,33.505417 C253.437134,55.779629 256.098511,78.197044 260.328156,100.315552 C266.640045,133.322906 273.635254,166.215027 281.152100,198.969742 C284.699707,214.428375 289.995850,229.497391 294.751068,244.664139 C299.987762,261.366760 305.431152,278.006226 310.966339,294.612579 C312.479675,299.152954 314.645966,303.475708 316.636322,308.261414 Z" fill="url(#kGoldH)" filter="url(#kE20)"/>
+    <path d="M316.636322,308.261414 C321.471313,315.687927 320.314758,322.042511 315.993744,329.234955 C296.917114,360.988403 278.327209,393.034546 259.614441,425.005981 C257.113678,429.278656 254.962357,433.754364 252.567841,438.091156 C250.289536,442.217529 248.921906,442.361206 246.343826,438.337555 C236.137405,422.408356 225.854996,406.521729 215.988495,390.382294 C203.254547,369.552307 190.957397,348.455658 178.313080,327.570129 C175.837219,323.480560 175.616196,319.781799 177.325836,315.340790 C182.741852,301.271881 188.198593,287.199036 192.949600,272.898468 C199.799835,252.279129 207.118423,231.722778 212.299438,210.662872 C220.370697,177.854477 226.991608,144.682541 233.869858,111.590416 C237.012741,96.469643 239.630173,81.219673 241.870804,65.938118 C243.450546,55.164047 243.988342,44.237526 245.003799,33.380230 C245.433075,28.790327 245.894257,24.203407 247.412735,19.324734 C248.286285,24.050556 249.282516,28.757519 250.012512,33.505417 C253.437134,55.779629 256.098511,78.197044 260.328156,100.315552 C266.640045,133.322906 273.635254,166.215027 281.152100,198.969742 C284.699707,214.428375 289.995850,229.497391 294.751068,244.664139 C299.987762,261.366760 305.431152,278.006226 310.966339,294.612579 C312.479675,299.152954 314.645966,303.475708 316.636322,308.261414 Z" fill="url(#kGoldV)" filter="url(#kE20)"/>
+    <path d="M316.636322,308.261414 C321.471313,315.687927 320.314758,322.042511 315.993744,329.234955 C296.917114,360.988403 278.327209,393.034546 259.614441,425.005981 C257.113678,429.278656 254.962357,433.754364 252.567841,438.091156 C250.289536,442.217529 248.921906,442.361206 246.343826,438.337555 C236.137405,422.408356 225.854996,406.521729 215.988495,390.382294 C203.254547,369.552307 190.957397,348.455658 178.313080,327.570129 C175.837219,323.480560 175.616196,319.781799 177.325836,315.340790 C182.741852,301.271881 188.198593,287.199036 192.949600,272.898468 C199.799835,252.279129 207.118423,231.722778 212.299438,210.662872 C220.370697,177.854477 226.991608,144.682541 233.869858,111.590416 C237.012741,96.469643 239.630173,81.219673 241.870804,65.938118 C243.450546,55.164047 243.988342,44.237526 245.003799,33.380230 C245.433075,28.790327 245.894257,24.203407 247.412735,19.324734 C248.286285,24.050556 249.282516,28.757519 250.012512,33.505417 C253.437134,55.779629 256.098511,78.197044 260.328156,100.315552 C266.640045,133.322906 273.635254,166.215027 281.152100,198.969742 C284.699707,214.428375 289.995850,229.497391 294.751068,244.664139 C299.987762,261.366760 305.431152,278.006226 310.966339,294.612579 C312.479675,299.152954 314.645966,303.475708 316.636322,308.261414 Z" fill="url(#kGoldSpec)" filter="url(#kE20)"/>
+    <path d="M316.636322,308.261414 C321.471313,315.687927 320.314758,322.042511 315.993744,329.234955 C296.917114,360.988403 278.327209,393.034546 259.614441,425.005981 C257.113678,429.278656 254.962357,433.754364 252.567841,438.091156 C250.289536,442.217529 248.921906,442.361206 246.343826,438.337555 C236.137405,422.408356 225.854996,406.521729 215.988495,390.382294 C203.254547,369.552307 190.957397,348.455658 178.313080,327.570129 C175.837219,323.480560 175.616196,319.781799 177.325836,315.340790 C182.741852,301.271881 188.198593,287.199036 192.949600,272.898468 C199.799835,252.279129 207.118423,231.722778 212.299438,210.662872 C220.370697,177.854477 226.991608,144.682541 233.869858,111.590416 C237.012741,96.469643 239.630173,81.219673 241.870804,65.938118 C243.450546,55.164047 243.988342,44.237526 245.003799,33.380230 C245.433075,28.790327 245.894257,24.203407 247.412735,19.324734 C248.286285,24.050556 249.282516,28.757519 250.012512,33.505417 C253.437134,55.779629 256.098511,78.197044 260.328156,100.315552 C266.640045,133.322906 273.635254,166.215027 281.152100,198.969742 C284.699707,214.428375 289.995850,229.497391 294.751068,244.664139 C299.987762,261.366760 305.431152,278.006226 310.966339,294.612579 C312.479675,299.152954 314.645966,303.475708 316.636322,308.261414 Z" fill="url(#kWineBase)" filter="url(#kE30)"/>
+    <path d="M316.636322,308.261414 C321.471313,315.687927 320.314758,322.042511 315.993744,329.234955 C296.917114,360.988403 278.327209,393.034546 259.614441,425.005981 C257.113678,429.278656 254.962357,433.754364 252.567841,438.091156 C250.289536,442.217529 248.921906,442.361206 246.343826,438.337555 C236.137405,422.408356 225.854996,406.521729 215.988495,390.382294 C203.254547,369.552307 190.957397,348.455658 178.313080,327.570129 C175.837219,323.480560 175.616196,319.781799 177.325836,315.340790 C182.741852,301.271881 188.198593,287.199036 192.949600,272.898468 C199.799835,252.279129 207.118423,231.722778 212.299438,210.662872 C220.370697,177.854477 226.991608,144.682541 233.869858,111.590416 C237.012741,96.469643 239.630173,81.219673 241.870804,65.938118 C243.450546,55.164047 243.988342,44.237526 245.003799,33.380230 C245.433075,28.790327 245.894257,24.203407 247.412735,19.324734 C248.286285,24.050556 249.282516,28.757519 250.012512,33.505417 C253.437134,55.779629 256.098511,78.197044 260.328156,100.315552 C266.640045,133.322906 273.635254,166.215027 281.152100,198.969742 C284.699707,214.428375 289.995850,229.497391 294.751068,244.664139 C299.987762,261.366760 305.431152,278.006226 310.966339,294.612579 C312.479675,299.152954 314.645966,303.475708 316.636322,308.261414 Z" fill="url(#kWineH)" filter="url(#kE30)"/>
+    <path d="M316.636322,308.261414 C321.471313,315.687927 320.314758,322.042511 315.993744,329.234955 C296.917114,360.988403 278.327209,393.034546 259.614441,425.005981 C257.113678,429.278656 254.962357,433.754364 252.567841,438.091156 C250.289536,442.217529 248.921906,442.361206 246.343826,438.337555 C236.137405,422.408356 225.854996,406.521729 215.988495,390.382294 C203.254547,369.552307 190.957397,348.455658 178.313080,327.570129 C175.837219,323.480560 175.616196,319.781799 177.325836,315.340790 C182.741852,301.271881 188.198593,287.199036 192.949600,272.898468 C199.799835,252.279129 207.118423,231.722778 212.299438,210.662872 C220.370697,177.854477 226.991608,144.682541 233.869858,111.590416 C237.012741,96.469643 239.630173,81.219673 241.870804,65.938118 C243.450546,55.164047 243.988342,44.237526 245.003799,33.380230 C245.433075,28.790327 245.894257,24.203407 247.412735,19.324734 C248.286285,24.050556 249.282516,28.757519 250.012512,33.505417 C253.437134,55.779629 256.098511,78.197044 260.328156,100.315552 C266.640045,133.322906 273.635254,166.215027 281.152100,198.969742 C284.699707,214.428375 289.995850,229.497391 294.751068,244.664139 C299.987762,261.366760 305.431152,278.006226 310.966339,294.612579 C312.479675,299.152954 314.645966,303.475708 316.636322,308.261414 Z" fill="url(#kWineV)" filter="url(#kE30)"/>
+    <path d="M316.636322,308.261414 C321.471313,315.687927 320.314758,322.042511 315.993744,329.234955 C296.917114,360.988403 278.327209,393.034546 259.614441,425.005981 C257.113678,429.278656 254.962357,433.754364 252.567841,438.091156 C250.289536,442.217529 248.921906,442.361206 246.343826,438.337555 C236.137405,422.408356 225.854996,406.521729 215.988495,390.382294 C203.254547,369.552307 190.957397,348.455658 178.313080,327.570129 C175.837219,323.480560 175.616196,319.781799 177.325836,315.340790 C182.741852,301.271881 188.198593,287.199036 192.949600,272.898468 C199.799835,252.279129 207.118423,231.722778 212.299438,210.662872 C220.370697,177.854477 226.991608,144.682541 233.869858,111.590416 C237.012741,96.469643 239.630173,81.219673 241.870804,65.938118 C243.450546,55.164047 243.988342,44.237526 245.003799,33.380230 C245.433075,28.790327 245.894257,24.203407 247.412735,19.324734 C248.286285,24.050556 249.282516,28.757519 250.012512,33.505417 C253.437134,55.779629 256.098511,78.197044 260.328156,100.315552 C266.640045,133.322906 273.635254,166.215027 281.152100,198.969742 C284.699707,214.428375 289.995850,229.497391 294.751068,244.664139 C299.987762,261.366760 305.431152,278.006226 310.966339,294.612579 C312.479675,299.152954 314.645966,303.475708 316.636322,308.261414 Z" fill="url(#kWineSpec)" filter="url(#kE30)"/>
+    <path d="M316.636322,308.261414 C321.471313,315.687927 320.314758,322.042511 315.993744,329.234955 C296.917114,360.988403 278.327209,393.034546 259.614441,425.005981 C257.113678,429.278656 254.962357,433.754364 252.567841,438.091156 C250.289536,442.217529 248.921906,442.361206 246.343826,438.337555 C236.137405,422.408356 225.854996,406.521729 215.988495,390.382294 C203.254547,369.552307 190.957397,348.455658 178.313080,327.570129 C175.837219,323.480560 175.616196,319.781799 177.325836,315.340790 C182.741852,301.271881 188.198593,287.199036 192.949600,272.898468 C199.799835,252.279129 207.118423,231.722778 212.299438,210.662872 C220.370697,177.854477 226.991608,144.682541 233.869858,111.590416 C237.012741,96.469643 239.630173,81.219673 241.870804,65.938118 C243.450546,55.164047 243.988342,44.237526 245.003799,33.380230 C245.433075,28.790327 245.894257,24.203407 247.412735,19.324734 C248.286285,24.050556 249.282516,28.757519 250.012512,33.505417 C253.437134,55.779629 256.098511,78.197044 260.328156,100.315552 C266.640045,133.322906 273.635254,166.215027 281.152100,198.969742 C284.699707,214.428375 289.995850,229.497391 294.751068,244.664139 C299.987762,261.366760 305.431152,278.006226 310.966339,294.612579 C312.479675,299.152954 314.645966,303.475708 316.636322,308.261414 Z" fill="url(#kWineBase)" filter="url(#kE30)"/>
+    <g filter="url(#kGV)"><path d="M316.636322,308.261414 C321.471313,315.687927 320.314758,322.042511 315.993744,329.234955 C296.917114,360.988403 278.327209,393.034546 259.614441,425.005981 C257.113678,429.278656 254.962357,433.754364 252.567841,438.091156 C250.289536,442.217529 248.921906,442.361206 246.343826,438.337555 C236.137405,422.408356 225.854996,406.521729 215.988495,390.382294 C203.254547,369.552307 190.957397,348.455658 178.313080,327.570129 C175.837219,323.480560 175.616196,319.781799 177.325836,315.340790 C182.741852,301.271881 188.198593,287.199036 192.949600,272.898468 C199.799835,252.279129 207.118423,231.722778 212.299438,210.662872 C220.370697,177.854477 226.991608,144.682541 233.869858,111.590416 C237.012741,96.469643 239.630173,81.219673 241.870804,65.938118 C243.450546,55.164047 243.988342,44.237526 245.003799,33.380230 C245.433075,28.790327 245.894257,24.203407 247.412735,19.324734 C248.286285,24.050556 249.282516,28.757519 250.012512,33.505417 C253.437134,55.779629 256.098511,78.197044 260.328156,100.315552 C266.640045,133.322906 273.635254,166.215027 281.152100,198.969742 C284.699707,214.428375 289.995850,229.497391 294.751068,244.664139 C299.987762,261.366760 305.431152,278.006226 310.966339,294.612579 C312.479675,299.152954 314.645966,303.475708 316.636322,308.261414 Z" fill="url(#kWineBase)" filter="url(#kE30)"/></g>
+    <path d="M506.827942,469.598022 C498.145935,479.146912 487.135376,485.379822 475.775146,490.980896 C453.735596,501.847168 430.290649,506.095734 405.823273,505.124329 C395.588043,504.717926 385.205780,505.240631 375.158966,503.647247 C365.197906,502.067535 355.616028,498.199402 345.791473,495.626740 C336.650055,493.232971 327.485504,490.784637 318.192902,489.142975 C302.357849,486.345581 286.412720,484.172638 270.519592,481.700348 C269.101624,481.479706 267.725739,480.988434 265.958984,480.525574 C286.675079,436.421234 314.955994,397.256714 338.259979,354.371124 C344.518402,362.561737 350.165009,370.080383 355.946594,377.493744 C372.333527,398.505615 392.491425,415.324310 415.463135,428.471741 C426.121887,434.572144 438.091919,438.385071 449.478577,443.208801 C459.175079,447.316559 469.271118,449.842224 479.722565,451.184601 C487.860962,452.229919 495.941528,453.725281 504.671814,455.370575 C511.766632,458.726440 511.748169,458.717438 508.447083,465.481781 C507.802490,466.802673 507.362396,468.223358 506.827942,469.598022 Z" fill="url(#kGoldBase)" filter="url(#kBB)"/>
+    <path d="M506.827942,469.598022 C498.145935,479.146912 487.135376,485.379822 475.775146,490.980896 C453.735596,501.847168 430.290649,506.095734 405.823273,505.124329 C395.588043,504.717926 385.205780,505.240631 375.158966,503.647247 C365.197906,502.067535 355.616028,498.199402 345.791473,495.626740 C336.650055,493.232971 327.485504,490.784637 318.192902,489.142975 C302.357849,486.345581 286.412720,484.172638 270.519592,481.700348 C269.101624,481.479706 267.725739,480.988434 265.958984,480.525574 C286.675079,436.421234 314.955994,397.256714 338.259979,354.371124 C344.518402,362.561737 350.165009,370.080383 355.946594,377.493744 C372.333527,398.505615 392.491425,415.324310 415.463135,428.471741 C426.121887,434.572144 438.091919,438.385071 449.478577,443.208801 C459.175079,447.316559 469.271118,449.842224 479.722565,451.184601 C487.860962,452.229919 495.941528,453.725281 504.671814,455.370575 C511.766632,458.726440 511.748169,458.717438 508.447083,465.481781 C507.802490,466.802673 507.362396,468.223358 506.827942,469.598022 Z" fill="url(#kGoldH)" filter="url(#kE16)"/>
+    <path d="M506.827942,469.598022 C498.145935,479.146912 487.135376,485.379822 475.775146,490.980896 C453.735596,501.847168 430.290649,506.095734 405.823273,505.124329 C395.588043,504.717926 385.205780,505.240631 375.158966,503.647247 C365.197906,502.067535 355.616028,498.199402 345.791473,495.626740 C336.650055,493.232971 327.485504,490.784637 318.192902,489.142975 C302.357849,486.345581 286.412720,484.172638 270.519592,481.700348 C269.101624,481.479706 267.725739,480.988434 265.958984,480.525574 C286.675079,436.421234 314.955994,397.256714 338.259979,354.371124 C344.518402,362.561737 350.165009,370.080383 355.946594,377.493744 C372.333527,398.505615 392.491425,415.324310 415.463135,428.471741 C426.121887,434.572144 438.091919,438.385071 449.478577,443.208801 C459.175079,447.316559 469.271118,449.842224 479.722565,451.184601 C487.860962,452.229919 495.941528,453.725281 504.671814,455.370575 C511.766632,458.726440 511.748169,458.717438 508.447083,465.481781 C507.802490,466.802673 507.362396,468.223358 506.827942,469.598022 Z" fill="url(#kGoldV)" filter="url(#kE16)"/>
+    <path d="M506.827942,469.598022 C498.145935,479.146912 487.135376,485.379822 475.775146,490.980896 C453.735596,501.847168 430.290649,506.095734 405.823273,505.124329 C395.588043,504.717926 385.205780,505.240631 375.158966,503.647247 C365.197906,502.067535 355.616028,498.199402 345.791473,495.626740 C336.650055,493.232971 327.485504,490.784637 318.192902,489.142975 C302.357849,486.345581 286.412720,484.172638 270.519592,481.700348 C269.101624,481.479706 267.725739,480.988434 265.958984,480.525574 C286.675079,436.421234 314.955994,397.256714 338.259979,354.371124 C344.518402,362.561737 350.165009,370.080383 355.946594,377.493744 C372.333527,398.505615 392.491425,415.324310 415.463135,428.471741 C426.121887,434.572144 438.091919,438.385071 449.478577,443.208801 C459.175079,447.316559 469.271118,449.842224 479.722565,451.184601 C487.860962,452.229919 495.941528,453.725281 504.671814,455.370575 C511.766632,458.726440 511.748169,458.717438 508.447083,465.481781 C507.802490,466.802673 507.362396,468.223358 506.827942,469.598022 Z" fill="url(#kGoldSpec)" filter="url(#kE16)"/>
+    <path d="M506.827942,469.598022 C498.145935,479.146912 487.135376,485.379822 475.775146,490.980896 C453.735596,501.847168 430.290649,506.095734 405.823273,505.124329 C395.588043,504.717926 385.205780,505.240631 375.158966,503.647247 C365.197906,502.067535 355.616028,498.199402 345.791473,495.626740 C336.650055,493.232971 327.485504,490.784637 318.192902,489.142975 C302.357849,486.345581 286.412720,484.172638 270.519592,481.700348 C269.101624,481.479706 267.725739,480.988434 265.958984,480.525574 C286.675079,436.421234 314.955994,397.256714 338.259979,354.371124 C344.518402,362.561737 350.165009,370.080383 355.946594,377.493744 C372.333527,398.505615 392.491425,415.324310 415.463135,428.471741 C426.121887,434.572144 438.091919,438.385071 449.478577,443.208801 C459.175079,447.316559 469.271118,449.842224 479.722565,451.184601 C487.860962,452.229919 495.941528,453.725281 504.671814,455.370575 C511.766632,458.726440 511.748169,458.717438 508.447083,465.481781 C507.802490,466.802673 507.362396,468.223358 506.827942,469.598022 Z" fill="url(#kWineBase)" filter="url(#kE25)"/>
+    <path d="M506.827942,469.598022 C498.145935,479.146912 487.135376,485.379822 475.775146,490.980896 C453.735596,501.847168 430.290649,506.095734 405.823273,505.124329 C395.588043,504.717926 385.205780,505.240631 375.158966,503.647247 C365.197906,502.067535 355.616028,498.199402 345.791473,495.626740 C336.650055,493.232971 327.485504,490.784637 318.192902,489.142975 C302.357849,486.345581 286.412720,484.172638 270.519592,481.700348 C269.101624,481.479706 267.725739,480.988434 265.958984,480.525574 C286.675079,436.421234 314.955994,397.256714 338.259979,354.371124 C344.518402,362.561737 350.165009,370.080383 355.946594,377.493744 C372.333527,398.505615 392.491425,415.324310 415.463135,428.471741 C426.121887,434.572144 438.091919,438.385071 449.478577,443.208801 C459.175079,447.316559 469.271118,449.842224 479.722565,451.184601 C487.860962,452.229919 495.941528,453.725281 504.671814,455.370575 C511.766632,458.726440 511.748169,458.717438 508.447083,465.481781 C507.802490,466.802673 507.362396,468.223358 506.827942,469.598022 Z" fill="url(#kWineH)" filter="url(#kE25)"/>
+    <path d="M506.827942,469.598022 C498.145935,479.146912 487.135376,485.379822 475.775146,490.980896 C453.735596,501.847168 430.290649,506.095734 405.823273,505.124329 C395.588043,504.717926 385.205780,505.240631 375.158966,503.647247 C365.197906,502.067535 355.616028,498.199402 345.791473,495.626740 C336.650055,493.232971 327.485504,490.784637 318.192902,489.142975 C302.357849,486.345581 286.412720,484.172638 270.519592,481.700348 C269.101624,481.479706 267.725739,480.988434 265.958984,480.525574 C286.675079,436.421234 314.955994,397.256714 338.259979,354.371124 C344.518402,362.561737 350.165009,370.080383 355.946594,377.493744 C372.333527,398.505615 392.491425,415.324310 415.463135,428.471741 C426.121887,434.572144 438.091919,438.385071 449.478577,443.208801 C459.175079,447.316559 469.271118,449.842224 479.722565,451.184601 C487.860962,452.229919 495.941528,453.725281 504.671814,455.370575 C511.766632,458.726440 511.748169,458.717438 508.447083,465.481781 C507.802490,466.802673 507.362396,468.223358 506.827942,469.598022 Z" fill="url(#kWineV)" filter="url(#kE25)"/>
+    <path d="M506.827942,469.598022 C498.145935,479.146912 487.135376,485.379822 475.775146,490.980896 C453.735596,501.847168 430.290649,506.095734 405.823273,505.124329 C395.588043,504.717926 385.205780,505.240631 375.158966,503.647247 C365.197906,502.067535 355.616028,498.199402 345.791473,495.626740 C336.650055,493.232971 327.485504,490.784637 318.192902,489.142975 C302.357849,486.345581 286.412720,484.172638 270.519592,481.700348 C269.101624,481.479706 267.725739,480.988434 265.958984,480.525574 C286.675079,436.421234 314.955994,397.256714 338.259979,354.371124 C344.518402,362.561737 350.165009,370.080383 355.946594,377.493744 C372.333527,398.505615 392.491425,415.324310 415.463135,428.471741 C426.121887,434.572144 438.091919,438.385071 449.478577,443.208801 C459.175079,447.316559 469.271118,449.842224 479.722565,451.184601 C487.860962,452.229919 495.941528,453.725281 504.671814,455.370575 C511.766632,458.726440 511.748169,458.717438 508.447083,465.481781 C507.802490,466.802673 507.362396,468.223358 506.827942,469.598022 Z" fill="url(#kWineSpec)" filter="url(#kE25)"/>
+    <path d="M506.827942,469.598022 C498.145935,479.146912 487.135376,485.379822 475.775146,490.980896 C453.735596,501.847168 430.290649,506.095734 405.823273,505.124329 C395.588043,504.717926 385.205780,505.240631 375.158966,503.647247 C365.197906,502.067535 355.616028,498.199402 345.791473,495.626740 C336.650055,493.232971 327.485504,490.784637 318.192902,489.142975 C302.357849,486.345581 286.412720,484.172638 270.519592,481.700348 C269.101624,481.479706 267.725739,480.988434 265.958984,480.525574 C286.675079,436.421234 314.955994,397.256714 338.259979,354.371124 C344.518402,362.561737 350.165009,370.080383 355.946594,377.493744 C372.333527,398.505615 392.491425,415.324310 415.463135,428.471741 C426.121887,434.572144 438.091919,438.385071 449.478577,443.208801 C459.175079,447.316559 469.271118,449.842224 479.722565,451.184601 C487.860962,452.229919 495.941528,453.725281 504.671814,455.370575 C511.766632,458.726440 511.748169,458.717438 508.447083,465.481781 C507.802490,466.802673 507.362396,468.223358 506.827942,469.598022 Z" fill="url(#kWineBase)" filter="url(#kE25)"/>
+    <g filter="url(#kGV)"><path d="M506.827942,469.598022 C498.145935,479.146912 487.135376,485.379822 475.775146,490.980896 C453.735596,501.847168 430.290649,506.095734 405.823273,505.124329 C395.588043,504.717926 385.205780,505.240631 375.158966,503.647247 C365.197906,502.067535 355.616028,498.199402 345.791473,495.626740 C336.650055,493.232971 327.485504,490.784637 318.192902,489.142975 C302.357849,486.345581 286.412720,484.172638 270.519592,481.700348 C269.101624,481.479706 267.725739,480.988434 265.958984,480.525574 C286.675079,436.421234 314.955994,397.256714 338.259979,354.371124 C344.518402,362.561737 350.165009,370.080383 355.946594,377.493744 C372.333527,398.505615 392.491425,415.324310 415.463135,428.471741 C426.121887,434.572144 438.091919,438.385071 449.478577,443.208801 C459.175079,447.316559 469.271118,449.842224 479.722565,451.184601 C487.860962,452.229919 495.941528,453.725281 504.671814,455.370575 C511.766632,458.726440 511.748169,458.717438 508.447083,465.481781 C507.802490,466.802673 507.362396,468.223358 506.827942,469.598022 Z" fill="url(#kWineBase)" filter="url(#kE25)"/></g>
+    <path d="M164.511902,366.432495 C188.043610,402.963867 209.515854,440.270844 230.981934,478.385651 C219.599930,479.542755 209.513657,480.267120 199.518173,481.648529 C180.300064,484.304535 161.300369,487.922668 143.418594,495.963013 C132.785141,500.744202 121.725273,504.656219 111.369392,509.959381 C88.515587,521.662659 70.401558,539.000000 55.245075,559.529663 C51.873909,564.095947 48.855282,568.922485 45.674339,573.629211 C45.148098,573.586853 44.621861,573.544495 44.095619,573.502075 C42.111629,565.071716 39.455276,556.734009 38.279175,548.192383 C35.565002,528.480286 36.297348,508.837738 42.160439,489.645721 C46.300941,476.092285 52.774647,463.855133 61.573193,452.572754 C70.943718,440.556946 81.768761,430.180359 93.009056,420.040161 C105.303627,408.948853 116.982849,397.177094 129.226547,386.027222 C138.408646,377.665436 145.881073,368.019531 152.582657,357.673828 C154.873474,354.137299 156.410095,354.102600 158.716843,357.519562 C160.631378,360.355560 162.459869,363.249664 164.511902,366.432495 Z" fill="url(#kGoldBase)" filter="url(#kBB)"/>
+    <path d="M164.511902,366.432495 C188.043610,402.963867 209.515854,440.270844 230.981934,478.385651 C219.599930,479.542755 209.513657,480.267120 199.518173,481.648529 C180.300064,484.304535 161.300369,487.922668 143.418594,495.963013 C132.785141,500.744202 121.725273,504.656219 111.369392,509.959381 C88.515587,521.662659 70.401558,539.000000 55.245075,559.529663 C51.873909,564.095947 48.855282,568.922485 45.674339,573.629211 C45.148098,573.586853 44.621861,573.544495 44.095619,573.502075 C42.111629,565.071716 39.455276,556.734009 38.279175,548.192383 C35.565002,528.480286 36.297348,508.837738 42.160439,489.645721 C46.300941,476.092285 52.774647,463.855133 61.573193,452.572754 C70.943718,440.556946 81.768761,430.180359 93.009056,420.040161 C105.303627,408.948853 116.982849,397.177094 129.226547,386.027222 C138.408646,377.665436 145.881073,368.019531 152.582657,357.673828 C154.873474,354.137299 156.410095,354.102600 158.716843,357.519562 C160.631378,360.355560 162.459869,363.249664 164.511902,366.432495 Z" fill="url(#kGoldH)" filter="url(#kE16)"/>
+    <path d="M164.511902,366.432495 C188.043610,402.963867 209.515854,440.270844 230.981934,478.385651 C219.599930,479.542755 209.513657,480.267120 199.518173,481.648529 C180.300064,484.304535 161.300369,487.922668 143.418594,495.963013 C132.785141,500.744202 121.725273,504.656219 111.369392,509.959381 C88.515587,521.662659 70.401558,539.000000 55.245075,559.529663 C51.873909,564.095947 48.855282,568.922485 45.674339,573.629211 C45.148098,573.586853 44.621861,573.544495 44.095619,573.502075 C42.111629,565.071716 39.455276,556.734009 38.279175,548.192383 C35.565002,528.480286 36.297348,508.837738 42.160439,489.645721 C46.300941,476.092285 52.774647,463.855133 61.573193,452.572754 C70.943718,440.556946 81.768761,430.180359 93.009056,420.040161 C105.303627,408.948853 116.982849,397.177094 129.226547,386.027222 C138.408646,377.665436 145.881073,368.019531 152.582657,357.673828 C154.873474,354.137299 156.410095,354.102600 158.716843,357.519562 C160.631378,360.355560 162.459869,363.249664 164.511902,366.432495 Z" fill="url(#kGoldV)" filter="url(#kE16)"/>
+    <path d="M164.511902,366.432495 C188.043610,402.963867 209.515854,440.270844 230.981934,478.385651 C219.599930,479.542755 209.513657,480.267120 199.518173,481.648529 C180.300064,484.304535 161.300369,487.922668 143.418594,495.963013 C132.785141,500.744202 121.725273,504.656219 111.369392,509.959381 C88.515587,521.662659 70.401558,539.000000 55.245075,559.529663 C51.873909,564.095947 48.855282,568.922485 45.674339,573.629211 C45.148098,573.586853 44.621861,573.544495 44.095619,573.502075 C42.111629,565.071716 39.455276,556.734009 38.279175,548.192383 C35.565002,528.480286 36.297348,508.837738 42.160439,489.645721 C46.300941,476.092285 52.774647,463.855133 61.573193,452.572754 C70.943718,440.556946 81.768761,430.180359 93.009056,420.040161 C105.303627,408.948853 116.982849,397.177094 129.226547,386.027222 C138.408646,377.665436 145.881073,368.019531 152.582657,357.673828 C154.873474,354.137299 156.410095,354.102600 158.716843,357.519562 C160.631378,360.355560 162.459869,363.249664 164.511902,366.432495 Z" fill="url(#kGoldSpec)" filter="url(#kE16)"/>
+    <path d="M164.511902,366.432495 C188.043610,402.963867 209.515854,440.270844 230.981934,478.385651 C219.599930,479.542755 209.513657,480.267120 199.518173,481.648529 C180.300064,484.304535 161.300369,487.922668 143.418594,495.963013 C132.785141,500.744202 121.725273,504.656219 111.369392,509.959381 C88.515587,521.662659 70.401558,539.000000 55.245075,559.529663 C51.873909,564.095947 48.855282,568.922485 45.674339,573.629211 C45.148098,573.586853 44.621861,573.544495 44.095619,573.502075 C42.111629,565.071716 39.455276,556.734009 38.279175,548.192383 C35.565002,528.480286 36.297348,508.837738 42.160439,489.645721 C46.300941,476.092285 52.774647,463.855133 61.573193,452.572754 C70.943718,440.556946 81.768761,430.180359 93.009056,420.040161 C105.303627,408.948853 116.982849,397.177094 129.226547,386.027222 C138.408646,377.665436 145.881073,368.019531 152.582657,357.673828 C154.873474,354.137299 156.410095,354.102600 158.716843,357.519562 C160.631378,360.355560 162.459869,363.249664 164.511902,366.432495 Z" fill="url(#kWineBase)" filter="url(#kE25)"/>
+    <path d="M164.511902,366.432495 C188.043610,402.963867 209.515854,440.270844 230.981934,478.385651 C219.599930,479.542755 209.513657,480.267120 199.518173,481.648529 C180.300064,484.304535 161.300369,487.922668 143.418594,495.963013 C132.785141,500.744202 121.725273,504.656219 111.369392,509.959381 C88.515587,521.662659 70.401558,539.000000 55.245075,559.529663 C51.873909,564.095947 48.855282,568.922485 45.674339,573.629211 C45.148098,573.586853 44.621861,573.544495 44.095619,573.502075 C42.111629,565.071716 39.455276,556.734009 38.279175,548.192383 C35.565002,528.480286 36.297348,508.837738 42.160439,489.645721 C46.300941,476.092285 52.774647,463.855133 61.573193,452.572754 C70.943718,440.556946 81.768761,430.180359 93.009056,420.040161 C105.303627,408.948853 116.982849,397.177094 129.226547,386.027222 C138.408646,377.665436 145.881073,368.019531 152.582657,357.673828 C154.873474,354.137299 156.410095,354.102600 158.716843,357.519562 C160.631378,360.355560 162.459869,363.249664 164.511902,366.432495 Z" fill="url(#kWineH)" filter="url(#kE25)"/>
+    <path d="M164.511902,366.432495 C188.043610,402.963867 209.515854,440.270844 230.981934,478.385651 C219.599930,479.542755 209.513657,480.267120 199.518173,481.648529 C180.300064,484.304535 161.300369,487.922668 143.418594,495.963013 C132.785141,500.744202 121.725273,504.656219 111.369392,509.959381 C88.515587,521.662659 70.401558,539.000000 55.245075,559.529663 C51.873909,564.095947 48.855282,568.922485 45.674339,573.629211 C45.148098,573.586853 44.621861,573.544495 44.095619,573.502075 C42.111629,565.071716 39.455276,556.734009 38.279175,548.192383 C35.565002,528.480286 36.297348,508.837738 42.160439,489.645721 C46.300941,476.092285 52.774647,463.855133 61.573193,452.572754 C70.943718,440.556946 81.768761,430.180359 93.009056,420.040161 C105.303627,408.948853 116.982849,397.177094 129.226547,386.027222 C138.408646,377.665436 145.881073,368.019531 152.582657,357.673828 C154.873474,354.137299 156.410095,354.102600 158.716843,357.519562 C160.631378,360.355560 162.459869,363.249664 164.511902,366.432495 Z" fill="url(#kWineV)" filter="url(#kE25)"/>
+    <path d="M164.511902,366.432495 C188.043610,402.963867 209.515854,440.270844 230.981934,478.385651 C219.599930,479.542755 209.513657,480.267120 199.518173,481.648529 C180.300064,484.304535 161.300369,487.922668 143.418594,495.963013 C132.785141,500.744202 121.725273,504.656219 111.369392,509.959381 C88.515587,521.662659 70.401558,539.000000 55.245075,559.529663 C51.873909,564.095947 48.855282,568.922485 45.674339,573.629211 C45.148098,573.586853 44.621861,573.544495 44.095619,573.502075 C42.111629,565.071716 39.455276,556.734009 38.279175,548.192383 C35.565002,528.480286 36.297348,508.837738 42.160439,489.645721 C46.300941,476.092285 52.774647,463.855133 61.573193,452.572754 C70.943718,440.556946 81.768761,430.180359 93.009056,420.040161 C105.303627,408.948853 116.982849,397.177094 129.226547,386.027222 C138.408646,377.665436 145.881073,368.019531 152.582657,357.673828 C154.873474,354.137299 156.410095,354.102600 158.716843,357.519562 C160.631378,360.355560 162.459869,363.249664 164.511902,366.432495 Z" fill="url(#kWineSpec)" filter="url(#kE25)"/>
+    <path d="M164.511902,366.432495 C188.043610,402.963867 209.515854,440.270844 230.981934,478.385651 C219.599930,479.542755 209.513657,480.267120 199.518173,481.648529 C180.300064,484.304535 161.300369,487.922668 143.418594,495.963013 C132.785141,500.744202 121.725273,504.656219 111.369392,509.959381 C88.515587,521.662659 70.401558,539.000000 55.245075,559.529663 C51.873909,564.095947 48.855282,568.922485 45.674339,573.629211 C45.148098,573.586853 44.621861,573.544495 44.095619,573.502075 C42.111629,565.071716 39.455276,556.734009 38.279175,548.192383 C35.565002,528.480286 36.297348,508.837738 42.160439,489.645721 C46.300941,476.092285 52.774647,463.855133 61.573193,452.572754 C70.943718,440.556946 81.768761,430.180359 93.009056,420.040161 C105.303627,408.948853 116.982849,397.177094 129.226547,386.027222 C138.408646,377.665436 145.881073,368.019531 152.582657,357.673828 C154.873474,354.137299 156.410095,354.102600 158.716843,357.519562 C160.631378,360.355560 162.459869,363.249664 164.511902,366.432495 Z" fill="url(#kWineBase)" filter="url(#kE25)"/>
+    <g filter="url(#kGV)"><path d="M164.511902,366.432495 C188.043610,402.963867 209.515854,440.270844 230.981934,478.385651 C219.599930,479.542755 209.513657,480.267120 199.518173,481.648529 C180.300064,484.304535 161.300369,487.922668 143.418594,495.963013 C132.785141,500.744202 121.725273,504.656219 111.369392,509.959381 C88.515587,521.662659 70.401558,539.000000 55.245075,559.529663 C51.873909,564.095947 48.855282,568.922485 45.674339,573.629211 C45.148098,573.586853 44.621861,573.544495 44.095619,573.502075 C42.111629,565.071716 39.455276,556.734009 38.279175,548.192383 C35.565002,528.480286 36.297348,508.837738 42.160439,489.645721 C46.300941,476.092285 52.774647,463.855133 61.573193,452.572754 C70.943718,440.556946 81.768761,430.180359 93.009056,420.040161 C105.303627,408.948853 116.982849,397.177094 129.226547,386.027222 C138.408646,377.665436 145.881073,368.019531 152.582657,357.673828 C154.873474,354.137299 156.410095,354.102600 158.716843,357.519562 C160.631378,360.355560 162.459869,363.249664 164.511902,366.432495 Z" fill="url(#kWineBase)" filter="url(#kE25)"/></g>
+  </g>
+</g>
+
+
+<!-- === ENGRAVED TEXT (Incised Carved, Large, Klingon-style) === -->
+<!-- KLINGON - left gap -->
+<text font-family="Orbitron, Impact, 'Arial Black', sans-serif" font-size="200" font-weight="bold" font-style="italic"
+      fill="#8a6818" letter-spacing="4" filter="url(#kCarve)">
+  <textPath xlink:href="#tL" startOffset="50%" text-anchor="middle">KLINGON</textPath>
+</text>
+
+<!-- EMPIRE - right gap -->
+<text font-family="Orbitron, Impact, 'Arial Black', sans-serif" font-size="200" font-weight="bold" font-style="italic"
+      fill="#8a6818" letter-spacing="4" filter="url(#kCarve)">
+  <textPath xlink:href="#tR" startOffset="50%" text-anchor="middle">EMPIRE</textPath>
+</text>
+
+<!-- HIGH COUNCIL - bottom gap -->
+<text font-family="Orbitron, Impact, 'Arial Black', sans-serif" font-size="170" font-weight="bold" font-style="italic"
+      fill="#8a6818" letter-spacing="6" filter="url(#kCarve)">
+  <textPath xlink:href="#tB" startOffset="50%" text-anchor="middle">HIGH COUNCIL</textPath>
+</text>
+
 </svg>

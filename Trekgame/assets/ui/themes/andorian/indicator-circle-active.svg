@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" fill="none">
+  <!-- Andorian Indicator Circle Active: Lit ice crystal indicator -->
+  <defs>
+    <linearGradient id="andorianIndicatorWhite" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#AAEEFF"/>
+      <stop offset="100%" style="stop-color:#FFFFFF"/>
+    </linearGradient>
+    <filter id="andorianIceGlow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Outer circle with glow -->
+  <circle cx="15" cy="15" r="12" fill="none" stroke="url(#andorianIndicatorWhite)" stroke-width="3" filter="url(#andorianIceGlow)"/>
+
+  <!-- Ice crystal shape filled -->
+  <path d="M 15 5 L 15 25 M 7 10 L 23 20 M 23 10 L 7 20" stroke="url(#andorianIndicatorWhite)" stroke-width="2"/>
+  <circle cx="15" cy="15" r="4" fill="url(#andorianIndicatorWhite)"/>
+</svg>

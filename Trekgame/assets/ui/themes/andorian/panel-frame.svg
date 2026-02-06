@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" fill="none">
+  <!-- Andorian Panel Frame: Flowing curves with antenna-inspired accents -->
+  <defs>
+    <linearGradient id="andorianFrameBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#88CCFF"/>
+      <stop offset="100%" style="stop-color:#4499DD"/>
+    </linearGradient>
+    <linearGradient id="andorianAccentWhite" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#4499DD"/>
+      <stop offset="50%" style="stop-color:#AAEEFF"/>
+      <stop offset="100%" style="stop-color:#4499DD"/>
+    </linearGradient>
+    <filter id="andorianIceGlow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Top bar with flowing curve -->
+  <path d="
+    M 0 30
+    Q 50 0 100 0
+    L 700 0
+    Q 750 0 800 30
+    L 800 50
+    L 0 50
+    Z
+  " fill="url(#andorianFrameBlue)"/>
+
+  <!-- Left sidebar with curved edge -->
+  <path d="
+    M 0 30
+    L 80 30
+    Q 90 30 90 40
+    L 90 560
+    Q 90 570 80 570
+    L 0 570
+    Z
+  " fill="url(#andorianFrameBlue)"/>
+
+  <!-- Bottom bar with flowing curve -->
+  <path d="
+    M 0 550
+    L 800 550
+    L 800 570
+    Q 750 600 700 600
+    L 100 600
+    Q 50 600 0 570
+    Z
+  " fill="url(#andorianFrameBlue)"/>
+
+  <!-- Right sidebar with curved edge -->
+  <path d="
+    M 710 30
+    L 800 30
+    L 800 570
+    L 720 570
+    Q 710 570 710 560
+    L 710 40
+    Q 710 30 720 30
+    Z
+  " fill="url(#andorianFrameBlue)"/>
+
+  <!-- Antenna-inspired accent top center -->
+  <path d="
+    M 380 0
+    Q 390 30 400 40
+    Q 410 30 420 0
+  " fill="none" stroke="url(#andorianAccentWhite)" stroke-width="3" filter="url(#andorianIceGlow)"/>
+
+  <!-- Antenna accents at corners -->
+  <path d="M 90 50 Q 100 70 120 60" fill="none" stroke="#AAEEFF" stroke-width="2"/>
+  <path d="M 710 50 Q 700 70 680 60" fill="none" stroke="#AAEEFF" stroke-width="2"/>
+  <path d="M 90 550 Q 100 530 120 540" fill="none" stroke="#AAEEFF" stroke-width="2"/>
+  <path d="M 710 550 Q 700 530 680 540" fill="none" stroke="#AAEEFF" stroke-width="2"/>
+</svg>

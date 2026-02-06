@@ -1,0 +1,92 @@
+{
+  "defaultLanguage": "en",
+  "supportedLanguages": [
+    {
+      "code": "en",
+      "name": "English",
+      "nativeName": "English",
+      "file": "en.json",
+      "complete": true
+    },
+    {
+      "code": "de",
+      "name": "German",
+      "nativeName": "Deutsch",
+      "file": "de.json",
+      "complete": true
+    },
+    {
+      "code": "fr",
+      "name": "French",
+      "nativeName": "Français",
+      "file": "fr.json",
+      "complete": false
+    },
+    {
+      "code": "es",
+      "name": "Spanish",
+      "nativeName": "Español",
+      "file": "es.json",
+      "complete": false
+    },
+    {
+      "code": "it",
+      "name": "Italian",
+      "nativeName": "Italiano",
+      "file": "it.json",
+      "complete": false
+    },
+    {
+      "code": "pt",
+      "name": "Portuguese",
+      "nativeName": "Português",
+      "file": "pt.json",
+      "complete": false
+    },
+    {
+      "code": "ru",
+      "name": "Russian",
+      "nativeName": "Русский",
+      "file": "ru.json",
+      "complete": false
+    },
+    {
+      "code": "ja",
+      "name": "Japanese",
+      "nativeName": "日本語",
+      "file": "ja.json",
+      "complete": false
+    },
+    {
+      "code": "ko",
+      "name": "Korean",
+      "nativeName": "한국어",
+      "file": "ko.json",
+      "complete": false
+    },
+    {
+      "code": "zh",
+      "name": "Chinese (Simplified)",
+      "nativeName": "简体中文",
+      "file": "zh.json",
+      "complete": false
+    }
+  ],
+  "placeholderFormat": {
+    "start": "{",
+    "end": "}",
+    "example": "{ship} construction complete"
+  },
+  "fallbackBehavior": {
+    "missingKey": "useDefault",
+    "missingLanguage": "useDefault",
+    "showKeyOnMissing": false,
+    "logMissingKeys": true
+  },
+  "specialFeatures": {
+    "pluralization": true,
+    "genderAgreement": true,
+    "contextualVariants": true,
+    "rtlSupport": false
+  }
+}

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" fill="none">
+  <!-- Ferengi Indicator Active: Glowing gold hexagon -->
+  <defs>
+    <linearGradient id="ferengiIndicatorActive" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFEE88"/>
+      <stop offset="50%" style="stop-color:#FFD700"/>
+      <stop offset="100%" style="stop-color:#D4A017"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Active hexagon indicator -->
+  <polygon points="20,2 36,11 36,29 20,38 4,29 4,11" fill="url(#ferengiIndicatorActive)"/>
+  <polygon points="20,10 28,15 28,25 20,30 12,25 12,15" fill="#FFEE88"/>
+</svg>

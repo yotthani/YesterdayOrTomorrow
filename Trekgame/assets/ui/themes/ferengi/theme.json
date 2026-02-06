@@ -1,0 +1,49 @@
+{
+  "id": "ferengi",
+  "name": "Ferengi Alliance",
+  "description": "Ferengi Commerce Authority interface system",
+  "faction": "ferengi",
+  "fonts": {
+    "primary": {
+      "family": "Ferengi",
+      "fallback": "Arial Black, Impact, sans-serif",
+      "file": "fonts/ferengi.ttf",
+      "weight": "bold",
+      "letterSpacing": "0.03em",
+      "textTransform": "uppercase"
+    },
+    "secondary": {
+      "family": "Ferengi Text",
+      "fallback": "Trebuchet MS, Arial, sans-serif",
+      "file": "fonts/ferengi-text.ttf",
+      "weight": "normal",
+      "letterSpacing": "0.02em"
+    },
+    "display": {
+      "family": "Ferengi Script",
+      "fallback": "Ferengi, Arial Black, sans-serif",
+      "file": "fonts/ferengi-script.ttf",
+      "weight": "bold",
+      "letterSpacing": "0.05em",
+      "comment": "Traditional Ferengi script for decorative use"
+    }
+  },
+  "colors": {
+    "primary": "#8B6914",
+    "secondary": "#5C4A0F",
+    "accent": "#D4A017",
+    "highlight": "#FFD700",
+    "alert": "#FF6699",
+    "success": "#66CCFF",
+    "background": "#1a1408",
+    "text": "#D4A017",
+    "textDark": "#2a1f0a",
+    "displayAccent1": "#FF66CC",
+    "displayAccent2": "#66CCFF"
+  },
+  "styles": {
+    "cornerRadius": "hexagonal",
+    "borderStyle": "beveled",
+    "animationStyle": "flashy"
+  }
+}

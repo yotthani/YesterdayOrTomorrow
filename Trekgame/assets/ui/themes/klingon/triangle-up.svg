@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60" fill="none">
+  <!-- Klingon Triangle Up: Upward pointing triangle accent -->
+  <defs>
+    <linearGradient id="klingonTriRed" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" style="stop-color:#FF3333"/>
+      <stop offset="100%" style="stop-color:#AA0000"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Upward pointing triangle -->
+  <path d="M 30 0 L 60 60 L 0 60 Z" fill="url(#klingonTriRed)"/>
+</svg>

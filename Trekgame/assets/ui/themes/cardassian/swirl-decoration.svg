@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <!-- Cardassian Decoration: Spoonhead-inspired curved shape -->
+  <defs>
+    <linearGradient id="cardassianDecoBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#5A7B8C"/>
+      <stop offset="100%" style="stop-color:#3A5B6C"/>
+    </linearGradient>
+    <linearGradient id="cardassianDecoOrange" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#CC6633"/>
+      <stop offset="100%" style="stop-color:#FF9944"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Spoon-like curved shape -->
+  <path d="
+    M 50 10
+    Q 20 20 15 50
+    Q 10 80 50 90
+    Q 90 80 85 50
+    Q 80 20 50 10
+    Z
+  " fill="url(#cardassianDecoBlue)"/>
+
+  <!-- Inner detail -->
+  <path d="
+    M 50 25
+    Q 35 30 30 50
+    Q 25 70 50 75
+    Q 75 70 70 50
+    Q 65 30 50 25
+    Z
+  " fill="#0a1015"/>
+
+  <!-- Central oval -->
+  <ellipse cx="50" cy="50" rx="15" ry="10" fill="url(#cardassianDecoOrange)"/>
+</svg>

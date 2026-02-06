@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 20" fill="none">
+  <!-- Trill Progress Bar Fill: Glowing organic fill -->
+  <defs>
+    <linearGradient id="trillProgressFill" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#55AAAA"/>
+      <stop offset="50%" style="stop-color:#88DDDD"/>
+      <stop offset="100%" style="stop-color:#DDCCAA"/>
+    </linearGradient>
+    <filter id="trillFillGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Organic flowing progress fill -->
+  <path d="
+    M 10 0
+    Q 0 0, 0 10
+    Q 0 20, 10 20
+    L 190 20
+    Q 200 20, 200 10
+    Q 200 0, 190 0
+    Z
+  " fill="url(#trillProgressFill)" filter="url(#trillFillGlow)"/>
+
+  <!-- Subtle organic spot highlights -->
+  <ellipse cx="50" cy="7" rx="8" ry="3" fill="#DDCCAA" opacity="0.3"/>
+  <ellipse cx="120" cy="13" rx="10" ry="3" fill="#DDCCAA" opacity="0.25"/>
+</svg>

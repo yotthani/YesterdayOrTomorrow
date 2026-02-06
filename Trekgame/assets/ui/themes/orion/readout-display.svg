@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 60" fill="none">
+  <!-- Orion Readout Display: Luxurious display panel with ornate border -->
+  <defs>
+    <linearGradient id="orionReadoutBorder" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#44BB66"/>
+      <stop offset="50%" style="stop-color:#33AA55"/>
+      <stop offset="100%" style="stop-color:#227744"/>
+    </linearGradient>
+    <linearGradient id="orionReadoutGold" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#CC9900"/>
+      <stop offset="50%" style="stop-color:#FFCC00"/>
+      <stop offset="100%" style="stop-color:#CC9900"/>
+    </linearGradient>
+    <linearGradient id="orionReadoutBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#0F1F0F"/>
+      <stop offset="100%" style="stop-color:#051005"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Outer ornate border -->
+  <path d="
+    M 15 0
+    Q 0 0 0 15
+    L 0 45
+    Q 0 60 15 60
+    L 135 60
+    Q 150 60 150 45
+    L 150 15
+    Q 150 0 135 0
+    Z
+  " fill="url(#orionReadoutBorder)"/>
+
+  <!-- Gold trim ring -->
+  <path d="
+    M 18 3
+    Q 5 3 5 15
+    L 5 45
+    Q 5 57 18 57
+    L 132 57
+    Q 145 57 145 45
+    L 145 15
+    Q 145 3 132 3
+    Z
+    M 20 6
+    Q 10 6 10 15
+    L 10 45
+    Q 10 54 20 54
+    L 130 54
+    Q 140 54 140 45
+    L 140 15
+    Q 140 6 130 6
+    Z
+  " fill="url(#orionReadoutGold)"/>
+
+  <!-- Inner display screen -->
+  <path d="
+    M 20 6
+    Q 10 6 10 15
+    L 10 45
+    Q 10 54 20 54
+    L 130 54
+    Q 140 54 140 45
+    L 140 15
+    Q 140 6 130 6
+    Z
+  " fill="url(#orionReadoutBg)"/>
+
+  <!-- Top gold flourish -->
+  <ellipse cx="75" cy="8" rx="20" ry="3" fill="url(#orionReadoutGold)" opacity="0.6"/>
+
+  <!-- Bottom gold flourish -->
+  <ellipse cx="75" cy="52" rx="20" ry="3" fill="url(#orionReadoutGold)" opacity="0.6"/>
+</svg>

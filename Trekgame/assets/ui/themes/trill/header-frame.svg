@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 80" fill="none">
+  <!-- Trill Header Frame: Organic flowing header with symbiont-inspired curves -->
+  <defs>
+    <linearGradient id="trillHeaderTeal" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#3D8080"/>
+      <stop offset="50%" style="stop-color:#55AAAA"/>
+      <stop offset="100%" style="stop-color:#3D8080"/>
+    </linearGradient>
+    <linearGradient id="trillHeaderBeige" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#DDCCAA"/>
+      <stop offset="100%" style="stop-color:#BBA888"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Main organic header bar with flowing curves -->
+  <path d="
+    M 30 10
+    Q 0 20, 0 40
+    Q 0 60, 30 70
+    L 570 70
+    Q 600 60, 600 40
+    Q 600 20, 570 10
+    Z
+  " fill="url(#trillHeaderTeal)"/>
+
+  <!-- Left organic spot cluster -->
+  <ellipse cx="40" cy="30" rx="8" ry="5" fill="url(#trillHeaderBeige)" transform="rotate(-15 40 30)" opacity="0.8"/>
+  <ellipse cx="55" cy="45" rx="6" ry="4" fill="url(#trillHeaderBeige)" transform="rotate(-5 55 45)" opacity="0.7"/>
+  <ellipse cx="45" cy="58" rx="5" ry="3" fill="url(#trillHeaderBeige)" transform="rotate(5 45 58)" opacity="0.6"/>
+
+  <!-- Right organic spot cluster -->
+  <ellipse cx="560" cy="30" rx="8" ry="5" fill="url(#trillHeaderBeige)" transform="rotate(15 560 30)" opacity="0.8"/>
+  <ellipse cx="545" cy="45" rx="6" ry="4" fill="url(#trillHeaderBeige)" transform="rotate(5 545 45)" opacity="0.7"/>
+  <ellipse cx="555" cy="58" rx="5" ry="3" fill="url(#trillHeaderBeige)" transform="rotate(-5 555 58)" opacity="0.6"/>
+</svg>

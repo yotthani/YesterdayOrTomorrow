@@ -1,0 +1,29 @@
+{
+  "category": "Anomalies",
+  "description": "Space anomalies, nebulae, and phenomena for galaxy map",
+  "assets": [
+    { "id": "nebula_blue", "name": "Nebula Blue Emission", "match": ["nebula blue", "blue emission"], "prompt": { "type": "Blue Emission Nebula", "features": ["Bright blue glowing gas clouds", "Wispy tendrils", "Star-forming region", "Ethereal beauty"] }},
+    { "id": "nebula_red", "name": "Nebula Red Emission", "match": ["nebula red", "red emission"], "prompt": { "type": "Red Emission Nebula", "features": ["Deep red/crimson gas", "Hydrogen-alpha glow", "Dramatic appearance", "Hot stellar winds"] }},
+    { "id": "nebula_green", "name": "Nebula Green Planetary", "match": ["nebula green", "planetary"], "prompt": { "type": "Green Planetary Nebula", "features": ["Green glowing ring", "Dying star at center", "Oxygen emission", "Shell structure"] }},
+    { "id": "wormhole_stable", "name": "Anomaly Wormhole Stable", "match": ["wormhole stable"], "prompt": { "type": "Stable Wormhole", "features": ["Glowing circular portal", "Event horizon visible", "Space-time distortion", "Safe passage"], "reference": "Bajoran Wormhole" }},
+    { "id": "wormhole_unstable", "name": "Anomaly Wormhole Unstable", "match": ["wormhole unstable"], "prompt": { "type": "Unstable Wormhole", "features": ["Flickering, chaotic portal", "Energy discharges", "Dangerous passage", "Unpredictable"] }},
+    { "id": "black_hole", "name": "Anomaly Black Hole", "match": ["black hole"], "prompt": { "type": "Black Hole", "features": ["Event horizon darkness", "Accretion disk glowing", "Light bending", "Gravitational lensing"], "reference": "Interstellar-style" }},
+    { "id": "white_hole", "name": "Anomaly White Hole", "match": ["white hole"], "prompt": { "type": "White Hole", "features": ["Brilliant light emission", "Matter ejection", "Opposite of black hole", "Theoretical phenomenon"] }},
+    { "id": "quantum_singularity", "name": "Anomaly Quantum Singularity", "match": ["quantum singularity"], "prompt": { "type": "Quantum Singularity", "features": ["Artificial singularity", "Romulan power source style", "Contained energy", "Green/purple glow"], "reference": "Romulan ship core" }},
+    { "id": "ion_storm", "name": "Anomaly Ion Storm", "match": ["ion storm"], "prompt": { "type": "Ion Storm", "features": ["Electrical discharges", "Blue/white lightning", "Turbulent energy", "Ship hazard"] }},
+    { "id": "plasma_storm", "name": "Anomaly Plasma Storm", "match": ["plasma storm"], "prompt": { "type": "Plasma Storm", "features": ["Superheated plasma", "Orange/red energy", "Extreme temperatures", "Sensor disruption"] }},
+    { "id": "asteroid_dense", "name": "Field Asteroid Dense", "match": ["asteroid dense"], "prompt": { "type": "Dense Asteroid Field", "features": ["Many rocky bodies", "Navigation hazard", "Mining opportunity", "Gray/brown rocks"] }},
+    { "id": "debris_battle", "name": "Field Debris Battle", "match": ["debris battle"], "prompt": { "type": "Battle Debris Field", "features": ["Ship wreckage", "Floating hull pieces", "Burnt metal", "Signs of combat"] }},
+    { "id": "dyson_sphere", "name": "Anomaly Dyson Sphere", "match": ["dyson sphere"], "prompt": { "type": "Dyson Sphere", "features": ["Massive artificial structure", "Encases a star", "Ancient technology", "Habitable interior"], "reference": "TNG Relics" }},
+    { "id": "bajoran_wormhole", "name": "Anomaly Bajoran Wormhole", "match": ["bajoran wormhole"], "prompt": { "type": "Bajoran Wormhole (Celestial Temple)", "features": ["Blue/white swirling portal", "Divine appearance", "Prophets' home", "Stable passage to Gamma Quadrant"], "reference": "DS9" }},
+    { "id": "nexus_ribbon", "name": "Anomaly Nexus Ribbon", "match": ["nexus ribbon"], "prompt": { "type": "Nexus Energy Ribbon", "features": ["Golden energy ribbon", "Traveling through space", "Paradise within", "Temporal anomaly"], "reference": "Star Trek Generations" }},
+    { "id": "iconian_gateway", "name": "Anomaly Gateway Iconian", "match": ["gateway iconian"], "prompt": { "type": "Iconian Gateway", "features": ["Ancient portal device", "Instant transportation", "Stone/metal arch", "Glowing interior"], "reference": "TNG Contagion" }}
+  ],
+  "styleGuide": {
+    "material": "Glowing energy/gas effects, cosmic phenomena",
+    "quality": "Dramatic, impressive space visuals",
+    "lighting": "Self-illuminating phenomena",
+    "composition": "Centered in frame, dramatic scale",
+    "background": "Solid black (#000000) - space"
+  }
+}

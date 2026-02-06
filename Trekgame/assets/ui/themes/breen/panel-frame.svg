@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" fill="none">
+  <!-- Breen Panel Frame: Armored, angular, cold -->
+  <defs>
+    <linearGradient id="breenFrameGrey" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8899AA"/>
+      <stop offset="100%" style="stop-color:#556677"/>
+    </linearGradient>
+    <linearGradient id="breenAccent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#556677"/>
+      <stop offset="50%" style="stop-color:#AABBCC"/>
+      <stop offset="100%" style="stop-color:#556677"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Top bar with armor plating -->
+  <path d="
+    M 0 0
+    L 200 0
+    L 210 10
+    L 300 10
+    L 310 0
+    L 490 0
+    L 500 10
+    L 590 10
+    L 600 0
+    L 800 0
+    L 800 50
+    L 0 50
+    Z
+  " fill="url(#breenFrameGrey)"/>
+
+  <!-- Left sidebar armored -->
+  <path d="
+    M 0 0
+    L 90 0
+    L 90 200
+    L 80 210
+    L 90 220
+    L 90 380
+    L 80 390
+    L 90 400
+    L 90 600
+    L 0 600
+    Z
+  " fill="url(#breenFrameGrey)"/>
+
+  <!-- Bottom bar -->
+  <path d="
+    M 0 550
+    L 800 550
+    L 800 600
+    L 600 600
+    L 590 590
+    L 500 590
+    L 490 600
+    L 310 600
+    L 300 590
+    L 210 590
+    L 200 600
+    L 0 600
+    Z
+  " fill="url(#breenFrameGrey)"/>
+
+  <!-- Right sidebar -->
+  <path d="
+    M 710 50
+    L 800 50
+    L 800 600
+    L 710 600
+    L 710 400
+    L 720 390
+    L 710 380
+    L 710 220
+    L 720 210
+    L 710 200
+    Z
+  " fill="url(#breenFrameGrey)"/>
+
+  <!-- Frost/ice accent lines -->
+  <line x1="100" y1="55" x2="700" y2="55" stroke="#AABBCC" stroke-width="1" opacity="0.5"/>
+  <line x1="100" y1="545" x2="700" y2="545" stroke="#AABBCC" stroke-width="1" opacity="0.5"/>
+</svg>

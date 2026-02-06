@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" fill="none">
+  <!-- Andorian Corner Accent: Antenna-inspired accent -->
+  <defs>
+    <linearGradient id="andorianAccentWhite" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#AAEEFF"/>
+      <stop offset="100%" style="stop-color:#FFFFFF"/>
+    </linearGradient>
+    <filter id="antennaeGlow">
+      <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Dual antenna curves -->
+  <path d="M 5 40 Q 10 20 20 10 Q 25 5 30 0" fill="none" stroke="url(#andorianAccentWhite)" stroke-width="3" filter="url(#antennaeGlow)"/>
+  <path d="M 15 40 Q 20 25 30 15 Q 35 10 40 5" fill="none" stroke="url(#andorianAccentWhite)" stroke-width="2" opacity="0.7"/>
+
+  <!-- Antenna tips -->
+  <circle cx="30" cy="0" r="3" fill="#AAEEFF"/>
+  <circle cx="40" cy="5" r="2" fill="#AAEEFF" opacity="0.7"/>
+</svg>

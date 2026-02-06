@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" fill="none">
+  <!-- Romulan Panel Frame: Elegant beveled frame with V accents -->
+  <defs>
+    <linearGradient id="romulanFrameGreen" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00CC99"/>
+      <stop offset="100%" style="stop-color:#006655"/>
+    </linearGradient>
+    <linearGradient id="romulanFrameAccent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#CC33CC"/>
+      <stop offset="50%" style="stop-color:#FF66FF"/>
+      <stop offset="100%" style="stop-color:#CC33CC"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Top bar with trapezoid shape -->
+  <path d="
+    M 50 0
+    L 750 0
+    L 780 30
+    L 780 50
+    L 20 50
+    L 20 30
+    Z
+  " fill="url(#romulanFrameGreen)"/>
+
+  <!-- Left sidebar with angle -->
+  <path d="
+    M 0 50
+    L 80 50
+    L 80 550
+    L 0 550
+    Z
+  " fill="url(#romulanFrameGreen)"/>
+
+  <!-- Bottom bar -->
+  <path d="
+    M 20 550
+    L 780 550
+    L 780 570
+    L 750 600
+    L 50 600
+    L 20 570
+    Z
+  " fill="url(#romulanFrameGreen)"/>
+
+  <!-- Right sidebar -->
+  <path d="
+    M 720 50
+    L 800 50
+    L 800 550
+    L 720 550
+    Z
+  " fill="url(#romulanFrameGreen)"/>
+
+  <!-- Top center V accent -->
+  <path d="
+    M 350 0
+    L 400 20
+    L 450 0
+  " fill="none" stroke="url(#romulanFrameAccent)" stroke-width="4"/>
+
+  <!-- Bottom center inverted V accent -->
+  <path d="
+    M 350 600
+    L 400 580
+    L 450 600
+  " fill="none" stroke="url(#romulanFrameAccent)" stroke-width="4"/>
+
+  <!-- Corner accents -->
+  <path d="M 80 50 L 110 50 L 80 80 Z" fill="url(#romulanFrameAccent)"/>
+  <path d="M 720 50 L 690 50 L 720 80 Z" fill="url(#romulanFrameAccent)"/>
+  <path d="M 80 550 L 110 550 L 80 520 Z" fill="url(#romulanFrameAccent)"/>
+  <path d="M 720 550 L 690 550 L 720 520 Z" fill="url(#romulanFrameAccent)"/>
+</svg>

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 80" fill="none">
+  <defs>
+    <linearGradient id="tholianHeaderOrange" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF6633"/>
+      <stop offset="100%" style="stop-color:#CC4411"/>
+    </linearGradient>
+  </defs>
+
+  <path d="
+    M 0 20 L 20 0 L 120 0 L 140 15 L 280 15 L 300 0 L 460 0 L 480 15 L 580 15 L 600 0 L 600 80 L 0 80 Z
+  " fill="url(#tholianHeaderOrange)"/>
+
+  <!-- Crystalline web accent -->
+  <path d="M 200 60 L 300 50 L 400 60" fill="none" stroke="#FFAA44" stroke-width="2" opacity="0.5"/>
+</svg>

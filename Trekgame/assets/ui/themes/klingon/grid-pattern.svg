@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <!-- Klingon Grid Pattern: Triangular grid pattern seen in backgrounds -->
+  <defs>
+    <pattern id="klingonGridPattern" x="0" y="0" width="20" height="17.32" patternUnits="userSpaceOnUse">
+      <!-- Triangle grid -->
+      <path d="M 0 17.32 L 10 0 L 20 17.32 Z" fill="none" stroke="#660000" stroke-width="0.5"/>
+      <path d="M 10 17.32 L 0 0 L 20 0 Z" fill="none" stroke="#660000" stroke-width="0.5"/>
+    </pattern>
+  </defs>
+
+  <!-- Background with grid pattern -->
+  <rect x="0" y="0" width="100" height="100" fill="#110000"/>
+  <rect x="0" y="0" width="100" height="100" fill="url(#klingonGridPattern)"/>
+</svg>

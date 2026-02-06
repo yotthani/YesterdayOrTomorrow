@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 40" fill="none">
+  <!-- Orion Data Cell Wide: Extended data display with curved corners -->
+  <defs>
+    <linearGradient id="orionCellWideGold" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#CC9900"/>
+      <stop offset="50%" style="stop-color:#FFCC00"/>
+      <stop offset="100%" style="stop-color:#CC9900"/>
+    </linearGradient>
+    <linearGradient id="orionCellWideBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#0F1F0F"/>
+      <stop offset="100%" style="stop-color:#0A140A"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Outer gold border with curves -->
+  <path d="
+    M 10 0
+    Q 0 0 0 10
+    L 0 30
+    Q 0 40 10 40
+    L 190 40
+    Q 200 40 200 30
+    L 200 10
+    Q 200 0 190 0
+    Z
+  " fill="url(#orionCellWideGold)"/>
+
+  <!-- Inner dark display area -->
+  <path d="
+    M 12 3
+    Q 5 3 5 10
+    L 5 30
+    Q 5 37 12 37
+    L 188 37
+    Q 195 37 195 30
+    L 195 10
+    Q 195 3 188 3
+    Z
+  " fill="url(#orionCellWideBg)"/>
+
+  <!-- Left decorative accent -->
+  <ellipse cx="15" cy="20" rx="3" ry="8" fill="url(#orionCellWideGold)" opacity="0.4"/>
+
+  <!-- Right decorative accent -->
+  <ellipse cx="185" cy="20" rx="3" ry="8" fill="url(#orionCellWideGold)" opacity="0.4"/>
+</svg>

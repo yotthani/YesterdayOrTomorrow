@@ -1,0 +1,262 @@
+{
+  "factionName": "Federation",
+  "categoryName": "Buildings",
+  "architectureStyle": {
+    "description": "Utopian, optimistic futurism - welcoming, open, and harmonious with nature",
+    "keyElements": [
+      "Curved glass domes and organic flowing lines",
+      "White/beige walls with large transparent aluminum windows",
+      "Lush interior gardens visible through windows",
+      "Clean energy integration (solar panels, fusion reactors)",
+      "Starfleet delta emblems on official buildings",
+      "San Francisco / Vulcan temple influenced design",
+      "Accessible design welcoming all species",
+      "Green spaces and sustainable materials",
+      "NO military brutalism - even defense structures are elegant"
+    ],
+    "colors": "Pearl white, light gray, blue accents, transparent glass, chrome trim",
+    "materials": "Transparent aluminum, polished duranium, living plants, sustainable composites"
+  },
+  "buildings": [
+    {
+      "name": "Starfleet Headquarters",
+      "category": "Government",
+      "description": "Central command for all Starfleet operations, iconic building overlooking San Francisco Bay with sweeping views"
+    },
+    {
+      "name": "Federation Council Chamber",
+      "category": "Government",
+      "description": "Grand assembly hall where representatives from all member worlds debate interstellar policy under a massive dome"
+    },
+    {
+      "name": "President's Office",
+      "category": "Government",
+      "description": "Executive mansion of the Federation President, symbol of united galactic democracy with elegant gardens"
+    },
+    {
+      "name": "Diplomatic Corps",
+      "category": "Government",
+      "description": "Training and coordination center for Federation ambassadors and first contact specialists"
+    },
+    {
+      "name": "Colonial Administration",
+      "category": "Government",
+      "description": "Governance hub for new colony worlds, managing expansion with welcoming architecture"
+    },
+    {
+      "name": "Starfleet JAG Office",
+      "category": "Government",
+      "description": "Judge Advocate General's headquarters for military justice, balancing authority with fairness"
+    },
+    {
+      "name": "Phaser Assembly Plant",
+      "category": "Military",
+      "description": "Precision manufacturing for phasers and ship-mounted arrays, clean and efficient production lines"
+    },
+    {
+      "name": "Torpedo Manufacturing",
+      "category": "Military",
+      "description": "Production plant for photon and quantum torpedoes with extensive safety containment systems"
+    },
+    {
+      "name": "Security Office",
+      "category": "Military",
+      "description": "Local law enforcement and Starfleet security coordination, accessible and community-focused"
+    },
+    {
+      "name": "Rehabilitation Center",
+      "category": "Military",
+      "description": "Humane facility for criminals focusing on reform and reintegration, not punishment"
+    },
+    {
+      "name": "Training Ground",
+      "category": "Military",
+      "description": "Open-air combat training facility for security personnel with holographic simulation areas"
+    },
+    {
+      "name": "Tactical Range",
+      "category": "Military",
+      "description": "Phaser practice facility with holographic targets and safety monitoring systems"
+    },
+    {
+      "name": "Science Institute",
+      "category": "Research",
+      "description": "Multi-disciplinary research center with transparent labs showcasing Federation scientific progress"
+    },
+    {
+      "name": "Daystrom Institute",
+      "category": "Research",
+      "description": "Premier computer science and AI research facility, home of cutting-edge positronic research"
+    },
+    {
+      "name": "Medical Research Center",
+      "category": "Research",
+      "description": "Advanced laboratory developing cures for diseases affecting species across the quadrant"
+    },
+    {
+      "name": "Stellar Observatory",
+      "category": "Research",
+      "description": "Deep space observation facility with massive domes housing subspace telescopes"
+    },
+    {
+      "name": "Xenobiology Lab",
+      "category": "Research",
+      "description": "Research center studying alien life forms with environments for many species"
+    },
+    {
+      "name": "Warp Core Factory",
+      "category": "Production",
+      "description": "Precision manufacturing of matter/antimatter reactors, heavily shielded but architecturally elegant"
+    },
+    {
+      "name": "Ground Shipyard",
+      "category": "Production",
+      "description": "Planetary facility building shuttle components and small craft in massive assembly halls"
+    },
+    {
+      "name": "Replicator Factory",
+      "category": "Production",
+      "description": "Industrial replicator production ensuring material abundance, embodying post-scarcity ideals"
+    },
+    {
+      "name": "Cargo Distribution Center",
+      "category": "Production",
+      "description": "Automated warehouse with transporter distribution, efficient logistics hub"
+    },
+    {
+      "name": "Agricultural Dome",
+      "category": "FoodProduction",
+      "description": "Climate-controlled farming under glass domes, growing crops from across Federation worlds"
+    },
+    {
+      "name": "Hydroponics Bay",
+      "category": "FoodProduction",
+      "description": "Vertical soilless farming facility maximizing food yield with recycled water systems"
+    },
+    {
+      "name": "Food Processing Center",
+      "category": "FoodProduction",
+      "description": "Converting harvests into nutritious meals and replicator patterns for distribution"
+    },
+    {
+      "name": "Botanical Arboretum",
+      "category": "FoodProduction",
+      "description": "Living garden preserving plant species from hundreds of worlds, open to public"
+    },
+    {
+      "name": "Fusion Power Plant",
+      "category": "Energy",
+      "description": "Clean fusion reactor providing abundant energy, designed to blend with natural surroundings"
+    },
+    {
+      "name": "Solar Collection Array",
+      "category": "Energy",
+      "description": "Orbital-linked solar farm with elegant ground station, zero-emission power"
+    },
+    {
+      "name": "Geothermal Station",
+      "category": "Energy",
+      "description": "Deep-core thermal tap extracting planetary heat while minimizing environmental impact"
+    },
+    {
+      "name": "General Hospital",
+      "category": "Medical",
+      "description": "Full-service medical center with biobeds, surgical suites, and regeneration chambers for all species"
+    },
+    {
+      "name": "Medical Academy",
+      "category": "Medical",
+      "description": "Training facility for doctors and nurses, emphasizing compassionate care across species"
+    },
+    {
+      "name": "Counseling Center",
+      "category": "Medical",
+      "description": "Mental health facility with holographic therapy and counselors from many worlds"
+    },
+    {
+      "name": "Starfleet Academy",
+      "category": "Education",
+      "description": "Elite officer training institution with iconic red bridge, producing the finest crews in the galaxy"
+    },
+    {
+      "name": "University Campus",
+      "category": "Education",
+      "description": "Higher education offering degrees in sciences, arts, and humanities with diverse architecture"
+    },
+    {
+      "name": "Public Library",
+      "category": "Education",
+      "description": "Vast repository with access to the entire Federation database, open to all citizens"
+    },
+    {
+      "name": "Primary School",
+      "category": "Education",
+      "description": "Education facility for colony children of all species, bright and welcoming design"
+    },
+    {
+      "name": "Trade Center",
+      "category": "Commerce",
+      "description": "Commercial hub facilitating fair exchange between Federation worlds and allies"
+    },
+    {
+      "name": "Federation Embassy",
+      "category": "Commerce",
+      "description": "Diplomatic mission representing Federation values of peace and cooperation"
+    },
+    {
+      "name": "Habitat Dome",
+      "category": "Housing",
+      "description": "Residential complex providing comfortable quarters with shared community spaces"
+    },
+    {
+      "name": "Residential Complex",
+      "category": "Housing",
+      "description": "Multi-family housing with recreational facilities and green spaces"
+    },
+    {
+      "name": "Recreation Center",
+      "category": "Recreation",
+      "description": "Community hub with sports facilities, games, and social gathering spaces"
+    },
+    {
+      "name": "Holosuite Arcade",
+      "category": "Recreation",
+      "description": "Public holographic entertainment center with programs for all ages and species"
+    },
+    {
+      "name": "Cultural Museum",
+      "category": "Recreation",
+      "description": "Institution preserving artifacts and celebrating the diverse history of Federation peoples"
+    },
+    {
+      "name": "Memorial Park",
+      "category": "Recreation",
+      "description": "Green space with monuments honoring those who gave their lives for the Federation"
+    },
+    {
+      "name": "Transporter Hub",
+      "category": "Infrastructure",
+      "description": "Central transportation facility with multiple pads for rapid transit across the colony"
+    },
+    {
+      "name": "Shuttlebay Complex",
+      "category": "Infrastructure",
+      "description": "Landing facility for shuttles and visiting craft with passenger amenities"
+    },
+    {
+      "name": "Communications Tower",
+      "category": "Infrastructure",
+      "description": "Subspace relay station enabling real-time interstellar communication"
+    },
+    {
+      "name": "Weather Control Station",
+      "category": "Special",
+      "description": "Atmospheric management facility maintaining optimal climate conditions for colonists"
+    },
+    {
+      "name": "Terraforming Hub",
+      "category": "Special",
+      "description": "Planetary engineering center coordinating the transformation of worlds for habitation"
+    }
+  ]
+}

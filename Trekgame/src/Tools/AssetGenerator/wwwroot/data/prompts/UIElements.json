@@ -1,0 +1,87 @@
+{
+  "category": "UIElements",
+  "description": "User interface elements in faction-specific styles - LCARS for Federation",
+  "factionStyles": {
+    "federation": {
+      "name": "LCARS",
+      "style": "Flat 2D, rounded rectangles, colorful",
+      "colors": {
+        "primary": "Orange (#FF9900)",
+        "secondary": "Purple (#CC99FF)",
+        "accent": "Blue (#9999FF)",
+        "alert": "Red (#FF5555)",
+        "background": "Black (#000000)"
+      },
+      "features": ["Rounded corners", "Pill shapes", "Grid layouts", "Text labels"]
+    },
+    "klingon": {
+      "name": "Klingon Interface",
+      "style": "Angular, aggressive, red/black",
+      "colors": {
+        "primary": "Red (#CC0000)",
+        "secondary": "Dark red (#660000)",
+        "accent": "Gold (#FFCC00)",
+        "background": "Black"
+      },
+      "features": ["Sharp angles", "Trefoil motifs", "Warrior imagery"]
+    },
+    "romulan": {
+      "name": "Romulan Interface",
+      "style": "Elegant, green-based, secretive",
+      "colors": {
+        "primary": "Green (#00CC00)",
+        "secondary": "Dark green (#006600)",
+        "accent": "Silver (#CCCCCC)",
+        "background": "Black"
+      },
+      "features": ["Sleek curves", "Bird motifs", "Hidden elements"]
+    },
+    "cardassian": {
+      "name": "Cardassian Interface",
+      "style": "Functional, brown/orange, militaristic",
+      "colors": {
+        "primary": "Orange (#FF6600)",
+        "secondary": "Brown (#996633)",
+        "accent": "Yellow (#FFCC00)",
+        "background": "Dark brown"
+      },
+      "features": ["Geometric shapes", "Status displays", "Surveillance feel"]
+    },
+    "borg": {
+      "name": "Borg Interface",
+      "style": "Technological, green on black, hexagonal",
+      "colors": {
+        "primary": "Green (#00FF00)",
+        "secondary": "Dark green (#003300)",
+        "accent": "White text",
+        "background": "Black"
+      },
+      "features": ["Hexagons", "Data streams", "Designation numbers", "No individual elements"]
+    }
+  },
+  "elementTypes": [
+    { "id": "button", "name": "Button Standard", "use": "Clickable interface button" },
+    { "id": "panel", "name": "Panel Information", "use": "Information display panel" },
+    { "id": "frame", "name": "Frame Border", "use": "Window/dialog border" },
+    { "id": "header", "name": "Header Bar", "use": "Section header" },
+    { "id": "footer", "name": "Footer Bar", "use": "Bottom navigation" },
+    { "id": "icon_set", "name": "Icon Set Common", "use": "Common UI icons" },
+    { "id": "progress", "name": "Progress Bar", "use": "Loading/status indicator" },
+    { "id": "alert", "name": "Alert Box", "use": "Warning/error display" },
+    { "id": "menu", "name": "Menu Panel", "use": "Selection menu" },
+    { "id": "tooltip", "name": "Tooltip Popup", "use": "Hover information" }
+  ],
+  "styleGuide": {
+    "material": "FLAT 2D graphics - vector style",
+    "quality": "Clean, crisp edges, readable at all sizes",
+    "lighting": "None - flat colors and gradients only",
+    "composition": "UI element isolated on transparent or black",
+    "background": "Transparent or solid black",
+    "critical": [
+      "MUST be flat 2D - these are UI elements",
+      "Faction color scheme strictly followed",
+      "Readable text areas clearly marked",
+      "Consistent with game UI needs"
+    ]
+  }
+}

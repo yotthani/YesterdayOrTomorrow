@@ -287,6 +287,33 @@
 - Vorta types (Commander, Supervisor, Interrogator, etc.)
 - Founder combat forms
 
+## v1.43.67 - Asset Generator: Blazor WASM JSON Loading Fix
+
+### Fixed - Andorian Ship Generation
+- **Andorian ships no longer generate as Federation saucers** - Ships now correctly appear as raptor/bird-of-prey shaped vessels with swept-back wing pylons
+- Added explicit "NO SAUCER" instructions in Ships.json for Andorian faction
+- Added faction-specific negative prompts and warnings via `GetFactionShipWarning()` and `GetFactionNegativePrompt()`
+
+### Fixed - Blazor WASM File Access
+- **PromptDataService completely rewritten for Blazor WASM compatibility**
+- Replaced `File.ReadAllTextAsync()` with `HttpClient.GetAsync()` - file system access doesn't work in WebAssembly
+- JSON prompt files now loaded from `wwwroot/data/prompts/` via HTTP requests
+- Added proper error handling with `InvalidOperationException` when JSON files are missing (no silent fallbacks)
+
+### Changed - Dependency Injection
+- `PromptDataService` now requires `HttpClient` in constructor
+- `PromptBuilderService` now requires `HttpClient` in constructor
+- `AssetGeneratorService` now requires `HttpClient` in constructor
+- Updated `Program.cs` DI registrations to pass `HttpClient` through service chain
+
+### Changed - Build Process
+- Added MSBuild target `CopyPromptJsonToWwwroot` that copies `Data/Prompts/*.json` to `wwwroot/data/prompts/` before build
+- Ensures JSON files are available for HTTP access during development
+
+### Removed - Hardcoded Data
+- Removed ~220 lines of hardcoded `_iconicShipGeometry` dictionary from `PromptBuilderService.cs`
+- Ship geometry data now exclusively loaded from `Ships.json`
+
 ## v1.43.66 - Romulan Emblem Complete
 - Added Romulan premium emblem with:
   - 20 outer feathers with volumetric blade effect

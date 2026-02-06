@@ -1,0 +1,47 @@
+{
+  "id": "cardassian",
+  "name": "Cardassian Union",
+  "description": "Cardassian Central Command interface system",
+  "faction": "cardassian",
+  "fonts": {
+    "primary": {
+      "family": "Cardassian",
+      "fallback": "Copperplate Gothic, Georgia, serif",
+      "file": "fonts/cardassian.ttf",
+      "weight": "bold",
+      "letterSpacing": "0.05em",
+      "textTransform": "uppercase"
+    },
+    "secondary": {
+      "family": "Cardassian Text",
+      "fallback": "Palatino, Book Antiqua, serif",
+      "file": "fonts/cardassian-text.ttf",
+      "weight": "normal",
+      "letterSpacing": "0.02em"
+    },
+    "display": {
+      "family": "Cardassian Script",
+      "fallback": "Cardassian, Copperplate Gothic, serif",
+      "file": "fonts/cardassian-script.ttf",
+      "weight": "bold",
+      "letterSpacing": "0.08em",
+      "comment": "Traditional Cardassian script for decorative use"
+    }
+  },
+  "colors": {
+    "primary": "#4A6B7C",
+    "secondary": "#2A4A5A",
+    "accent": "#CC6633",
+    "highlight": "#FF9944",
+    "alert": "#FF6633",
+    "success": "#66AA88",
+    "background": "#0a1015",
+    "text": "#88AACC",
+    "textDark": "#1a2530"
+  },
+  "styles": {
+    "cornerRadius": "curved",
+    "borderStyle": "nested",
+    "animationStyle": "smooth"
+  }
+}

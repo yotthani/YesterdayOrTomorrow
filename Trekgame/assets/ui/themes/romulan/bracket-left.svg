@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 200" fill="none">
+  <!-- Romulan Bracket Left: Elegant angular bracket -->
+  <defs>
+    <linearGradient id="romulanBracketGreen" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00CC99"/>
+      <stop offset="100%" style="stop-color:#006655"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Angular left bracket -->
+  <path d="
+    M 40 0
+    L 40 15
+    L 20 15
+    L 10 25
+    L 10 175
+    L 20 185
+    L 40 185
+    L 40 200
+    L 15 200
+    L 0 185
+    L 0 15
+    L 15 0
+    Z
+  " fill="url(#romulanBracketGreen)"/>
+
+  <!-- V accent -->
+  <path d="M 15 95 L 5 100 L 15 105" fill="none" stroke="#CC33CC" stroke-width="2"/>
+</svg>

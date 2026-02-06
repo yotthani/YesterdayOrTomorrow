@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 20" fill="none">
+  <!-- Andorian Progress Bar Fill: Ice fill element -->
+  <defs>
+    <linearGradient id="andorianProgressFill" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#4499DD"/>
+      <stop offset="50%" style="stop-color:#88CCFF"/>
+      <stop offset="100%" style="stop-color:#AAEEFF"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Fill bar with rounded ends -->
+  <path d="
+    M 8 3
+    L 190 3
+    Q 197 3 197 10
+    Q 197 17 190 17
+    L 8 17
+    Q 3 17 3 10
+    Q 3 3 8 3
+    Z
+  " fill="url(#andorianProgressFill)"/>
+</svg>

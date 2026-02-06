@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 60" fill="none">
+  <!-- Ferengi Header Frame: Bronze with gold hexagon accents -->
+  <defs>
+    <linearGradient id="ferengiHeaderBronze" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#5C4A0F"/>
+      <stop offset="50%" style="stop-color:#8B6914"/>
+      <stop offset="100%" style="stop-color:#5C4A0F"/>
+    </linearGradient>
+    <linearGradient id="ferengiHeaderGold" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#D4A017"/>
+      <stop offset="50%" style="stop-color:#FFD700"/>
+      <stop offset="100%" style="stop-color:#D4A017"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Main header with angled ends -->
+  <path d="
+    M 20 0
+    L 380 0
+    L 400 30
+    L 380 60
+    L 20 60
+    L 0 30
+    Z
+  " fill="url(#ferengiHeaderBronze)"/>
+
+  <!-- Inner gold border -->
+  <path d="
+    M 28 6
+    L 372 6
+    L 390 30
+    L 372 54
+    L 28 54
+    L 10 30
+    Z
+  " fill="none" stroke="url(#ferengiHeaderGold)" stroke-width="2"/>
+
+  <!-- Side hexagon accents -->
+  <polygon points="40,25 50,18 60,25 60,35 50,42 40,35" fill="url(#ferengiHeaderGold)"/>
+  <polygon points="340,25 350,18 360,25 360,35 350,42 340,35" fill="url(#ferengiHeaderGold)"/>
+</svg>

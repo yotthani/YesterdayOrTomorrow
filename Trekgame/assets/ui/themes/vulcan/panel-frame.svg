@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" fill="none">
+  <!-- Vulcan Panel Frame: Geometric precision with IDIC-inspired elements -->
+  <defs>
+    <linearGradient id="vulcanFrameCopper" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#DD8844"/>
+      <stop offset="100%" style="stop-color:#AA6633"/>
+    </linearGradient>
+    <linearGradient id="vulcanAccentGold" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#FFBB77"/>
+      <stop offset="50%" style="stop-color:#FFD4A8"/>
+      <stop offset="100%" style="stop-color:#FFBB77"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Top bar with precise geometric cut -->
+  <path d="
+    M 40 0
+    L 760 0
+    L 760 10
+    L 770 10
+    L 770 50
+    L 30 50
+    L 30 10
+    L 40 10
+    Z
+  " fill="url(#vulcanFrameCopper)"/>
+
+  <!-- Left sidebar with stepped edge -->
+  <path d="
+    M 0 40
+    L 10 40
+    L 10 30
+    L 80 30
+    L 80 570
+    L 10 570
+    L 10 560
+    L 0 560
+    Z
+  " fill="url(#vulcanFrameCopper)"/>
+
+  <!-- Bottom bar with geometric precision -->
+  <path d="
+    M 30 550
+    L 770 550
+    L 770 590
+    L 760 590
+    L 760 600
+    L 40 600
+    L 40 590
+    L 30 590
+    Z
+  " fill="url(#vulcanFrameCopper)"/>
+
+  <!-- Right sidebar -->
+  <path d="
+    M 720 30
+    L 790 30
+    L 790 40
+    L 800 40
+    L 800 560
+    L 790 560
+    L 790 570
+    L 720 570
+    Z
+  " fill="url(#vulcanFrameCopper)"/>
+
+  <!-- IDIC-inspired triangle accent top center -->
+  <path d="
+    M 380 0
+    L 400 25
+    L 420 0
+    Z
+  " fill="url(#vulcanAccentGold)"/>
+
+  <!-- IDIC-inspired triangle accent bottom center -->
+  <path d="
+    M 380 600
+    L 400 575
+    L 420 600
+    Z
+  " fill="url(#vulcanAccentGold)"/>
+
+  <!-- Corner geometric accents -->
+  <rect x="80" y="50" width="20" height="20" fill="url(#vulcanAccentGold)"/>
+  <rect x="700" y="50" width="20" height="20" fill="url(#vulcanAccentGold)"/>
+  <rect x="80" y="530" width="20" height="20" fill="url(#vulcanAccentGold)"/>
+  <rect x="700" y="530" width="20" height="20" fill="url(#vulcanAccentGold)"/>
+
+  <!-- Circular IDIC reference elements -->
+  <circle cx="50" cy="50" r="8" fill="none" stroke="url(#vulcanAccentGold)" stroke-width="2"/>
+  <circle cx="750" cy="50" r="8" fill="none" stroke="url(#vulcanAccentGold)" stroke-width="2"/>
+  <circle cx="50" cy="550" r="8" fill="none" stroke="url(#vulcanAccentGold)" stroke-width="2"/>
+  <circle cx="750" cy="550" r="8" fill="none" stroke="url(#vulcanAccentGold)" stroke-width="2"/>
+</svg>

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" fill="none">
+  <defs>
+    <linearGradient id="hirogenIndicatorActive" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#AA8855"/>
+      <stop offset="100%" style="stop-color:#CCAA77"/>
+    </linearGradient>
+    <filter id="hirogenGlow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <path d="M 15 3 L 25 12 L 22 27 L 15 22 L 8 27 L 5 12 Z" fill="url(#hirogenIndicatorActive)" stroke="#CCAA77" stroke-width="2" filter="url(#hirogenGlow)"/>
+</svg>

@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 200" fill="none">
+  <!-- Bajoran Separator Vertical: Ornamental divider with earring chain motif -->
+  <defs>
+    <linearGradient id="bajoranSepVBrown" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#886633"/>
+      <stop offset="50%" style="stop-color:#AA7744"/>
+      <stop offset="100%" style="stop-color:#886633"/>
+    </linearGradient>
+    <linearGradient id="bajoranSepVGold" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#DDAA66"/>
+      <stop offset="100%" style="stop-color:#FFCC88"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Main separator line -->
+  <path d="M 4 20 L 6 20 L 6 180 L 4 180 Z" fill="url(#bajoranSepVBrown)"/>
+
+  <!-- Top ornamental end -->
+  <circle cx="5" cy="15" r="4" fill="url(#bajoranSepVGold)"/>
+  <circle cx="5" cy="5" r="2" fill="url(#bajoranSepVGold)"/>
+  <line x1="5" y1="7" x2="5" y2="11" stroke="#DDAA66" stroke-width="1"/>
+
+  <!-- Center spiritual diamond -->
+  <path d="M 5 96 L 9 100 L 5 104 L 1 100 Z" fill="url(#bajoranSepVGold)"/>
+
+  <!-- Bottom ornamental end -->
+  <circle cx="5" cy="185" r="4" fill="url(#bajoranSepVGold)"/>
+  <circle cx="5" cy="195" r="2" fill="url(#bajoranSepVGold)"/>
+  <line x1="5" y1="189" x2="5" y2="193" stroke="#DDAA66" stroke-width="1"/>
+</svg>

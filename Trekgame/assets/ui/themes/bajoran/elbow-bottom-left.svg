@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <!-- Bajoran Elbow Bottom-Left: Temple arch corner with earring chain accent -->
+  <defs>
+    <linearGradient id="bajoranBrown" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#AA7744"/>
+      <stop offset="100%" style="stop-color:#886633"/>
+    </linearGradient>
+    <linearGradient id="bajoranGold" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#DDAA66"/>
+      <stop offset="100%" style="stop-color:#FFCC88"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Arched elbow shape with rounded temple-style corner -->
+  <path d="
+    M 0 0
+    L 30 0
+    L 30 70
+    Q 30 90 50 90
+    L 120 90
+    L 120 120
+    L 0 120
+    Z
+  " fill="url(#bajoranBrown)"/>
+
+  <!-- Inner arch detail -->
+  <path d="
+    M 35 85
+    Q 45 85 45 75
+    L 45 65
+    L 40 65
+    L 40 72
+    Q 40 80 48 80
+    L 55 80
+    L 55 85
+    Z
+  " fill="url(#bajoranGold)" opacity="0.8"/>
+
+  <!-- Earring chain decoration -->
+  <circle cx="15" cy="105" r="5" fill="url(#bajoranGold)"/>
+  <circle cx="15" cy="92" r="3" fill="url(#bajoranGold)"/>
+  <line x1="15" y1="100" x2="15" y2="95" stroke="#DDAA66" stroke-width="1"/>
+</svg>

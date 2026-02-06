@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 60" fill="none">
+  <!-- Andorian Readout Display: Ice-inspired data readout -->
+  <defs>
+    <linearGradient id="andorianReadoutBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#0A1520"/>
+      <stop offset="100%" style="stop-color:#152030"/>
+    </linearGradient>
+    <linearGradient id="andorianReadoutBorder" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#88CCFF"/>
+      <stop offset="100%" style="stop-color:#4499DD"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Main display with flowing corners -->
+  <path d="
+    M 15 0
+    L 135 0
+    Q 150 0 150 15
+    L 150 45
+    Q 150 60 135 60
+    L 15 60
+    Q 0 60 0 45
+    L 0 15
+    Q 0 0 15 0
+    Z
+  " fill="url(#andorianReadoutBg)" stroke="url(#andorianReadoutBorder)" stroke-width="2"/>
+
+  <!-- Inner ice crystal accent -->
+  <path d="M 75 10 L 75 50" stroke="#AAEEFF" stroke-width="1" opacity="0.3"/>
+  <path d="M 20 30 L 130 30" stroke="#AAEEFF" stroke-width="1" opacity="0.3"/>
+</svg>

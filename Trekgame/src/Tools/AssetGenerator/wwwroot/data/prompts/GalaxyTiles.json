@@ -1,0 +1,28 @@
+{
+  "category": "GalaxyTiles",
+  "description": "Hexagonal galaxy map tiles representing different regions of space",
+  "assets": [
+    { "id": "empty_space", "name": "Tile Empty Space", "match": ["empty", "void"], "prompt": { "type": "Empty Space", "features": ["Dark starfield", "Scattered distant stars", "No significant features"], "density": "sparse" }},
+    { "id": "dense_stars", "name": "Tile Dense Starfield", "match": ["dense", "starfield"], "prompt": { "type": "Dense Starfield", "features": ["Many bright stars", "Star clusters", "Rich region"], "density": "high" }},
+    { "id": "nebula_region", "name": "Tile Nebula Region", "match": ["nebula region", "gas cloud"], "prompt": { "type": "Nebula Region", "features": ["Colorful gas clouds", "Diffuse light", "Star-forming area"], "colors": "various nebula colors" }},
+    { "id": "asteroid_belt", "name": "Tile Asteroid Belt", "match": ["asteroid belt", "rocky"], "prompt": { "type": "Asteroid Belt", "features": ["Rocky debris", "Navigation hazard", "Mining opportunity"], "density": "medium" }},
+    { "id": "border_zone", "name": "Tile Border Zone Contested", "match": ["border", "contested"], "prompt": { "type": "Border Zone", "features": ["Patrol routes visible", "Warning beacons", "Tense area"], "significance": "political" }},
+    { "id": "trade_route", "name": "Tile Trade Route Active", "match": ["trade route", "shipping"], "prompt": { "type": "Trade Route", "features": ["Shipping lanes marked", "Frequent traffic", "Economic importance"], "significance": "commercial" }},
+    { "id": "anomaly_zone", "name": "Tile Anomaly Zone Dangerous", "match": ["anomaly zone", "dangerous"], "prompt": { "type": "Anomaly Zone", "features": ["Strange energy readings", "Unpredictable phenomena", "Warning markers"], "hazard": "high" }},
+    { "id": "explored", "name": "Tile Explored Charted", "match": ["explored", "charted"], "prompt": { "type": "Explored Space", "features": ["Survey markers", "Known coordinates", "Safe passage"], "status": "charted" }},
+    { "id": "unexplored", "name": "Tile Unexplored Unknown", "match": ["unexplored", "unknown"], "prompt": { "type": "Unexplored Space", "features": ["Fog of war", "Mystery", "Discovery potential"], "status": "uncharted" }},
+    { "id": "warp_corridor", "name": "Tile Warp Corridor Fast", "match": ["warp corridor", "fast travel"], "prompt": { "type": "Warp Corridor", "features": ["Stable warp field region", "Fast travel possible", "Major route"], "significance": "strategic" }}
+  ],
+  "styleGuide": {
+    "material": "Space background with tile-appropriate features",
+    "quality": "Clean, readable at small sizes",
+    "lighting": "Stars provide light points",
+    "composition": "Hexagonal tile format, top-down view",
+    "background": "Deep space black base",
+    "critical": [
+      "Must work as small hexagonal map tiles",
+      "Clear visual distinction between tile types",
+      "Readable at game zoom levels"
+    ]
+  }
+}

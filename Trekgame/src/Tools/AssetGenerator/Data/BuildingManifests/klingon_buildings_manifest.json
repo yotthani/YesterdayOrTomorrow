@@ -21,99 +21,243 @@
   "buildings": [
     {
       "name": "Great Hall of the High Council",
-      "description": "Massive fortress where the Klingon High Council meets. Towering central spire, throne room, surrounded by warrior statues."
+      "category": "Government",
+      "description": "Massive fortress where the Klingon High Council meets. Towering central spire, throne room, surrounded by warrior statues"
+    },
+    {
+      "name": "Chancellor's Fortress",
+      "category": "Government",
+      "description": "Imposing residence of the Empire's supreme leader, heavily fortified with personal guard barracks"
+    },
+    {
+      "name": "House Stronghold",
+      "category": "Government",
+      "description": "Noble House ancestral fortress. Defensive walls, family trophy room, armory, great dining hall for feasts"
+    },
+    {
+      "name": "Council Chamber",
+      "category": "Government",
+      "description": "Meeting hall where warriors and politicians settle disputes through debate or combat"
+    },
+    {
+      "name": "Emperor's Palace",
+      "category": "Government",
+      "description": "Ancient seat of the Klingon Emperor, restored after centuries, filled with sacred relics of Kahless"
+    },
+    {
+      "name": "Colonial Governance Hall",
+      "category": "Government",
+      "description": "Administrative fortress for conquered or colonized worlds, projecting Klingon authority"
     },
     {
       "name": "Warrior Academy",
-      "description": "Training facility for young warriors. Combat arenas, weapons halls, sparring grounds. Brutal and functional."
+      "category": "Military",
+      "description": "Brutal training facility for young warriors. Combat arenas, weapons halls, where weakness is purged"
     },
     {
-      "name": "House Fortress",
-      "description": "Noble House stronghold. Defensive walls, family trophy room, armory, great dining hall for feasts."
-    },
-    {
-      "name": "Weapons Forge",
-      "description": "Where bat'leths and disruptors are crafted. Furnaces, anvils, glowing metal, master smiths workspace."
-    },
-    {
-      "name": "Defense Command",
-      "description": "Military command center. Tactical displays, communications arrays, heavily fortified."
-    },
-    {
-      "name": "Disruptor Battery",
-      "description": "Planetary defense weapon emplacement. Massive disruptor cannons, targeting systems, armored bunker."
-    },
-    {
-      "name": "Shipyard Control Tower",
-      "description": "Oversees construction of warships. Industrial, functional, overlooks construction bays."
-    },
-    {
-      "name": "Prison Fortress",
-      "description": "Where enemies and dishonored warriors are held. Cells carved into rock, guard towers, execution grounds."
-    },
-    {
-      "name": "Hall of Warriors",
-      "description": "Memorial to fallen heroes. Statues of legendary warriors, walls inscribed with battle honors."
-    },
-    {
-      "name": "Bloodwine Distillery",
-      "description": "Where bloodwine is brewed. Industrial vats, storage barrels, tasting hall."
-    },
-    {
-      "name": "Targ Breeding Facility",
-      "description": "Where targs are raised for food and hunting. Pens, feeding areas, processing facility."
-    },
-    {
-      "name": "Opera House",
-      "description": "Klingon opera performance hall. Acoustically designed, dramatic architecture, seating for warriors."
-    },
-    {
-      "name": "Medical Facility",
-      "description": "Spartan medical center. Warriors prefer to die in battle, but injuries must be treated. Functional, no comfort."
-    },
-    {
-      "name": "Intelligence Outpost",
-      "description": "Klingon Intelligence headquarters. Hidden entrances, surveillance equipment, interrogation rooms."
-    },
-    {
-      "name": "Recruitment Center",
-      "description": "Where young Klingons enlist for military service. Testing grounds, evaluation chambers."
-    },
-    {
-      "name": "Energy Plant",
-      "description": "Power generation facility. Geothermal or fusion based, industrial, functional."
-    },
-    {
-      "name": "Communications Array",
-      "description": "Subspace communication hub. Antenna towers, relay stations, heavily guarded."
-    },
-    {
-      "name": "Trading Post",
-      "description": "Where merchants trade goods. Less honorable but necessary. Rough, utilitarian market."
-    },
-    {
-      "name": "Monastery of Kahless",
-      "description": "Religious site dedicated to Kahless the Unforgettable. Sacred scrolls, meditation chambers, clerics."
-    },
-    {
-      "name": "Arena of Combat",
-      "description": "Public combat arena for trials, entertainment, and honor duels. Tiered seating, blood-stained floor."
+      "name": "Weapons Factory",
+      "category": "Military",
+      "description": "Industrial forge producing disruptors and military equipment. Smoke, fire, the sound of hammering"
     },
     {
       "name": "Barracks",
-      "description": "Warrior housing. Spartan sleeping quarters, weapons racks, communal eating area."
+      "category": "Military",
+      "description": "Spartan quarters for warriors awaiting deployment. No luxuries, only weapons racks and hard beds"
     },
     {
-      "name": "Armory",
-      "description": "Weapons storage and distribution. Racks of bat'leths, disruptors, armor. Heavily secured."
+      "name": "Prison Fortress",
+      "category": "Military",
+      "description": "Where enemies and the dishonored are held. Cells carved into rock, execution grounds, no escape"
     },
     {
-      "name": "Garrison Fortress",
-      "description": "Military base for planetary defense forces. Walls, watchtowers, troop quarters."
+      "name": "Defense Command",
+      "category": "Military",
+      "description": "Military coordination center. Tactical displays, war planning rooms, heavily fortified"
     },
     {
-      "name": "Embassy",
-      "description": "Diplomatic facility - still imposing and fortress-like. Klingon diplomacy is backed by strength."
+      "name": "Guard Post",
+      "category": "Military",
+      "description": "Checkpoint manned by warriors protecting vital locations, featuring disruptor emplacements"
+    },
+    {
+      "name": "Training Ground",
+      "category": "Military",
+      "description": "Open arena where warriors hone combat skills through brutal sparring with real weapons"
+    },
+    {
+      "name": "Defense Tower",
+      "category": "Military",
+      "description": "Fortified watchtower with disruptor emplacements scanning for approaching enemies"
+    },
+    {
+      "name": "Bat'leth Smithy",
+      "category": "Production",
+      "description": "Sacred workshop where master craftsmen forge the legendary sword of honor by traditional methods"
+    },
+    {
+      "name": "Disruptor Factory",
+      "category": "Production",
+      "description": "Mass production of Klingon energy weapons for the Empire's vast military forces"
+    },
+    {
+      "name": "Weapons Forge",
+      "category": "Production",
+      "description": "Traditional smithy with furnaces and anvils where legendary blades are created"
+    },
+    {
+      "name": "Shipyard Control Tower",
+      "category": "Production",
+      "description": "Industrial complex overseeing construction of warships. Smoke, sparks, the birth of birds of prey"
+    },
+    {
+      "name": "Mining Complex",
+      "category": "Production",
+      "description": "Brutal extraction facility for dilithium and metals, worked by prisoners and the dishonored"
+    },
+    {
+      "name": "Ore Refinery",
+      "category": "Production",
+      "description": "Processing plant converting raw materials into war materials for the Empire"
+    },
+    {
+      "name": "Targ Kennel",
+      "category": "FoodProduction",
+      "description": "Breeding grounds for vicious targs - used as food, war beasts, and hunting companions"
+    },
+    {
+      "name": "Targ Farm",
+      "category": "FoodProduction",
+      "description": "Large-scale targ ranching supplying meat to warriors across the colony"
+    },
+    {
+      "name": "Gagh Breeding Facility",
+      "category": "FoodProduction",
+      "description": "Cultivation of serpent worms, the Klingon staple food eaten live and wriggling"
+    },
+    {
+      "name": "Bloodwine Distillery",
+      "category": "FoodProduction",
+      "description": "Where the warrior's drink is brewed. Massive vats, aging barrels, tasting halls"
+    },
+    {
+      "name": "Power Plant",
+      "category": "Energy",
+      "description": "Industrial generator powering the Empire's war factories, rugged and functional"
+    },
+    {
+      "name": "Shield Generator",
+      "category": "Energy",
+      "description": "Defensive installation protecting vital military assets from orbital bombardment"
+    },
+    {
+      "name": "Temple of Kahless",
+      "category": "Religion",
+      "description": "Sacred shrine to the greatest warrior, where pilgrims seek enlightenment through combat trials"
+    },
+    {
+      "name": "Statue of Kahless",
+      "category": "Religion",
+      "description": "Massive monument to the legendary founder of Klingon honor, towering over the plaza"
+    },
+    {
+      "name": "Memorial Obelisk",
+      "category": "Religion",
+      "description": "Stone monument inscribed with names of warriors who died gloriously in battle"
+    },
+    {
+      "name": "Hall of Warriors",
+      "category": "Religion",
+      "description": "Memorial displaying statues and weapons of legendary heroes, walls inscribed with battle honors"
+    },
+    {
+      "name": "Opera House",
+      "category": "Religion",
+      "description": "Grand theater for Klingon opera - tales of conquest, betrayal, and honor sung with passion"
+    },
+    {
+      "name": "Museum of Conquest",
+      "category": "Religion",
+      "description": "Hall displaying trophies from the Empire's greatest victories over inferior species"
+    },
+    {
+      "name": "Medical Facility",
+      "category": "Medical",
+      "description": "Spartan treatment center - true warriors prefer honorable scars to medical intervention"
+    },
+    {
+      "name": "Field Hospital",
+      "category": "Medical",
+      "description": "Combat medical station for those wounded but not killed, functional and without comfort"
+    },
+    {
+      "name": "Library of Honor",
+      "category": "Education",
+      "description": "Repository of warrior wisdom, battle tactics, and the glorious histories of noble Houses"
+    },
+    {
+      "name": "Diplomatic Hall",
+      "category": "Education",
+      "description": "Training for the few who negotiate rather than conquer - still imposing architecture"
+    },
+    {
+      "name": "Arena of Combat",
+      "category": "Recreation",
+      "description": "Gladiatorial pit where disputes of honor are settled in blood before cheering crowds"
+    },
+    {
+      "name": "Feast Hall",
+      "category": "Recreation",
+      "description": "Great dining hall for victory celebrations with bloodwine, gagh, and songs of glory"
+    },
+    {
+      "name": "Bloodwine Hall",
+      "category": "Recreation",
+      "description": "Drinking establishment where warriors boast of battles and plot future conquests"
+    },
+    {
+      "name": "Veterans Hall",
+      "category": "Recreation",
+      "description": "Gathering place for old warriors to share tales of past glory and train the young"
+    },
+    {
+      "name": "Landing Fortress",
+      "category": "Infrastructure",
+      "description": "Fortified spaceport designed to repel attack during landing operations"
+    },
+    {
+      "name": "Communications Hub",
+      "category": "Infrastructure",
+      "description": "Encrypted relay station coordinating military operations across the sector"
+    },
+    {
+      "name": "Sensor Tower",
+      "category": "Infrastructure",
+      "description": "Early warning installation detecting approaching enemies before they can attack"
+    },
+    {
+      "name": "Cargo Warehouse",
+      "category": "Infrastructure",
+      "description": "Storage fortress holding supplies and weapons for the endless war machine"
+    },
+    {
+      "name": "Trade Hall",
+      "category": "Commerce",
+      "description": "Market where Houses exchange goods, weapons, and occasionally prisoners"
+    },
+    {
+      "name": "Merchant Quarter",
+      "category": "Commerce",
+      "description": "District for traders - commerce is beneath most warriors but necessary for the Empire"
+    },
+    {
+      "name": "Embassy Fortress",
+      "category": "Special",
+      "description": "Heavily fortified diplomatic mission - Klingon diplomacy is always backed by strength"
+    },
+    {
+      "name": "Rehabilitation Center",
+      "category": "Special",
+      "description": "Facility where dishonored warriors may earn back their standing through trials"
     }
   ]
 }

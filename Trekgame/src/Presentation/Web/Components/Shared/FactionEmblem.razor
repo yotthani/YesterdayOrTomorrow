@@ -48,45 +48,64 @@
     // Use hand-crafted SVG symbols where available, fall back to PNG extracts
     private static readonly Dictionary<string, string> RaceEmblems = new()
     {
-        // SVG versions — hand-crafted or potrace-traced
+        // Major Powers - SVG
         { "federation", "assets/universal/symbols/federation.svg" },
         { "klingon", "assets/universal/symbols/klingon.svg" },
         { "romulan", "assets/universal/symbols/romulan.svg" },
         { "cardassian", "assets/universal/symbols/cardassian.svg" },
-        { "borg", "assets/universal/symbols/borg.svg" },
         { "ferengi", "assets/universal/symbols/ferengi.svg" },
+        { "borg", "assets/universal/symbols/borg.svg" },
         { "dominion", "assets/universal/symbols/dominion.svg" },
+        // Minor Powers - SVG
         { "breen", "assets/universal/symbols/breen.svg" },
         { "gorn", "assets/universal/symbols/gorn.svg" },
         { "andorian", "assets/universal/symbols/andorian.svg" },
         { "vulcan", "assets/universal/symbols/vulcan.svg" },
-        // PNG fallbacks (non-game factions, extracted from reference)
+        { "trill", "assets/universal/symbols/trill.svg" },
+        { "bajoran", "assets/universal/symbols/bajoran.svg" },
+        { "tholian", "assets/universal/symbols/tholian.svg" },
+        { "orion", "assets/universal/symbols/orion.svg" },
+        { "hirogen", "assets/universal/symbols/hirogen.svg" },
+        { "betazoid", "assets/universal/symbols/betazoid.svg" },
+        // Rebel / Independent Groups - SVG
+        { "maquis", "assets/universal/symbols/maquis.svg" },
+        { "pirates", "assets/universal/symbols/pirates.svg" },
+        { "nausicaan", "assets/universal/symbols/nausicaan.svg" },
+        // Exotic / Extradimensional - SVG
+        { "species8472", "assets/universal/symbols/species8472.svg" },
+        // PNG fallback (mirror universe)
         { "terran", "assets/universal/symbols/terran.png" },
-        { "bajoran", "assets/universal/symbols/bajoran.png" },
-        { "trill", "assets/universal/symbols/trill.png" },
-        { "orion", "assets/universal/symbols/orion.png" },
-        { "maquis", "assets/universal/symbols/maquis.png" },
-        { "species8472", "assets/universal/symbols/species8472.png" },
     };
 
     private static readonly Dictionary<string, string> RaceIcons = new()
     {
+        // Major Powers
         { "federation", "🌟" },
-        { "terran", "🌍" },
-        { "vulcan", "🖖" },
-        { "andorian", "❄️" },
         { "klingon", "⚔️" },
         { "romulan", "🦅" },
         { "cardassian", "🔶" },
         { "ferengi", "💰" },
         { "borg", "🔲" },
         { "dominion", "👁️" },
+        // Minor Powers
         { "breen", "🥶" },
-        { "tholian", "🔺" },
         { "gorn", "🦎" },
-        { "bajoran", "🙏" },
+        { "andorian", "❄️" },
+        { "vulcan", "🖖" },
         { "trill", "🔵" },
+        { "bajoran", "🙏" },
+        { "tholian", "🔺" },
         { "orion", "💚" },
+        { "hirogen", "🎯" },
+        { "betazoid", "🧠" },
+        // Rebel / Independent
+        { "maquis", "✊" },
+        { "pirates", "☠️" },
+        { "nausicaan", "👹" },
+        // Exotic
+        { "species8472", "👽" },
+        // Mirror
+        { "terran", "🌍" },
     };
 
     private string GetEmblemPath()

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 30" fill="none">
+  <!-- Dominion Cap Top -->
+  <defs>
+    <linearGradient id="dominionCapPurple" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#5A3A7A"/>
+      <stop offset="100%" style="stop-color:#6A4A8A"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Organic top cap -->
+  <path d="
+    M 0 30
+    L 0 15
+    Q 5 0 20 0
+    Q 35 0 40 15
+    L 40 30
+    Z
+  " fill="url(#dominionCapPurple)"/>
+</svg>

@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" fill="none">
+  <defs>
+    <linearGradient id="gornIndicatorActive" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#88BB55"/>
+      <stop offset="100%" style="stop-color:#AADD77"/>
+    </linearGradient>
+    <filter id="gornGlow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <path d="
+    M 15 3
+    L 26 10
+    L 26 20
+    L 15 27
+    L 4 20
+    L 4 10
+    Z
+  " fill="url(#gornIndicatorActive)" stroke="#AADD77" stroke-width="2" filter="url(#gornGlow)"/>
+
+  <path d="M 10 12 Q 15 10 20 12 Q 15 14 10 12" fill="#AADD77"/>
+  <path d="M 10 17 Q 15 15 20 17 Q 15 19 10 17" fill="#AADD77"/>
+</svg>

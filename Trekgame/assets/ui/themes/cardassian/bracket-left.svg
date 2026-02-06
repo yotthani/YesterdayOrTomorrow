@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 200" fill="none">
+  <!-- Cardassian Bracket Left: Curved organic bracket -->
+  <defs>
+    <linearGradient id="cardassianBracketBlue" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#4A6B7C"/>
+      <stop offset="100%" style="stop-color:#2A4A5A"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Curved left bracket -->
+  <path d="
+    M 40 0
+    L 40 20
+    Q 20 20 15 30
+    L 15 85
+    Q 10 95 10 100
+    Q 10 105 15 115
+    L 15 170
+    Q 20 180 40 180
+    L 40 200
+    Q 10 200 5 185
+    L 5 115
+    Q 0 105 0 100
+    Q 0 95 5 85
+    L 5 15
+    Q 10 0 40 0
+    Z
+  " fill="url(#cardassianBracketBlue)"/>
+</svg>

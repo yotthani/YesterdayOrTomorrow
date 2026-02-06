@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 60" fill="none">
+  <defs>
+    <linearGradient id="hirogenReadoutBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#0A0F0A"/>
+      <stop offset="100%" style="stop-color:#151F15"/>
+    </linearGradient>
+    <linearGradient id="hirogenReadoutBorder" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#557755"/>
+      <stop offset="100%" style="stop-color:#334433"/>
+    </linearGradient>
+  </defs>
+  <path d="M 10 0 L 140 0 L 150 10 L 147 30 L 150 50 L 140 60 L 10 60 L 0 50 L 3 30 L 0 10 Z" fill="url(#hirogenReadoutBg)" stroke="url(#hirogenReadoutBorder)" stroke-width="2"/>
+  <!-- Trophy marks -->
+  <path d="M 20 45 L 28 52 L 20 50" stroke="#AA8855" stroke-width="1.5" opacity="0.5"/>
+  <path d="M 26 45 L 34 52 L 26 50" stroke="#AA8855" stroke-width="1.5" opacity="0.5"/>
+</svg>

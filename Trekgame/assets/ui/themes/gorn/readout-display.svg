@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 60" fill="none">
+  <defs>
+    <linearGradient id="gornReadoutBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#1A1A0A"/>
+      <stop offset="100%" style="stop-color:#2A2A15"/>
+    </linearGradient>
+    <linearGradient id="gornReadoutBorder" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#669944"/>
+      <stop offset="100%" style="stop-color:#445522"/>
+    </linearGradient>
+  </defs>
+
+  <path d="
+    M 10 0 L 140 0 L 150 10 L 148 20 L 150 30 L 148 40 L 150 50 L 140 60 L 10 60 L 0 50 L 2 40 L 0 30 L 2 20 L 0 10 Z
+  " fill="url(#gornReadoutBg)" stroke="url(#gornReadoutBorder)" stroke-width="2"/>
+
+  <!-- Scale pattern overlay -->
+  <path d="M 30 20 Q 45 15 60 20 Q 45 25 30 20" fill="none" stroke="#669944" stroke-width="1" opacity="0.3"/>
+  <path d="M 30 35 Q 45 30 60 35 Q 45 40 30 35" fill="none" stroke="#669944" stroke-width="1" opacity="0.3"/>
+  <path d="M 90 20 Q 105 15 120 20 Q 105 25 90 20" fill="none" stroke="#669944" stroke-width="1" opacity="0.3"/>
+  <path d="M 90 35 Q 105 30 120 35 Q 105 40 90 35" fill="none" stroke="#669944" stroke-width="1" opacity="0.3"/>
+</svg>

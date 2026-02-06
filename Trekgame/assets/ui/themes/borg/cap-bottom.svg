@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 30" fill="none">
+  <!-- Borg Cap Bottom -->
+  <defs>
+    <linearGradient id="borgCapMetal" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#2A3A3A"/>
+      <stop offset="100%" style="stop-color:#1A2A2A"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Rectangular cap -->
+  <rect x="0" y="0" width="40" height="30" fill="url(#borgCapMetal)"/>
+
+  <!-- Circuit line -->
+  <line x1="5" y1="25" x2="35" y2="25" stroke="#2A5A2A" stroke-width="2"/>
+
+  <!-- Node -->
+  <circle cx="20" cy="25" r="3" fill="#4A8A4A"/>
+</svg>

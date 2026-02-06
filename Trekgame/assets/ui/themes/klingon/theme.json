@@ -1,0 +1,47 @@
+{
+  "id": "klingon",
+  "name": "Klingon Defense Force",
+  "description": "Klingon Empire military interface system",
+  "faction": "klingon",
+  "fonts": {
+    "primary": {
+      "family": "Klingon Blade",
+      "fallback": "Impact, Arial Black, sans-serif",
+      "file": "fonts/klingon-blade.ttf",
+      "weight": "bold",
+      "letterSpacing": "0.02em",
+      "textTransform": "uppercase"
+    },
+    "secondary": {
+      "family": "Klingon Text",
+      "fallback": "Arial Narrow, sans-serif",
+      "file": "fonts/klingon-text.ttf",
+      "weight": "normal",
+      "letterSpacing": "0.01em"
+    },
+    "display": {
+      "family": "pIqaD",
+      "fallback": "Klingon Blade, Impact, sans-serif",
+      "file": "fonts/piqad.ttf",
+      "weight": "bold",
+      "letterSpacing": "0.05em",
+      "comment": "Traditional Klingon script for decorative use"
+    }
+  },
+  "colors": {
+    "primary": "#CC2222",
+    "secondary": "#880000",
+    "accent": "#FF6600",
+    "highlight": "#FFCC00",
+    "alert": "#FF0000",
+    "success": "#FF6600",
+    "background": "#0a0000",
+    "text": "#FF6600",
+    "textDark": "#000000"
+  },
+  "styles": {
+    "cornerRadius": "angular",
+    "borderStyle": "sharp",
+    "animationStyle": "aggressive"
+  }
+}

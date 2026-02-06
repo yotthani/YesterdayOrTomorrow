@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" fill="none">
+  <!-- Trill Corner Accent: Organic flowing corner with spot cluster -->
+  <defs>
+    <linearGradient id="trillCornerTeal" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#55AAAA"/>
+      <stop offset="100%" style="stop-color:#3D8080"/>
+    </linearGradient>
+    <linearGradient id="trillCornerBeige" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#DDCCAA"/>
+      <stop offset="100%" style="stop-color:#BBA888"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Organic curved L-shape corner -->
+  <path d="
+    M 0 0
+    L 40 0
+    Q 38 5, 35 8
+    Q 20 10, 10 20
+    Q 8 25, 8 40
+    L 0 40
+    Z
+  " fill="url(#trillCornerTeal)"/>
+
+  <!-- Decorative spot cluster -->
+  <ellipse cx="18" cy="8" rx="5" ry="3" fill="url(#trillCornerBeige)" transform="rotate(-10 18 8)" opacity="0.8"/>
+  <ellipse cx="10" cy="18" rx="4" ry="2.5" fill="url(#trillCornerBeige)" transform="rotate(-45 10 18)" opacity="0.7"/>
+  <ellipse cx="5" cy="28" rx="3" ry="2" fill="url(#trillCornerBeige)" transform="rotate(-75 5 28)" opacity="0.6"/>
+</svg>

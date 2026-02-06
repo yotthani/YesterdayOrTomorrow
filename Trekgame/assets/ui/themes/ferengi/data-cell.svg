@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 30" fill="none">
+  <!-- Ferengi Data Cell: Pink display accent (for data readouts) -->
+  <defs>
+    <linearGradient id="ferengiCellPink" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF99CC"/>
+      <stop offset="100%" style="stop-color:#CC6699"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Hexagonal data cell -->
+  <path d="
+    M 8 0
+    L 92 0
+    L 100 15
+    L 92 30
+    L 8 30
+    L 0 15
+    Z
+  " fill="url(#ferengiCellPink)"/>
+</svg>

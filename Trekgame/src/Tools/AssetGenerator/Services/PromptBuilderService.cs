@@ -1,3 +1,4 @@
+using System.Net.Http;
 using StarTrekGame.AssetGenerator.Models;
 using AssetGenerator.Services;
 
@@ -6,17 +7,22 @@ namespace StarTrekGame.AssetGenerator.Services;
 public class PromptBuilderService
 {
     private readonly Dictionary<Faction, FactionProfile> _factionProfiles;
-    private readonly Dictionary<string, string> _iconicShipGeometry;
     private readonly PromptDataService _promptData;
+    private readonly BuildingManifestService _buildingManifestService;
     private bool _jsonDataLoaded = false;
-    
-    public PromptBuilderService()
+
+    public PromptBuilderService(HttpClient httpClient)
     {
         _factionProfiles = InitializeFactionProfiles();
-        _iconicShipGeometry = InitializeIconicShipGeometry();
-        _promptData = new PromptDataService();
+        _promptData = new PromptDataService(httpClient);
+        _buildingManifestService = new BuildingManifestService();
     }
-    
+
+    /// <summary>
+    /// Get the building manifest service for external use
+    /// </summary>
+    public BuildingManifestService BuildingManifestService => _buildingManifestService;
+
     /// <summary>
     /// Initialize JSON data loading (call once at startup)
     /// </summary>
@@ -25,229 +31,15 @@ public class PromptBuilderService
         if (!_jsonDataLoaded)
         {
             await _promptData.LoadAsync();
+            await _buildingManifestService.LoadAsync();
             _jsonDataLoaded = true;
         }
     }
     
-    /// <summary>
-    /// Detailed geometric descriptions for iconic ship classes to ensure recognizable silhouettes
-    /// </summary>
-    private Dictionary<string, string> InitializeIconicShipGeometry()
-    {
-        return new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
-        {
-            // ═══════════════════════════════════════════════════════════════════
-            // FEDERATION STARSHIPS - Reference-based (trust AI's Star Trek knowledge)
-            // ═══════════════════════════════════════════════════════════════════
-            ["Constitution"] = "Star Trek CONSTITUTION CLASS starship, USS Enterprise NCC-1701 from The Original Series. Accurate to the original design.",
-            ["Galaxy"] = "Star Trek GALAXY CLASS starship, USS Enterprise NCC-1701-D from The Next Generation. Accurate to the original design.",
-            ["Sovereign"] = "Star Trek SOVEREIGN CLASS starship, USS Enterprise NCC-1701-E from First Contact/Nemesis. Accurate to the original design.",
-            ["Intrepid"] = "Star Trek INTREPID CLASS starship, USS Voyager NCC-74656 from Voyager series. Accurate to the original design.",
-            ["Defiant"] = "Star Trek DEFIANT CLASS escort, USS Defiant NX-74205 from Deep Space Nine. Accurate to the original design.",
-            ["Miranda"] = "Star Trek MIRANDA CLASS starship, USS Reliant NCC-1864 from Wrath of Khan. With roll bar. Accurate to the original design.",
-            ["Excelsior"] = "Star Trek EXCELSIOR CLASS starship, USS Excelsior NCC-2000 from Star Trek III and VI. Accurate to the original design.",
-            ["Nebula"] = "Star Trek NEBULA CLASS starship, USS Sutherland from TNG. With sensor pod. Accurate to the original design.",
-            ["Akira"] = "Star Trek AKIRA CLASS starship from First Contact. Accurate to the original design.",
-            ["Prometheus"] = "Star Trek PROMETHEUS CLASS from Voyager 'Message in a Bottle'. Accurate to the original design.",
-            ["Nova"] = "Star Trek NOVA CLASS, USS Equinox from Voyager. Small science vessel. Accurate to the original design.",
-            ["Ambassador"] = "Star Trek AMBASSADOR CLASS, USS Enterprise NCC-1701-C from TNG. Accurate to the original design.",
-            ["Oberth"] = "Star Trek OBERTH CLASS, USS Grissom from Search for Spock. Accurate to the original design.",
-            ["Constellation"] = "Star Trek CONSTELLATION CLASS, USS Stargazer NCC-2893 from TNG. Four nacelles. Accurate to the original design.",
-            ["Niagara"] = "Star Trek NIAGARA CLASS from TNG. Three nacelles. Accurate to the original design.",
-            ["Cheyenne"] = "Star Trek CHEYENNE CLASS from TNG. Four nacelles. Accurate to the original design.",
-            ["Springfield"] = "Star Trek SPRINGFIELD CLASS from TNG. Accurate to the original design.",
-            ["New Orleans"] = "Star Trek NEW ORLEANS CLASS from TNG. Accurate to the original design.",
-            ["Centaur"] = "Star Trek CENTAUR CLASS from DS9. Accurate to the original design.",
-            ["Saber"] = "Star Trek SABER CLASS escort from First Contact. Accurate to the original design.",
-            ["Steamrunner"] = "Star Trek STEAMRUNNER CLASS from First Contact. Accurate to the original design.",
-            ["Norway"] = "Star Trek NORWAY CLASS from First Contact. Accurate to the original design.",
-            
-            // ═══════════════════════════════════════════════════════════════════
-            // FEDERATION SHUTTLES
-            // ═══════════════════════════════════════════════════════════════════
-            ["Danube Runabout"] = "Star Trek DANUBE CLASS RUNABOUT from Deep Space Nine. Accurate to the original design.",
-            ["Delta Flyer"] = "Star Trek DELTA FLYER shuttle from Voyager. Designed by Tom Paris. Accurate to the original design.",
-            ["Type 6 Shuttle"] = "Star Trek TYPE 6 SHUTTLECRAFT from TNG. Accurate to the original design.",
-            ["Type 9 Shuttle"] = "Star Trek TYPE 9 SHUTTLECRAFT from Voyager. Accurate to the original design.",
-            ["Work Bee"] = "Star Trek WORK BEE utility pod from The Motion Picture and TNG. Yellow. Accurate to the original design.",
-            
-            // Default for unknown Federation ships
-            ["Federation Default"] = "Generic Federation Starfleet vessel. White/grey hull, saucer section, warp nacelles with red Bussard collectors and blue glow.",
-            
-            // ═══════════════════════════════════════════════════════════════════
-            // KLINGON SHIPS - IMPORTANT: Each class is VISUALLY DISTINCT!
-            // ═══════════════════════════════════════════════════════════════════
-            
-            // Classic Bird of Prey variants (the ONLY ones with swept wings)
-            ["Bird of Prey"] = "Star Trek KLINGON BIRD OF PREY (B'rel class). COMPACT BODY with TWO SWEPT-BACK WINGS that angle UP in cruise position. Small/medium ship. Green hull.",
-            ["B'rel"] = "Star Trek KLINGON B'REL CLASS BIRD OF PREY. SMALL scout ship with movable wings. Green hull.",
-            ["K'Vort"] = "Star Trek KLINGON K'VORT CLASS. LARGER Bird of Prey variant with wider wingspan. Medium cruiser size.",
-            
-            // D7/K't'inga lineage (HAMMERHEAD design - NOT bird-like!)
-            ["D7"] = "Star Trek KLINGON D7 BATTLECRUISER from TOS. DISTINCT HAMMERHEAD SHAPE: bulbous COMMAND POD at front connected by long thin NECK to MAIN HULL with two ANGLED WARP NACELLES on short wings. NOT a bird shape - looks like a hammer or mace.",
-            ["K'Tinga"] = "Star Trek KLINGON K'TINGA CLASS from The Motion Picture. HAMMERHEAD SHAPE like D7 but more detailed: bulbous HEAD connected by LONG NECK to angular BODY with two NACELLES on wing struts. More detailed than D7.",
-            ["D5"] = "Early KLINGON D5 CRUISER. Similar to D7 but smaller and simpler. Hammerhead shape with neck and nacelles.",
-            
-            // Attack Cruisers (ELONGATED predator shapes)
-            ["Vor'cha"] = "Star Trek KLINGON VOR'CHA CLASS ATTACK CRUISER. ELONGATED PREDATOR SHAPE: long pointed NOSE, raised BRIDGE SECTION near rear, angular HULL. NOT a bird - more like an aggressive dagger or spear shape.",
-            
-            // Dreadnoughts/Flagships (MASSIVE wide ships)
-            ["Negh'Var"] = "Star Trek KLINGON NEGH'VAR CLASS WARSHIP. MASSIVE DREADNOUGHT: very WIDE BODY, multiple visible DECKS, heavy ARMOR plating, prominent COMMAND TOWER, many weapon hardpoints. Flagship of the Empire.",
-            
-            // Raptors (SLEEK interceptors)
-            ["Raptor"] = "KLINGON RAPTOR CLASS interceptor from Enterprise. SLEEK needle-like NOSE, small forward-swept wings, fast attack ship. Different from Bird of Prey - more like a diving falcon.",
-            
-            // Additional classes from expanded universe/games
-            ["Kvort"] = "KLINGON K'VORT CLASS cruiser. Large Bird of Prey variant.",
-            ["Qang"] = "KLINGON QANG CLASS destroyer. Angular attack ship with heavy forward weapons.",
-            ["Birok"] = "KLINGON BIROK CLASS frigate. Small patrol ship with aggressive profile.",
-            ["Chontay"] = "KLINGON CHONTAY CLASS fast destroyer. Sleek, fast, angular design.",
-            ["Suvwl"] = "KLINGON SUVWI' CLASS escort. Compact warship design.",
-            
-            // Default for unknown Klingon ships - VARIES by size
-            ["Klingon Default"] = "Generic Klingon warship. Dark green hull with angular aggressive design. NOTE: Klingon ships are NOT all bird-shaped. Small ships may be bird-like, medium ships often have hammerhead/nacelle designs, large ships are bulky dreadnoughts.",
-            ["Klingon Frigate"] = "Small KLINGON frigate/patrol ship. Compact angular design. Dark green hull. NOT necessarily bird-shaped.",
-            ["Klingon Cruiser"] = "Medium KLINGON cruiser. Could be hammerhead (D7-style) with neck and nacelles, OR elongated predator (Vor'cha-style). NOT a Bird of Prey.",
-            ["Klingon Battleship"] = "Large KLINGON battleship. Heavy armor, multiple decks, aggressive angular design. NOT bird-shaped.",
-            ["Klingon Dreadnought"] = "Massive KLINGON dreadnought like Negh'Var. Wide body, heavy armor, command tower, many weapons.",
-            
-            // ═══════════════════════════════════════════════════════════════════
-            // ROMULAN SHIPS - Elegant predatory birds, NO visible nacelles
-            // ═══════════════════════════════════════════════════════════════════
-            ["Warbird"] = "ROMULAN D'DERIDEX CLASS WARBIRD: MASSIVE ship with TWO PARALLEL HULLS creating NEGATIVE SPACE (open area) in center. Bird-HEAD shape at front. Double-hull creates distinctive silhouette. Green hull with bird markings. Reference: TNG Romulan Warbird. NO visible nacelles.",
-            ["D'deridex"] = "ROMULAN D'DERIDEX CLASS: TWO HULLS with OPEN CENTER - like a tuning fork or bird with spread wings. MASSIVE size. Green hull. Reference: TNG.",
-            ["Valdore"] = "ROMULAN VALDORE TYPE: SINGLE sleeker hull, more compact than D'deridex. Still bird-like but NARROWER profile. Green with copper accents. Reference: Star Trek Nemesis.",
-            ["Scimitar"] = "ROMULAN SCIMITAR: MASSIVE dreadnought with WING structures. Heavily armed. Dark green. Reference: Star Trek Nemesis Reman ship.",
-            ["T'Liss"] = "ROMULAN T'LISS CLASS: Light warbird, patrol vessel. Single compact hull, elegant bird curves.",
-            ["Mogai"] = "ROMULAN MOGAI CLASS: Heavy warbird similar to Valdore. Aggressive angular profile.",
-            ["Bird of Prey TOS"] = "ROMULAN BIRD OF PREY (TOS): SMALL compact warbird from Original Series. Different from Klingon BoP. Plasma weapon visible. Reference: Balance of Terror.",
-            
-            // Romulan defaults by size
-            ["Romulan Default"] = "Generic ROMULAN warship. Green hull, elegant predatory bird aesthetic, NO visible warp nacelles (propulsion is internal). Bird-like curves and markings.",
-            ["Romulan Frigate"] = "Small ROMULAN patrol ship. Sleek single-hull design, green with bird markings. NO nacelles visible.",
-            ["Romulan Cruiser"] = "Medium ROMULAN warbird. Could be single-hull (Valdore-style) or hint of double-hull. Green, elegant, predatory.",
-            ["Romulan Battleship"] = "Large ROMULAN warbird. Double-hull design with central negative space. Massive and imposing.",
-            ["Romulan Dreadnought"] = "Massive ROMULAN dreadnought. D'deridex-scale or larger. Prominent double-hull or Scimitar-style wings.",
-            
-            // ═══════════════════════════════════════════════════════════════════
-            // CARDASSIAN SHIPS - Angular spade/arrowhead shapes, brown/tan
-            // ═══════════════════════════════════════════════════════════════════
-            ["Galor"] = "CARDASSIAN GALOR CLASS: SPADE/ARROWHEAD shape - pointed triangular BOW, WIDE MIDSECTION, TAPERED stern. Yellow-brown hull. Distinct DORSAL SPINE ridge running length of ship. Ridge/scale texture like armor plating. Reference: DS9/TNG Cardassian Warship.",
-            ["Keldon"] = "CARDASSIAN KELDON CLASS: Larger GALOR variant with additional WEAPONS POD on dorsal spine. More angular and aggressive. Reference: DS9.",
-            ["Hideki"] = "CARDASSIAN HIDEKI CLASS: SMALL ANGULAR patrol ship. Compact, wedge-shaped fighter. Reference: DS9 Cardassian fighter.",
-            ["Hutet"] = "CARDASSIAN HUTET CLASS: DREADNOUGHT size. Massive Galor-derived design with multiple weapon arrays.",
-            
-            // Cardassian defaults
-            ["Cardassian Default"] = "Generic CARDASSIAN warship. Yellow-brown/ochre hull, ANGULAR SPADE shape with pointed bow. Ridged hull texture. Dorsal spine detail.",
-            ["Cardassian Frigate"] = "Small CARDASSIAN patrol ship. Wedge-shaped Hideki design. Brown/tan, angular.",
-            ["Cardassian Cruiser"] = "Medium CARDASSIAN cruiser. Galor-class arrowhead design. Yellow-brown with hull ridges and dorsal spine.",
-            ["Cardassian Battleship"] = "Large CARDASSIAN warship. Keldon-style with dorsal weapon pod. Heavy armor plating.",
-            ["Cardassian Dreadnought"] = "Massive CARDASSIAN dreadnought. Hutet-class scale. Multiple weapon platforms.",
-            
-            // ═══════════════════════════════════════════════════════════════════
-            // BORG SHIPS - PERFECT GEOMETRIC shapes only
-            // ═══════════════════════════════════════════════════════════════════
-            ["Cube"] = "BORG CUBE: PERFECT CUBE shape - all sides EQUAL length. Dark gray/black with GREEN internal glow visible through hull gaps. No windows, no curves. Reference: TNG/Voyager Borg Cube.",
-            ["Sphere"] = "BORG SPHERE: PERFECT SPHERE shape. Dark gray with green glow. Smooth surface with technological details. Reference: First Contact.",
-            ["Diamond"] = "BORG DIAMOND: OCTAHEDRON shape - two PYRAMIDS joined base-to-base. Queen's vessel. Green glow.",
-            ["Borg Tactical Cube"] = "BORG TACTICAL CUBE: Cube with EXTRA ARMOR plating visible. More weapon hardpoints. Darker, more industrial.",
-            ["Borg Probe"] = "BORG PROBE: Small RECTANGULAR scout ship. Box shape. Green scanner glow.",
-            
-            // Borg defaults
-            ["Borg Default"] = "Generic BORG vessel. Must be GEOMETRIC (cube, sphere, rectangle, octahedron). Dark gray with GREEN glow. NO curves, NO windows, NO aesthetic design.",
-            ["Borg Frigate"] = "Small BORG probe/scout. Rectangular or small cubic. Green glow.",
-            ["Borg Cruiser"] = "Medium BORG vessel. Sphere or small cube. Technological surface detail.",
-            ["Borg Battleship"] = "Large BORG cube. Standard or tactical variant. Massive geometric shape.",
-            ["Borg Dreadnought"] = "Massive BORG vessel. Huge cube or unique geometric shape. Terrifying scale.",
-            
-            // ═══════════════════════════════════════════════════════════════════
-            // FERENGI SHIPS - D'Kora has very specific shape, others vary
-            // ═══════════════════════════════════════════════════════════════════
-            ["Marauder"] = "FERENGI D'KORA MARAUDER: TWO CURVED PRONGS extending forward like a tuning fork or crab claws. The prongs are SOLID HULL, NOT hollow. BRIDGE POD sits between prongs at the back. The space between prongs is EMPTY (negative space). Orange/copper hull. Reference: TNG Season 1 Ferengi Marauder - look it up!",
-            ["D'Kora"] = "FERENGI D'KORA CLASS: TWO FORWARD-SWEEPING ARMS/PRONGS with a COMMAND POD between them at rear. Like a tuning fork or letter U. Orange with gold accents. The center gap is EMPTY - no pod in the middle!",
-            ["Ferengi Pod"] = "FERENGI SHUTTLE POD: Small egg or teardrop shape. Simple curved personal transport. NOT crescent shaped.",
-            ["Ferengi Nagus"] = "FERENGI NAGUS YACHT: SLEEK ELONGATED luxury vessel like a space limousine. NOT fork-shaped - smooth aerodynamic single hull. Gold with ornate decorations.",
-            ["Ferengi Trader"] = "FERENGI TRADING VESSEL: BOXY RECTANGULAR cargo ship. Simple box shape. Maximizes cargo volume. Orange industrial hull.",
-            ["Ferengi Salvage"] = "FERENGI SALVAGE SHIP: IRREGULAR shape with GRAPPLING ARMS and tractor arrays. Industrial salvage vessel. Utilitarian.",
-            ["Ferengi Raider"] = "FERENGI RAIDER: WEDGE-SHAPED fast attack ship. Pointed bow, swept design. NOT fork-shaped. Built for speed.",
-            ["Ferengi Transport"] = "FERENGI TRANSPORT: BULBOUS cargo ship - OVAL or CYLINDER hull. Like a flying cargo container. NOT crescent shaped.",
-            ["Ferengi Cargo"] = "FERENGI CARGO HAULER: MASSIVE BOXY freighter. Simple rectangular shape. Industrial orange. Pure function.",
-            
-            // Ferengi defaults - ONLY military ships have fork shape
-            ["Ferengi Default"] = "Generic FERENGI vessel. Orange-copper hull. ONLY warships use the D'Kora fork/prong shape. Cargo ships are BOXY. Yachts are SLEEK. Shuttles are OVAL.",
-            ["Ferengi Frigate"] = "Small FERENGI warship. Compact version of D'Kora with two forward prongs and rear bridge pod. Orange with gold.",
-            ["Ferengi Cruiser"] = "Medium FERENGI warship. Classic D'Kora design - two curved PRONGS extending forward, command section at rear between them. Empty space between prongs.",
-            ["Ferengi Battleship"] = "Large FERENGI warship. Oversized D'Kora with massive forward prongs. More weapon arrays. Orange/gold.",
-            
-            // ═══════════════════════════════════════════════════════════════════
-            // DOMINION SHIPS - Organic beetle/insect shapes, purple
-            // ═══════════════════════════════════════════════════════════════════
-            ["Jem'Hadar Fighter"] = "JEM'HADAR FIGHTER: BEETLE/SCARAB shape - compact CURVED hull like an insect carapace. Purple/violet with glowing accents. ORGANIC appearance. Reference: DS9.",
-            ["Jem'Hadar Attack Ship"] = "JEM'HADAR ATTACK SHIP: Larger beetle design than fighter. More weapon pods. Purple organic hull.",
-            ["Jem'Hadar Battlecruiser"] = "JEM'HADAR BATTLECRUISER: LARGE insectoid warship. Multiple organic weapon protrusions. Purple bioluminescent.",
-            ["Dominion Battleship"] = "DOMINION BATTLESHIP: MASSIVE organic dreadnought. Carrier capability. Purple, almost alive-looking.",
-            
-            // Dominion defaults
-            ["Dominion Default"] = "Generic DOMINION vessel. Purple/violet hull, ORGANIC INSECTOID design like alien beetles. Curves not angles. NO windows. Bioluminescent glow.",
-            ["Dominion Frigate"] = "Small DOMINION fighter. Beetle-like scarab shape. Purple organic hull.",
-            ["Dominion Cruiser"] = "Medium DOMINION attack ship. Insectoid design with weapon pods.",
-            ["Dominion Dreadnought"] = "Massive DOMINION battleship. Huge organic beetle-like form.",
-            
-            // ═══════════════════════════════════════════════════════════════════
-            // OTHER FACTIONS
-            // ═══════════════════════════════════════════════════════════════════
-            
-            // BREEN - Asymmetric, icy
-            ["Breen Default"] = "Generic BREEN warship. ASYMMETRIC design (not mirrored). Ice-blue/teal coloring. Mysterious angular. Reference: DS9 Breen ships.",
-            ["Breen Frigate"] = "Small BREEN patrol ship. Asymmetric angular hull. Cold blue/teal tones. Compact but still deliberately asymmetric.",
-            ["Breen Cruiser"] = "Medium BREEN warship. Distinctive asymmetric design with uneven hull sections. Energy dampening weapon equipped. Ice-blue with teal accents.",
-            ["Breen Battleship"] = "Large BREEN warship. Heavily armed asymmetric design. Multiple weapon arrays including energy dampening systems. Imposing ice-blue hull.",
-            ["Breen Dreadnought"] = "Massive BREEN dreadnought. Extreme asymmetric design, largest class. Bristling with energy dampener arrays. Ice-blue and silver.",
-            ["Breen Carrier"] = "BREEN carrier vessel. Asymmetric flight deck configuration. Launch bays arranged unevenly. Ice-blue hull with fighter launch ports.",
-            ["Chel Grett"] = "BREEN CHEL GRETT CLASS warship. Distinctive asymmetric hull with angular protrusions. Medium-sized combat vessel. Teal-blue hull with crystalline accents. Reference: STO Breen ships.",
-            ["Plesh Brek"] = "BREEN PLESH BREK CLASS raider. Fast asymmetric attack ship. Sleek angular design optimized for speed. Ice-blue/teal with sharp edges.",
-            ["Sar Theln"] = "BREEN SAR THELN CLASS carrier. Large asymmetric hull with multiple flight bays. Massive ice-themed design. Cold blue with silver.",
-            ["Rezreth"] = "BREEN REZRETH CLASS dreadnought. Massive flagship. Extreme asymmetric profile. Most powerful Breen vessel. Ice-blue and white with crystalline weapons arrays.",
-            ["Bleth Choas"] = "BREEN BLETH CHOAS CLASS heavy cruiser. Powerful asymmetric warship. Heavy armor and weapons. Dark teal with ice-blue accents.",
-            
-            // THOLIAN - Crystalline geometric
-            ["Tholian Default"] = "Generic THOLIAN vessel. CRYSTALLINE appearance, amber/orange, GEOMETRIC angular design like faceted crystal.",
-            
-            // GORN - Heavy reptilian tanks
-            ["Gorn Default"] = "Generic GORN warship. HEAVY ARMORED design. Dark green/brown. Reptilian aesthetic - brutal and massive.",
-            ["Gorn Frigate"] = "Small GORN patrol ship. Compact but heavily armored. Dark green hull with scaled texture. Reptilian design language - brutal even at small size.",
-            ["Gorn Cruiser"] = "GORN cruiser. Bulky, heavily armored. Plasma weapons. Reference: TOS Arena, SNW.",
-            ["Gorn Battleship"] = "Large GORN battleship. Extremely heavy armor plating. Massive plasma weapon arrays. Dark green/bronze hull. Like a reptilian fortress in space.",
-            ["Gorn Dreadnought"] = "Massive GORN dreadnought. The largest reptilian warship. Overwhelming firepower and armor. Dark green with bronze accents. A mountain of weapons.",
-            ["Gorn Carrier"] = "GORN carrier. Heavy armored hull with reinforced fighter bays. Dark green. Built to deploy waves of smaller ships.",
-            ["Vishap"] = "GORN VISHAP CLASS cruiser. Main combat vessel. Heavy armored hull with scaled texture. Prominent plasma weapons. Dark green/brown. Reference: STO Gorn ships.",
-            ["Tuatara"] = "GORN TUATARA CLASS cruiser. Armored reptilian warship. Thick hull plating resembling scales. Multiple weapon mounts. Dark green.",
-            ["Draguas"] = "GORN DRAGUAS CLASS destroyer. Fast heavy attack ship. Powerful forward plasma weapons. Armored but more streamlined than cruisers. Dark green/bronze.",
-            ["Zilant"] = "GORN ZILANT CLASS battleship. Massive armored warship. Multiple plasma cannon batteries. Thick reptilian hull plating. Dark green with heavy bronze accents.",
-            ["Balaur"] = "GORN BALAUR CLASS dreadnought. Largest Gorn vessel. Multiple heads/weapon pods giving it a hydra-like appearance. Enormous, brutally armored. Dark green.",
-            ["Varanus"] = "GORN VARANUS CLASS support vessel. Armored support/repair ship. Heavy hull but support-focused. Medical and engineering bays. Dark green.",
-            
-            // ANDORIAN - Sleek blue
-            ["Andorian Default"] = "Generic ANDORIAN warship. SLEEK blue hull, prominent ANTENNA-like sensor arrays. Fast and elegant.",
-            ["Andorian Frigate"] = "Small ANDORIAN frigate. Sleek compact design. Blue hull with white accents. Antenna-like sensor arrays. Fast and maneuverable.",
-            ["Andorian Cruiser"] = "Medium ANDORIAN cruiser. Elegant blue warship with prominent antenna structures. Balanced weapons and speed. White and silver accents.",
-            ["Andorian Battleship"] = "Large ANDORIAN battleship. Powerful blue warship with multiple antenna arrays. Heavy weapons but still elegant. Ice-blue hull.",
-            ["Andorian Dreadnought"] = "Massive ANDORIAN dreadnought. Largest Imperial Guard vessel. Multiple antenna spires. Imposing ice-blue hull. Elegant but overwhelming.",
-            ["Andorian Carrier"] = "ANDORIAN carrier. Sleek blue hull with multiple launch bays. Antenna arrays for coordination. Elegant military design.",
-            ["Kumari"] = "ANDORIAN KUMARI CLASS: Sleek blue warship with distinctive antenna structures. Reference: Enterprise.",
-            ["Charal"] = "ANDORIAN CHARAL CLASS escort. Sleek blue tactical escort. Enhanced weapons. Antenna arrays for targeting. Reference: STO Andorian ships.",
-            ["Khyzon"] = "ANDORIAN KHYZON CLASS escort. Aggressive blue warship variant. Enhanced combat systems. Prominent antenna weapon arrays. Reference: STO.",
-            
-            // VULCAN - Ring warp drive
-            ["Vulcan Default"] = "Generic VULCAN vessel. Bronze/copper hull with distinctive RING-SHAPED WARP DRIVE (not nacelles). Logical efficient design.",
-            ["Vulcan Frigate"] = "Small VULCAN defense ship. Compact bronze hull with small ring-shaped warp nacelle. Logical minimalist design. Efficient.",
-            ["Vulcan Battleship"] = "Large VULCAN combat cruiser. Bronze/copper hull with large prominent ring warp drive. Heavy weapons but logical layout. Ancient yet powerful.",
-            ["Vulcan Dreadnought"] = "Massive VULCAN flagship. Largest Vulcan vessel with enormous ring warp drive. Bronze/copper. Overwhelming logical precision in design.",
-            ["D'Kyr"] = "VULCAN D'KYR CLASS: CIRCULAR WARP RING around central hull. Bronze color. Reference: Enterprise.",
-            ["Suurok"] = "VULCAN SUUROK CLASS: Combat cruiser with ring warp drive. Bronze/copper.",
-        };
-    }
-    
+    // NOTE: Ship geometry data is now loaded from Ships.json via PromptDataService
+    // The old hardcoded InitializeIconicShipGeometry() dictionary has been removed.
+    // If you get errors about missing ship data, check that Ships.json has the required faction entries.
+
     public FactionProfile GetFactionProfile(Faction faction) => _factionProfiles[faction];
     
     public List<string> GetAssetList(Faction faction, AssetCategory category)
@@ -297,7 +89,7 @@ public class PromptBuilderService
             AssetCategory.Portraits => new GridSpec { Columns = 6, Rows = 6 },
             AssetCategory.HouseSymbols => new GridSpec { Columns = 8, Rows = 6 },
             AssetCategory.EventCharacters => new GridSpec { Columns = 6, Rows = 6 },
-            AssetCategory.FactionLeaders => new GridSpec { Columns = 4, Rows = 4 },  // 16 faction leaders
+            AssetCategory.FactionLeaders => new GridSpec { Columns = 4, Rows = 5 },  // 20 faction leaders (17 defined + 3 spare)
             // New categories
             AssetCategory.UIElements => new GridSpec { Columns = 6, Rows = 6 },
             AssetCategory.UIIcons => new GridSpec { Columns = 8, Rows = 6 },
@@ -307,7 +99,7 @@ public class PromptBuilderService
             AssetCategory.GalaxyTiles => new GridSpec { Columns = 6, Rows = 6 },
             AssetCategory.SystemElements => new GridSpec { Columns = 6, Rows = 6 },
             AssetCategory.Effects => new GridSpec { Columns = 6, Rows = 6 },
-            AssetCategory.FactionSymbols => new GridSpec { Columns = 4, Rows = 4 },  // 16 factions
+            AssetCategory.FactionSymbols => new GridSpec { Columns = 5, Rows = 5 },  // 21+ factions (25 slots)
             AssetCategory.SpecialCharacters => new GridSpec { Columns = 4, Rows = 4 },  // 16 special chars
             _ => new GridSpec { Columns = 6, Rows = 6 }
         };
@@ -574,25 +366,51 @@ public class PromptBuilderService
         {
             return BuildCivilianShipPrompt(profile, shipName);
         }
-        
+
         var shipType = "military warship";
         var weaponNote = "weapon arrays visible";
-        
-        // Check if this is an iconic ship class with specific geometry
-        // Pass faction for default fallback
-        var geometryDescription = GetShipGeometry(shipName, profile.Faction);
-        var geometrySection = !string.IsNullOrEmpty(geometryDescription) 
-            ? $"\n\n{geometryDescription}\n" 
-            : "";
+
+        // Get ship description from JSON data (Ships.json) - this is the ONLY source
+        // Throw error if JSON data is missing so we notice immediately
+        var geometryParts = new List<string>();
+
+        // Get faction-wide design language from JSON (designLanguage, colors, features, important)
+        var jsonFactionStyle = _promptData.GetFactionStyle("ships", profile.Faction.ToString(), isMilitary: true);
+        if (string.IsNullOrEmpty(jsonFactionStyle))
+        {
+            throw new InvalidOperationException(
+                $"MISSING JSON DATA: Ships.json has no 'factionStyles.{profile.Faction.ToString().ToLower()}.military' entry. " +
+                $"Please add faction style definition for {profile.Faction} in Data/Prompts/Ships.json");
+        }
+        geometryParts.Add(jsonFactionStyle);
+
+        // Get ship class variant from JSON (more specific than faction default) - optional but logged
+        var jsonClassVariant = _promptData.GetShipClassVariant(profile.Faction.ToString(), shipName);
+        if (!string.IsNullOrEmpty(jsonClassVariant))
+        {
+            geometryParts.Add(jsonClassVariant);
+        }
+        else
+        {
+            // Log info - not every ship needs a specific class variant, faction default is used
+            Console.WriteLine($"[INFO] No specific classVariant for '{shipName}' in {profile.Faction} - using faction default");
+        }
+
+        var geometryDescription = string.Join("\n\n", geometryParts);
+        var geometrySection = $"\n\n{geometryDescription}\n";
         
         // Add faction-specific tactical notes
         var tacticalNote = GetFactionTacticalNote(profile.Faction);
-        
-        // Anti-double-saucer warning for Federation
-        var saucerWarning = profile.Faction == Faction.Federation 
-            ? "\n\nCRITICAL FEDERATION RULE: Federation ships have ONLY ONE SAUCER - never two saucers stacked or side by side. The saucer is the primary hull. Secondary hull (if present) is cylindrical/elongated, NOT another saucer.\n"
-            : "";
-        
+
+        // Faction-specific warnings and negative prompts
+        var factionWarning = GetFactionShipWarning(profile.Faction);
+        var factionNegativePrompt = GetFactionNegativePrompt(profile.Faction);
+
+        // Adjust camera description based on faction (not all have saucers!)
+        var cameraFrontDescription = profile.Faction == Faction.Federation
+            ? "Saucer/bridge appears in lower-left quadrant"
+            : "Ship's bow/front appears in lower-left quadrant";
+
         return $@"MANDATORY STYLE GUIDE:
 Material & Texture: The spaceship must look like a handmade physical model made of plasticine clay with a subtle comic-like shader. Realistic metallic hull texture with a non-glossy, soft clay finish. High-end stop-motion animation quality (Laika/Aardman style). Very detailed panel lines, windows, and technical details.
 Proportions (CRUCIAL - FOLLOW EXACTLY): Accurate to the ship class design. Maintain correct proportions and EXACT number of components as specified.
@@ -604,7 +422,7 @@ Camera/Perspective (CRITICAL - MUST FOLLOW EXACTLY):
 - Ship's BACK/ENGINES/STERN = TOP-RIGHT of image
 - Visible: TOP surface + LEFT (port) side of ship
 - Nacelles/engines appear in upper-right quadrant
-- Saucer/bridge appears in lower-left quadrant
+- {cameraFrontDescription}
 - Like viewing from 2 o'clock position above the ship
 - Angle: 30-45 degrees above horizontal
 - DO NOT flip or mirror - nose MUST be lower-left!
@@ -612,20 +430,19 @@ Background: Solid black background (#000000).
 Details: Glowing windows, engine glow, subtle weathering, {profile.Name} faction markings, {weaponNote}.
 {geometrySection}
 {tacticalNote}
-{saucerWarning}
-Subject: Single {profile.Name} {shipType}, {shipName} class. 
+{factionWarning}
+Subject: Single {profile.Name} {shipType}, {shipName} class.
 Design Language: {profile.DesignLanguage}
 Color Scheme: {profile.ColorScheme}
 
 CRITICAL RULES:
 1. Follow the EXACT GEOMETRY specified above
 2. Do NOT add extra nacelles or components
-3. Do NOT add double saucers - only ONE saucer section per ship
-4. Count components carefully before generating
-5. Ship MUST face BOTTOM-LEFT, engines toward TOP-RIGHT
+3. Count components carefully before generating
+4. Ship MUST face BOTTOM-LEFT, engines toward TOP-RIGHT
 
 **single spacecraft miniature model, rendered in high-quality stylized claymation 3D style, game asset, isometric view, ship facing bottom-left**
---no funny, thumbprints, exaggerated features, multiple ships, fleet, grid, shiny plastic, CGI look, action figure, base, stand, table surface, tilt-shift, blurry background, frame, border, text, label, pedestal, extra engines, wrong number of nacelles, double saucer, two saucers, stacked hulls, ship facing right, ship facing up, frontal view, rear view";
+--no funny, thumbprints, exaggerated features, multiple ships, fleet, grid, shiny plastic, CGI look, action figure, base, stand, table surface, tilt-shift, blurry background, frame, border, text, label, pedestal, extra engines, wrong number of nacelles, stacked hulls, ship facing right, ship facing up, frontal view, rear view{factionNegativePrompt}";
     }
     
     /// <summary>
@@ -1104,7 +921,7 @@ CRITICAL CIVILIAN SHIP RULES:
             Faction.Breen => "BREEN DESIGN: Refrigeration systems integral. Energy dampening weapons. Completely mysterious technology. Asymmetric, alien design.",
             Faction.Gorn => "GORN DESIGN: Massive, heavily armored. Slow but extremely powerful. Built for their large crew. Reptilian heat requirements.",
             Faction.Vulcan => "VULCAN DESIGN: Ring/circular warp drive configuration. Logical, efficient, no wasted space. Bronze/copper coloring. Ancient yet advanced.",
-            Faction.Andorian => "ANDORIAN DESIGN: Ice-crystal aesthetics. Aggressive military tradition. Blue color accents. Antenna-inspired design elements.",
+            Faction.Andorian => "ANDORIAN DESIGN: NO SAUCER SECTIONS! Ships have ARROW/SPEAR-SHAPED hulls with SWEPT-BACK WING PYLONS like raptors. Blue-gray color. Imperial Guard military tradition.",
             Faction.Trill => "TRILL DESIGN: Federation-adjacent but unique. Symbiont-inspired organic curves. Scientific focus. Elegant exploration vessels.",
             Faction.Bajoran => "BAJORAN DESIGN: Spiritual aesthetic with solar-sail and lightship heritage. Resistance-era ships are utilitarian, post-occupation more elegant. Prophets symbolism.",
             Faction.Tholian => "THOLIAN DESIGN: Crystalline geometric shapes. Web-spinning capability. Extreme heat environments. Faceted surfaces like gems. Amber/orange coloring.",
@@ -1112,129 +929,50 @@ CRITICAL CIVILIAN SHIP RULES:
             _ => ""
         };
     }
-    
+
     /// <summary>
-    /// Gets the detailed geometry description for iconic ship classes
-    /// Falls back to faction default if specific ship not found
-    /// IMPORTANT: Avoids cross-faction contamination by checking faction prefix
+    /// Get faction-specific warning text to prevent wrong designs
     /// </summary>
-    private string GetShipGeometry(string shipName, Faction? faction = null)
+    private string GetFactionShipWarning(Faction faction)
     {
-        // Normalize the ship name
-        var normalizedName = shipName.ToLower().Trim();
-        var factionPrefix = faction?.ToString().ToLower() ?? "";
-        
-        // PHASE 1: Try exact match first
-        foreach (var kvp in _iconicShipGeometry)
+        return faction switch
         {
-            if (normalizedName.Equals(kvp.Key.ToLower()))
-                return kvp.Value;
-        }
-        
-        // PHASE 2: Try faction-SPECIFIC ship class matches first (e.g., "Galor" for Cardassian)
-        // Only match entries that either:
-        // - Start with the current faction name, OR
-        // - Don't start with ANY faction name (generic entries like "Constitution", "Galor")
-        var allFactions = new[] { "federation", "klingon", "romulan", "cardassian", "ferengi", "borg", "dominion", "breen", "gorn", "tholian", "andorian", "vulcan" };
-        
-        foreach (var kvp in _iconicShipGeometry)
-        {
-            var keyLower = kvp.Key.ToLower();
-            
-            // Skip default entries and generic type entries in this pass
-            if (keyLower.Contains("default")) continue;
-            if (keyLower.Contains("frigate") || keyLower.Contains("cruiser") || 
-                keyLower.Contains("battleship") || keyLower.Contains("dreadnought") ||
-                keyLower.Contains("carrier")) continue;
-            
-            // Check if this key belongs to a DIFFERENT faction - if so, skip it!
-            var keyBelongsToOtherFaction = allFactions.Any(f => 
-                keyLower.StartsWith(f) && f != factionPrefix);
-            if (keyBelongsToOtherFaction) continue;
-            
-            // Now safe to match - check if ship name contains this class
-            if (normalizedName.Contains(keyLower) || 
-                normalizedName.StartsWith(keyLower) ||
-                keyLower.Contains(normalizedName))
-            {
-                return kvp.Value;
-            }
-            
-            // Check individual words for partial match (but avoid short words)
-            var shipWords = normalizedName.Split(' ', '-', '_', '\'');
-            var keyWords = keyLower.Split(' ', '-', '_', '\'');
-            
-            // Only match on significant words (length > 3) and not generic terms
-            var genericTerms = new[] { "class", "type", "ship", "vessel", "cruiser", "frigate", "battleship" };
-            if (shipWords.Any(w => keyWords.Contains(w) && w.Length > 3 && !genericTerms.Contains(w)))
-            {
-                return kvp.Value;
-            }
-        }
-        
-        // PHASE 3: Generic ship types with faction-specific defaults
-        if (faction.HasValue)
-        {
-            var factionName = faction.Value.ToString();
-            
-            // Frigates/Escorts (small)
-            if (normalizedName.Contains("frigate") || normalizedName.Contains("escort") || 
-                normalizedName.Contains("patrol") || normalizedName.Contains("scout"))
-            {
-                var frigateKey = $"{factionName} Frigate";
-                if (_iconicShipGeometry.TryGetValue(frigateKey, out var frigateGeometry))
-                    return frigateGeometry;
-            }
-            
-            // Cruisers (medium) - but NOT if a specific class was already in the name
-            if (normalizedName.Contains("cruiser") || normalizedName.Contains("destroyer") ||
-                normalizedName.Contains("attack"))
-            {
-                var cruiserKey = $"{factionName} Cruiser";
-                if (_iconicShipGeometry.TryGetValue(cruiserKey, out var cruiserGeometry))
-                    return cruiserGeometry;
-            }
-            
-            // Battleships (large)
-            if (normalizedName.Contains("battleship") || normalizedName.Contains("warship") ||
-                normalizedName.Contains("heavy"))
-            {
-                var battleshipKey = $"{factionName} Battleship";
-                if (_iconicShipGeometry.TryGetValue(battleshipKey, out var battleshipGeometry))
-                    return battleshipGeometry;
-            }
-            
-            // Dreadnoughts (huge)
-            if (normalizedName.Contains("dreadnought") || normalizedName.Contains("command") ||
-                normalizedName.Contains("flagship"))
-            {
-                var dreadnoughtKey = $"{factionName} Dreadnought";
-                if (_iconicShipGeometry.TryGetValue(dreadnoughtKey, out var dreadnoughtGeometry))
-                    return dreadnoughtGeometry;
-            }
-            
-            // Carriers
-            if (normalizedName.Contains("carrier") || normalizedName.Contains("fighter"))
-            {
-                var carrierKey = $"{factionName} Carrier";
-                if (_iconicShipGeometry.TryGetValue(carrierKey, out var carrierGeometry))
-                    return carrierGeometry;
-            }
-        }
-        
-        // PHASE 4: Faction default
-        if (faction.HasValue)
-        {
-            var defaultKey = $"{faction.Value} Default";
-            if (_iconicShipGeometry.TryGetValue(defaultKey, out var defaultGeometry))
-            {
-                return defaultGeometry;
-            }
-        }
-        
-        return string.Empty;
+            Faction.Federation => "\n\nCRITICAL FEDERATION RULE: Federation ships have ONLY ONE SAUCER - never two saucers stacked or side by side.\n",
+            Faction.Andorian => "\n\nCRITICAL ANDORIAN RULE: Andorian ships have ABSOLUTELY NO SAUCER SECTIONS! They are ARROW/SPEAR shaped with SWEPT-BACK WING PYLONS like birds of prey. If you are drawing a saucer or disc shape, STOP - that is WRONG for Andorian!\n",
+            Faction.Klingon => "\n\nCRITICAL KLINGON RULE: Klingon ships are NOT all Bird of Prey! D7/K't'inga have HAMMERHEAD shape, Vor'cha is DAGGER shaped, Negh'Var is MASSIVE and WIDE.\n",
+            Faction.Romulan => "\n\nCRITICAL ROMULAN RULE: Romulan warbirds have NO visible warp nacelles - propulsion is internal. D'deridex has DOUBLE HULL with negative space.\n",
+            Faction.Vulcan => "\n\nCRITICAL VULCAN RULE: Vulcan ships have RING-SHAPED WARP DRIVES encircling the hull - NOT nacelles on pylons! Bronze/copper color.\n",
+            Faction.Borg => "\n\nCRITICAL BORG RULE: Borg ships are PERFECT GEOMETRIC shapes - cubes, spheres, octahedrons. NO organic curves, NO windows.\n",
+            Faction.Cardassian => "\n\nCRITICAL CARDASSIAN RULE: Cardassian ships are INSECTOID/COBRA shaped - pointed head, segmented body. Yellow-brown/ochre hull.\n",
+            Faction.Dominion => "\n\nCRITICAL DOMINION RULE: Dominion ships look ORGANIC and INSECTOID - like alien beetles. Purple/violet hull. NOT mechanical.\n",
+            Faction.Orion => "\n\nCRITICAL ORION RULE: Orion ships are CRESCENT/SICKLE shaped - curved like elegant blades. Dark hull with GREEN accent lighting.\n",
+            _ => ""
+        };
     }
-    
+
+    /// <summary>
+    /// Get faction-specific negative prompt additions
+    /// </summary>
+    private string GetFactionNegativePrompt(Faction faction)
+    {
+        return faction switch
+        {
+            Faction.Federation => ", double saucer, two saucers",
+            Faction.Andorian => ", saucer, saucer section, disc shape, circular hull, round primary hull, Federation design",
+            Faction.Klingon => ", Federation saucer, round hull",
+            Faction.Romulan => ", visible nacelles, Federation saucer",
+            Faction.Vulcan => ", Federation saucer, nacelles on pylons",
+            Faction.Borg => ", organic curves, windows, saucer",
+            Faction.Cardassian => ", Federation saucer, round hull",
+            Faction.Dominion => ", mechanical look, Federation saucer, angular design",
+            Faction.Orion => ", Federation saucer, angular blocky design",
+            Faction.Breen => ", symmetrical design, Federation saucer",
+            Faction.Gorn => ", sleek design, Federation saucer",
+            Faction.Tholian => ", organic curves, Federation saucer",
+            _ => ""
+        };
+    }
+
     private string BuildStructurePrompt(FactionProfile profile, string structureName, bool isMilitary)
     {
         var structureType = isMilitary ? "military defense structure" : "civilian space structure";
@@ -1423,7 +1161,23 @@ CRITICAL RULES FOR SPACE STRUCTURES:
     private string BuildBuildingPrompt(FactionProfile profile, string buildingName)
     {
         var factionArchitecture = GetFactionBuildingStyle(profile.Faction, buildingName);
-        
+
+        // Try to get detailed building info from JSON manifest
+        var buildingInfo = _buildingManifestService.GetBuilding(profile.Faction, buildingName);
+        var buildingDescription = buildingInfo?.Description ?? string.Empty;
+        var buildingCategory = buildingInfo?.Category ?? string.Empty;
+
+        // Build the building-specific details section
+        var buildingDetails = string.Empty;
+        if (!string.IsNullOrEmpty(buildingDescription))
+        {
+            buildingDetails = $@"
+BUILDING PURPOSE:
+- Category: {buildingCategory}
+- Function: {buildingDescription}
+- Design the building to clearly reflect this purpose in its architecture.";
+        }
+
         return $@"MANDATORY STYLE GUIDE:
 Material & Texture: The building must look like a handmade physical model made of plasticine clay with a subtle comic-like shader. Realistic architectural texture with a non-glossy, soft clay finish. High-end stop-motion animation quality (Laika/Aardman style). Very detailed windows, doors, and structural elements.
 Proportions (Crucial): Proper architectural proportions for the building type.
@@ -1441,6 +1195,7 @@ Background: Solid black background (#000000).
 Details: Faction-appropriate architectural details, glowing windows, entry points, subtle faction insignia.
 
 {factionArchitecture}
+{buildingDetails}
 
 Subject: Single {profile.Name} planetary building, {buildingName}.
 Architecture Style: {profile.Architecture}
@@ -3272,6 +3027,12 @@ CRITICAL: This is a UNIQUE character type, not a standard faction member. Follow
             [Faction.Bajoran] = CreateBajoranProfile(),
             [Faction.Tholian] = CreateTholianProfile(),
             [Faction.Orion] = CreateOrionProfile(),
+            [Faction.Hirogen] = CreateHirogenProfile(),
+            [Faction.Betazoid] = CreateBetazoidProfile(),
+            [Faction.Maquis] = CreateMaquisProfile(),
+            [Faction.Pirates] = CreatePiratesProfile(),
+            [Faction.Nausicaan] = CreateNausicaanProfile(),
+            [Faction.Species8472] = CreateSpecies8472Profile(),
             [Faction.Special] = CreateSpecialProfile(),
             [Faction.AncientRaces] = CreateAncientRacesProfile()
         };
@@ -3646,8 +3407,8 @@ CRITICAL: This is a UNIQUE character type, not a standard faction member. Follow
     {
         Faction = Faction.Andorian,
         Name = "Andorian",
-        DesignLanguage = "Elegant military forms, antenna-inspired design elements, ice-crystal aesthetics",
-        ColorScheme = "Ice blue, white, silver, cool metallic tones, subtle blue glow",
+        DesignLanguage = "RAPTOR/BIRD-OF-PREY silhouette - ELONGATED POINTED HULL with MULTIPLE SWEPT-BACK WING PYLONS like spread raptor wings. Aggressive predator aesthetic. NOT Federation saucer design!",
+        ColorScheme = "BLUE-GRAY to TEAL hull, CYAN/TURQUOISE glowing accents, DARK BLUE panels, SILVER metallic trim",
         CivilianDesignLanguage = "Crystalline elegant forms, ice-inspired curves, underground city aesthetics",
         CivilianColorScheme = "Light blue, white, silver, cool pastels",
         Architecture = "Crystalline ice-inspired, elegant military, antenna-like spires",
@@ -3836,7 +3597,162 @@ CRITICAL: This is a UNIQUE character type, not a standard faction member. Follow
         PortraitVariants = GeneratePortraitList("Orion Male Syndicate Boss", "Orion Male Pirate Captain", "Orion Male Slaver", "Orion Male Merchant", "Orion Male Warrior", "Orion Male Guard", "Orion Female Syndicate Leader", "Orion Female Pirate Captain", "Orion Female Dancer", "Orion Female Slave Girl", "Orion Female Merchant", "Orion Female Warrior", "Orion Male Assassin", "Orion Female Assassin", "Orion Male Thief", "Orion Female Thief", "Orion Male Bounty Hunter", "Orion Female Bounty Hunter", "Orion Male Civilian", "Orion Female Civilian", "Orion Male Child", "Orion Female Child", "Orion Male Elder", "Orion Female Elder", "Orion Male Scientist", "Orion Female Doctor", "Orion Male Engineer", "Orion Female Pilot", "Orion Male Freed Slave", "Orion Female Freed Slave", "Orion Male Noble", "Orion Female Noble", "Orion Male Gladiator", "Orion Female Gladiator", "Orion Male Bartender", "Orion Female Entertainer"),
         HouseSymbols = GenerateSymbolList("Orion Syndicate Symbol", "Orion Pirate Flag", "Orion Slaver Mark", "Orion Trade Guild", "Orion Assassin Guild", "Orion Thief Guild", "Orion Bounty Guild", "Orion Mercenary Guild", "Orion Banking Clan", "Orion Mining Clan", "Orion Shipping Clan", "Orion Entertainment Guild", "Orion Arena League", "Orion Fight Circuit", "Orion Dance Troupe", "Orion Music Guild", "Orion Crime Family One", "Orion Crime Family Two", "Orion Crime Family Three", "Orion Crime Family Four", "Orion Crime Family Five", "Orion Boss Seal", "Orion Underboss Seal", "Orion Captain Seal", "Orion Lieutenant Seal", "Orion Soldier Seal", "Orion Associate Seal", "Orion Contract Seal", "Orion Bounty Seal", "Orion Hit Seal", "Orion Theft Seal", "Orion Smuggling Seal", "Orion Slavery Seal", "Orion Freedom Seal", "Orion Neutral Seal", "Orion Alliance Seal", "Orion War Seal", "Orion Peace Seal", "Orion Honor Seal", "Orion Betrayal Warning", "Orion Death Mark", "Orion Protection Seal", "Orion Territory Marker", "Orion Border Marker", "Orion Home World", "Orion Colony Marker", "Orion Outpost Marker", "Orion Haven Marker")
     };
-    
+
+    private FactionProfile CreateHirogenProfile() => new FactionProfile
+    {
+        Faction = Faction.Hirogen,
+        Name = "Hirogen",
+        DesignLanguage = "Massive hunter ships, heavily armored, trophy displays, predator aesthetic, organic-tech hybrid",
+        ColorScheme = "Bronze, olive green, dark brown, bone white trophy accents, amber lighting",
+        CivilianDesignLanguage = "Functional hunting vessels, trophy transport, nomadic fleet design",
+        CivilianColorScheme = "Dark olive, bronze trim, weathered hunting vessel aesthetic",
+        Architecture = "Nomadic hunting lodges, trophy halls, training arenas, sparse functional structures",
+        // CRITICAL HIROGEN PHYSICAL FEATURES:
+        // - DUAL-LOBED CRANIUM: Two distinct bulging lobes on top of skull (SIGNATURE FEATURE)
+        // - FLAT NOSE: No nasal bridge, nostrils flush with face like reptile/Saurian
+        // - NO LIPS: Lipless reptilian mouth slit
+        // - GILA MONSTER SKIN: Pebbled/scaled texture, tan/beige/olive with mottled patches
+        // - MASSIVE BUILD: Tower over humans, oversized head
+        // - ARMOR: Silver-blue metallic when suited; bronze/olive when unarmored
+        RaceFeatures = "DUAL-LOBED CRANIUM (two bulges on skull), FLAT NOSE (flush with face), NO LIPS (reptilian mouth), PEBBLED GILA MONSTER SKIN (tan/olive mottled), massive build, completely bald",
+        ClothingDetails = "ARMORED: Silver-blue metallic full armor with helmet/respirator mask, narrow visor. UNARMORED: Bronze/olive hunting armor. Trophy decorations (bones, teeth), sensor equipment",
+        HeraldicStyle = "Predator symbols, hunting trophies, prey species marks, alpha status indicators",
+        MilitaryShips = GenerateShipList("Hirogen Hunting Vessel", "Hirogen Attack Ship", "Hirogen Warship", "Hirogen Venatic Class", "Hirogen Pursuit Craft", "Hirogen Heavy Hunter", "Hirogen Alpha Ship", "Hirogen Pack Leader", "Hirogen Ambush Craft", "Hirogen Stealth Hunter", "Hirogen Trophy Ship", "Hirogen Arena Ship", "Hirogen Training Vessel", "Hirogen Scout Ship", "Hirogen Interceptor", "Hirogen Raider", "Hirogen Assault Ship", "Hirogen Boarding Craft", "Hirogen Fighter", "Hirogen Bomber", "Hirogen Carrier", "Hirogen Command Ship", "Hirogen Flagship", "Hirogen Battle Cruiser", "Hirogen Dreadnought", "Hirogen Destroyer", "Hirogen Frigate", "Hirogen Corvette", "Hirogen Patrol Craft", "Hirogen Gunship", "Hirogen Torpedo Boat", "Hirogen Mine Layer", "Hirogen Electronic Warfare", "Hirogen Communications Ship", "Hirogen Supply Ship", "Hirogen Repair Vessel"),
+        CivilianShips = GenerateShipList("Hirogen Transport", "Hirogen Cargo Ship", "Hirogen Colony Ship", "Hirogen Mining Vessel", "Hirogen Construction Ship", "Hirogen Salvage Vessel", "Hirogen Repair Ship", "Hirogen Tanker", "Hirogen Freighter", "Hirogen Courier", "Hirogen Medical Ship", "Hirogen Research Vessel", "Hirogen Survey Ship", "Hirogen Exploration Craft", "Hirogen Shuttle", "Hirogen Personal Craft", "Hirogen Trophy Transport", "Hirogen Habitat Ship", "Hirogen Generation Ship", "Hirogen Nomad Vessel", "Hirogen Fleet Tender", "Hirogen Supply Vessel", "Hirogen Food Processing", "Hirogen Water Harvester", "Hirogen Fuel Collector", "Hirogen Ore Processor", "Hirogen Manufacturing Ship", "Hirogen Training Ship", "Hirogen Youth Vessel", "Hirogen Elder Ship", "Hirogen Diplomatic Vessel", "Hirogen Trade Ship", "Hirogen Barter Vessel", "Hirogen Exchange Ship", "Hirogen Communication Relay", "Hirogen Beacon Ship"),
+        MilitaryStructures = GenerateStructureList("Hirogen Hunting Station", "Hirogen Trophy Hall Station", "Hirogen Training Arena", "Hirogen Defense Platform", "Hirogen Weapon Station", "Hirogen Shield Generator", "Hirogen Sensor Array", "Hirogen Command Post", "Hirogen Fleet Base", "Hirogen Repair Dock", "Hirogen Intelligence Hub", "Hirogen Communication Array", "Hirogen Early Warning", "Hirogen Patrol Base", "Hirogen Border Station", "Hirogen Checkpoint", "Hirogen Garrison", "Hirogen Armory", "Hirogen Prison Station", "Hirogen Interrogation Platform", "Hirogen Security Hub", "Hirogen Tactical Center", "Hirogen Operations Base", "Hirogen Logistics Hub", "Hirogen Supply Depot", "Hirogen Fighter Bay", "Hirogen Hunter Bay", "Hirogen Ambush Point", "Hirogen Relay Station", "Hirogen Prey Tracker", "Hirogen Hunt Coordinator", "Hirogen Alpha Station", "Hirogen Pack Station", "Hirogen Territory Marker", "Hirogen Boundary Station", "Hirogen Outpost"),
+        CivilianStructures = GenerateStructureList("Hirogen Trade Station", "Hirogen Market Hub", "Hirogen Trophy Exchange", "Hirogen Hunting Bazaar", "Hirogen Cargo Depot", "Hirogen Shipyard", "Hirogen Drydock", "Hirogen Mining Station", "Hirogen Refinery", "Hirogen Power Station", "Hirogen Agricultural Station", "Hirogen Food Processing", "Hirogen Medical Station", "Hirogen Hospital", "Hirogen Research Station", "Hirogen Science Platform", "Hirogen Training Academy", "Hirogen Youth Center", "Hirogen Elder Sanctuary", "Hirogen Cultural Center", "Hirogen Museum of Hunts", "Hirogen Trophy Gallery", "Hirogen Communication Relay", "Hirogen Transit Hub", "Hirogen Habitat Station", "Hirogen Recreation Center", "Hirogen Arena Station", "Hirogen Combat Training", "Hirogen Simulation Center", "Hirogen Holodeck Station", "Hirogen Prey Reserve", "Hirogen Wildlife Station", "Hirogen Preservation Center", "Hirogen Diplomatic Station", "Hirogen Embassy", "Hirogen Neutral Zone"),
+        Buildings = GenerateBuildingList("Hirogen Alpha Lodge", "Hirogen Hunt Command", "Hirogen Trophy Hall", "Hirogen Great Hunt Memorial", "Hirogen Barracks", "Hirogen Training Arena", "Hirogen Combat Pit", "Hirogen Weapon Forge", "Hirogen Armor Works", "Hirogen Sensor Workshop", "Hirogen Tracking Center", "Hirogen Prey Database", "Hirogen Hunt Planning", "Hirogen Strategy Hall", "Hirogen Pack Quarters", "Hirogen Alpha Residence", "Hirogen Beta Quarters", "Hirogen Youth Training", "Hirogen Elder Council", "Hirogen Medical Bay", "Hirogen Healing Center", "Hirogen Gene Lab", "Hirogen Enhancement Facility", "Hirogen Food Hall", "Hirogen Meat Processing", "Hirogen Preservation Facility", "Hirogen Supply Depot", "Hirogen Equipment Storage", "Hirogen Vehicle Bay", "Hirogen Shuttle Port", "Hirogen Communication Tower", "Hirogen Relay Station", "Hirogen Power Generator", "Hirogen Shield Generator", "Hirogen Defense Tower", "Hirogen Watchtower", "Hirogen Observation Post", "Hirogen Sensor Tower", "Hirogen Holographic Arena", "Hirogen Simulation Chamber", "Hirogen Virtual Hunt", "Hirogen Recreation Hall", "Hirogen Trophy Display", "Hirogen Museum", "Hirogen Archive", "Hirogen Library", "Hirogen Diplomatic Hall", "Hirogen Trade Post"),
+        Troops = GenerateTroopList("Hirogen Hunter", "Hirogen Alpha Hunter", "Hirogen Beta Hunter", "Hirogen Pack Leader", "Hirogen Tracker", "Hirogen Stalker", "Hirogen Ambusher", "Hirogen Sniper", "Hirogen Heavy Hunter", "Hirogen Arena Fighter", "Hirogen Combat Trainer", "Hirogen Youth Hunter", "Hirogen Elder Hunter", "Hirogen Trophy Keeper", "Hirogen Prey Handler", "Hirogen Hunt Master"),
+        PortraitVariants = GeneratePortraitList("Hirogen Alpha Male", "Hirogen Beta Male", "Hirogen Hunter Male", "Hirogen Tracker Male", "Hirogen Elder Male", "Hirogen Youth Male", "Hirogen Alpha Female", "Hirogen Hunter Female", "Hirogen Tracker Female", "Hirogen Elder Female", "Hirogen Arena Champion", "Hirogen Hunt Master", "Hirogen Pack Leader", "Hirogen Lone Wolf", "Hirogen Veteran Hunter", "Hirogen Trophy Collector", "Hirogen Prey Specialist", "Hirogen Technology Expert", "Hirogen Medic", "Hirogen Engineer", "Hirogen Pilot", "Hirogen Navigator", "Hirogen Communications", "Hirogen Weapons Master", "Hirogen Armor Smith", "Hirogen Trainer", "Hirogen Youth Mentor", "Hirogen Elder Sage", "Hirogen Diplomat", "Hirogen Trader", "Hirogen Storyteller", "Hirogen Historian", "Hirogen Scout", "Hirogen Infiltrator", "Hirogen Heavy Weapons", "Hirogen Commander"),
+        HouseSymbols = GenerateSymbolList("Hirogen Alpha Symbol", "Hirogen Pack Mark", "Hirogen Hunt Seal", "Hirogen Trophy Mark", "Hirogen Prey Symbol", "Hirogen Kill Count", "Hirogen Arena Champion", "Hirogen Grand Hunt", "Hirogen First Kill", "Hirogen Alpha Pack", "Hirogen Beta Pack", "Hirogen Gamma Pack", "Hirogen Delta Pack", "Hirogen Hunting Ground", "Hirogen Territory Mark", "Hirogen Border Sign", "Hirogen Warning Sign", "Hirogen Challenge Mark", "Hirogen Honor Symbol", "Hirogen Veteran Mark", "Hirogen Elder Status", "Hirogen Youth Mark", "Hirogen Training Symbol", "Hirogen Combat Ready", "Hirogen Hunt Active", "Hirogen Rest Period", "Hirogen Migration Mark", "Hirogen Fleet Symbol", "Hirogen Ship Mark", "Hirogen Weapon Symbol", "Hirogen Armor Mark", "Hirogen Tech Symbol", "Hirogen Medical Mark", "Hirogen Trade Symbol", "Hirogen Neutral Mark", "Hirogen Alliance Symbol", "Hirogen Enemy Mark", "Hirogen Prey Species One", "Hirogen Prey Species Two", "Hirogen Prey Species Three", "Hirogen Trophy Rank One", "Hirogen Trophy Rank Two", "Hirogen Trophy Rank Three", "Hirogen Trophy Rank Four", "Hirogen Trophy Rank Five", "Hirogen Grand Master", "Hirogen Legend Status", "Hirogen Eternal Hunt")
+    };
+
+    // =================================================================
+    // NEW FACTIONS - Betazoid, Maquis, Pirates, Species 8472
+    // =================================================================
+
+    private FactionProfile CreateBetazoidProfile() => new FactionProfile
+    {
+        Faction = Faction.Betazoid,
+        Name = "Betazoid",
+        DesignLanguage = "Elegant, organic, flowing designs - peaceful telepathic culture, Federation member",
+        ColorScheme = "Soft purples, lavenders, silver, white - calming, sophisticated palette",
+        CivilianDesignLanguage = "Graceful architecture, gardens, meditation spaces, open designs",
+        CivilianColorScheme = "Light purple, cream, silver accents, natural wood tones",
+        Architecture = "Organic flowing structures, large windows, integration with nature, peaceful aesthetic",
+        RaceFeatures = "Humanoid appearance nearly identical to humans, SOLID BLACK EYES (no visible iris/pupil - key feature), telepathic/empathic abilities",
+        ClothingDetails = "Flowing elegant robes in purples and silvers, or Starfleet uniforms if serving in fleet",
+        HeraldicStyle = "Abstract mind/telepathy symbols, flowing organic designs, peaceful imagery",
+        // Betazoids primarily use Federation ships - limited own military
+        IsPortraitOnly = true,
+        HasShips = false,
+        HasBuildings = true,
+        HasTroops = false,
+        Buildings = GenerateBuildingList("Betazoid Embassy", "Betazoid Meditation Center", "Betazoid University of Psychology", "Betazoid Telepathy Institute", "Betazoid Cultural Center", "Betazoid Garden Palace", "Betazoid Healing Center", "Betazoid Counseling Hall", "Betazoid Wedding Chapel", "Betazoid Art Gallery", "Betazoid Music Hall", "Betazoid Library", "Betazoid Botanical Garden", "Betazoid Residence Manor", "Betazoid Government Hall", "Betazoid Diplomatic Center"),
+        PortraitVariants = GeneratePortraitList("Betazoid Female Counselor", "Betazoid Male Diplomat", "Betazoid Female Ambassador", "Betazoid Male Telepath", "Betazoid Female Elder", "Betazoid Male Youth", "Betazoid Female Starfleet Officer", "Betazoid Male Civilian", "Betazoid Female Noble", "Betazoid Male Healer", "Betazoid Female Student", "Betazoid Male Professor", "Betazoid Female Bride", "Betazoid Male Ceremonial", "Betazoid Female Artist", "Betazoid Male Musician"),
+        HouseSymbols = GenerateSymbolList("Betazoid Mind Symbol", "Betazoid Telepathy Mark", "Betazoid House Troi", "Betazoid Noble House", "Betazoid Meditation Symbol", "Betazoid Peace Sign", "Betazoid Unity Mark", "Betazoid Wedding Symbol", "Betazoid Government Seal", "Betazoid University Crest", "Betazoid Healing Symbol", "Betazoid Art Guild", "Betazoid Music Guild", "Betazoid Diplomatic Seal", "Betazoid Cultural Mark", "Betazoid Federation Member")
+    };
+
+    private FactionProfile CreateMaquisProfile() => new FactionProfile
+    {
+        Faction = Faction.Maquis,
+        Name = "Maquis",
+        DesignLanguage = "Rugged, improvised, guerrilla aesthetic - converted civilian ships, hidden bases",
+        ColorScheme = "Earth tones, browns, greens, rust - camouflage and utilitarian",
+        CivilianDesignLanguage = "Hidden settlements, underground bunkers, camouflaged outposts",
+        CivilianColorScheme = "Natural camouflage colors, weathered materials",
+        Architecture = "Hidden bunkers, cave bases, camouflaged settlements, repurposed structures",
+        RaceFeatures = "Mixed species - primarily Human, Bajoran, some Vulcan and other Federation species who joined the resistance",
+        ClothingDetails = "Practical civilian clothing, leather jackets, utilitarian gear, no uniforms - resistance fighter look",
+        HeraldicStyle = "Resistance symbols, fist/freedom imagery, anti-Cardassian marks",
+        MilitaryShips = GenerateShipList("Maquis Raider", "Maquis Fighter", "Maquis Attack Ship", "Maquis Interceptor", "Maquis Converted Freighter", "Maquis Armed Transport", "Maquis Blockade Runner", "Maquis Scout", "Maquis Patrol Craft", "Maquis Bomber", "Maquis Strike Ship", "Maquis Gunship", "Maquis Fast Attack", "Maquis Infiltrator", "Maquis Stealth Ship", "Maquis Command Ship", "Maquis Carrier", "Maquis Heavy Raider", "Maquis Torpedo Boat", "Maquis Mine Layer", "Maquis Electronic Warfare", "Maquis Communications Ship", "Maquis Supply Runner", "Maquis Medical Ship", "Maquis Repair Vessel", "Maquis Salvage Ship", "Maquis Tug", "Maquis Shuttle", "Maquis Courier", "Maquis Escape Pod Carrier", "Maquis Decoy Ship", "Maquis Q-Ship", "Maquis Converted Yacht", "Maquis Armed Shuttle", "Maquis Fighter Carrier", "Maquis Flagship"),
+        CivilianShips = GenerateShipList("Maquis Transport", "Maquis Cargo Ship", "Maquis Freighter", "Maquis Refugee Ship", "Maquis Colony Ship", "Maquis Supply Vessel", "Maquis Medical Transport", "Maquis Passenger Ship", "Maquis Shuttle", "Maquis Courier", "Maquis Personal Craft", "Maquis Family Ship", "Maquis Farm Ship", "Maquis Mining Vessel", "Maquis Construction Ship", "Maquis Repair Ship"),
+        MilitaryStructures = GenerateStructureList("Maquis Hidden Base", "Maquis Asteroid Outpost", "Maquis Defense Platform", "Maquis Sensor Array", "Maquis Communications Relay", "Maquis Weapons Cache", "Maquis Fighter Bay", "Maquis Command Bunker", "Maquis Shield Generator", "Maquis Ambush Point", "Maquis Early Warning", "Maquis Patrol Station", "Maquis Border Outpost", "Maquis Prison", "Maquis Interrogation Post", "Maquis Training Camp"),
+        CivilianStructures = GenerateStructureList("Maquis Colony", "Maquis Settlement", "Maquis Underground City", "Maquis Cave Base", "Maquis Hidden Farm", "Maquis Medical Station", "Maquis School", "Maquis Market", "Maquis Refugee Camp", "Maquis Supply Depot", "Maquis Shipyard", "Maquis Repair Facility", "Maquis Communication Hub", "Maquis Meeting Hall", "Maquis Memorial", "Maquis Cemetery"),
+        Buildings = GenerateBuildingList("Maquis Command Center", "Maquis Barracks", "Maquis Armory", "Maquis Training Hall", "Maquis Medical Bay", "Maquis Communications", "Maquis Strategy Room", "Maquis Mess Hall", "Maquis Bunker", "Maquis Underground Hangar", "Maquis Weapons Workshop", "Maquis Supply Cache", "Maquis Intelligence Hub", "Maquis Meeting Room", "Maquis Leader Quarters", "Maquis Cell Block", "Maquis Interrogation Room", "Maquis Escape Tunnel", "Maquis Hidden Entrance", "Maquis Watchtower", "Maquis Sniper Post", "Maquis Ambush Point", "Maquis Safe House", "Maquis Dead Drop", "Maquis Coded Message Center", "Maquis Recruitment Office", "Maquis Memorial Wall", "Maquis Trophy Room", "Maquis Planning Room", "Maquis Radio Station", "Maquis Power Generator", "Maquis Water Recycler", "Maquis Food Storage", "Maquis Family Quarters", "Maquis Children's Area", "Maquis Recreation Room", "Maquis Library", "Maquis Holodeck", "Maquis Transporter Room", "Maquis Shuttle Bay", "Maquis Docking Port", "Maquis Cargo Bay", "Maquis Engineering", "Maquis Reactor Room", "Maquis Life Support", "Maquis Environmental Control", "Maquis Security Station", "Maquis Checkpoint"),
+        Troops = GenerateTroopList("Maquis Fighter", "Maquis Cell Leader", "Maquis Saboteur", "Maquis Sniper", "Maquis Infiltrator", "Maquis Demolitions Expert", "Maquis Medic", "Maquis Scout", "Maquis Communications", "Maquis Heavy Weapons", "Maquis Pilot", "Maquis Engineer", "Maquis Intelligence", "Maquis Recruiter", "Maquis Veteran", "Maquis Commander"),
+        PortraitVariants = GeneratePortraitList("Maquis Human Male Fighter", "Maquis Human Female Fighter", "Maquis Bajoran Male", "Maquis Bajoran Female", "Maquis Vulcan Male", "Maquis Human Male Leader", "Maquis Human Female Leader", "Maquis Veteran Male", "Maquis Veteran Female", "Maquis Youth Male", "Maquis Youth Female", "Maquis Medic Female", "Maquis Engineer Male", "Maquis Pilot Female", "Maquis Sniper Male", "Maquis Saboteur Female"),
+        HouseSymbols = GenerateSymbolList("Maquis Resistance Symbol", "Maquis Fist Symbol", "Maquis Freedom Mark", "Maquis Cell Alpha", "Maquis Cell Beta", "Maquis Cell Gamma", "Maquis Strike Team", "Maquis Intelligence", "Maquis Medical", "Maquis Engineering", "Maquis Pilot Wings", "Maquis Veteran Badge", "Maquis Leadership", "Maquis Memorial", "Maquis Victory Mark", "Maquis Anti-Cardassian")
+    };
+
+    private FactionProfile CreatePiratesProfile() => new FactionProfile
+    {
+        Faction = Faction.Pirates,
+        Name = "Pirates",
+        DesignLanguage = "Mismatched, cobbled together, intimidating - stolen and modified ships from various factions",
+        ColorScheme = "Dark colors, black, rust, blood red accents - skull and crossbones imagery",
+        CivilianDesignLanguage = "Hidden asteroid bases, lawless stations, black markets",
+        CivilianColorScheme = "Grimy, weathered, neon signs, dark and dangerous",
+        Architecture = "Asteroid hideouts, derelict station conversions, lawless ports",
+        // NOTE: Do NOT use Nausicaans or Orions - they have their own factions!
+        // Use diverse species: Humans, Bolians, Tellarites, Lurians, Yridians, Pakleds, etc.
+        RaceFeatures = "Mixed species (NOT Nausicaan/Orion - they have own factions). Humans, Bolians (blue, ridge), Tellarites (porcine), Lurians (large head), Yridians (wrinkled gray), Pakleds, other aliens. Rough, scarred, dangerous",
+        ClothingDetails = "Leader: Dark military uniform with medals. Crew: Mismatched armor, leather, stolen uniforms, weapons visible",
+        HeraldicStyle = "Skull imagery, crossed weapons, intimidating symbols, crew markings",
+        MilitaryShips = GenerateShipList("Pirate Raider", "Pirate Frigate", "Pirate Cruiser", "Pirate Destroyer", "Pirate Battleship", "Pirate Carrier", "Pirate Flagship", "Pirate Interceptor", "Pirate Gunboat", "Pirate Corvette", "Pirate Fast Attack", "Pirate Boarding Ship", "Pirate Stealth Raider", "Pirate Q-Ship", "Pirate Armed Freighter", "Pirate Missile Boat", "Pirate Mine Layer", "Pirate Electronic Warfare", "Pirate Command Ship", "Pirate Dreadnought", "Pirate Assault Ship", "Pirate Landing Craft", "Pirate Fighter", "Pirate Bomber", "Pirate Scout", "Pirate Patrol Craft", "Pirate Blockade Runner", "Pirate Smuggler Ship", "Pirate Slave Ship", "Pirate Prison Ship", "Pirate Torture Ship", "Pirate Trophy Ship", "Pirate Salvage Vessel", "Pirate Tug", "Pirate Shuttle", "Pirate Escape Craft"),
+        CivilianShips = GenerateShipList("Pirate Transport", "Pirate Cargo Hauler", "Pirate Freighter", "Pirate Tanker", "Pirate Passenger Ship", "Pirate Luxury Yacht", "Pirate Pleasure Barge", "Pirate Casino Ship", "Pirate Slave Transport", "Pirate Contraband Runner", "Pirate Medical Ship", "Pirate Repair Vessel", "Pirate Supply Ship", "Pirate Mining Ship", "Pirate Salvage Tug", "Pirate Personal Craft"),
+        MilitaryStructures = GenerateStructureList("Pirate Fortress", "Pirate Defense Platform", "Pirate Weapons Platform", "Pirate Shield Generator", "Pirate Sensor Array", "Pirate Communications Relay", "Pirate Fighter Bay", "Pirate Command Station", "Pirate Prison Station", "Pirate Interrogation Platform", "Pirate Ambush Point", "Pirate Patrol Base", "Pirate Border Outpost", "Pirate Warning Beacon", "Pirate Mine Field Control", "Pirate Torpedo Platform"),
+        CivilianStructures = GenerateStructureList("Pirate Haven", "Pirate Port", "Pirate Black Market", "Pirate Cantina Station", "Pirate Gambling Den", "Pirate Pleasure Station", "Pirate Slave Market", "Pirate Shipyard", "Pirate Drydock", "Pirate Repair Station", "Pirate Supply Depot", "Pirate Cargo Hub", "Pirate Fence Station", "Pirate Hideout", "Pirate Safe House", "Pirate Meeting Point"),
+        Buildings = GenerateBuildingList("Pirate Captain's Quarters", "Pirate Crew Barracks", "Pirate Armory", "Pirate Weapons Locker", "Pirate Treasure Vault", "Pirate Brig", "Pirate Torture Chamber", "Pirate Interrogation Room", "Pirate War Room", "Pirate Navigation Center", "Pirate Communications", "Pirate Black Market", "Pirate Cantina", "Pirate Gambling Hall", "Pirate Fighting Pit", "Pirate Slave Pen", "Pirate Medical Bay", "Pirate Mess Hall", "Pirate Kitchen", "Pirate Storage", "Pirate Engineering", "Pirate Reactor Room", "Pirate Hangar", "Pirate Docking Bay", "Pirate Transporter Room", "Pirate Trophy Room", "Pirate Captain's Office", "Pirate Meeting Room", "Pirate Lookout Tower", "Pirate Defense Tower", "Pirate Gun Emplacement", "Pirate Shield Generator", "Pirate Power Plant", "Pirate Water Recycler", "Pirate Life Support", "Pirate Escape Pods", "Pirate Hidden Passage", "Pirate Secret Room", "Pirate Contraband Storage", "Pirate Drug Lab", "Pirate Counterfeiting", "Pirate Hacking Center", "Pirate Intelligence", "Pirate Recruitment", "Pirate Training Pit", "Pirate Execution Ground", "Pirate Graveyard", "Pirate Memorial"),
+        Troops = GenerateTroopList("Pirate Captain", "Pirate First Mate", "Pirate Bosun", "Pirate Raider", "Pirate Boarder", "Pirate Gunner", "Pirate Sniper", "Pirate Enforcer", "Pirate Thug", "Pirate Slaver", "Pirate Torturer", "Pirate Scout", "Pirate Pilot", "Pirate Engineer", "Pirate Medic", "Pirate Recruit"),
+        // NOTE: Diverse species - NOT Nausicaan or Orion (they have own factions)
+        PortraitVariants = GeneratePortraitList("Pirate Human Male Commander", "Pirate Human Female Commander", "Pirate Bolian Male", "Pirate Bolian Female", "Pirate Tellarite Male", "Pirate Lurian Male", "Pirate Yridian Male", "Pirate Pakled Male", "Pirate Human Male Raider", "Pirate Human Female Raider", "Pirate Alien Male", "Pirate Alien Female", "Pirate Scarred Veteran", "Pirate Cyborg", "Pirate Masked Raider", "Pirate Boslic Female"),
+        HouseSymbols = GenerateSymbolList("Pirate Skull Crossbones", "Pirate Jolly Roger", "Pirate Captain's Mark", "Pirate Crew Symbol", "Pirate Fleet Mark", "Pirate Boarding Party", "Pirate Kill Count", "Pirate Ship Silhouette", "Pirate Treasure Mark", "Pirate Warning Flag", "Pirate Surrender Demand", "Pirate Alliance Symbol", "Pirate Rivalry Mark", "Pirate Territory Claim", "Pirate Bounty Mark", "Pirate Most Wanted")
+    };
+
+    private FactionProfile CreateNausicaanProfile() => new FactionProfile
+    {
+        Faction = Faction.Nausicaan,
+        Name = "Nausicaan",
+        DesignLanguage = "Brutal, heavy, intimidating - crude but effective warships, rough industrial aesthetic",
+        ColorScheme = "Dark browns, grays, rust, gunmetal - brutal and utilitarian",
+        CivilianDesignLanguage = "Rough outposts, mercenary bases, fighting pits",
+        CivilianColorScheme = "Same brutal industrial colors",
+        Architecture = "Crude fortifications, fighting arenas, mercenary camps",
+        // NAUSICAAN PHYSICAL FEATURES (Predator-like, NOT Orc-like!):
+        // - VERY TALL (over 2m) and lean/muscular
+        // - TWO TUSKS protruding UPWARD from lower jaw (KEY FEATURE!)
+        // - ELONGATED SKULL - high domed forehead sloping back
+        // - DEEP-SET small eyes under heavy brow
+        // - PROMINENT CHEEKBONES - angular face structure
+        // - GRAY/TAN leathery skin with slight texture
+        // - BALD - no hair
+        // - Predator-movie aesthetic, NOT green orc
+        RaceFeatures = "TALL lean humanoid (Predator-like, NOT orc!), TWO TUSKS curving UP from lower jaw, elongated high-domed skull sloping back, deep-set small eyes, prominent angular cheekbones, gray/tan leathery skin, completely bald, menacing mercenary appearance",
+        ClothingDetails = "Rough leather and metal armor, practical mercenary gear, visible weapons, battle-worn equipment",
+        HeraldicStyle = "Crude tribal symbols, tusk imagery, strength symbols, mercenary marks",
+        MilitaryShips = GenerateShipList("Nausicaan Raider", "Nausicaan Fighter", "Nausicaan Cruiser", "Nausicaan Destroyer", "Nausicaan Battleship", "Nausicaan Carrier", "Nausicaan Interceptor", "Nausicaan Gunboat", "Nausicaan Frigate", "Nausicaan Corvette", "Nausicaan Fast Attack", "Nausicaan Boarding Ship", "Nausicaan Assault Craft", "Nausicaan Scout", "Nausicaan Patrol Craft", "Nausicaan Command Ship", "Nausicaan Heavy Raider", "Nausicaan Missile Boat", "Nausicaan Mine Layer", "Nausicaan Blockade Runner", "Nausicaan Smuggler", "Nausicaan Transport Attack", "Nausicaan Fighter Carrier", "Nausicaan Flagship", "Nausicaan Dreadnought", "Nausicaan Prison Ship", "Nausicaan Slave Ship", "Nausicaan Arena Ship", "Nausicaan Salvage Vessel", "Nausicaan Tug", "Nausicaan Shuttle", "Nausicaan Drop Ship", "Nausicaan Landing Craft", "Nausicaan Bomber", "Nausicaan Torpedo Boat", "Nausicaan Escort"),
+        CivilianShips = GenerateShipList("Nausicaan Transport", "Nausicaan Freighter", "Nausicaan Cargo Ship", "Nausicaan Tanker", "Nausicaan Mining Vessel", "Nausicaan Salvage Ship", "Nausicaan Repair Vessel", "Nausicaan Supply Ship", "Nausicaan Personal Craft", "Nausicaan Shuttle", "Nausicaan Courier", "Nausicaan Passenger Ship", "Nausicaan Medical Ship", "Nausicaan Construction Ship", "Nausicaan Tug", "Nausicaan Merchant Ship"),
+        MilitaryStructures = GenerateStructureList("Nausicaan Fortress", "Nausicaan Defense Platform", "Nausicaan Weapons Station", "Nausicaan Shield Generator", "Nausicaan Sensor Array", "Nausicaan Fighter Bay", "Nausicaan Command Post", "Nausicaan Patrol Base", "Nausicaan Border Outpost", "Nausicaan Prison Station", "Nausicaan Interrogation Platform", "Nausicaan Training Arena", "Nausicaan Ambush Point", "Nausicaan Mercenary Base", "Nausicaan Raider Base", "Nausicaan Communications"),
+        CivilianStructures = GenerateStructureList("Nausicaan Outpost", "Nausicaan Settlement", "Nausicaan Market", "Nausicaan Cantina Station", "Nausicaan Fighting Pit", "Nausicaan Arena", "Nausicaan Shipyard", "Nausicaan Drydock", "Nausicaan Repair Station", "Nausicaan Supply Depot", "Nausicaan Mining Station", "Nausicaan Refinery", "Nausicaan Trade Post", "Nausicaan Mercenary Hall", "Nausicaan Recruitment Center", "Nausicaan Hideout"),
+        Buildings = GenerateBuildingList("Nausicaan Chieftain Hall", "Nausicaan Warrior Barracks", "Nausicaan Armory", "Nausicaan Weapons Forge", "Nausicaan Fighting Pit", "Nausicaan Arena", "Nausicaan Training Ground", "Nausicaan Medical Bay", "Nausicaan Mess Hall", "Nausicaan Cantina", "Nausicaan Gambling Den", "Nausicaan Trophy Hall", "Nausicaan Prison", "Nausicaan Interrogation Room", "Nausicaan Command Center", "Nausicaan Communications", "Nausicaan Power Generator", "Nausicaan Shield Generator", "Nausicaan Defense Tower", "Nausicaan Watchtower", "Nausicaan Hangar", "Nausicaan Docking Bay", "Nausicaan Storage", "Nausicaan Engineering", "Nausicaan Reactor Room", "Nausicaan Life Support", "Nausicaan Mercenary Office", "Nausicaan Contract Hall", "Nausicaan Recruitment", "Nausicaan Slave Pen", "Nausicaan Market", "Nausicaan Black Market", "Nausicaan Fence", "Nausicaan Intelligence", "Nausicaan Ambush Point", "Nausicaan Lookout", "Nausicaan Camp", "Nausicaan Tent", "Nausicaan Fortification", "Nausicaan Wall", "Nausicaan Gate", "Nausicaan Bunker", "Nausicaan Underground", "Nausicaan Escape Route", "Nausicaan Safe House", "Nausicaan Memorial", "Nausicaan Shrine", "Nausicaan Elder Hall"),
+        Troops = GenerateTroopList("Nausicaan Chieftain", "Nausicaan Warlord", "Nausicaan Warrior", "Nausicaan Raider", "Nausicaan Brute", "Nausicaan Enforcer", "Nausicaan Thug", "Nausicaan Mercenary", "Nausicaan Bodyguard", "Nausicaan Scout", "Nausicaan Sniper", "Nausicaan Heavy", "Nausicaan Pilot", "Nausicaan Engineer", "Nausicaan Medic", "Nausicaan Recruit"),
+        PortraitVariants = GeneratePortraitList("Nausicaan Chieftain Male", "Nausicaan Warlord Male", "Nausicaan Warrior Male", "Nausicaan Warrior Female", "Nausicaan Raider Male", "Nausicaan Mercenary Male", "Nausicaan Mercenary Female", "Nausicaan Brute Male", "Nausicaan Elder Male", "Nausicaan Youth Male", "Nausicaan Pilot Male", "Nausicaan Engineer Male", "Nausicaan Scout Male", "Nausicaan Heavy Male", "Nausicaan Thug Male", "Nausicaan Enforcer Male"),
+        HouseSymbols = GenerateSymbolList("Nausicaan Tusk Symbol", "Nausicaan Clan Mark", "Nausicaan Warrior Crest", "Nausicaan Strength Symbol", "Nausicaan Battle Mark", "Nausicaan Mercenary Badge", "Nausicaan Chieftain Seal", "Nausicaan Raider Flag", "Nausicaan Kill Count", "Nausicaan Trophy Mark", "Nausicaan Contract Symbol", "Nausicaan Alliance Mark", "Nausicaan Rivalry Symbol", "Nausicaan Territory Claim", "Nausicaan War Banner", "Nausicaan Honor Mark")
+    };
+
+    private FactionProfile CreateSpecies8472Profile() => new FactionProfile
+    {
+        Faction = Faction.Species8472,
+        Name = "Species 8472",
+        DesignLanguage = "ORGANIC BIOSHIPS - living vessels, no metal, purple/violet bioluminescence, tripod/tentacle forms",
+        ColorScheme = "Deep purple, violet, bioluminescent greens, organic browns - alien and terrifying",
+        CivilianDesignLanguage = "Organic structures in fluidic space, living architecture",
+        CivilianColorScheme = "Purple, violet, organic greens, bioluminescent accents",
+        Architecture = "Organic living structures, bioengineered environments, fluidic space realms",
+        RaceFeatures = "TRIPEDAL aliens - three legs, three arms, elongated head with multiple eyes, NO MOUTH visible, communicates telepathically, gray-purple skin, extremely tall and thin",
+        ClothingDetails = "No clothing - organic exoskeleton/skin, possibly bio-armor integration",
+        HeraldicStyle = "Organic symbols, tripod imagery, fluidic space motifs",
+        MilitaryShips = GenerateShipList("Species 8472 Bioship", "Species 8472 Dreadnought", "Species 8472 Battleship", "Species 8472 Cruiser", "Species 8472 Destroyer", "Species 8472 Frigate", "Species 8472 Fighter", "Species 8472 Scout", "Species 8472 Carrier", "Species 8472 Flagship", "Species 8472 Planet Killer", "Species 8472 Assault Ship", "Species 8472 Boarding Pod", "Species 8472 Infiltrator", "Species 8472 Stealth Ship", "Species 8472 Command Ship", "Species 8472 Heavy Bioship", "Species 8472 Light Bioship", "Species 8472 Fast Attack", "Species 8472 Patrol Craft", "Species 8472 Interceptor", "Species 8472 Bomber", "Species 8472 Torpedo Ship", "Species 8472 Mine Layer", "Species 8472 Electronic Warfare", "Species 8472 Communications", "Species 8472 Medical Ship", "Species 8472 Repair Organism", "Species 8472 Supply Ship", "Species 8472 Transport", "Species 8472 Colony Ship", "Species 8472 Invasion Ship", "Species 8472 Terraformer", "Species 8472 Gateway Ship", "Species 8472 Fluidic Rift Opener", "Species 8472 Quantum Singularity Ship"),
+        CivilianShips = GenerateShipList("Species 8472 Transport Pod", "Species 8472 Cargo Organism", "Species 8472 Passenger Ship", "Species 8472 Colony Pod", "Species 8472 Medical Organism", "Species 8472 Research Vessel", "Species 8472 Survey Ship", "Species 8472 Communication Relay", "Species 8472 Shuttle Organism", "Species 8472 Personal Pod", "Species 8472 Family Unit", "Species 8472 Elder Transport", "Species 8472 Youth Pod", "Species 8472 Agricultural Ship", "Species 8472 Food Processor", "Species 8472 Water Harvester"),
+        MilitaryStructures = GenerateStructureList("Species 8472 Bio-Station", "Species 8472 Defense Organism", "Species 8472 Weapons Platform", "Species 8472 Shield Generator", "Species 8472 Sensor Array", "Species 8472 Communications Hub", "Species 8472 Fighter Bay", "Species 8472 Command Center", "Species 8472 Fleet Base", "Species 8472 Repair Facility", "Species 8472 Shipyard Organism", "Species 8472 Drydock", "Species 8472 Ambush Point", "Species 8472 Patrol Station", "Species 8472 Border Outpost", "Species 8472 Gateway Station"),
+        CivilianStructures = GenerateStructureList("Species 8472 Habitat", "Species 8472 Colony", "Species 8472 City Organism", "Species 8472 Research Station", "Species 8472 Medical Facility", "Species 8472 Education Center", "Species 8472 Cultural Hub", "Species 8472 Recreation Organism", "Species 8472 Agricultural Station", "Species 8472 Food Processing", "Species 8472 Trade Hub", "Species 8472 Communication Relay", "Species 8472 Transit Hub", "Species 8472 Elder Sanctuary", "Species 8472 Youth Center", "Species 8472 Fluidic Gateway"),
+        Buildings = GenerateBuildingList("Species 8472 Organic Tower", "Species 8472 Living Quarters", "Species 8472 Command Organism", "Species 8472 Medical Bay", "Species 8472 Research Lab", "Species 8472 Weapons Growth", "Species 8472 Shield Organism", "Species 8472 Power Generator", "Species 8472 Communication Node", "Species 8472 Storage Organism", "Species 8472 Hangar Growth", "Species 8472 Docking Tentacle", "Species 8472 Transporter Organism", "Species 8472 Replication Chamber", "Species 8472 Training Ground", "Species 8472 Meeting Chamber", "Species 8472 Council Hall", "Species 8472 Elder Chamber", "Species 8472 Youth Nursery", "Species 8472 Recreation Pod", "Species 8472 Food Chamber", "Species 8472 Water Recycler", "Species 8472 Life Support Organism", "Species 8472 Environmental Control", "Species 8472 Security Node", "Species 8472 Defense Tower", "Species 8472 Observation Post", "Species 8472 Sensor Node", "Species 8472 Early Warning", "Species 8472 Ambush Chamber", "Species 8472 Prison Organism", "Species 8472 Interrogation Chamber", "Species 8472 Intelligence Hub", "Species 8472 Infiltration Center", "Species 8472 Genetic Lab", "Species 8472 Evolution Chamber", "Species 8472 Bioweapon Lab", "Species 8472 Virus Chamber", "Species 8472 Telepathy Amplifier", "Species 8472 Mind Link Hub", "Species 8472 Gateway Generator", "Species 8472 Fluidic Rift", "Species 8472 Quantum Lab", "Species 8472 Dimensional Research", "Species 8472 Memorial Growth", "Species 8472 Sacred Grove", "Species 8472 Ancient Organism", "Species 8472 Progenitor Chamber"),
+        Troops = GenerateTroopList("Species 8472 Warrior", "Species 8472 Elite", "Species 8472 Commander", "Species 8472 Infiltrator", "Species 8472 Scout", "Species 8472 Heavy Warrior", "Species 8472 Psionic", "Species 8472 Medic", "Species 8472 Engineer", "Species 8472 Pilot", "Species 8472 Scientist", "Species 8472 Elder", "Species 8472 Youth", "Species 8472 Guardian", "Species 8472 Assassin", "Species 8472 Leader"),
+        PortraitVariants = GeneratePortraitList("Species 8472 Warrior", "Species 8472 Commander", "Species 8472 Elder", "Species 8472 Scientist", "Species 8472 Pilot", "Species 8472 Infiltrator", "Species 8472 Guardian", "Species 8472 Youth", "Species 8472 Psionic Master", "Species 8472 War Leader", "Species 8472 Ambassador", "Species 8472 Scout", "Species 8472 Heavy Warrior", "Species 8472 Medical", "Species 8472 Engineer", "Species 8472 Ancient One"),
+        HouseSymbols = GenerateSymbolList("Species 8472 Tripod Symbol", "Species 8472 Bioship Mark", "Species 8472 Fluidic Space", "Species 8472 Eye Symbol", "Species 8472 Tentacle Mark", "Species 8472 Organic Pattern", "Species 8472 War Mark", "Species 8472 Peace Symbol", "Species 8472 Territory Claim", "Species 8472 Gateway Mark", "Species 8472 Elder Council", "Species 8472 Warrior Caste", "Species 8472 Science Caste", "Species 8472 Pilot Caste", "Species 8472 Guardian Mark", "Species 8472 Ancient Symbol")
+    };
+
     // =================================================================
     // SPECIAL FACTIONS - Portrait/Event only (no ships, buildings, etc.)
     // =================================================================
@@ -4602,6 +4518,15 @@ CRITICAL: This is a SMALL GAME ICON.
     
     private List<string> GetPlanetsList()
     {
+        // Try to load from JSON first
+        if (_promptData.HasCategory("planets"))
+        {
+            var jsonNames = _promptData.GetAssetNames("planets");
+            if (jsonNames.Count > 0)
+                return jsonNames;
+        }
+
+        // Fallback to hardcoded list
         return new List<string>
         {
             // Habitable (6)
@@ -4621,6 +4546,15 @@ CRITICAL: This is a SMALL GAME ICON.
     
     private List<string> GetStarsList()
     {
+        // Try to load from JSON first
+        if (_promptData.HasCategory("stars"))
+        {
+            var jsonNames = _promptData.GetAssetNames("stars");
+            if (jsonNames.Count > 0)
+                return jsonNames;
+        }
+
+        // Fallback to hardcoded list
         return new List<string>
         {
             // Main Sequence (4)
@@ -4636,36 +4570,64 @@ CRITICAL: This is a SMALL GAME ICON.
     
     private List<string> GetFactionSymbolsList()
     {
+        // Try to load from JSON first
+        if (_promptData.HasCategory("factionsymbols"))
+        {
+            var jsonNames = _promptData.GetAssetNames("factionsymbols");
+            if (jsonNames.Count > 0)
+                return jsonNames;
+        }
+
+        // Fallback to hardcoded list - 5x5 grid (25 slots)
         return new List<string>
         {
-            // Major Factions (Row 1)
+            // Row 1 - Major Powers
             "Symbol United Federation of Planets",
             "Symbol Klingon Empire",
             "Symbol Romulan Star Empire",
             "Symbol Cardassian Union",
-            // Major Factions (Row 2)
             "Symbol Ferengi Alliance",
+            // Row 2 - Major Powers continued
             "Symbol Dominion",
             "Symbol Borg Collective",
             "Symbol Breen Confederacy",
-            // Minor Factions (Row 3)
             "Symbol Gorn Hegemony",
             "Symbol Andorian Empire",
+            // Row 3 - Minor Factions
             "Symbol Vulcan High Command",
             "Symbol Trill Symbiosis Commission",
-            // Minor Factions (Row 4)
             "Symbol Bajoran Republic",
             "Symbol Tholian Assembly",
             "Symbol Orion Syndicate",
-            "Symbol Maquis Resistance"
+            // Row 4 - New Factions
+            "Symbol Hirogen Hunters",
+            "Symbol Betazoid",
+            "Symbol Maquis Resistance",
+            "Symbol Pirates",
+            "Symbol Nausicaan",
+            // Row 5 - Special
+            "Symbol Species 8472",
+            "Symbol Terran Empire",
+            "Symbol Reserved 1",
+            "Symbol Reserved 2",
+            "Symbol Reserved 3"
         };
     }
     
     private List<string> GetFactionLeadersList()
     {
+        // Try to load from JSON first
+        if (_promptData.HasCategory("factionleaders"))
+        {
+            var jsonNames = _promptData.GetAssetNames("factionleaders");
+            if (jsonNames.Count > 0)
+                return jsonNames;
+        }
+
+        // Fallback to hardcoded list (should not be needed if JSON is loaded)
         return new List<string>
         {
-            // Row 1 - Major Faction Leaders
+            // Row 1 - Major Faction Leaders (4 columns)
             "Leader Federation President Human Male",
             "Leader Klingon Chancellor Male",
             "Leader Romulan Praetor Male",
@@ -4674,17 +4636,22 @@ CRITICAL: This is a SMALL GAME ICON.
             "Leader Ferengi Grand Nagus Male",
             "Leader Dominion Female Changeling Founder",
             "Leader Borg Queen Female",
-            "Leader Breen Thot Armored",
-            // Row 3 - Minor Faction Leaders
+            "Leader Breen Thot Modern",
+            // Row 3 - Breen variants + Hirogen/Gorn
+            "Leader Breen Thot Classic",
+            "Leader Breen Thot Revealed Face",
+            "Leader Hirogen Alpha Hunter Male",
             "Leader Gorn Hegemony King Male",
+            // Row 4 - Minor Faction Leaders
             "Leader Andorian Chancellor Female",
             "Leader Vulcan High Command Admiral Male",
             "Leader Trill Symbiosis President Female",
-            // Row 4 - Minor Faction Leaders continued
             "Leader Bajoran Kai Female Religious",
+            // Row 5 - Alien Leaders + Mercenaries
             "Leader Tholian Assembly Commander",
             "Leader Orion Syndicate Boss Female",
-            "Leader Independent Mercenary Captain"
+            "Leader Independent Mercenary Captain",
+            "Leader Nausicaan Raider Captain"
         };
     }
     
@@ -4797,6 +4764,67 @@ CRITICAL - LEADER CHARACTERISTICS:
 - Think: master of logic, emotionless strategist
 - Brown/rust/gold robes";
         
+        if (lowerName.Contains("hirogen"))
+        {
+            // Check for helmet/armor variants
+            if (lowerName.Contains("helmet") || lowerName.Contains("armored") || lowerName.Contains("suited"))
+                return @"HIROGEN ALPHA HUNTER (FULLY ARMORED WITH HELMET):
+- MASSIVE towering build - much larger than humans
+- FULL-FACE HUNTING HELMET covering entire head
+- Helmet is SILVER-BLUE METALLIC with color-shifting sheen
+- ANGULAR PREDATORY SHAPE - aggressive hunting aesthetic
+- NARROW HORIZONTAL VISOR slit with AMBER/ORANGE glow
+- RESPIRATOR SECTION covering mouth/nose - ribbed metal grille
+- Tubes and hoses connecting helmet to suit
+- SILVER-BLUE METALLIC full body armor matching helmet
+- Segmented armor plates, heavy pauldrons
+- TROPHY DECORATIONS - bones, teeth from kills
+- Sensor equipment integrated into armor
+- Battle-worn finish - scratches, dents
+- KEY: SILVER-BLUE ARMOR + FULL HELMET + NARROW VISOR + TROPHIES = Armored Hirogen";
+
+            if (lowerName.Contains("mask") || lowerName.Contains("partial"))
+                return @"HIROGEN ALPHA HUNTER (PARTIAL HELMET - SIGNATURE LOOK):
+- MASSIVE towering reptilian humanoid
+- UPPER SKULL VISIBLE showing DUAL-LOBED CRANIUM (two bulges on top of head!)
+- Completely BALD - no hair
+- Heavy BROW RIDGES over deep-set predatory eyes
+- TAN/OLIVE SCALED SKIN visible on forehead (Gila monster texture)
+- RESPIRATOR MASK covering LOWER FACE (nose and mouth)
+- Mask is SILVER-BLUE METALLIC with ribbed grille
+- Tubes connecting mask to armor
+- SILVER-BLUE metallic body armor
+- Trophy decorations on armor
+- KEY: DUAL-LOBED SKULL VISIBLE + SILVER-BLUE RESPIRATOR MASK = Signature Hirogen";
+
+            // Default: unmasked face visible
+            return @"HIROGEN ALPHA HUNTER (FACE VISIBLE):
+=== CRITICAL CRANIAL STRUCTURE ===
+- ENLARGED DUAL-LOBED CRANIUM - TWO DISTINCT BULGING LOBES on top of skull (THIS IS KEY!)
+- Head is OVERSIZED compared to humans
+- Skull WIDENS at top into two rounded protrusions
+- Completely BALD - no hair on head or face
+
+=== CRITICAL FACIAL FEATURES ===
+- FLAT NOSE - almost NO nasal bridge, nostrils sit FLUSH with face (like reptile/Saurian)
+- NO LIPS - mouth is a LIPLESS reptilian slit
+- HEAVY BROW RIDGES protruding over deep-set eyes
+- Deep-set PREDATORY EYES with intense hunter's gaze
+
+=== SKIN ===
+- SCALED/PEBBLED TEXTURE like GILA MONSTER skin
+- TAN/BEIGE to OLIVE coloring with darker MOTTLED patches
+- Rough, weathered, bumpy texture - NOT smooth
+
+=== ARMOR (when unmasked) ===
+- Heavy BRONZE/OLIVE hunting armor (matches skin tones)
+- Trophy decorations - bones, teeth, skulls
+- ALPHA STATUS SYMBOLS
+
+- KEY: DUAL-LOBED SKULL + FLAT NOSE + NO LIPS + GILA MONSTER SKIN = Hirogen
+- Think: massive reptilian hunter with distinctive two-lobed alien skull";
+        }
+
         if (lowerName.Contains("gorn"))
             return @"GORN HEGEMONY LEADER:
 - Reptilian Gorn with green scaly skin
@@ -4805,7 +4833,22 @@ CRITICAL - LEADER CHARACTERISTICS:
 - Ceremonial armor or royal regalia
 - Fierce, predatory expression
 - Think: ancient reptilian king, powerful warrior";
-        
+
+        if (lowerName.Contains("nausicaan"))
+            return @"NAUSICAAN RAIDER CAPTAIN:
+- TALL, muscular humanoid with rough gray/brown skin
+- Prominent TUSKS protruding from lower jaw
+- Heavy brow ridges and deep-set eyes
+- Bald or minimal coarse hair
+- Battle scars and rough, weathered features
+- Rough leather and metal armor
+- Mismatched pirate/raider aesthetic
+- Trophy items from past raids visible
+- Dark colors - black, brown, gunmetal
+- Aggressive, intimidating, brutish expression
+- Think: space pirate, hired muscle, dangerous thug-for-hire
+- KEY: TUSKS + TALL + BRUTISH = Nausicaan";
+
         if (lowerName.Contains("tholian"))
             return @"THOLIAN COMMANDER:
 - Crystalline/silicon-based life form
@@ -4814,28 +4857,128 @@ CRITICAL - LEADER CHARACTERISTICS:
 - Alien, inscrutable
 - Environmental suit if visible
 - Think: incomprehensible alien intelligence";
-        
+
+        if (lowerName.Contains("betazoid"))
+            return @"BETAZOID LEADER/AMBASSADOR:
+- Humanoid NEARLY IDENTICAL to human appearance
+- SOLID BLACK EYES - completely black, no visible iris or pupil (KEY FEATURE!)
+- Elegant, refined features
+- Serene, empathic expression showing telepathic awareness
+- Often female (matriarchal society) but can be male
+- CLOTHING: Flowing elegant robes in PURPLES, LAVENDERS, and SILVERS
+- Or Starfleet uniform if serving in fleet
+- Sophisticated, calm, diplomatic bearing
+- Think: Lwaxana Troi, Deanna Troi - telepathic counselor/diplomat
+- KEY: SOLID BLACK EYES + ELEGANT ROBES + SERENE EXPRESSION = Betazoid";
+
+        if (lowerName.Contains("maquis"))
+            return @"MAQUIS LEADER/COMMANDER:
+- MIXED SPECIES - Human, Bajoran, or occasionally Vulcan
+- RESISTANCE FIGHTER aesthetic - NOT military uniform
+- Rugged civilian clothing: leather jackets, practical gear
+- Battle-worn, determined expression
+- Scars or signs of hard living common
+- Earth tone colors: browns, greens, blacks
+- NO Starfleet uniform (they rejected Starfleet)
+- Visible weapons, utilitarian equipment
+- Intense, passionate, defiant expression
+- Think: Chakotay, Michael Eddington - freedom fighter against Cardassians
+- KEY: CIVILIAN CLOTHES + RESISTANCE LOOK + DETERMINED EXPRESSION = Maquis";
+
+        if (lowerName.Contains("pirate") || lowerName.Contains("raider"))
+            return @"PIRATE FLEET COMMANDER:
+- HUMAN male with commanding, authoritative presence
+- Middle-aged to older, experienced and hardened
+- Cold, calculating eyes - battle-worn veteran
+- DARK MILITARY-STYLE UNIFORM - like a corrupted/twisted admiral's uniform
+- BLACK or DARK GRAY base with GOLD/BRASS trim
+- High collar, formal military cut
+- MEDALS AND DECORATIONS on chest - stolen or self-awarded honors
+- Rank insignia (self-proclaimed)
+- Optional: dark cape or long coat over uniform
+- Cold, authoritative, dangerous expression
+- Think: rogue admiral, fallen military commander turned pirate lord
+- KEY: DARK MILITARY UNIFORM + MEDALS + COMMANDING PRESENCE = Pirate Commander";
+
+        if (lowerName.Contains("species8472") || lowerName.Contains("8472") || lowerName.Contains("undine"))
+            return @"SPECIES 8472 / UNDINE LEADER:
+- TRIPEDAL ALIEN - three legs, three arms
+- EXTREMELY TALL and thin, elongated body
+- ELONGATED HEAD with MULTIPLE EYES (no visible mouth)
+- GRAY-PURPLE SKIN with organic texture
+- Communicates TELEPATHICALLY - no mouth visible
+- NO CLOTHING - organic exoskeleton/bio-armor
+- Bioluminescent markings possible
+- TERRIFYING, ALIEN appearance - not humanoid
+- From FLUIDIC SPACE - completely alien
+- Think: ultimate alien threat, extradimensional beings
+- KEY: TRIPEDAL + MULTIPLE EYES + NO MOUTH + GRAY-PURPLE = Species 8472";
+
         if (lowerName.Contains("breen") || lowerName.Contains("thot"))
-            return @"BREEN THOT MILITARY COMMANDER:
+        {
+            // Check for specific Breen variants
+            if (lowerName.Contains("classic"))
+            {
+                return @"BREEN THOT CLASSIC STYLE (DS9 ERA):
 - HELMET:
-  * Closed, technological helmet made of brown clay
-  * Most distinctive feature: Wide HORIZONTAL VISOR glowing NEON GREEN
-  * Below visor: ELONGATED RESPIRATOR/SNOUT protruding forward
-  * Snout shape: Like a TRUNCATED PYRAMID (flat-topped pyramid) viewed from side
-  * The respirator extends forward and downward from the visor
-  * Respirator has vertical ridges/grilles along its length
-  * Small side tubes/filters (2-3 each side) near jaw area
-  * Helmet has horizontal layered bands/ridges on top
+  * Closed helmet made of SAND-COLORED/TAN material
+  * Wide HORIZONTAL VISOR glowing NEON GREEN
+  * Below visor: ELONGATED SNOUT/BREATHER protruding forward
+  * Snout shape: truncated pyramid extending forward and down
+  * Vertical ridges/grilles along the respirator
+  * Horizontal layered bands on top of helmet
 - CLOTHING & ARMOR:
-  * Light brown/beige TUNIC as base layer
+  * SAND/TAN colored LEATHER tunic as base layer
   * CROSSED BANDOLIERS/STRAPS across chest in dark brown
-  * Bandoliers have impressed woven/grid texture (basket-weave pattern)
-  * Massive, angular SHOULDER PADS with geometric details
-- COLOR PALETTE: Brown, tan, beige, khaki (warm earth tones only)
-- LIGHTING: Dramatic studio light highlighting clay texture
-- BACKGROUND: Solid black (#000000)
-- COMPOSITION: Medium shot portrait, head and upper torso visible
-- KEY SHAPE: Helmet with elongated TRAPEZOIDAL snout extending forward";
+  * Bandoliers have basket-weave/grid texture
+  * Massive angular SHOULDER PADS
+  * NO capes, NO cloaks
+- COLOR PALETTE: Sand, tan, beige, khaki, brown leather, green visor glow
+- KEY: Sand-colored leather armor, elongated snout helmet, green visor, NO face visible";
+            }
+
+            if (lowerName.Contains("revealed") || lowerName.Contains("face"))
+            {
+                return @"BREEN THOT WITH VISIBLE FACE:
+- HELMET:
+  * OPEN-FACE HELMET with dark metal frame
+  * GREEN TRANSLUCENT ENERGY FIELD covering the face area
+  * Energy field CONTOURS TO THE FACE SHAPE - not flat glass
+  * Dark metal frame with BRONZE/GOLD accent trim around faceplate
+  * Vertical ribbed tubes on sides of helmet
+- FACE:
+  * REPTILIAN FACE visible through green energy barrier
+  * FLAT NOSE that merges seamlessly into a raised FOREHEAD PLATE
+  * Slightly GLOWING EYES with eerie luminescence
+  * SCALY TEXTURED SKIN - reptilian/amphibian appearance
+  * NOT human - clearly alien reptilian features
+- CLOTHING:
+  * DARK METALLIC ARMOR - gunmetal/black base
+  * BRONZE/GOLD ACCENT STRIPS and trim pieces
+  * Heavy industrial aesthetic - tubes, cables, mechanical joints
+  * NO capes, NO cloaks, NO fabric
+- KEY: Open helmet with CONTOURED green energy field over REPTILIAN face";
+            }
+
+            // Default: Modern Breen with rounded helmet
+            return @"BREEN THOT MILITARY COMMANDER (MODERN):
+- HELMET:
+  * ROUNDED DOME HELMET made of dark gunmetal/black metal
+  * Helmet shape is SPHERICAL/ROUNDED - like a dome or bubble
+  * Narrow HORIZONTAL CYAN/TEAL VISOR - thin glowing slit across eyes
+  * RESPIRATOR/BREATH MASK integrated into lower helmet section
+  * Respirator has VERTICAL GRILLE LINES/VENTS at the mouth area
+  * The respirator section is recessed/inset into the helmet, not smooth
+  * Helmet fully CLOSED - NO face visible, NO skin showing
+- CLOTHING & ARMOR:
+  * DARK METALLIC ARMOR - gunmetal gray/black color
+  * Sleek modern design with segmented armor plates
+  * High collar integrated with helmet seal
+  * Minimal ornamentation - functional military aesthetic
+  * NO capes, NO cloaks, NO fabric - only metal armor
+- COLOR PALETTE: Dark gunmetal, black metal, cyan/teal visor glow ONLY
+- CRITICAL: Helmet is ROUNDED/DOMED, respirator has VERTICAL VENT LINES at mouth";
+        }
         
         if (lowerName.Contains("cardassian"))
             return @"CARDASSIAN LEGATE:
@@ -4949,23 +5092,32 @@ CRITICAL - LEADER CHARACTERISTICS:
     
     private List<string> GetSpecialCharactersList()
     {
+        // Try to load from JSON first
+        if (_promptData.HasCategory("specialcharacters"))
+        {
+            var jsonNames = _promptData.GetAssetNames("specialcharacters");
+            if (jsonNames.Count > 0)
+                return jsonNames;
+        }
+
+        // Fallback to hardcoded list
         return new List<string>
         {
             // Q (3 variants)
             "Q Classic Smirk Starfleet",
             "Q Judge Robes Tribunal",
             "Q Mariachi Snapping Fingers",
-            
+
             // Data / Androids (3 variants)
             "Data Yellow Eyes Curious",
             "Data Emotion Chip Smiling",
             "Lore Evil Twin Smirk",
-            
+
             // Khan / Augments (3 variants)
             "Khan Classic Vengeful",
             "Khan Young Calculating",
             "Augment Soldier Elite",
-            
+
             // Other iconic (7 variants)
             "Guinan Wise Bartender",
             "Borg Queen Seductive",
@@ -5285,6 +5437,15 @@ COLORS: Faction-appropriate";
     
     private List<string> GetAnomaliesList()
     {
+        // Try to load from JSON first
+        if (_promptData.HasCategory("anomalies"))
+        {
+            var jsonNames = _promptData.GetAssetNames("anomalies");
+            if (jsonNames.Count > 0)
+                return jsonNames;
+        }
+
+        // Fallback to hardcoded list
         return new List<string>
         {
             // Nebulae (6)
@@ -5304,6 +5465,15 @@ COLORS: Faction-appropriate";
     
     private List<string> GetGalaxyTilesList()
     {
+        // Try to load from JSON first
+        if (_promptData.HasCategory("galaxytiles"))
+        {
+            var jsonNames = _promptData.GetAssetNames("galaxytiles");
+            if (jsonNames.Count > 0)
+                return jsonNames;
+        }
+
+        // Fallback to hardcoded list
         return new List<string>
         {
             // Space Types (6)
@@ -5323,6 +5493,15 @@ COLORS: Faction-appropriate";
     
     private List<string> GetSystemElementsList()
     {
+        // Try to load from JSON first
+        if (_promptData.HasCategory("systemelements"))
+        {
+            var jsonNames = _promptData.GetAssetNames("systemelements");
+            if (jsonNames.Count > 0)
+                return jsonNames;
+        }
+
+        // Fallback to hardcoded list
         return new List<string>
         {
             // Asteroids (6)

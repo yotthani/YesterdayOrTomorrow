@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 8" fill="none">
+  <!-- Borg Horizontal Separator: Circuit line -->
+  <defs>
+    <linearGradient id="borgSepGreen" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#1A3A1A"/>
+      <stop offset="50%" style="stop-color:#3A6A3A"/>
+      <stop offset="100%" style="stop-color:#1A3A1A"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Main line -->
+  <line x1="0" y1="4" x2="300" y2="4" stroke="url(#borgSepGreen)" stroke-width="2"/>
+
+  <!-- Center node -->
+  <circle cx="150" cy="4" r="4" fill="#4A8A4A"/>
+  <circle cx="150" cy="4" r="2" fill="#0a0f0a"/>
+</svg>

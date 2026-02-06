@@ -1,3 +1,4 @@
+using System.Net.Http;
 using StarTrekGame.AssetGenerator.Models;
 using Microsoft.JSInterop;
 
@@ -8,30 +9,30 @@ public class AssetGeneratorService
     private readonly GeminiApiService _geminiApi;
     private readonly PromptBuilderService _promptBuilder;
     private readonly IJSRuntime _jsRuntime;
-    
+
     public event Action<AssetDefinition>? OnAssetGenerated;
     public event Action<AssetDefinition, string>? OnAssetFailed;
     public event Action<GenerationJob>? OnJobProgressChanged;
     public event Action<string>? OnStatusMessage;
-    
+
     private CancellationTokenSource? _cancellationTokenSource;
     private bool _isPaused;
     private GenerationJob? _currentJob;
-    
+
     // Background removal settings
     public bool RemoveBackground { get; set; } = true;
     public int BackgroundTolerance { get; set; } = 25;
     public bool SmoothEdges { get; set; } = true;
-    
+
     // Resize settings - ensure consistent output size
     public bool ResizeToTarget { get; set; } = true;
     public int TargetSize { get; set; } = 512;
-    
-    public AssetGeneratorService(GeminiApiService geminiApi, IJSRuntime jsRuntime)
+
+    public AssetGeneratorService(GeminiApiService geminiApi, IJSRuntime jsRuntime, HttpClient httpClient)
     {
         _geminiApi = geminiApi;
         _jsRuntime = jsRuntime;
-        _promptBuilder = new PromptBuilderService();
+        _promptBuilder = new PromptBuilderService(httpClient);
     }
     
     public PromptBuilderService PromptBuilder => _promptBuilder;

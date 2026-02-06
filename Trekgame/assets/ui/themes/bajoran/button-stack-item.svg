@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 40" fill="none">
+  <!-- Bajoran Button Stack Item: Temple tablet style stacked button -->
+  <defs>
+    <linearGradient id="bajoranStackBrown" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#AA7744"/>
+      <stop offset="100%" style="stop-color:#886633"/>
+    </linearGradient>
+    <linearGradient id="bajoranStackGold" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#DDAA66"/>
+      <stop offset="100%" style="stop-color:#FFCC88"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Main tablet shape with subtle arch -->
+  <path d="
+    M 10 0
+    L 190 0
+    Q 200 0 200 10
+    L 200 30
+    Q 200 40 190 40
+    L 10 40
+    Q 0 40 0 30
+    L 0 10
+    Q 0 0 10 0
+    Z
+  " fill="url(#bajoranStackBrown)"/>
+
+  <!-- Left ornamental dot -->
+  <circle cx="15" cy="20" r="4" fill="url(#bajoranStackGold)"/>
+
+  <!-- Right ornamental dot -->
+  <circle cx="185" cy="20" r="4" fill="url(#bajoranStackGold)"/>
+
+  <!-- Subtle top border highlight -->
+  <path d="M 15 3 L 185 3" stroke="#DDAA66" stroke-width="1" opacity="0.4"/>
+</svg>

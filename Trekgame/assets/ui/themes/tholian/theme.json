@@ -1,0 +1,47 @@
+{
+  "id": "tholian",
+  "name": "Tholian Assembly",
+  "description": "Tholian interface system - Crystalline, hexagonal, precise",
+  "faction": "tholian",
+  "fonts": {
+    "primary": {
+      "family": "Tholian Crystal",
+      "fallback": "Orbitron, Arial, sans-serif",
+      "file": "fonts/tholian-crystal.ttf",
+      "weight": "bold",
+      "letterSpacing": "0.05em",
+      "textTransform": "uppercase"
+    },
+    "secondary": {
+      "family": "Tholian Text",
+      "fallback": "Rajdhani, Arial Narrow, sans-serif",
+      "file": "fonts/tholian-text.ttf",
+      "weight": "normal",
+      "letterSpacing": "0.02em"
+    },
+    "display": {
+      "family": "Tholian Lattice",
+      "fallback": "Tholian Crystal, Orbitron, sans-serif",
+      "file": "fonts/tholian-lattice.ttf",
+      "weight": "bold",
+      "letterSpacing": "0.06em",
+      "comment": "Crystalline Tholian display script"
+    }
+  },
+  "colors": {
+    "primary": "#FF6633",
+    "secondary": "#CC4411",
+    "accent": "#FFAA44",
+    "highlight": "#FFDD88",
+    "alert": "#FF3300",
+    "success": "#FFAA44",
+    "background": "#1A0A00",
+    "text": "#FFCC88",
+    "textDark": "#1A0A00"
+  },
+  "styles": {
+    "cornerRadius": "crystalline",
+    "borderStyle": "hexagonal",
+    "animationStyle": "faceted"
+  }
+}

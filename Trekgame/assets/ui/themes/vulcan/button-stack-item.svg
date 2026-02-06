@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 40" fill="none">
+  <!-- Vulcan Button Stack Item: Clean geometric menu item -->
+  <defs>
+    <linearGradient id="vulcanStackCopper" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#DD8844"/>
+      <stop offset="100%" style="stop-color:#AA6633"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Main rectangular button with small geometric notch -->
+  <path d="
+    M 0 0
+    L 190 0
+    L 200 10
+    L 200 40
+    L 0 40
+    Z
+  " fill="url(#vulcanStackCopper)"/>
+
+  <!-- Accent indicator -->
+  <rect x="5" y="10" width="3" height="20" fill="#FFBB77"/>
+</svg>

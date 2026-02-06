@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 20" fill="none">
+  <!-- Andorian Progress Bar Background: Ice container -->
+  <defs>
+    <linearGradient id="andorianProgressBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#0A1520"/>
+      <stop offset="100%" style="stop-color:#152030"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Main background with rounded ends -->
+  <path d="
+    M 10 0
+    L 190 0
+    Q 200 0 200 10
+    Q 200 20 190 20
+    L 10 20
+    Q 0 20 0 10
+    Q 0 0 10 0
+    Z
+  " fill="url(#andorianProgressBg)" stroke="#4499DD" stroke-width="1"/>
+</svg>

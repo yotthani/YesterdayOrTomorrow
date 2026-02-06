@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <!-- Vulcan Elbow Bottom Right: Geometric precision corner -->
+  <defs>
+    <linearGradient id="vulcanElbowCopper" x1="100%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" style="stop-color:#DD8844"/>
+      <stop offset="100%" style="stop-color:#AA6633"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Main elbow with stepped geometry -->
+  <path d="
+    M 90 0
+    L 120 0
+    L 120 120
+    L 0 120
+    L 0 90
+    L 70 90
+    L 70 70
+    L 90 70
+    Z
+  " fill="url(#vulcanElbowCopper)"/>
+
+  <!-- Accent line -->
+  <rect x="75" y="5" width="10" height="60" fill="#FFBB77" opacity="0.7"/>
+</svg>

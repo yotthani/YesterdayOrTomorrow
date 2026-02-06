@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <!-- Orion Elbow Bottom-Right: Ornate curved corner with flourish -->
+  <defs>
+    <linearGradient id="orionGreen" x1="100%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" style="stop-color:#33AA55"/>
+      <stop offset="100%" style="stop-color:#227744"/>
+    </linearGradient>
+    <linearGradient id="orionGold" x1="100%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" style="stop-color:#FFCC00"/>
+      <stop offset="100%" style="stop-color:#CC9900"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Main curved elbow shape -->
+  <path d="
+    M 90 0
+    L 120 0
+    L 120 120
+    L 0 120
+    L 0 90
+    Q 20 90 40 85
+    Q 70 75 80 40
+    Q 85 20 90 0
+  " fill="url(#orionGreen)"/>
+
+  <!-- Inner gold flourish curve -->
+  <path d="
+    M 85 85
+    Q 70 85 65 70
+    Q 60 55 70 45
+    Q 75 60 80 70
+    Q 85 75 85 85
+  " fill="url(#orionGold)"/>
+
+  <!-- Small gold accent dot -->
+  <circle cx="100" cy="100" r="5" fill="url(#orionGold)"/>
+</svg>

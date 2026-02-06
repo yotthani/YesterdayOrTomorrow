@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 200" fill="none">
+  <!-- Klingon Bracket Left: Angular bracket -->
+  <defs>
+    <linearGradient id="klingonBracketRed" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#CC2222"/>
+      <stop offset="100%" style="stop-color:#880000"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Angular left bracket -->
+  <path d="
+    M 40 0
+    L 40 20
+    L 20 20
+    L 10 30
+    L 10 170
+    L 20 180
+    L 40 180
+    L 40 200
+    L 15 200
+    L 0 185
+    L 0 15
+    L 15 0
+    Z
+  " fill="url(#klingonBracketRed)"/>
+</svg>

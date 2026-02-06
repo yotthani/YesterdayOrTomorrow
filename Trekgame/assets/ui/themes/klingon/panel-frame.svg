@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" fill="none">
+  <!-- Klingon Panel Frame: Aggressive angular frame with triangular accents -->
+  <defs>
+    <linearGradient id="klingonFrameRed" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#CC2222"/>
+      <stop offset="100%" style="stop-color:#880000"/>
+    </linearGradient>
+    <linearGradient id="klingonAccentOrange" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#FF6600"/>
+      <stop offset="100%" style="stop-color:#CC4400"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Main frame with angular cuts -->
+  <!-- Top bar with angled ends -->
+  <path d="
+    M 30 0
+    L 770 0
+    L 800 30
+    L 800 50
+    L 0 50
+    L 0 30
+    Z
+  " fill="url(#klingonFrameRed)"/>
+
+  <!-- Left sidebar with angular cut -->
+  <path d="
+    M 0 30
+    L 30 0
+    L 30 0
+    L 100 0
+    L 100 600
+    L 0 600
+    Z
+  " fill="url(#klingonFrameRed)"/>
+
+  <!-- Bottom bar -->
+  <path d="
+    M 0 550
+    L 800 550
+    L 800 570
+    L 770 600
+    L 30 600
+    L 0 570
+    Z
+  " fill="url(#klingonFrameRed)"/>
+
+  <!-- Right sidebar -->
+  <path d="
+    M 750 50
+    L 800 50
+    L 800 570
+    L 750 550
+    L 750 50
+    Z
+  " fill="url(#klingonFrameRed)"/>
+
+  <!-- Triangular accent top-left -->
+  <path d="M 100 50 L 130 50 L 100 80 Z" fill="url(#klingonAccentOrange)"/>
+
+  <!-- Triangular accent bottom-right -->
+  <path d="M 750 550 L 720 550 L 750 520 Z" fill="url(#klingonAccentOrange)"/>
+</svg>

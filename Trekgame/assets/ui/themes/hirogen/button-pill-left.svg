@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 50" fill="none">
+  <defs>
+    <linearGradient id="hirogenButtonGreen" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#557755"/>
+      <stop offset="50%" style="stop-color:#334433"/>
+      <stop offset="100%" style="stop-color:#557755"/>
+    </linearGradient>
+  </defs>
+  <path d="M 10 0 L 100 0 L 100 50 L 10 50 L 0 42 L 5 25 L 0 8 Z" fill="url(#hirogenButtonGreen)"/>
+</svg>

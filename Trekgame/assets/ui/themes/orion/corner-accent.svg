@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" fill="none">
+  <!-- Orion Corner Accent: Ornate corner decoration with flourish -->
+  <defs>
+    <linearGradient id="orionCornerGreen" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#33AA55"/>
+      <stop offset="100%" style="stop-color:#227744"/>
+    </linearGradient>
+    <linearGradient id="orionCornerGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFE066"/>
+      <stop offset="100%" style="stop-color:#FFCC00"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Curved L-shape corner -->
+  <path d="
+    M 0 0
+    L 40 0
+    Q 35 0 35 5
+    L 35 10
+    Q 35 15 30 15
+    L 15 15
+    Q 15 30 10 35
+    L 5 35
+    Q 0 35 0 40
+    L 0 0
+  " fill="url(#orionCornerGreen)"/>
+
+  <!-- Gold flourish swirl -->
+  <path d="
+    M 8 8
+    Q 15 5 20 10
+    Q 25 15 20 20
+    Q 15 18 12 15
+    Q 10 12 8 8
+  " fill="url(#orionCornerGold)"/>
+
+  <!-- Small gold dot accent -->
+  <circle cx="5" cy="5" r="2" fill="url(#orionCornerGold)"/>
+</svg>

@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 400" fill="none">
+  <!-- Trill Sidebar Vertical: Organic flowing sidebar with symbiont curves -->
+  <defs>
+    <linearGradient id="trillSideTeal" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#55AAAA"/>
+      <stop offset="100%" style="stop-color:#3D8080"/>
+    </linearGradient>
+    <linearGradient id="trillSideBeige" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#DDCCAA"/>
+      <stop offset="100%" style="stop-color:#BBA888"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Organic flowing sidebar shape -->
+  <path d="
+    M 0 20
+    Q 10 0, 40 0
+    Q 70 0, 80 20
+    L 80 380
+    Q 70 400, 40 400
+    Q 10 400, 0 380
+    Z
+  " fill="url(#trillSideTeal)"/>
+
+  <!-- Decorative spots flowing down the sidebar -->
+  <ellipse cx="25" cy="40" rx="8" ry="5" fill="url(#trillSideBeige)" transform="rotate(-10 25 40)" opacity="0.7"/>
+  <ellipse cx="50" cy="100" rx="7" ry="4" fill="url(#trillSideBeige)" transform="rotate(5 50 100)" opacity="0.6"/>
+  <ellipse cx="30" cy="170" rx="6" ry="4" fill="url(#trillSideBeige)" transform="rotate(-8 30 170)" opacity="0.7"/>
+  <ellipse cx="55" cy="240" rx="7" ry="4" fill="url(#trillSideBeige)" transform="rotate(3 55 240)" opacity="0.6"/>
+  <ellipse cx="25" cy="310" rx="6" ry="4" fill="url(#trillSideBeige)" transform="rotate(-5 25 310)" opacity="0.7"/>
+  <ellipse cx="45" cy="370" rx="8" ry="5" fill="url(#trillSideBeige)" transform="rotate(8 45 370)" opacity="0.6"/>
+</svg>

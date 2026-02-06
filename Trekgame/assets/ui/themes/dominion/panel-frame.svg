@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" fill="none">
+  <!-- Dominion Panel Frame: Organic flowing frame with founder-inspired accents -->
+  <defs>
+    <linearGradient id="dominionFramePurple" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6A3A8A"/>
+      <stop offset="100%" style="stop-color:#3A1A4A"/>
+    </linearGradient>
+    <linearGradient id="dominionFrameGold" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#C89030"/>
+      <stop offset="50%" style="stop-color:#E8C060"/>
+      <stop offset="100%" style="stop-color:#C89030"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Top bar with wave -->
+  <path d="
+    M 0 0
+    L 800 0
+    L 800 50
+    Q 700 45 600 50
+    Q 500 55 400 50
+    Q 300 45 200 50
+    Q 100 55 0 50
+    Z
+  " fill="url(#dominionFramePurple)"/>
+
+  <!-- Left sidebar with organic curve -->
+  <path d="
+    M 0 0
+    L 80 0
+    L 80 600
+    L 0 600
+    Z
+  " fill="url(#dominionFramePurple)"/>
+
+  <!-- Bottom bar -->
+  <path d="
+    M 0 550
+    Q 100 545 200 550
+    Q 300 555 400 550
+    Q 500 545 600 550
+    Q 700 555 800 550
+    L 800 600
+    L 0 600
+    Z
+  " fill="url(#dominionFramePurple)"/>
+
+  <!-- Right sidebar -->
+  <path d="
+    M 720 50
+    L 800 50
+    L 800 550
+    L 720 550
+    Z
+  " fill="url(#dominionFramePurple)"/>
+
+  <!-- Golden liquid accent lines -->
+  <path d="M 80 50 Q 400 60 720 50" fill="none" stroke="url(#dominionFrameGold)" stroke-width="3"/>
+  <path d="M 80 550 Q 400 540 720 550" fill="none" stroke="url(#dominionFrameGold)" stroke-width="3"/>
+
+  <!-- Corner droplets (founder symbols) -->
+  <ellipse cx="60" cy="30" rx="12" ry="8" fill="url(#dominionFrameGold)"/>
+  <ellipse cx="740" cy="30" rx="12" ry="8" fill="url(#dominionFrameGold)"/>
+  <ellipse cx="60" cy="570" rx="12" ry="8" fill="url(#dominionFrameGold)"/>
+  <ellipse cx="740" cy="570" rx="12" ry="8" fill="url(#dominionFrameGold)"/>
+</svg>

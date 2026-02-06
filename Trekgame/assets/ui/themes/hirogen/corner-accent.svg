@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" fill="none">
+  <defs>
+    <linearGradient id="hirogenAccent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#AA8855"/>
+      <stop offset="100%" style="stop-color:#CCAA77"/>
+    </linearGradient>
+  </defs>
+  <!-- Trophy claw marks -->
+  <path d="M 5 35 L 15 10 L 12 8" stroke="url(#hirogenAccent)" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 15 38 L 25 13 L 22 11" stroke="url(#hirogenAccent)" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 25 40 L 35 15 L 32 13" stroke="url(#hirogenAccent)" stroke-width="3" stroke-linecap="round"/>
+</svg>

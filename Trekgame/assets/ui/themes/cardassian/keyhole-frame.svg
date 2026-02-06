@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 180" fill="none">
+  <!-- Cardassian Keyhole Frame: Characteristic arch-and-stem shape -->
+  <defs>
+    <linearGradient id="cardassianKeyholeBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#5A7B8C"/>
+      <stop offset="100%" style="stop-color:#3A5B6C"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Keyhole outer shape -->
+  <path d="
+    M 60 0
+    Q 120 0 120 60
+    Q 120 100 80 110
+    L 80 180
+    L 40 180
+    L 40 110
+    Q 0 100 0 60
+    Q 0 0 60 0
+    Z
+  " fill="url(#cardassianKeyholeBlue)"/>
+
+  <!-- Inner cutout -->
+  <path d="
+    M 60 10
+    Q 110 10 110 60
+    Q 110 95 75 102
+    L 70 170
+    L 50 170
+    L 45 102
+    Q 10 95 10 60
+    Q 10 10 60 10
+    Z
+  " fill="#0a1015"/>
+</svg>

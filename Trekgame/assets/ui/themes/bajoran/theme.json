@@ -1,0 +1,47 @@
+{
+  "id": "bajoran",
+  "name": "Bajoran Spiritual Council",
+  "description": "Bajoran temple-inspired interface with spiritual and ornamental motifs",
+  "faction": "bajoran",
+  "fonts": {
+    "primary": {
+      "family": "Bajoran Temple",
+      "fallback": "Palatino Linotype, Book Antiqua, serif",
+      "file": "fonts/bajoran-temple.ttf",
+      "weight": "normal",
+      "letterSpacing": "0.03em",
+      "textTransform": "none"
+    },
+    "secondary": {
+      "family": "Bajoran Script",
+      "fallback": "Georgia, Times New Roman, serif",
+      "file": "fonts/bajoran-script.ttf",
+      "weight": "normal",
+      "letterSpacing": "0.02em"
+    },
+    "display": {
+      "family": "Bajoran Sacred",
+      "fallback": "Palatino Linotype, serif",
+      "file": "fonts/bajoran-sacred.ttf",
+      "weight": "bold",
+      "letterSpacing": "0.04em",
+      "comment": "Ornate Bajoran script for ceremonial and decorative use"
+    }
+  },
+  "colors": {
+    "primary": "#AA7744",
+    "secondary": "#886633",
+    "accent": "#DDAA66",
+    "highlight": "#FFCC88",
+    "alert": "#CC6633",
+    "success": "#DDAA66",
+    "background": "#120A05",
+    "text": "#DDAA66",
+    "textDark": "#120A05"
+  },
+  "styles": {
+    "cornerRadius": "arched",
+    "borderStyle": "ornamental",
+    "animationStyle": "flowing"
+  }
+}

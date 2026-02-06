@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" fill="none">
+  <!-- Trill Panel Frame: Organic flowing frame with symbiont-inspired curves -->
+  <defs>
+    <linearGradient id="trillFrameTeal" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#55AAAA"/>
+      <stop offset="100%" style="stop-color:#3D8080"/>
+    </linearGradient>
+    <linearGradient id="trillAccentBeige" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#DDCCAA"/>
+      <stop offset="100%" style="stop-color:#BBA888"/>
+    </linearGradient>
+    <radialGradient id="trillSpotGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#88DDDD"/>
+      <stop offset="100%" style="stop-color:#55AAAA"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Top flowing bar with organic curves -->
+  <path d="
+    M 0 40
+    Q 50 0, 100 10
+    Q 200 25, 300 15
+    Q 500 5, 700 15
+    Q 750 20, 800 40
+    L 800 50
+    Q 750 35, 700 30
+    Q 500 20, 300 30
+    Q 200 40, 100 25
+    Q 50 15, 0 50
+    Z
+  " fill="url(#trillFrameTeal)"/>
+
+  <!-- Left organic sidebar -->
+  <path d="
+    M 0 40
+    Q 10 100, 5 200
+    Q 0 300, 5 400
+    Q 10 500, 0 560
+    L 0 600
+    L 80 600
+    Q 90 500, 85 400
+    Q 80 300, 85 200
+    Q 90 100, 80 40
+    Z
+  " fill="url(#trillFrameTeal)"/>
+
+  <!-- Bottom flowing bar -->
+  <path d="
+    M 0 560
+    Q 50 590, 100 575
+    Q 200 560, 400 570
+    Q 600 580, 700 565
+    Q 750 555, 800 560
+    L 800 600
+    L 0 600
+    Z
+  " fill="url(#trillFrameTeal)"/>
+
+  <!-- Right organic sidebar -->
+  <path d="
+    M 800 40
+    L 800 560
+    L 720 560
+    Q 710 500, 715 400
+    Q 720 300, 715 200
+    Q 710 100, 720 40
+    Z
+  " fill="url(#trillFrameTeal)"/>
+
+  <!-- Organic spot accents - top left -->
+  <ellipse cx="95" cy="65" rx="12" ry="8" fill="url(#trillAccentBeige)" transform="rotate(-15 95 65)"/>
+  <ellipse cx="115" cy="80" rx="8" ry="5" fill="url(#trillAccentBeige)" transform="rotate(-10 115 80)"/>
+
+  <!-- Organic spot accents - bottom right -->
+  <ellipse cx="705" cy="545" rx="12" ry="8" fill="url(#trillAccentBeige)" transform="rotate(15 705 545)"/>
+  <ellipse cx="725" cy="530" rx="8" ry="5" fill="url(#trillAccentBeige)" transform="rotate(10 725 530)"/>
+</svg>

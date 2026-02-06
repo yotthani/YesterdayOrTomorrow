@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 40" fill="none">
+  <!-- Bajoran Bar Horizontal: Temple lintel style horizontal bar -->
+  <defs>
+    <linearGradient id="bajoranBarBrown" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#AA7744"/>
+      <stop offset="100%" style="stop-color:#886633"/>
+    </linearGradient>
+    <linearGradient id="bajoranBarGold" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#DDAA66"/>
+      <stop offset="100%" style="stop-color:#FFCC88"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Main bar with subtle arch profile -->
+  <path d="
+    M 20 5
+    Q 200 0 380 5
+    L 395 10
+    Q 400 20 395 30
+    L 380 35
+    Q 200 40 20 35
+    L 5 30
+    Q 0 20 5 10
+    Z
+  " fill="url(#bajoranBarBrown)"/>
+
+  <!-- Left end ornament -->
+  <circle cx="15" cy="20" r="6" fill="url(#bajoranBarGold)"/>
+  <circle cx="15" cy="20" r="3" fill="#FFCC88"/>
+
+  <!-- Right end ornament -->
+  <circle cx="385" cy="20" r="6" fill="url(#bajoranBarGold)"/>
+  <circle cx="385" cy="20" r="3" fill="#FFCC88"/>
+
+  <!-- Center spiritual symbol -->
+  <path d="M 190 15 Q 200 10 210 15 L 205 20 Q 200 18 195 20 Z" fill="url(#bajoranBarGold)" opacity="0.8"/>
+  <circle cx="200" cy="22" r="2" fill="#FFCC88"/>
+
+  <!-- Top highlight -->
+  <path d="M 30 8 Q 200 4 370 8" stroke="#DDAA66" stroke-width="1" fill="none" opacity="0.4"/>
+</svg>

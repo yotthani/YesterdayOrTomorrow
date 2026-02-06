@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60" fill="none">
+  <!-- LCARS Corner Accent: Small decorative corner piece -->
+  <defs>
+    <linearGradient id="lcarsAccentOrange" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF9966"/>
+      <stop offset="100%" style="stop-color:#CC6633"/>
+    </linearGradient>
+  </defs>
+
+  <!-- L-shaped corner accent -->
+  <path d="
+    M 0 0
+    L 60 0
+    L 60 15
+    L 15 15
+    L 15 60
+    L 0 60
+    Z
+  " fill="url(#lcarsAccentOrange)"/>
+</svg>

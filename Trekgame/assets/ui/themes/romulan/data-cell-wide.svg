@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 30" fill="none">
+  <!-- Romulan Data Cell Wide: Cyan/teal color -->
+  <defs>
+    <linearGradient id="romulanCellCyan" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#00FFCC"/>
+      <stop offset="100%" style="stop-color:#009999"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Wide beveled data cell -->
+  <path d="
+    M 5 0
+    L 195 0
+    L 200 5
+    L 200 25
+    L 195 30
+    L 5 30
+    L 0 25
+    L 0 5
+    Z
+  " fill="url(#romulanCellCyan)"/>
+</svg>

@@ -1,0 +1,48 @@
+{
+  "id": "dominion",
+  "name": "The Dominion",
+  "description": "Dominion Founders' interface system - organic and controlled",
+  "faction": "dominion",
+  "fonts": {
+    "primary": {
+      "family": "Dominion",
+      "fallback": "Optima, Candara, sans-serif",
+      "file": "fonts/dominion.ttf",
+      "weight": "normal",
+      "letterSpacing": "0.06em"
+    },
+    "secondary": {
+      "family": "Dominion Text",
+      "fallback": "Segoe UI, Calibri, sans-serif",
+      "file": "fonts/dominion-text.ttf",
+      "weight": "normal",
+      "letterSpacing": "0.03em"
+    },
+    "display": {
+      "family": "Dominion Script",
+      "fallback": "Dominion, Optima, sans-serif",
+      "file": "fonts/dominion-script.ttf",
+      "weight": "bold",
+      "letterSpacing": "0.08em",
+      "comment": "Formal Dominion designations"
+    }
+  },
+  "colors": {
+    "primary": "#6A3A8A",
+    "secondary": "#4A2A5A",
+    "accent": "#D4A030",
+    "highlight": "#E8C060",
+    "alert": "#AA4488",
+    "success": "#8A6AAA",
+    "background": "#120a18",
+    "text": "#C8A8D8",
+    "textDark": "#2A1A3A",
+    "founderGold": "#C89030",
+    "vortaPurple": "#8A5AAA"
+  },
+  "styles": {
+    "cornerRadius": "organic",
+    "borderStyle": "flowing",
+    "animationStyle": "fluid"
+  }
+}

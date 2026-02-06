@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <!-- Gorn decoration: Scale pattern with claw marks -->
+  <defs>
+    <linearGradient id="gornDecoGreen" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#88BB55"/>
+      <stop offset="100%" style="stop-color:#669944"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Scale pattern -->
+  <path d="M 20 30 Q 35 20 50 30 Q 35 40 20 30" fill="none" stroke="url(#gornDecoGreen)" stroke-width="2"/>
+  <path d="M 50 30 Q 65 20 80 30 Q 65 40 50 30" fill="none" stroke="url(#gornDecoGreen)" stroke-width="2"/>
+  <path d="M 35 50 Q 50 40 65 50 Q 50 60 35 50" fill="none" stroke="url(#gornDecoGreen)" stroke-width="2"/>
+  <path d="M 20 70 Q 35 60 50 70 Q 35 80 20 70" fill="none" stroke="url(#gornDecoGreen)" stroke-width="2"/>
+  <path d="M 50 70 Q 65 60 80 70 Q 65 80 50 70" fill="none" stroke="url(#gornDecoGreen)" stroke-width="2"/>
+
+  <!-- Claw marks -->
+  <path d="M 10 90 L 25 60" stroke="#AADD77" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 18 95 L 33 65" stroke="#AADD77" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 26 98 L 41 68" stroke="#AADD77" stroke-width="3" stroke-linecap="round"/>
+</svg>

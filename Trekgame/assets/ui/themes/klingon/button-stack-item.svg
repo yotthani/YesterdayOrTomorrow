@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 35" fill="none">
+  <!-- Klingon Button Stack Item: Angular menu button -->
+  <defs>
+    <linearGradient id="klingonStackBtn" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#CC2222"/>
+      <stop offset="100%" style="stop-color:#880000"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Angular button with cut corners -->
+  <path d="
+    M 8 0
+    L 142 0
+    L 150 8
+    L 150 27
+    L 142 35
+    L 8 35
+    L 0 27
+    L 0 8
+    Z
+  " fill="url(#klingonStackBtn)"/>
+</svg>

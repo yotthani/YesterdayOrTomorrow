@@ -1,0 +1,160 @@
+{
+  "factionName": "Andorian",
+  "categoryName": "Buildings",
+  "architectureStyle": {
+    "description": "Ice-adapted, military proud - built for a passionate warrior culture from a frozen moon",
+    "keyElements": [
+      "Ice-crystal inspired architecture with sharp angles",
+      "Blue and white coloring matching Andorian skin",
+      "Underground elements - Andorian cities extend below surface",
+      "Imperial Guard militarism evident even in civilian buildings",
+      "Antenna-like spires reaching upward",
+      "Insulated construction for ice world environment",
+      "Dueling arenas for Ushaan honor combat"
+    ],
+    "colors": "Ice-blue, white, silver accents, deep blue, frost patterns",
+    "materials": "Ice-resistant alloys, crystalline composites, thermal insulation"
+  },
+  "buildings": [
+    {
+      "name": "Imperial Palace",
+      "category": "Government",
+      "description": "Seat of the Andorian Imperial government - elegant ice-crystal architecture"
+    },
+    {
+      "name": "Imperial Guard Headquarters",
+      "category": "Government",
+      "description": "Command center for Andoria's elite military forces"
+    },
+    {
+      "name": "Parliament Chambers",
+      "category": "Government",
+      "description": "Democratic assembly hall famous for heated debates and passionate politics"
+    },
+    {
+      "name": "Colonial Administration",
+      "category": "Government",
+      "description": "Governance for Andorian settlements across the galaxy"
+    },
+    {
+      "name": "Guard Barracks",
+      "category": "Military",
+      "description": "Quarters for the proud Imperial Guard warriors"
+    },
+    {
+      "name": "Military Academy",
+      "category": "Military",
+      "description": "Training institution producing passionate Andorian warriors"
+    },
+    {
+      "name": "Weapons Factory",
+      "category": "Military",
+      "description": "Manufacturing Andorian arms and traditional ushaan-tor ice picks"
+    },
+    {
+      "name": "Defense Tower",
+      "category": "Military",
+      "description": "Ice-crystal styled fortification with modern weapons systems"
+    },
+    {
+      "name": "Prison Complex",
+      "category": "Military",
+      "description": "Detention with typical Andorian discipline and harsh conditions"
+    },
+    {
+      "name": "Ushaan Arena",
+      "category": "Recreation",
+      "description": "Ceremonial dueling grounds where honor disputes are settled with ice picks"
+    },
+    {
+      "name": "Training Ground",
+      "category": "Military",
+      "description": "Combat exercises in harsh frozen conditions building toughness"
+    },
+    {
+      "name": "Science Academy",
+      "category": "Research",
+      "description": "Advanced research rivaling Vulcan institutions with Andorian passion"
+    },
+    {
+      "name": "Ice Research Lab",
+      "category": "Research",
+      "description": "Studying cryogenic and cold-weather phenomena unique to ice worlds"
+    },
+    {
+      "name": "Technology Center",
+      "category": "Research",
+      "description": "Developing innovations adapted for frozen environment"
+    },
+    {
+      "name": "Ship Assembly",
+      "category": "Production",
+      "description": "Building Andorian vessels with distinctive antenna designs"
+    },
+    {
+      "name": "Mining Complex",
+      "category": "Production",
+      "description": "Extracting resources from ice and rock on frozen worlds"
+    },
+    {
+      "name": "Power Plant",
+      "category": "Energy",
+      "description": "Energy generation adapted for extreme cold conditions"
+    },
+    {
+      "name": "Geothermal Station",
+      "category": "Energy",
+      "description": "Tapping planetary heat from beneath the frozen surface"
+    },
+    {
+      "name": "Underground Hub",
+      "category": "Infrastructure",
+      "description": "Subterranean transit center connecting Andoria's ice tunnel network"
+    },
+    {
+      "name": "Communication Tower",
+      "category": "Infrastructure",
+      "description": "Subspace relay functioning despite violent surface storms"
+    },
+    {
+      "name": "Temple of Ice",
+      "category": "Religion",
+      "description": "Spiritual center honoring ancient Andorian traditions"
+    },
+    {
+      "name": "War Memorial",
+      "category": "Religion",
+      "description": "Ice monuments honoring fallen warriors with passionate inscriptions"
+    },
+    {
+      "name": "Clan Hall",
+      "category": "Religion",
+      "description": "Family gathering place for quad-bonded groups unique to Andorian society"
+    },
+    {
+      "name": "University",
+      "category": "Education",
+      "description": "Higher learning taught with Andorian passion and competitive spirit"
+    },
+    {
+      "name": "Medical Facility",
+      "category": "Medical",
+      "description": "Healthcare adapted for Andorian physiology and antenna sensitivity"
+    },
+    {
+      "name": "Food Processing",
+      "category": "FoodProduction",
+      "description": "Nutrition production for a world of eternal ice"
+    },
+    {
+      "name": "Market Station",
+      "category": "Commerce",
+      "description": "Trade facilities where Andorians bargain with characteristic intensity"
+    },
+    {
+      "name": "Diplomatic Station",
+      "category": "Commerce",
+      "description": "Embassy for interstellar relations despite Andorian hot tempers"
+    }
+  ]
+}

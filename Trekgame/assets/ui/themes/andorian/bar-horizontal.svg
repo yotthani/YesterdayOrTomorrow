@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 40" fill="none">
+  <!-- Andorian Bar Horizontal: Flowing ice bar -->
+  <defs>
+    <linearGradient id="andorianBarBlue" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#88CCFF"/>
+      <stop offset="100%" style="stop-color:#4499DD"/>
+    </linearGradient>
+  </defs>
+
+  <path d="
+    M 0 10
+    Q 0 0 10 0
+    L 390 0
+    Q 400 0 400 10
+    L 400 30
+    Q 400 40 390 40
+    L 10 40
+    Q 0 40 0 30
+    Z
+  " fill="url(#andorianBarBlue)"/>
+</svg>

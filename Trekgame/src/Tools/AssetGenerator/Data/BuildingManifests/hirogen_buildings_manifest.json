@@ -1,0 +1,200 @@
+{
+  "factionName": "Hirogen",
+  "categoryName": "Buildings",
+  "architectureStyle": {
+    "description": "Heavy industrial hunter architecture - utilitarian structures built for the hunt. Massive trophy halls, prey processing facilities, and hunt coordination centers. Buildings look like converted industrial complexes modified for hunting operations.",
+    "keyElements": [
+      "Blocky industrial construction",
+      "Trophy display halls with mounted prey",
+      "Massive sensor/tracking arrays",
+      "Prey containment cells",
+      "Exposed pipes and conduits",
+      "Heavy armor plating",
+      "Yellow/amber interior lighting"
+    ],
+    "colors": "Olive green, dark brown, gray metallic, bronze accents, yellow/amber lighting",
+    "materials": "Heavy industrial metal, reinforced plating, trophy bones and hides, sensor equipment"
+  },
+  "buildings": [
+    {
+      "name": "Alpha's Lodge",
+      "category": "Government",
+      "description": "Command center for the pack Alpha. Massive trophy hall displaying the greatest kills. Hunt strategy planning. Pack hierarchy enforcement."
+    },
+    {
+      "name": "Trophy Hall",
+      "category": "Government",
+      "description": "Central display of pack hunting achievements. Mounted prey from across the quadrant. Ritual gathering place for hunt celebrations."
+    },
+    {
+      "name": "Hunt Command Center",
+      "category": "Military",
+      "description": "Tactical coordination for pack hunts. Sensor data processing. Prey tracking and pursuit planning. Communication hub."
+    },
+    {
+      "name": "Weapons Forge",
+      "category": "Military",
+      "description": "Manufacturing facility for tetryon weapons and hunting blades. Customization of personal armaments. Trophy weapon crafting."
+    },
+    {
+      "name": "Training Arena",
+      "category": "Military",
+      "description": "Combat training facility for young hunters. Simulated prey encounters. Weapon proficiency drills. Beta selection trials."
+    },
+    {
+      "name": "Armory",
+      "category": "Military",
+      "description": "Storage for hunting weapons, armor, and capture equipment. Maintenance and repair. Gear distribution before hunts."
+    },
+    {
+      "name": "Sensor Array",
+      "category": "Research",
+      "description": "Long-range prey detection and tracking. Analysis of prey species weaknesses. Hunt planning intelligence gathering."
+    },
+    {
+      "name": "Prey Analysis Lab",
+      "category": "Research",
+      "description": "Study of captured prey specimens. Weakness identification. Trophy preservation techniques. Hunting strategy development."
+    },
+    {
+      "name": "Tracking Station",
+      "category": "Research",
+      "description": "Monitoring of prey movements across sectors. Hunt coordination with other packs. Relay communication hub."
+    },
+    {
+      "name": "Ship Hangar",
+      "category": "Production",
+      "description": "Construction and maintenance of hunting vessels. Ship modification for specific prey types. Fleet readiness facility."
+    },
+    {
+      "name": "Equipment Fabricator",
+      "category": "Production",
+      "description": "Manufacturing of hunting gear, traps, and capture devices. Customization of equipment for specific hunts."
+    },
+    {
+      "name": "Armor Workshop",
+      "category": "Production",
+      "description": "Crafting and repair of hunter armor. Trophy integration into personal gear. Alpha armor ceremonial crafting."
+    },
+    {
+      "name": "Prey Pen",
+      "category": "FoodProduction",
+      "description": "Containment facility for captured prey awaiting processing. Live storage for extended hunts. Feeding and maintenance."
+    },
+    {
+      "name": "Processing Plant",
+      "category": "FoodProduction",
+      "description": "Prey butchering and food processing. Trophy extraction. Waste recycling. Ration production for hunting parties."
+    },
+    {
+      "name": "Hunting Grounds",
+      "category": "FoodProduction",
+      "description": "Maintained wilderness area for training hunts and fresh meat acquisition. Stocked with various prey species."
+    },
+    {
+      "name": "Power Core",
+      "category": "Energy",
+      "description": "Industrial power generation for the settlement. Heavy-duty reactors. Redundant systems for critical hunt operations."
+    },
+    {
+      "name": "Generator Complex",
+      "category": "Energy",
+      "description": "Secondary power facilities. Sensor array power supply. Emergency backup systems. Industrial capacity."
+    },
+    {
+      "name": "Ritual Chamber",
+      "category": "Religion",
+      "description": "Sacred space for hunt rituals and prey consecration. Trophy blessing ceremonies. Coming-of-age hunt preparations."
+    },
+    {
+      "name": "Ancestor Shrine",
+      "category": "Religion",
+      "description": "Memorial to legendary hunters of the past. Greatest trophy displays. Meditation before significant hunts."
+    },
+    {
+      "name": "Medical Bay",
+      "category": "Medical",
+      "description": "Treatment facility for hunt injuries. Surgery and recovery. Cybernetic enhancement installation. Venom antidotes."
+    },
+    {
+      "name": "Regeneration Chamber",
+      "category": "Medical",
+      "description": "Advanced healing technology for severe wounds. Hunter restoration between hunts. Battle damage repair."
+    },
+    {
+      "name": "Training Hall",
+      "category": "Education",
+      "description": "Education facility for young hunters. Prey species knowledge. Hunting techniques. Pack hierarchy training."
+    },
+    {
+      "name": "Trophy Archive",
+      "category": "Education",
+      "description": "Historical records of great hunts. Prey species database. Hunting strategy library. Alpha lineage records."
+    },
+    {
+      "name": "Trade Post",
+      "category": "Commerce",
+      "description": "Exchange facility for hunting supplies and trophies. Inter-pack trading. Equipment procurement from other species."
+    },
+    {
+      "name": "Trophy Exchange",
+      "category": "Commerce",
+      "description": "Marketplace for rare trophies and hunting relics. Status symbol trading. Alpha-quality trophy auctions."
+    },
+    {
+      "name": "Hunter Barracks",
+      "category": "Housing",
+      "description": "Living quarters for pack hunters. Personal trophy displays. Weapon storage. Rest between hunts."
+    },
+    {
+      "name": "Alpha Quarters",
+      "category": "Housing",
+      "description": "Luxurious dwelling for the pack Alpha. Extensive trophy collection. Planning chambers. Status display."
+    },
+    {
+      "name": "Beta Den",
+      "category": "Housing",
+      "description": "Quarters for pack Betas and senior hunters. Mid-tier trophy displays. Pack leadership meetings."
+    },
+    {
+      "name": "Combat Pit",
+      "category": "Recreation",
+      "description": "Arena for honor duels and combat training. Settling pack disputes. Entertainment through controlled combat."
+    },
+    {
+      "name": "Hunt Simulator",
+      "category": "Recreation",
+      "description": "Holographic recreation of famous hunts. Training simulations. Entertainment reviewing past glories."
+    },
+    {
+      "name": "Comm Relay",
+      "category": "Infrastructure",
+      "description": "Long-range communication with other packs and hunting parties. Hunt coordination across sectors."
+    },
+    {
+      "name": "Transport Hub",
+      "category": "Infrastructure",
+      "description": "Shuttle landing facility. Prey transport processing. Equipment distribution center."
+    },
+    {
+      "name": "Intelligence Center",
+      "category": "Intelligence",
+      "description": "Gathering information on worthy prey. Infiltration planning. Species weakness analysis."
+    },
+    {
+      "name": "Observation Post",
+      "category": "Intelligence",
+      "description": "Covert monitoring of potential hunting grounds. Prey population assessment. Hunt timing optimization."
+    },
+    {
+      "name": "Relic Vault",
+      "category": "Special",
+      "description": "Storage for the most sacred hunting relics and legendary trophies. Only Alpha access. Pack heritage preservation."
+    },
+    {
+      "name": "Holographic Arena",
+      "category": "Special",
+      "description": "Advanced facility for recreating hunts of any prey species. Training for exotic targets. Entertainment center."
+    }
+  ]
+}

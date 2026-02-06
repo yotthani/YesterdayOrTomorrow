@@ -1,4 +1,5 @@
 using StarTrekGame.AssetGenerator.Models;
+using AssetGenerator.Services;
 using System.Text.Json;
 
 namespace StarTrekGame.AssetGenerator.Services;
@@ -6,7 +7,16 @@ namespace StarTrekGame.AssetGenerator.Services;
 public class SpriteSheetService
 {
     private const int CellSize = 360;
-    
+    private BuildingManifestService? _buildingManifestService;
+
+    /// <summary>
+    /// Set the building manifest service for enhanced building manifests
+    /// </summary>
+    public void SetBuildingManifestService(BuildingManifestService service)
+    {
+        _buildingManifestService = service;
+    }
+
     /// <summary>
     /// Creates a sprite sheet manifest JSON from a completed job
     /// </summary>
@@ -21,18 +31,36 @@ public class SpriteSheetService
             GeneratedAt = DateTime.UtcNow,
             Assets = job.Assets
                 .Where(a => a.Status == AssetStatus.Generated)
-                .Select(a => new AssetManifestEntry
-                {
-                    Row = a.GridRow,
-                    Col = a.GridCol,
-                    Name = a.Name,
-                    Type = job.Category.ToString(),
-                    PromptUsed = a.PromptUsed ?? string.Empty
-                })
+                .Select(a => CreateManifestEntry(a, job))
                 .ToList()
         };
-        
+
         return manifest;
+    }
+
+    /// <summary>
+    /// Create a manifest entry, enriching with building data if applicable
+    /// </summary>
+    private AssetManifestEntry CreateManifestEntry(AssetDefinition asset, GenerationJob job)
+    {
+        var entry = new AssetManifestEntry
+        {
+            Row = asset.GridRow,
+            Col = asset.GridCol,
+            Name = asset.Name,
+            Type = job.Category.ToString(),
+            PromptUsed = asset.PromptUsed ?? string.Empty
+        };
+
+        // For Buildings category, add category and description from manifest
+        if (job.Category == AssetCategory.Buildings && _buildingManifestService != null)
+        {
+            var (category, description) = _buildingManifestService.GetBuildingInfo(job.Faction, asset.Name);
+            entry.Category = category;
+            entry.Description = description;
+        }
+
+        return entry;
     }
     
     /// <summary>

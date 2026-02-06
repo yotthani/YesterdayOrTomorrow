@@ -1,0 +1,179 @@
+{
+  "factionName": "Trill",
+  "categoryName": "Buildings",
+  "architectureStyle": {
+    "description": "Symbiont-inspired organic curves - designed for a society of joined and unjoined",
+    "keyElements": [
+      "Flowing organic curves inspired by symbiont physiology",
+      "Teal, blue, and soft purple coloring",
+      "Pool-like elements throughout representing symbiont caves",
+      "Symbiosis Commission institutional aesthetic",
+      "Design accommodating both joined and unjoined Trill",
+      "Scientific and academic focus visible in architecture"
+    ],
+    "colors": "Teal, soft blue, lavender, purple accents, water-reflection tones",
+    "materials": "Smooth composites, water features, organic curves, crystalline elements"
+  },
+  "buildings": [
+    {
+      "name": "Symbiosis Commission HQ",
+      "category": "Government",
+      "description": "Sacred institution governing the joining of Trill hosts and symbionts"
+    },
+    {
+      "name": "Guardian Temple",
+      "category": "Government",
+      "description": "Ancient order protecting symbionts in the caves of Mak'ala"
+    },
+    {
+      "name": "Government Center",
+      "category": "Government",
+      "description": "Planetary administration balancing interests of joined and unjoined"
+    },
+    {
+      "name": "Evaluation Center",
+      "category": "Government",
+      "description": "Testing candidates for symbiont compatibility through rigorous assessment"
+    },
+    {
+      "name": "Selection Committee",
+      "category": "Government",
+      "description": "Board determining who is worthy of the honor of joining"
+    },
+    {
+      "name": "Joining Chamber",
+      "category": "Special",
+      "description": "Sacred room where host and symbiont become one being forever"
+    },
+    {
+      "name": "Symbiont Pool",
+      "category": "Special",
+      "description": "Underground caves where symbionts live in liquid form between hosts"
+    },
+    {
+      "name": "Host Records Archive",
+      "category": "Special",
+      "description": "Centuries of memories from previous hosts preserved for future reference"
+    },
+    {
+      "name": "Medical Center",
+      "category": "Medical",
+      "description": "Healthcare for both humanoid hosts and delicate symbionts"
+    },
+    {
+      "name": "Symbiont Research",
+      "category": "Research",
+      "description": "Studying the ancient lifeforms that carry memories across generations"
+    },
+    {
+      "name": "Joining Medicine",
+      "category": "Medical",
+      "description": "Specialized care for joined Trill with unique medical needs"
+    },
+    {
+      "name": "Psychology Institute",
+      "category": "Medical",
+      "description": "Mental health for those carrying multiple lifetimes of memory"
+    },
+    {
+      "name": "Science Academy",
+      "category": "Research",
+      "description": "Research drawing on the accumulated wisdom of joined scientists"
+    },
+    {
+      "name": "Genetic Research",
+      "category": "Research",
+      "description": "Studying Trill-symbiont compatibility and improving joining success"
+    },
+    {
+      "name": "Memory Research",
+      "category": "Research",
+      "description": "Understanding zhian'tara and past-life memory transfer"
+    },
+    {
+      "name": "University",
+      "category": "Education",
+      "description": "Higher learning taught by professors with centuries of experience"
+    },
+    {
+      "name": "Initiate Training",
+      "category": "Education",
+      "description": "Preparing promising candidates for possible joining with a symbiont"
+    },
+    {
+      "name": "Cultural Academy",
+      "category": "Education",
+      "description": "Preserving traditions of both joined and unjoined Trill society"
+    },
+    {
+      "name": "History Archive",
+      "category": "Education",
+      "description": "First-hand accounts spanning hundreds of years from joined Trill"
+    },
+    {
+      "name": "Art Institute",
+      "category": "Education",
+      "description": "Creative pursuits enhanced by talents remembered across lifetimes"
+    },
+    {
+      "name": "Music Conservatory",
+      "category": "Education",
+      "description": "Training in music skills remembered and refined across many hosts"
+    },
+    {
+      "name": "Cultural Center",
+      "category": "Religion",
+      "description": "Celebrating Trill heritage and the sacred tradition of joining"
+    },
+    {
+      "name": "Memorial Hall",
+      "category": "Religion",
+      "description": "Honoring hosts and symbionts who served across centuries"
+    },
+    {
+      "name": "Meditation Garden",
+      "category": "Religion",
+      "description": "Contemplating memories of past hosts in peaceful surroundings"
+    },
+    {
+      "name": "Defense Center",
+      "category": "Military",
+      "description": "Protecting the irreplaceable symbionts from any threat"
+    },
+    {
+      "name": "Security Station",
+      "category": "Military",
+      "description": "Guarding against symbiont theft or harm with vigilant protection"
+    },
+    {
+      "name": "Power Generation",
+      "category": "Energy",
+      "description": "Clean energy for Trill civilization's sophisticated needs"
+    },
+    {
+      "name": "Transport Center",
+      "category": "Infrastructure",
+      "description": "Movement across the spotted homeworld with care for joined passengers"
+    },
+    {
+      "name": "Residential Complex",
+      "category": "Housing",
+      "description": "Housing for Trill families both joined and unjoined"
+    },
+    {
+      "name": "Initiate Dormitory",
+      "category": "Housing",
+      "description": "Quarters for those hoping to someday be joined with a symbiont"
+    },
+    {
+      "name": "Market District",
+      "category": "Commerce",
+      "description": "Trade on the Trill homeworld with characteristic fairness"
+    },
+    {
+      "name": "Embassy",
+      "category": "Commerce",
+      "description": "Diplomatic representation drawing on lifetimes of negotiation experience"
+    }
+  ]
+}

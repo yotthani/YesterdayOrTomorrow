@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 60" fill="none">
+  <!-- Dominion Readout Display: Organic frame -->
+  <defs>
+    <linearGradient id="dominionReadoutBorder" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#5A3A7A"/>
+      <stop offset="50%" style="stop-color:#7A4A9A"/>
+      <stop offset="100%" style="stop-color:#5A3A7A"/>
+    </linearGradient>
+    <linearGradient id="dominionReadoutBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#1A0A2A"/>
+      <stop offset="100%" style="stop-color:#0A0515"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Outer organic frame -->
+  <path d="
+    M 15 0
+    Q 90 -3 165 0
+    Q 180 10 180 30
+    Q 180 50 165 60
+    Q 90 63 15 60
+    Q 0 50 0 30
+    Q 0 10 15 0
+    Z
+  " fill="url(#dominionReadoutBorder)"/>
+
+  <!-- Inner display area -->
+  <path d="
+    M 20 6
+    Q 90 4 160 6
+    Q 174 14 174 30
+    Q 174 46 160 54
+    Q 90 56 20 54
+    Q 6 46 6 30
+    Q 6 14 20 6
+    Z
+  " fill="url(#dominionReadoutBg)"/>
+
+  <!-- Gold accent lines -->
+  <path d="M 25 12 Q 90 10 155 12" fill="none" stroke="#D4A030" stroke-width="1.5"/>
+  <path d="M 25 48 Q 90 50 155 48" fill="none" stroke="#D4A030" stroke-width="1.5"/>
+</svg>

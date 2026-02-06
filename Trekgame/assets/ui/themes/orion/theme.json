@@ -1,0 +1,47 @@
+{
+  "id": "orion",
+  "name": "Orion Syndicate",
+  "description": "Opulent trade empire interface with luxurious flourishes",
+  "faction": "orion",
+  "fonts": {
+    "primary": {
+      "family": "Orion Commerce",
+      "fallback": "Palatino Linotype, Georgia, serif",
+      "file": "fonts/orion-commerce.ttf",
+      "weight": "600",
+      "letterSpacing": "0.03em",
+      "textTransform": "none"
+    },
+    "secondary": {
+      "family": "Orion Script",
+      "fallback": "Brush Script MT, cursive",
+      "file": "fonts/orion-script.ttf",
+      "weight": "normal",
+      "letterSpacing": "0.02em"
+    },
+    "display": {
+      "family": "Orion Ornate",
+      "fallback": "Copperplate Gothic, Papyrus, fantasy",
+      "file": "fonts/orion-ornate.ttf",
+      "weight": "bold",
+      "letterSpacing": "0.04em",
+      "comment": "Decorative font for trade displays and wealth indicators"
+    }
+  },
+  "colors": {
+    "primary": "#33AA55",
+    "secondary": "#227744",
+    "accent": "#FFCC00",
+    "highlight": "#FFE066",
+    "alert": "#FF6633",
+    "success": "#44DD66",
+    "background": "#0A140A",
+    "text": "#FFCC00",
+    "textDark": "#0A140A"
+  },
+  "styles": {
+    "cornerRadius": "curved",
+    "borderStyle": "ornate",
+    "animationStyle": "flowing"
+  }
+}

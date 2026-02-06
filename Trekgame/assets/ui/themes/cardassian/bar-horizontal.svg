@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 40" fill="none">
+  <!-- Cardassian Bar Horizontal with curved ends -->
+  <defs>
+    <linearGradient id="cardassianBarBlue" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#2A4A5A"/>
+      <stop offset="50%" style="stop-color:#4A6B7C"/>
+      <stop offset="100%" style="stop-color:#2A4A5A"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Horizontal bar with oval ends -->
+  <path d="
+    M 20 0
+    L 280 0
+    Q 300 0 300 20
+    Q 300 40 280 40
+    L 20 40
+    Q 0 40 0 20
+    Q 0 0 20 0
+    Z
+  " fill="url(#cardassianBarBlue)"/>
+
+  <!-- Center indentation -->
+  <path d="M 130 0 Q 150 10 170 0" fill="none" stroke="#0a1015" stroke-width="2"/>
+  <path d="M 130 40 Q 150 30 170 40" fill="none" stroke="#0a1015" stroke-width="2"/>
+</svg>

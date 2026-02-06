@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 40" fill="none">
+  <!-- Gorn Bar Horizontal -->
+  <defs>
+    <linearGradient id="gornBarGreen" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#669944"/>
+      <stop offset="100%" style="stop-color:#445522"/>
+    </linearGradient>
+  </defs>
+
+  <path d="
+    M 0 0
+    L 400 0
+    L 400 35
+    L 375 40
+    L 350 35
+    L 325 40
+    L 300 35
+    L 275 40
+    L 250 35
+    L 225 40
+    L 200 35
+    L 175 40
+    L 150 35
+    L 125 40
+    L 100 35
+    L 75 40
+    L 50 35
+    L 25 40
+    L 0 35
+    Z
+  " fill="url(#gornBarGreen)"/>
+</svg>

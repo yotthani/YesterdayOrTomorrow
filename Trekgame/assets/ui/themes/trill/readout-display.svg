@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 60" fill="none">
+  <!-- Trill Readout Display: Organic flowing display panel -->
+  <defs>
+    <linearGradient id="trillReadoutBorder" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#3D8080"/>
+      <stop offset="50%" style="stop-color:#55AAAA"/>
+      <stop offset="100%" style="stop-color:#3D8080"/>
+    </linearGradient>
+    <linearGradient id="trillReadoutBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#0D1818"/>
+      <stop offset="100%" style="stop-color:#0A1212"/>
+    </linearGradient>
+    <linearGradient id="trillReadoutBeige" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#DDCCAA"/>
+      <stop offset="100%" style="stop-color:#BBA888"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Outer organic border -->
+  <path d="
+    M 20 0
+    Q 0 5, 0 30
+    Q 0 55, 20 60
+    L 130 60
+    Q 150 55, 150 30
+    Q 150 5, 130 0
+    Z
+  " fill="url(#trillReadoutBorder)"/>
+
+  <!-- Inner dark display area -->
+  <path d="
+    M 22 5
+    Q 6 9, 6 30
+    Q 6 51, 22 55
+    L 128 55
+    Q 144 51, 144 30
+    Q 144 9, 128 5
+    Z
+  " fill="url(#trillReadoutBg)"/>
+
+  <!-- Decorative organic spot accents on border -->
+  <ellipse cx="18" cy="20" rx="4" ry="2.5" fill="url(#trillReadoutBeige)" transform="rotate(-15 18 20)" opacity="0.7"/>
+  <ellipse cx="15" cy="40" rx="3" ry="2" fill="url(#trillReadoutBeige)" transform="rotate(-5 15 40)" opacity="0.6"/>
+  <ellipse cx="132" cy="20" rx="4" ry="2.5" fill="url(#trillReadoutBeige)" transform="rotate(15 132 20)" opacity="0.7"/>
+  <ellipse cx="135" cy="40" rx="3" ry="2" fill="url(#trillReadoutBeige)" transform="rotate(5 135 40)" opacity="0.6"/>
+</svg>

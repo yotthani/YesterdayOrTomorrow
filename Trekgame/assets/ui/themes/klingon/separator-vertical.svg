@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 200" fill="none">
+  <!-- Klingon Vertical Separator: Angular line -->
+  <defs>
+    <linearGradient id="klingonSepRed" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#880000"/>
+      <stop offset="50%" style="stop-color:#CC2222"/>
+      <stop offset="100%" style="stop-color:#880000"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Angular separator -->
+  <path d="
+    M 4 0
+    L 8 4
+    L 8 196
+    L 4 200
+    L 0 196
+    L 0 4
+    Z
+  " fill="url(#klingonSepRed)"/>
+</svg>

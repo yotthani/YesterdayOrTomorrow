@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 90" fill="none">
+  <!-- Ferengi Hexagon Button: Standalone hexagonal button -->
+  <defs>
+    <linearGradient id="ferengiHexBtn" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#A67C1A"/>
+      <stop offset="50%" style="stop-color:#8B6914"/>
+      <stop offset="100%" style="stop-color:#5C4A0F"/>
+    </linearGradient>
+    <linearGradient id="ferengiHexGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFD700"/>
+      <stop offset="100%" style="stop-color:#D4A017"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Outer hexagon -->
+  <polygon points="40,2 76,24 76,66 40,88 4,66 4,24" fill="url(#ferengiHexBtn)"/>
+
+  <!-- Inner hexagon border -->
+  <polygon points="40,10 68,28 68,62 40,80 12,62 12,28" fill="none" stroke="url(#ferengiHexGold)" stroke-width="2"/>
+
+  <!-- Center area -->
+  <polygon points="40,18 58,32 58,58 40,72 22,58 22,32" fill="#1a1408"/>
+</svg>

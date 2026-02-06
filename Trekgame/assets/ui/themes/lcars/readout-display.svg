@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 60" fill="none">
+  <!-- LCARS Readout Display: Data display panel with rounded ends -->
+  <defs>
+    <linearGradient id="lcarsReadoutBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e"/>
+      <stop offset="100%" style="stop-color:#0a0a15"/>
+    </linearGradient>
+    <linearGradient id="lcarsReadoutBorder" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#CC9966"/>
+      <stop offset="100%" style="stop-color:#FFCC99"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Outer border -->
+  <rect x="0" y="0" width="180" height="60" rx="10" ry="10" fill="url(#lcarsReadoutBorder)"/>
+
+  <!-- Inner dark display area -->
+  <rect x="4" y="4" width="172" height="52" rx="8" ry="8" fill="url(#lcarsReadoutBg)"/>
+</svg>

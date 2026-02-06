@@ -1,0 +1,47 @@
+{
+  "id": "andorian",
+  "name": "Andorian Imperial Guard",
+  "description": "Andorian Empire military interface - Honor, ice, precision",
+  "faction": "andorian",
+  "fonts": {
+    "primary": {
+      "family": "Andorian Script",
+      "fallback": "Century Gothic, Arial, sans-serif",
+      "file": "fonts/andorian-script.ttf",
+      "weight": "bold",
+      "letterSpacing": "0.03em",
+      "textTransform": "uppercase"
+    },
+    "secondary": {
+      "family": "Andorian Text",
+      "fallback": "Segoe UI, Tahoma, sans-serif",
+      "file": "fonts/andorian-text.ttf",
+      "weight": "normal",
+      "letterSpacing": "0.02em"
+    },
+    "display": {
+      "family": "Andorian Calligraphy",
+      "fallback": "Andorian Script, Century Gothic, sans-serif",
+      "file": "fonts/andorian-calligraphy.ttf",
+      "weight": "bold",
+      "letterSpacing": "0.04em",
+      "comment": "Traditional Andorian script for ceremonial displays"
+    }
+  },
+  "colors": {
+    "primary": "#88CCFF",
+    "secondary": "#4499DD",
+    "accent": "#AAEEFF",
+    "highlight": "#FFFFFF",
+    "alert": "#FF6666",
+    "success": "#66FFAA",
+    "background": "#0A1520",
+    "text": "#CCDDFF",
+    "textDark": "#0A1520"
+  },
+  "styles": {
+    "cornerRadius": "flowing",
+    "borderStyle": "antenna-inspired",
+    "animationStyle": "swift"
+  }
+}

@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 60" fill="none">
+  <!-- Klingon Header Frame: Angular header with triangular accents -->
+  <defs>
+    <linearGradient id="klingonHeaderRed" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#880000"/>
+      <stop offset="50%" style="stop-color:#CC2222"/>
+      <stop offset="100%" style="stop-color:#880000"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Main header bar with aggressive angles -->
+  <path d="
+    M 30 0
+    L 370 0
+    L 400 30
+    L 370 60
+    L 30 60
+    L 0 30
+    Z
+  " fill="url(#klingonHeaderRed)"/>
+
+  <!-- Left triangle accent -->
+  <path d="M 0 30 L 20 10 L 20 50 Z" fill="#FF6600"/>
+
+  <!-- Right triangle accent -->
+  <path d="M 400 30 L 380 10 L 380 50 Z" fill="#FF6600"/>
+</svg>

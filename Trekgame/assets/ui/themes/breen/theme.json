@@ -1,0 +1,47 @@
+{
+  "id": "breen",
+  "name": "Breen Confederacy",
+  "description": "Breen interface system - Cold, armored, mysterious",
+  "faction": "breen",
+  "fonts": {
+    "primary": {
+      "family": "Breen Script",
+      "fallback": "Eurostile, Arial, sans-serif",
+      "file": "fonts/breen-script.ttf",
+      "weight": "bold",
+      "letterSpacing": "0.03em",
+      "textTransform": "uppercase"
+    },
+    "secondary": {
+      "family": "Breen Text",
+      "fallback": "Consolas, Courier New, monospace",
+      "file": "fonts/breen-text.ttf",
+      "weight": "normal",
+      "letterSpacing": "0.02em"
+    },
+    "display": {
+      "family": "Breen Cipher",
+      "fallback": "Breen Script, Eurostile, sans-serif",
+      "file": "fonts/breen-cipher.ttf",
+      "weight": "bold",
+      "letterSpacing": "0.04em",
+      "comment": "Encoded Breen display text"
+    }
+  },
+  "colors": {
+    "primary": "#8899AA",
+    "secondary": "#556677",
+    "accent": "#AABBCC",
+    "highlight": "#DDEEFF",
+    "alert": "#CC6666",
+    "success": "#66AA88",
+    "background": "#0A0F14",
+    "text": "#BBCCDD",
+    "textDark": "#0A0F14"
+  },
+  "styles": {
+    "cornerRadius": "armored",
+    "borderStyle": "plated",
+    "animationStyle": "mechanical"
+  }
+}

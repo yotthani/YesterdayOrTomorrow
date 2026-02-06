@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 20" fill="none">
+  <!-- Vulcan Progress Bar Background: Geometric container -->
+  <defs>
+    <linearGradient id="vulcanProgressBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#2A1A0A"/>
+      <stop offset="100%" style="stop-color:#1A1208"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Main background with geometric ends -->
+  <path d="
+    M 5 0
+    L 195 0
+    L 200 5
+    L 200 15
+    L 195 20
+    L 5 20
+    L 0 15
+    L 0 5
+    Z
+  " fill="url(#vulcanProgressBg)" stroke="#AA6633" stroke-width="1"/>
+</svg>

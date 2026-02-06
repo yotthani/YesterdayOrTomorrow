@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 200" fill="none">
+  <!-- Dominion Bracket Left: Organic flowing bracket -->
+  <defs>
+    <linearGradient id="dominionBracketPurple" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#6A3A8A"/>
+      <stop offset="100%" style="stop-color:#4A2A5A"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Flowing left bracket -->
+  <path d="
+    M 40 0
+    L 40 15
+    Q 20 20 15 40
+    L 15 80
+    Q 10 100 15 120
+    L 15 160
+    Q 20 180 40 185
+    L 40 200
+    L 25 200
+    Q 5 190 5 160
+    L 5 120
+    Q 0 100 5 80
+    L 5 40
+    Q 5 10 25 0
+    Z
+  " fill="url(#dominionBracketPurple)"/>
+
+  <!-- Gold accent -->
+  <path d="M 12 50 Q 8 100 12 150" fill="none" stroke="#D4A030" stroke-width="2"/>
+</svg>

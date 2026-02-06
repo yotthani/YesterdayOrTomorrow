@@ -1,0 +1,127 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" fill="none">
+  <!-- Bajoran Panel Frame: Temple-inspired architecture with arched elements and earring chain motifs -->
+  <defs>
+    <linearGradient id="bajoranFrameBrown" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#AA7744"/>
+      <stop offset="100%" style="stop-color:#886633"/>
+    </linearGradient>
+    <linearGradient id="bajoranAccentGold" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#DDAA66"/>
+      <stop offset="100%" style="stop-color:#FFCC88"/>
+    </linearGradient>
+    <linearGradient id="bajoranInnerGlow" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a0f08"/>
+      <stop offset="100%" style="stop-color:#120A05"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Main temple-style frame with arched top -->
+  <!-- Top bar with central arch -->
+  <path d="
+    M 0 50
+    L 0 30
+    Q 0 0 30 0
+    L 350 0
+    Q 400 0 400 30
+    Q 400 0 450 0
+    L 770 0
+    Q 800 0 800 30
+    L 800 50
+    L 750 50
+    L 750 40
+    Q 750 30 740 30
+    L 460 30
+    Q 400 30 400 60
+    Q 400 30 340 30
+    L 60 30
+    Q 50 30 50 40
+    L 50 50
+    Z
+  " fill="url(#bajoranFrameBrown)"/>
+
+  <!-- Left pillar with temple column style -->
+  <path d="
+    M 0 30
+    Q 0 0 30 0
+    L 80 0
+    L 80 600
+    L 30 600
+    Q 0 600 0 570
+    Z
+  " fill="url(#bajoranFrameBrown)"/>
+
+  <!-- Right pillar -->
+  <path d="
+    M 720 0
+    L 770 0
+    Q 800 0 800 30
+    L 800 570
+    Q 800 600 770 600
+    L 720 600
+    Z
+  " fill="url(#bajoranFrameBrown)"/>
+
+  <!-- Bottom bar with arch -->
+  <path d="
+    M 0 550
+    L 50 550
+    L 50 560
+    Q 50 570 60 570
+    L 340 570
+    Q 400 570 400 540
+    Q 400 570 460 570
+    L 740 570
+    Q 750 570 750 560
+    L 750 550
+    L 800 550
+    L 800 570
+    Q 800 600 770 600
+    L 30 600
+    Q 0 600 0 570
+    Z
+  " fill="url(#bajoranFrameBrown)"/>
+
+  <!-- Decorative column fluting on left pillar -->
+  <line x1="25" y1="60" x2="25" y2="540" stroke="#DDAA66" stroke-width="2" opacity="0.6"/>
+  <line x1="40" y1="60" x2="40" y2="540" stroke="#DDAA66" stroke-width="2" opacity="0.6"/>
+  <line x1="55" y1="60" x2="55" y2="540" stroke="#DDAA66" stroke-width="2" opacity="0.6"/>
+
+  <!-- Decorative column fluting on right pillar -->
+  <line x1="745" y1="60" x2="745" y2="540" stroke="#DDAA66" stroke-width="2" opacity="0.6"/>
+  <line x1="760" y1="60" x2="760" y2="540" stroke="#DDAA66" stroke-width="2" opacity="0.6"/>
+  <line x1="775" y1="60" x2="775" y2="540" stroke="#DDAA66" stroke-width="2" opacity="0.6"/>
+
+  <!-- Earring chain decoration - top left -->
+  <circle cx="90" cy="40" r="6" fill="url(#bajoranAccentGold)"/>
+  <circle cx="90" cy="55" r="4" fill="url(#bajoranAccentGold)"/>
+  <circle cx="90" cy="68" r="3" fill="url(#bajoranAccentGold)"/>
+  <line x1="90" y1="46" x2="90" y2="51" stroke="#DDAA66" stroke-width="1"/>
+  <line x1="90" y1="59" x2="90" y2="65" stroke="#DDAA66" stroke-width="1"/>
+
+  <!-- Earring chain decoration - top right -->
+  <circle cx="710" cy="40" r="6" fill="url(#bajoranAccentGold)"/>
+  <circle cx="710" cy="55" r="4" fill="url(#bajoranAccentGold)"/>
+  <circle cx="710" cy="68" r="3" fill="url(#bajoranAccentGold)"/>
+  <line x1="710" y1="46" x2="710" y2="51" stroke="#DDAA66" stroke-width="1"/>
+  <line x1="710" y1="59" x2="710" y2="65" stroke="#DDAA66" stroke-width="1"/>
+
+  <!-- Central arch ornament (spiritual symbol) -->
+  <path d="
+    M 385 10
+    Q 400 5 415 10
+    L 410 20
+    Q 400 15 390 20
+    Z
+  " fill="url(#bajoranAccentGold)"/>
+  <circle cx="400" cy="18" r="3" fill="#FFCC88"/>
+
+  <!-- Bottom spiritual ornament -->
+  <path d="
+    M 385 590
+    Q 400 595 415 590
+    L 410 580
+    Q 400 585 390 580
+    Z
+  " fill="url(#bajoranAccentGold)"/>
+  <circle cx="400" cy="582" r="3" fill="#FFCC88"/>
+</svg>

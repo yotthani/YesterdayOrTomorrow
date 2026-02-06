@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 60" fill="none">
+  <!-- Romulan Readout Display: Elegant panel with border -->
+  <defs>
+    <linearGradient id="romulanReadoutBorder" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#006655"/>
+      <stop offset="50%" style="stop-color:#00CC99"/>
+      <stop offset="100%" style="stop-color:#006655"/>
+    </linearGradient>
+    <linearGradient id="romulanReadoutBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#001a15"/>
+      <stop offset="100%" style="stop-color:#000a08"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Outer beveled border -->
+  <path d="
+    M 10 0
+    L 170 0
+    L 180 10
+    L 180 50
+    L 170 60
+    L 10 60
+    L 0 50
+    L 0 10
+    Z
+  " fill="url(#romulanReadoutBorder)"/>
+
+  <!-- Inner dark display -->
+  <path d="
+    M 14 5
+    L 166 5
+    L 175 14
+    L 175 46
+    L 166 55
+    L 14 55
+    L 5 46
+    L 5 14
+    Z
+  " fill="url(#romulanReadoutBg)"/>
+
+  <!-- Scan line effect hint -->
+  <line x1="10" y1="30" x2="170" y2="30" stroke="#00FFCC" stroke-width="0.5" opacity="0.3"/>
+</svg>

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 200" fill="none">
+  <!-- Cardassian Vertical Separator -->
+  <defs>
+    <linearGradient id="cardassianSepBlue" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#2A4A5A"/>
+      <stop offset="50%" style="stop-color:#4A6B7C"/>
+      <stop offset="100%" style="stop-color:#2A4A5A"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Vertical separator with bulge -->
+  <path d="
+    M 4 0
+    L 4 80
+    Q 0 90 0 100
+    Q 0 110 4 120
+    L 4 200
+    L 4 200
+    L 4 120
+    Q 8 110 8 100
+    Q 8 90 4 80
+    L 4 0
+    Z
+  " fill="url(#cardassianSepBlue)"/>
+</svg>

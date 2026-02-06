@@ -137,6 +137,9 @@
             <button class="btn btn-secondary" @onclick="ImportSpritesheetWithCrop" disabled="@_isGenerating">
                 🖼️ Import Spritesheet (Crop)
             </button>
+            <button class="btn btn-secondary" @onclick="ImportAndSplitSpritesheet" disabled="@_isGenerating">
+                ✂️ Import & Split Spritesheet
+            </button>
             <button class="btn btn-secondary" @onclick="GenerateManifestOnly">
                 📄 Generate Manifest Only
             </button>
@@ -147,6 +150,9 @@
         
         <!-- Hidden file input for normalize grid -->
         <InputFile id="normalizeFileInput" OnChange="OnNormalizeFileSelected" accept=".png" style="display: none;" />
+
+        <!-- Hidden file input for split spritesheet -->
+        <InputFile id="splitSpritesheetInput" OnChange="OnSplitSpritesheetSelected" accept=".png" style="display: none;" />
     </section>
     
     <!-- Normalize Grid Panel -->
@@ -326,19 +332,22 @@
                 </div>
             }
             
-            <!-- Asset Grid Preview -->
+            <!-- Asset Grid Preview with Drag & Drop -->
             <div class="asset-grid" style="grid-template-columns: repeat(@_currentJob.GridSpec.Columns, 1fr)">
                 @foreach (var asset in _currentJob.Assets)
                 {
-                    <div class="asset-cell @GetAssetStatusClass(asset.Status) @(_selectedAsset == asset ? "selected" : "")" 
-                         title="@asset.Name"
-                         @onclick="() => SelectAsset(asset)">
+                    <div class="asset-cell @GetAssetStatusClass(asset.Status) @(_selectedAsset == asset ? "selected" : "") @(_swapSourceAsset == asset ? "swap-source" : "") @(_swapSourceAsset != null && _swapSourceAsset != asset ? "swap-target" : "")"
+                         title="@GetAssetTooltip(asset)"
+                         @onclick="() => OnAssetClick(asset)">
                         @if (asset.Status == AssetStatus.Generated && !string.IsNullOrEmpty(asset.GeneratedImagePath))
                         {
                             <img src="data:image/png;base64,@asset.GeneratedImagePath" alt="@asset.Name" />
                             <div class="asset-overlay">
                                 <button class="btn-regenerate" @onclick:stopPropagation="true" @onclick="() => RegenerateSingleAsset(asset)" title="Regenerate this asset">
                                     🔄
+                                </button>
+                                <button class="btn-swap" @onclick:stopPropagation="true" @onclick="() => StartSwapMode(asset)" title="Swap with another cell">
+                                    🔀
                                 </button>
                             </div>
                             <div class="hover-preview">
@@ -366,6 +375,14 @@
                     </div>
                 }
             </div>
+
+            @if (_swapSourceAsset != null)
+            {
+                <div class="swap-hint">
+                    🔀 Click another cell to swap with: <strong>@_swapSourceAsset.Name</strong>
+                    <button class="btn-cancel-swap" @onclick="CancelSwapMode">✕ Cancel</button>
+                </div>
+            }
             
             <!-- Selected Asset Details -->
             @if (_selectedAsset != null)
@@ -428,11 +445,11 @@
         <h2>📈 Project Statistics</h2>
         <div class="stats-grid">
             <div class="stat-item">
-                <span class="stat-value">11</span>
+                <span class="stat-value">16</span>
                 <span class="stat-label">Factions</span>
             </div>
             <div class="stat-item">
-                <span class="stat-value">8</span>
+                <span class="stat-value">19</span>
                 <span class="stat-label">Categories</span>
             </div>
             <div class="stat-item">
@@ -799,8 +816,8 @@
         opacity: 1;
     }
     
-    .btn-regenerate {
-        background: var(--accent);
+    .btn-regenerate,
+    .btn-swap {
         border: none;
         border-radius: 50%;
         width: 36px;
@@ -810,14 +827,23 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: transform 0.15s ease, background 0.15s ease;
+        transition: transform 0.15s ease, filter 0.15s ease;
     }
-    
-    .btn-regenerate:hover {
-        background: var(--accent-light);
-        transform: scale(1.1);
+
+    .btn-regenerate {
+        background: var(--accent);
     }
-    
+
+    .btn-swap {
+        background: var(--warning);
+    }
+
+    .btn-regenerate:hover,
+    .btn-swap:hover {
+        transform: scale(1.15);
+        filter: brightness(1.2);
+    }
+
     /* Asset Details Panel */
     .asset-details-panel {
         margin-top: 1.5rem;
@@ -992,6 +1018,73 @@
     .asset-cell.status-failed {
         border: 2px solid var(--error);
         background: rgba(248, 113, 113, 0.1);
+    }
+
+    /* Drag & Drop Styles */
+    .asset-cell[draggable="true"] {
+        cursor: grab;
+    }
+
+    .asset-cell[draggable="true"]:active {
+        cursor: grabbing;
+    }
+
+    /* Swap mode styles */
+    .asset-cell.swap-source {
+        outline: 3px solid var(--primary);
+        outline-offset: -3px;
+        background: rgba(99, 102, 241, 0.3);
+        transform: scale(1.05);
+    }
+
+    .asset-cell.swap-target {
+        cursor: pointer;
+        outline: 2px dashed var(--warning);
+        outline-offset: -2px;
+    }
+
+    .asset-cell.swap-target:hover {
+        background: rgba(251, 191, 36, 0.3);
+        transform: scale(1.05);
+    }
+
+    .swap-hint {
+        margin-top: 1rem;
+        padding: 0.75rem 1rem;
+        background: var(--primary);
+        color: white;
+        border-radius: 4px;
+        font-weight: 500;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        animation: pulse-hint 1.5s infinite;
+    }
+
+    .swap-hint strong {
+        color: var(--warning);
+    }
+
+    .btn-cancel-swap {
+        background: rgba(255,255,255,0.2);
+        border: 1px solid rgba(255,255,255,0.3);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.85rem;
+        transition: background 0.15s ease;
+    }
+
+    .btn-cancel-swap:hover {
+        background: rgba(255,255,255,0.3);
+    }
+
+    @@keyframes pulse-hint {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.85; }
     }
     
     @@keyframes pulse {
@@ -1204,6 +1297,12 @@
     private bool _normalizeAutoDetect = true;
     private string _normalizeStatus = string.Empty;
     private bool _normalizeHasError;
+
+    // Swap Mode (click-based image swapping)
+    private AssetDefinition? _swapSourceAsset;
+
+    // Split Spritesheet Import
+    private bool _isSplittingSpritesheet;
     
     protected override async Task OnInitializedAsync()
     {
@@ -1217,6 +1316,10 @@
         {
             await AssetGenerator.PromptBuilder.InitializeJsonDataAsync();
             Console.WriteLine("JSON prompt data loaded successfully");
+
+            // Connect BuildingManifestService to SpriteSheetService for manifest generation
+            SpriteSheetService.SetBuildingManifestService(AssetGenerator.PromptBuilder.BuildingManifestService);
+            Console.WriteLine("BuildingManifestService connected to SpriteSheetService");
         }
         catch (Exception ex)
         {
@@ -1576,28 +1679,27 @@
     {
         return category switch
         {
-            AssetCategory.MilitaryShips => "🚀 Military Ships (36)",
-            AssetCategory.CivilianShips => "🚢 Civilian Ships (36)",
-            AssetCategory.MilitaryStructures => "🛡️ Military Structures (36)",
-            AssetCategory.CivilianStructures => "🏗️ Civilian Structures (36)",
-            AssetCategory.Buildings => "🏛️ Buildings (48)",
-            AssetCategory.Troops => "⚔️ Troops (36)",
-            AssetCategory.Vehicles => "🚗 Vehicles (16)",
-            AssetCategory.Portraits => "👤 Portraits (36)",
-            AssetCategory.HouseSymbols => "🏰 House Symbols (48)",
-            AssetCategory.EventCharacters => "✨ Event Characters (36)",
-            AssetCategory.FactionLeaders => "👑 Faction Leaders (16)",
-            AssetCategory.SpecialCharacters => "⭐ Special Characters (16)",
-            // New categories
-            AssetCategory.UIElements => "🖥️ UI Elements (36)",
-            AssetCategory.UIIcons => "🔷 UI Icons (48)",
-            AssetCategory.Planets => "🌍 Planets (36)",
-            AssetCategory.Stars => "⭐ Stars (16)",
-            AssetCategory.Anomalies => "🌀 Anomalies (36)",
-            AssetCategory.GalaxyTiles => "🗺️ Galaxy Tiles (36)",
-            AssetCategory.SystemElements => "☄️ System Elements (36)",
-            AssetCategory.Effects => "💥 Effects (36)",
-            AssetCategory.FactionSymbols => "🏴 Faction Symbols (16)",
+            AssetCategory.MilitaryShips => "Military Ships (36)",
+            AssetCategory.CivilianShips => "Civilian Ships (36)",
+            AssetCategory.MilitaryStructures => "Military Structures (36)",
+            AssetCategory.CivilianStructures => "Civilian Structures (36)",
+            AssetCategory.Buildings => "Buildings (48)",
+            AssetCategory.Troops => "Troops (36)",
+            AssetCategory.Vehicles => "Vehicles (16)",
+            AssetCategory.Portraits => "Portraits (36)",
+            AssetCategory.HouseSymbols => "House Symbols (48)",
+            AssetCategory.EventCharacters => "Event Characters (36)",
+            AssetCategory.FactionLeaders => "Faction Leaders (20)",
+            AssetCategory.SpecialCharacters => "Special Characters (16)",
+            AssetCategory.UIElements => "UI Elements (36)",
+            AssetCategory.UIIcons => "UI Icons (48)",
+            AssetCategory.Planets => "Planets (36)",
+            AssetCategory.Stars => "Stars (16)",
+            AssetCategory.Anomalies => "Anomalies (36)",
+            AssetCategory.GalaxyTiles => "Galaxy Tiles (36)",
+            AssetCategory.SystemElements => "System Elements (36)",
+            AssetCategory.Effects => "Effects (36)",
+            AssetCategory.FactionSymbols => "Faction Symbols (25)",
             _ => category.ToString()
         };
     }
@@ -2042,8 +2144,215 @@
     {
         if (string.IsNullOrEmpty(_normalizeResultImage))
             return;
-        
+
         var filename = $"{_selectedFaction.ToString().ToLower()}_{_selectedCategory.ToString().ToLower()}_normalized.png";
         await JS.InvokeVoidAsync("downloadBase64File", _normalizeResultImage, filename, "image/png");
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
+    // SWAP MODE (click-based image swapping)
+    // ═══════════════════════════════════════════════════════════════════
+
+    private void StartSwapMode(AssetDefinition asset)
+    {
+        if (asset.Status != AssetStatus.Generated) return;
+        _swapSourceAsset = asset;
+        StateHasChanged();
+    }
+
+    private void CancelSwapMode()
+    {
+        _swapSourceAsset = null;
+        StateHasChanged();
+    }
+
+    private void OnAssetClick(AssetDefinition asset)
+    {
+        // If in swap mode
+        if (_swapSourceAsset != null)
+        {
+            // Clicking on source cell does nothing (allows button clicks to work)
+            if (_swapSourceAsset == asset)
+            {
+                return;
+            }
+
+            // Clicking on different cell performs the swap
+            PerformSwap(_swapSourceAsset, asset);
+            _swapSourceAsset = null;
+            StateHasChanged();
+            return;
+        }
+
+        // Normal click - select the asset
+        SelectAsset(asset);
+    }
+
+    private void PerformSwap(AssetDefinition source, AssetDefinition target)
+    {
+        // Get source data
+        var sourceImage = source.GeneratedImagePath;
+        var sourceStatus = source.Status;
+
+        // Get target data (may be empty/pending)
+        var targetImage = target.GeneratedImagePath;
+        var targetStatus = target.Status;
+
+        // Move source to target
+        target.GeneratedImagePath = sourceImage;
+        target.Status = sourceStatus;
+
+        // Move target to source (swap) - may leave source empty if target was empty
+        source.GeneratedImagePath = targetImage;
+        source.Status = targetStatus;
+    }
+
+    private string GetAssetTooltip(AssetDefinition asset)
+    {
+        if (_swapSourceAsset != null && _swapSourceAsset != asset)
+        {
+            return $"Click to swap with {_swapSourceAsset.Name}";
+        }
+        return asset.Name;
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
+    // SPLIT SPRITESHEET IMPORT
+    // ═══════════════════════════════════════════════════════════════════
+
+    private async Task ImportAndSplitSpritesheet()
+    {
+        // Create an empty job for the selected faction/category
+        _currentJob = AssetGenerator.CreateJob(_selectedFaction, _selectedCategory);
+        _currentJob.Status = JobStatus.Completed;
+        StateHasChanged();
+
+        // Trigger file selection for split spritesheet
+        await JS.InvokeVoidAsync("triggerFileInput", "splitSpritesheetInput");
+    }
+
+    private async Task OnSplitSpritesheetSelected(InputFileChangeEventArgs e)
+    {
+        if (_currentJob == null) return;
+
+        var file = e.File;
+        if (file == null) return;
+
+        _isSplittingSpritesheet = true;
+        _isImporting = true;
+        StateHasChanged();
+
+        try
+        {
+            // Read the file as base64
+            using var stream = file.OpenReadStream(maxAllowedSize: 50 * 1024 * 1024); // 50MB max
+            using var ms = new MemoryStream();
+            await stream.CopyToAsync(ms);
+            var base64 = Convert.ToBase64String(ms.ToArray());
+
+            // Get grid spec for current job (expected values)
+            var gridSpec = _currentJob.GridSpec;
+
+            // First, detect the actual grid dimensions from the image
+            var detection = await JS.InvokeAsync<GridDetectionResult>(
+                "detectGridFromImage",
+                base64,
+                gridSpec.Columns  // Pass expected columns as hint
+            );
+
+            // Use detected dimensions if available, otherwise fall back to job spec
+            int actualColumns = gridSpec.Columns;
+            int actualRows = gridSpec.Rows;
+
+            if (detection?.Detected != null)
+            {
+                actualColumns = detection.Detected.Columns;
+                actualRows = detection.Detected.Rows;
+                Console.WriteLine($"Auto-detected grid: {actualColumns}x{actualRows} (cell size: {detection.Detected.CellSize}px) from image {detection.Width}x{detection.Height}");
+            }
+            else
+            {
+                Console.WriteLine($"Could not auto-detect grid, using job spec: {actualColumns}x{actualRows}");
+            }
+
+            // Call JavaScript to split the spritesheet with detected dimensions
+            var result = await JS.InvokeAsync<SplitSpritesheetResult>(
+                "splitSpritesheet",
+                base64,
+                actualColumns,
+                actualRows
+            );
+
+            if (result?.Images != null)
+            {
+                _importTotal = result.Images.Count;
+                _importProgress = 0;
+
+                // Distribute the split images to the corresponding grid positions
+                foreach (var imageInfo in result.Images)
+                {
+                    _importProgress++;
+
+                    // Find the asset at this grid position
+                    // Use the detected grid position, which maps to our job assets
+                    var asset = _currentJob.Assets.FirstOrDefault(a =>
+                        a.GridRow == imageInfo.Row && a.GridCol == imageInfo.Col);
+
+                    if (asset != null && imageInfo.HasContent)
+                    {
+                        asset.GeneratedImagePath = imageInfo.Base64;
+                        asset.Status = AssetStatus.Generated;
+                    }
+
+                    StateHasChanged();
+                    await Task.Delay(10); // Small delay for UI updates
+                }
+
+                Console.WriteLine($"Split spritesheet: {result.TotalCells} cells ({actualColumns}x{actualRows}), {result.Images.Count(i => i.HasContent)} with content");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error splitting spritesheet: {ex.Message}");
+        }
+        finally
+        {
+            _isSplittingSpritesheet = false;
+            _isImporting = false;
+            StateHasChanged();
+        }
+    }
+
+    // Helper class for grid detection result
+    public class GridDetectionResult
+    {
+        public int Width { get; set; }
+        public int Height { get; set; }
+        public DetectedGrid? Detected { get; set; }
+    }
+
+    public class DetectedGrid
+    {
+        public int Columns { get; set; }
+        public int Rows { get; set; }
+        public int CellSize { get; set; }
+    }
+
+    // Helper class for JavaScript interop
+    public class SplitSpritesheetResult
+    {
+        public List<SplitImageInfo> Images { get; set; } = new();
+        public int CellWidth { get; set; }
+        public int CellHeight { get; set; }
+        public int TotalCells { get; set; }
+    }
+
+    public class SplitImageInfo
+    {
+        public int Row { get; set; }
+        public int Col { get; set; }
+        public int Index { get; set; }
+        public bool HasContent { get; set; }
+        public string Base64 { get; set; } = string.Empty;
     }
 }

@@ -36,6 +36,7 @@ public enum AssetCategory
 
 public enum Faction
 {
+    // Major Powers
     Federation,
     Klingon,
     Romulan,
@@ -43,6 +44,8 @@ public enum Faction
     Cardassian,
     Borg,
     Dominion,
+
+    // Minor Powers / Independent Species
     Breen,
     Gorn,
     Andorian,
@@ -51,9 +54,20 @@ public enum Faction
     Bajoran,
     Tholian,
     Orion,
+    Hirogen,
+    Betazoid,       // Telepathic Federation member species
+
+    // Rebel / Independent Groups
+    Maquis,         // Anti-Cardassian resistance fighters
+    Pirates,        // Generic space pirates (mixed species)
+    Nausicaan,      // Brutish mercenaries and pirates
+
+    // Exotic / Extradimensional
+    Species8472,    // Fluidic space beings (Undine)
+
     // Special/Universal categories
-    Special,      // Universal assets: Planets, Stars, Anomalies, FactionSymbols, FactionLeaders + Event Characters (Q, Androids, etc.)
-    AncientRaces  // Iconians, Preservers, Tkon, etc. (Event Characters only)
+    Special,        // Universal assets: Planets, Stars, Anomalies, FactionSymbols, FactionLeaders + Event Characters (Q, Androids, etc.)
+    AncientRaces    // Iconians, Preservers, Tkon, etc. (Event Characters only)
 }
 
 public class GridSpec
@@ -132,7 +146,64 @@ public class AssetManifestEntry
     public int Col { get; set; }
     public string Name { get; set; } = string.Empty;
     public string Type { get; set; } = string.Empty;
+    public string? Category { get; set; }  // Building category (Government, Military, etc.) - null for non-buildings
+    public string? Description { get; set; }  // Detailed description of the asset's purpose
     public string PromptUsed { get; set; } = string.Empty;
+}
+
+/// <summary>
+/// Categories for planetary buildings - used for gameplay mechanics and prompt generation
+/// </summary>
+public enum BuildingCategory
+{
+    Government,      // Command centers, council halls, palaces, administrative buildings
+    Military,        // Barracks, defense towers, weapons factories, training grounds
+    Research,        // Science institutes, labs, R&D facilities
+    Production,      // Factories, shipyards, manufacturing plants
+    FoodProduction,  // Farms, hydroponics, food processing, livestock
+    Energy,          // Power plants, generators, solar collectors, reactors
+    Religion,        // Temples, shrines, monasteries, sacred sites
+    Medical,         // Hospitals, clinics, rehabilitation centers
+    Education,       // Academies, schools, universities, libraries
+    Commerce,        // Markets, trade centers, banks, exchanges
+    Housing,         // Residential complexes, habitat domes, quarters
+    Recreation,      // Entertainment venues, arenas, parks, holosuites
+    Infrastructure,  // Communications, transport hubs, cargo facilities
+    Intelligence,    // Spy agencies, surveillance, interrogation facilities
+    Special          // Unique faction-specific buildings that don't fit other categories
+}
+
+/// <summary>
+/// Detailed building definition with category and faction-specific description
+/// </summary>
+public record BuildingDefinition(
+    string Name,
+    BuildingCategory Category,
+    string Description
+)
+{
+    /// <summary>
+    /// Get the category display name for UI/manifest
+    /// </summary>
+    public string CategoryDisplayName => Category switch
+    {
+        BuildingCategory.Government => "Government & Administration",
+        BuildingCategory.Military => "Military & Defense",
+        BuildingCategory.Research => "Research & Science",
+        BuildingCategory.Production => "Production & Industry",
+        BuildingCategory.FoodProduction => "Food & Agriculture",
+        BuildingCategory.Energy => "Energy & Power",
+        BuildingCategory.Religion => "Religion & Culture",
+        BuildingCategory.Medical => "Medical & Health",
+        BuildingCategory.Education => "Education & Training",
+        BuildingCategory.Commerce => "Commerce & Trade",
+        BuildingCategory.Housing => "Housing & Habitation",
+        BuildingCategory.Recreation => "Recreation & Entertainment",
+        BuildingCategory.Infrastructure => "Infrastructure & Logistics",
+        BuildingCategory.Intelligence => "Intelligence & Security",
+        BuildingCategory.Special => "Special & Unique",
+        _ => Category.ToString()
+    };
 }
 
 public class FactionProfile
@@ -152,11 +223,12 @@ public class FactionProfile
     public List<string> MilitaryStructures { get; set; } = new();
     public List<string> CivilianStructures { get; set; } = new();
     public List<string> Buildings { get; set; } = new();
+    public List<BuildingDefinition> BuildingDefinitions { get; set; } = new();  // New: detailed building definitions
     public List<string> Troops { get; set; } = new();
     public List<string> PortraitVariants { get; set; } = new();
     public List<string> HouseSymbols { get; set; } = new();
     public List<string> EventCharacters { get; set; } = new();  // Special event-only portraits
-    
+
     // Flags for what this faction supports
     public bool HasShips { get; set; } = true;
     public bool HasBuildings { get; set; } = true;

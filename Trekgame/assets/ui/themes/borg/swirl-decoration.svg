@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <!-- Borg Decoration: Neural network node cluster -->
+  <defs>
+    <linearGradient id="borgNodeGreen" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4A8A4A"/>
+      <stop offset="100%" style="stop-color:#2A5A2A"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Central node -->
+  <circle cx="50" cy="50" r="15" fill="none" stroke="url(#borgNodeGreen)" stroke-width="3"/>
+  <circle cx="50" cy="50" r="10" fill="none" stroke="#3A6A3A" stroke-width="2"/>
+  <circle cx="50" cy="50" r="5" fill="#4A8A4A"/>
+
+  <!-- Connection lines to outer nodes -->
+  <line x1="50" y1="35" x2="50" y2="15" stroke="#2A5A2A" stroke-width="2"/>
+  <line x1="50" y1="65" x2="50" y2="85" stroke="#2A5A2A" stroke-width="2"/>
+  <line x1="35" y1="50" x2="15" y2="50" stroke="#2A5A2A" stroke-width="2"/>
+  <line x1="65" y1="50" x2="85" y2="50" stroke="#2A5A2A" stroke-width="2"/>
+
+  <!-- Diagonal connections -->
+  <line x1="40" y1="40" x2="25" y2="25" stroke="#2A5A2A" stroke-width="1"/>
+  <line x1="60" y1="40" x2="75" y2="25" stroke="#2A5A2A" stroke-width="1"/>
+  <line x1="40" y1="60" x2="25" y2="75" stroke="#2A5A2A" stroke-width="1"/>
+  <line x1="60" y1="60" x2="75" y2="75" stroke="#2A5A2A" stroke-width="1"/>
+
+  <!-- Outer nodes -->
+  <circle cx="50" cy="10" r="4" fill="#3A6A3A"/>
+  <circle cx="50" cy="90" r="4" fill="#3A6A3A"/>
+  <circle cx="10" cy="50" r="4" fill="#3A6A3A"/>
+  <circle cx="90" cy="50" r="4" fill="#3A6A3A"/>
+  <circle cx="22" cy="22" r="3" fill="#2A5A2A"/>
+  <circle cx="78" cy="22" r="3" fill="#2A5A2A"/>
+  <circle cx="22" cy="78" r="3" fill="#2A5A2A"/>
+  <circle cx="78" cy="78" r="3" fill="#2A5A2A"/>
+</svg>

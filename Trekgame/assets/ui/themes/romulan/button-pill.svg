@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 40" fill="none">
+  <!-- Romulan Button: Trapezoid shape with beveled corners -->
+  <defs>
+    <linearGradient id="romulanBtnGreen" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#00FFCC"/>
+      <stop offset="100%" style="stop-color:#006655"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Trapezoid button -->
+  <path d="
+    M 10 0
+    L 110 0
+    L 120 10
+    L 120 30
+    L 110 40
+    L 10 40
+    L 0 30
+    L 0 10
+    Z
+  " fill="url(#romulanBtnGreen)"/>
+</svg>

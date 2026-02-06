@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" fill="none">
+  <!-- Borg Indicator: Concentric circles (neural node) -->
+  <defs>
+    <linearGradient id="borgIndicator" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3A5A3A"/>
+      <stop offset="100%" style="stop-color:#1A3A1A"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Outer ring -->
+  <circle cx="20" cy="20" r="18" fill="none" stroke="url(#borgIndicator)" stroke-width="3"/>
+
+  <!-- Middle ring -->
+  <circle cx="20" cy="20" r="12" fill="none" stroke="#2A5A2A" stroke-width="2"/>
+
+  <!-- Inner circle -->
+  <circle cx="20" cy="20" r="6" fill="#1A3A1A"/>
+  <circle cx="20" cy="20" r="3" fill="#2A5A2A"/>
+</svg>

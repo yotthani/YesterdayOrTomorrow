@@ -1,0 +1,21 @@
+{
+  "category": "Stars",
+  "description": "Star types for solar systems",
+  "assets": [
+    { "id": "yellow_main", "name": "Star Yellow Main Sequence", "match": ["yellow", "main sequence", "g-type"], "prompt": { "type": "Yellow Dwarf (G-type)", "features": ["Bright yellow-white", "Solar flares", "Corona visible", "Stable, life-supporting"], "reference": "Our Sun" }},
+    { "id": "red_dwarf", "name": "Star Red Dwarf", "match": ["red dwarf", "m-type"], "prompt": { "type": "Red Dwarf (M-type)", "features": ["Deep red/orange", "Smaller size", "Cooler temperature", "Long-lived"], "reference": "Proxima Centauri" }},
+    { "id": "blue_giant", "name": "Star Blue Giant Hot", "match": ["blue giant", "hot", "o-type"], "prompt": { "type": "Blue Giant (O-type)", "features": ["Brilliant blue-white", "Massive size", "Extremely hot", "Short-lived"], "reference": "Rigel" }},
+    { "id": "red_giant", "name": "Star Red Giant Dying", "match": ["red giant", "dying"], "prompt": { "type": "Red Giant", "features": ["Expanded red sphere", "Diffuse edges", "Dying star", "Engulfing inner planets"], "reference": "Betelgeuse" }},
+    { "id": "white_dwarf", "name": "Star White Dwarf Remnant", "match": ["white dwarf", "remnant"], "prompt": { "type": "White Dwarf", "features": ["Small, dense", "Blue-white hot core", "Stellar remnant", "Planetary nebula possible"], "reference": "Sirius B" }},
+    { "id": "neutron_pulsar", "name": "Star Neutron Pulsar", "match": ["neutron", "pulsar"], "prompt": { "type": "Neutron Star/Pulsar", "features": ["Tiny, incredibly dense", "Pulsing radiation beams", "Magnetic field lines", "Rapid rotation"], "reference": "Magnetar" }},
+    { "id": "binary_pair", "name": "Star Binary System Pair", "match": ["binary", "pair", "double"], "prompt": { "type": "Binary Star System", "features": ["Two stars orbiting", "Different colors possible", "Gravitational dance", "Complex light patterns"], "reference": "Alpha Centauri" }},
+    { "id": "orange_subgiant", "name": "Star Orange Subgiant", "match": ["orange", "k-type"], "prompt": { "type": "Orange Star (K-type)", "features": ["Orange-yellow hue", "Cooler than Sun", "Stable, long-lived", "Potential habitability"], "reference": "Alpha Centauri B" }}
+  ],
+  "styleGuide": {
+    "material": "Glowing plasma sphere with corona effects",
+    "quality": "High detail, visible surface activity",
+    "lighting": "Self-illuminating, casting light outward",
+    "composition": "Full star view with corona/flares",
+    "background": "Solid black (#000000) - space"
+  }
+}

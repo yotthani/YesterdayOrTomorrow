@@ -1,0 +1,185 @@
+{
+  "factionName": "Orion",
+  "categoryName": "Buildings",
+  "architectureStyle": {
+    "description": "Criminal enterprise aesthetic - pleasure palaces, hidden vaults, and pirate havens",
+    "keyElements": [
+      "Green-skinned culture reflected in green and gold coloring",
+      "Decadent pleasure palace aesthetic for entertainment",
+      "Hidden rooms and escape routes for criminal operations",
+      "Syndicate headquarters style with concealed defenses",
+      "Gaudy displays of ill-gotten wealth",
+      "Mixed architectural styles from stolen goods",
+      "Slave market historical elements now repurposed"
+    ],
+    "colors": "Green, gold, copper, black, neon accents for entertainment venues",
+    "materials": "Stolen luxury materials, reinforced security barriers, pleasure-palace décor"
+  },
+  "buildings": [
+    {
+      "name": "Syndicate Headquarters",
+      "category": "Government",
+      "description": "Command center for Orion criminal enterprises hidden behind legitimate facade"
+    },
+    {
+      "name": "Crime Boss Palace",
+      "category": "Government",
+      "description": "Lavish residence of an Orion crime lord displaying ill-gotten wealth"
+    },
+    {
+      "name": "Pirate Cove",
+      "category": "Government",
+      "description": "Safe harbor for raider ships and smuggling vessels"
+    },
+    {
+      "name": "Contract Office",
+      "category": "Government",
+      "description": "Hiring assassins, mercenaries, and specialists for any job"
+    },
+    {
+      "name": "Smuggler's Den",
+      "category": "Intelligence",
+      "description": "Coordination center for illegal shipping across Federation space"
+    },
+    {
+      "name": "Information Broker",
+      "category": "Intelligence",
+      "description": "Selling secrets to the highest bidder without questions asked"
+    },
+    {
+      "name": "Interrogation Room",
+      "category": "Intelligence",
+      "description": "Extracting information through methods the authorities won't use"
+    },
+    {
+      "name": "Black Market Hub",
+      "category": "Commerce",
+      "description": "Trading post for stolen and illegal goods from across the quadrant"
+    },
+    {
+      "name": "Auction Block",
+      "category": "Commerce",
+      "description": "Selling goods, ships, and in darker times, much worse"
+    },
+    {
+      "name": "Latinum Vault",
+      "category": "Commerce",
+      "description": "Secure storage for the Syndicate's ill-gotten fortunes"
+    },
+    {
+      "name": "Fence Operation",
+      "category": "Commerce",
+      "description": "Converting stolen goods into clean, spendable profit"
+    },
+    {
+      "name": "Ship Market",
+      "category": "Commerce",
+      "description": "Selling vessels of questionable origin with no documentation"
+    },
+    {
+      "name": "Weapons Dealer",
+      "category": "Commerce",
+      "description": "Arms sales to anyone with enough latinum - no questions asked"
+    },
+    {
+      "name": "Pleasure Palace",
+      "category": "Recreation",
+      "description": "Entertainment complex offering every vice imaginable for a price"
+    },
+    {
+      "name": "Casino Complex",
+      "category": "Recreation",
+      "description": "Gambling den where the house cheats and the desperate lose everything"
+    },
+    {
+      "name": "Dance Hall",
+      "category": "Recreation",
+      "description": "Famous Orion dancers performing for wealthy and powerful patrons"
+    },
+    {
+      "name": "Fighting Pit",
+      "category": "Recreation",
+      "description": "Blood sport arena for betting and underground entertainment"
+    },
+    {
+      "name": "Exotic Bar",
+      "category": "Recreation",
+      "description": "Drinking establishment with special services and information trading"
+    },
+    {
+      "name": "Narcotic Den",
+      "category": "Recreation",
+      "description": "Illegal substance distribution keeping customers coming back"
+    },
+    {
+      "name": "Mercenary Compound",
+      "category": "Military",
+      "description": "Hired muscle awaiting deployment for Syndicate operations"
+    },
+    {
+      "name": "Security Station",
+      "category": "Military",
+      "description": "Protecting crime boss interests from rivals and authorities"
+    },
+    {
+      "name": "Weapons Cache",
+      "category": "Military",
+      "description": "Arsenal for Syndicate operations and defense against raids"
+    },
+    {
+      "name": "Raider Barracks",
+      "category": "Military",
+      "description": "Housing for pirate crews between raids and smuggling runs"
+    },
+    {
+      "name": "Shipyard",
+      "category": "Production",
+      "description": "Building and modifying raider vessels for speed and stealth"
+    },
+    {
+      "name": "Chop Shop",
+      "category": "Production",
+      "description": "Breaking down stolen ships for untraceable parts"
+    },
+    {
+      "name": "Counterfeiting Lab",
+      "category": "Production",
+      "description": "Producing fake currency, documents, and identities"
+    },
+    {
+      "name": "Drug Manufacturing",
+      "category": "Production",
+      "description": "Synthesizing illegal narcotics for distribution across the quadrant"
+    },
+    {
+      "name": "Medical Bay",
+      "category": "Medical",
+      "description": "Treating injuries no questions asked - discretion guaranteed"
+    },
+    {
+      "name": "Cosmetic Surgery",
+      "category": "Medical",
+      "description": "Changing faces for those who need to disappear permanently"
+    },
+    {
+      "name": "Safe House",
+      "category": "Housing",
+      "description": "Hidden refuge for those who need to disappear from authorities"
+    },
+    {
+      "name": "Luxury Suite",
+      "category": "Housing",
+      "description": "Opulent living for successful criminals enjoying their spoils"
+    },
+    {
+      "name": "Pheromone Lab",
+      "category": "Special",
+      "description": "Synthesizing Orion female pheromones for various applications"
+    },
+    {
+      "name": "Escape Tunnel",
+      "category": "Special",
+      "description": "Emergency exit network when authorities finally arrive"
+    }
+  ]
+}

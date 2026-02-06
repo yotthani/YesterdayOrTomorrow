@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 50" fill="none">
+  <!-- Andorian Button Pill: Flowing curved button -->
+  <defs>
+    <linearGradient id="andorianButtonBlue" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#88CCFF"/>
+      <stop offset="50%" style="stop-color:#4499DD"/>
+      <stop offset="100%" style="stop-color:#88CCFF"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Main button with smooth ends -->
+  <path d="
+    M 25 0
+    Q 0 0 0 25
+    Q 0 50 25 50
+    L 175 50
+    Q 200 50 200 25
+    Q 200 0 175 0
+    Z
+  " fill="url(#andorianButtonBlue)"/>
+
+  <!-- Inner highlight -->
+  <path d="
+    M 28 5
+    Q 8 5 8 25
+    Q 8 45 28 45
+    L 172 45
+    Q 192 45 192 25
+    Q 192 5 172 5
+    Z
+  " fill="none" stroke="#AAEEFF" stroke-width="1" opacity="0.5"/>
+</svg>

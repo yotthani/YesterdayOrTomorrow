@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 150" fill="none">
+  <!-- Ferengi Circular Display: Round display with nested rings -->
+  <defs>
+    <linearGradient id="ferengiCircOuter" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8B6914"/>
+      <stop offset="100%" style="stop-color:#5C4A0F"/>
+    </linearGradient>
+    <linearGradient id="ferengiCircGold" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#D4A017"/>
+      <stop offset="50%" style="stop-color:#FFD700"/>
+      <stop offset="100%" style="stop-color:#D4A017"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Outer bronze ring -->
+  <circle cx="75" cy="75" r="72" fill="url(#ferengiCircOuter)"/>
+
+  <!-- Gold trim ring -->
+  <circle cx="75" cy="75" r="65" fill="none" stroke="url(#ferengiCircGold)" stroke-width="3"/>
+
+  <!-- Middle bronze ring -->
+  <circle cx="75" cy="75" r="58" fill="url(#ferengiCircOuter)"/>
+
+  <!-- Inner display area (dark) -->
+  <circle cx="75" cy="75" r="50" fill="#1a1408"/>
+
+  <!-- Inner gold trim -->
+  <circle cx="75" cy="75" r="48" fill="none" stroke="#D4A017" stroke-width="1"/>
+</svg>

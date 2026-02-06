@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" fill="none">
+  <!-- Bajoran Indicator Circle Active: Glowing spiritual orb indicator -->
+  <defs>
+    <radialGradient id="bajoranOrbGoldOuter" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#FFCC88"/>
+      <stop offset="100%" style="stop-color:#DDAA66"/>
+    </radialGradient>
+    <radialGradient id="bajoranOrbGoldInner" cx="30%" cy="30%" r="50%">
+      <stop offset="0%" style="stop-color:#FFDD99"/>
+      <stop offset="100%" style="stop-color:#DDAA66"/>
+    </radialGradient>
+    <filter id="bajoranGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Glow effect background -->
+  <circle cx="15" cy="15" r="14" fill="#DDAA66" opacity="0.3" filter="url(#bajoranGlow)"/>
+
+  <!-- Outer ring -->
+  <circle cx="15" cy="15" r="14" fill="url(#bajoranOrbGoldOuter)"/>
+
+  <!-- Inner glowing orb -->
+  <circle cx="15" cy="15" r="10" fill="url(#bajoranOrbGoldInner)"/>
+
+  <!-- Bright highlight -->
+  <ellipse cx="12" cy="12" rx="4" ry="3" fill="#FFFFFF" opacity="0.5"/>
+
+  <!-- Center bright point -->
+  <circle cx="15" cy="15" r="3" fill="#FFFFFF" opacity="0.6"/>
+</svg>

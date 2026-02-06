@@ -152,31 +152,434 @@
       }
     },
     {
-      "id": "breen_thot",
-      "name": "Leader Breen Thot Armored",
-      "match": ["breen", "thot"],
+      "id": "breen_thot_modern",
+      "name": "Leader Breen Thot Modern",
+      "match": ["breen", "thot", "modern"],
       "prompt": {
-        "title": "BREEN THOT MILITARY COMMANDER",
+        "title": "BREEN THOT MILITARY COMMANDER (MODERN)",
         "gender": "unknown",
-        "species": "Breen (face never visible)",
+        "species": "Breen - mysterious alien species",
         "helmet": [
-          "Closed, technological helmet made of brown clay",
-          "Most distinctive feature: Wide HORIZONTAL VISOR glowing NEON GREEN",
-          "Below visor: ELONGATED RESPIRATOR/SNOUT protruding forward",
-          "Snout shape: Like a TRUNCATED PYRAMID (flat-topped pyramid) viewed from side",
-          "The respirator extends forward and downward from the visor",
-          "Respirator has vertical ridges/grilles along its length",
-          "Small side tubes/filters (2-3 each side) near jaw area",
-          "Helmet has horizontal layered bands/ridges on top"
+          "SMOOTH CLOSED HELMET - shaped like a motorcycle helmet but FULLY SEALED",
+          "Helmet is oval/elongated - narrower at chin, wider at top",
+          "COMPLETELY SOLID SURFACE - NO flip-up visor, NO transparent parts",
+          "Only opening is a THIN HORIZONTAL GLOWING SLIT for the visor",
+          "The visor slit glows CYAN/TEAL - just a narrow line of light",
+          "Made of dark gunmetal/black metal with subtle texture",
+          "Helmet connects seamlessly to the neck armor/suit collar below",
+          "TWO LARGE THICK CORRUGATED TUBES/HOSES on each side of the helmet",
+          "The side tubes connect from the helmet to the back/suit",
+          "FINE DELICATE RESPIRATOR GRILLE at mouth area - subtle vertical lines",
+          "The respirator is flush with the helmet surface, not protruding"
         ],
         "clothing": [
-          "Light brown/beige TUNIC as base layer",
-          "CROSSED BANDOLIERS/STRAPS across chest in dark brown",
-          "Bandoliers have impressed woven/grid texture (basket-weave pattern)",
-          "Massive, angular SHOULDER PADS with geometric details"
+          "DARK METALLIC ARMOR - gunmetal gray/black color",
+          "Sleek modern design with segmented armor plates",
+          "High collar that helmet attaches to seamlessly",
+          "Minimal ornamentation - functional military aesthetic",
+          "NO capes, NO cloaks, NO fabric - only metal armor"
         ],
-        "colorPalette": "Brown, tan, beige, khaki (warm earth tones only)",
-        "keyFeatures": "Helmet with elongated TRAPEZOIDAL snout extending forward"
+        "colorPalette": "Dark gunmetal, black metal, cyan/teal visor glow ONLY",
+        "keyFeatures": "SEALED motorcycle-style helmet, THIN GLOWING SLIT visor, THICK SIDE TUBES",
+        "criticalNotes": [
+          "Helmet is COMPLETELY CLOSED - NO transparent visor, NO flip-up parts",
+          "The ONLY opening is a THIN GLOWING CYAN SLIT where eyes would be",
+          "Think: sealed helmet with just a narrow line of light - NOT a see-through visor",
+          "LARGE CORRUGATED TUBES on sides of helmet - this is key!",
+          "Helmet connects to the suit/armor at the neck - no gap",
+          "DO NOT show any face or skin - helmet is FULLY SEALED"
+        ]
+      }
+    },
+    {
+      "id": "breen_thot_classic",
+      "name": "Leader Breen Thot Classic",
+      "match": ["breen", "thot", "classic"],
+      "prompt": {
+        "title": "BREEN THOT CLASSIC STYLE (DS9 ERA)",
+        "gender": "unknown",
+        "species": "Breen - mysterious alien species (DS9 era design)",
+        "helmet": [
+          "Closed MECHANICAL helmet made of SAND-COLORED/TAN/OLIVE material",
+          "COPPER/BRONZE colored HORIZONTAL BANDS/RINGS wrapped around the helmet",
+          "Multiple metallic ring bands encircle the head portion",
+          "Wide HORIZONTAL VISOR glowing NEON GREEN - bright green light",
+          "Below visor: PROTRUDING RECTANGULAR BREATH FILTER extending forward",
+          "The breath filter is a GEOMETRIC BOX SHAPE - like an angular gas mask",
+          "NOT an animal snout - it's a MECHANICAL FILTER UNIT",
+          "Filter has vertical ridges/grilles for ventilation",
+          "Small tubes/filters on sides near jaw area"
+        ],
+        "clothing": [
+          "SAND/TAN/OLIVE colored LEATHER tunic as base layer",
+          "CROSSED BANDOLIERS/STRAPS across chest in dark brown",
+          "Bandoliers have basket-weave/grid texture",
+          "Massive angular SHOULDER PADS with geometric details",
+          "NO capes, NO cloaks"
+        ],
+        "colorPalette": "Sand, tan, olive, khaki, brown leather, COPPER/BRONZE bands, bright green visor glow",
+        "keyFeatures": "PROTRUDING RECTANGULAR BREATH FILTER, COPPER RING BANDS around head, bright GREEN visor",
+        "criticalNotes": [
+          "DO NOT show any face or skin - helmet is FULLY CLOSED",
+          "The breath filter is MECHANICAL/GEOMETRIC - NOT an animal nose or snout",
+          "Think: angular gas mask filter protruding from the helmet face",
+          "COPPER/BRONZE BANDS wrap horizontally around the helmet - KEY FEATURE",
+          "Visor is BRIGHT GREEN, not cyan/teal"
+        ]
+      }
+    },
+    {
+      "id": "breen_thot_revealed",
+      "name": "Leader Breen Thot Revealed Face",
+      "match": ["breen", "thot", "revealed", "face"],
+      "prompt": {
+        "title": "BREEN THOT WITH VISIBLE FACE",
+        "gender": "unknown",
+        "species": "Breen - reptilian alien revealed behind protective barrier",
+        "helmet": [
+          "OPEN-FACE HELMET with dark metal frame",
+          "GREEN TRANSLUCENT ENERGY FIELD covering the face area",
+          "Energy field CONTOURS TO THE FACE SHAPE - not flat glass",
+          "The green barrier follows the curves of forehead, nose, cheeks",
+          "Dark metal frame with BRONZE/GOLD accent trim around faceplate",
+          "Vertical ribbed tubes on sides of helmet",
+          "Small tubes and cables connecting helmet to suit"
+        ],
+        "face": [
+          "REPTILIAN FACE visible through green energy barrier",
+          "FLAT NOSE that merges seamlessly into a raised FOREHEAD PLATE",
+          "The forehead plate is a bony ridge extending from nose bridge upward",
+          "Slightly GLOWING EYES with eerie luminescence",
+          "SCALY TEXTURED SKIN - reptilian/amphibian appearance",
+          "The green energy field gives the face an eerie glow effect",
+          "NOT human - clearly alien reptilian features"
+        ],
+        "clothing": [
+          "DARK METALLIC ARMOR - gunmetal/black base",
+          "BRONZE/GOLD ACCENT STRIPS and trim pieces",
+          "Heavy industrial aesthetic - tubes, cables, mechanical joints",
+          "Segmented shoulder armor with gold trim",
+          "NO capes, NO cloaks, NO fabric"
+        ],
+        "colorPalette": "Dark gunmetal/black armor, bronze/gold accents, green energy barrier, glowing eyes",
+        "keyFeatures": "Open helmet with CONTOURED green energy field over REPTILIAN face, flat nose merging into forehead plate",
+        "criticalNotes": [
+          "Face IS visible through translucent green energy barrier",
+          "Energy barrier FOLLOWS FACE CONTOURS - not a flat plane",
+          "Face is REPTILIAN with flat nose extending into forehead plate",
+          "NOT human face - alien reptilian features",
+          "NO capes or fabric garments"
+        ]
+      }
+    },
+    {
+      "id": "hirogen_alpha_helmeted",
+      "name": "Leader Hirogen Alpha Hunter Helmeted",
+      "match": ["hirogen", "alpha", "helmet", "armored"],
+      "prompt": {
+        "title": "HIROGEN ALPHA HUNTER (FULLY ARMORED WITH HELMET)",
+        "gender": "male",
+        "species": "Hirogen - massive reptilian humanoid hunter species",
+        "helmet": [
+          "FULL-FACE HUNTING HELMET covering entire head",
+          "Helmet is SILVER-BLUE METALLIC with color-shifting sheen",
+          "ANGULAR PREDATORY SHAPE - aggressive hunting aesthetic",
+          "NARROW HORIZONTAL VISOR slit with amber/orange glow",
+          "RESPIRATOR SECTION covering mouth/nose area - ribbed metal grille",
+          "Tubes and hoses connecting helmet to suit for life support",
+          "Sensor arrays and targeting equipment integrated into helmet",
+          "Helmet surface has weathered, battle-worn texture"
+        ],
+        "armor": [
+          "SILVER-BLUE METALLIC full body armor - same finish as helmet",
+          "Segmented armor plates allowing movement while hunting",
+          "Heavy pauldrons (shoulder armor) with TROPHY DECORATIONS",
+          "Bone fragments and teeth from kills attached to armor",
+          "Integrated SENSOR EQUIPMENT and tracking devices",
+          "Inset WORKING LIGHTS on armor (amber/orange)",
+          "Battle-worn finish - scratches, dents from hunts",
+          "ALPHA STATUS MARKINGS - rank insignia, pack symbols"
+        ],
+        "colorPalette": "SILVER-BLUE metallic armor, amber/orange visor glow, bone white trophies",
+        "keyFeatures": "SILVER-BLUE ARMOR + FULL HELMET WITH NARROW VISOR + TROPHY DECORATIONS = Hirogen Alpha",
+        "criticalNotes": [
+          "Helmet completely covers face - NO skin visible",
+          "Color is SILVER-BLUE metallic, NOT bronze (that's unarmored skin)",
+          "Visor is a narrow horizontal slit, NOT a large transparent faceplate",
+          "Massive towering build - much larger than humans"
+        ],
+        "reference": "Think: Predator-inspired hunter in full battle gear, ready to hunt"
+      }
+    },
+    {
+      "id": "hirogen_alpha_unmasked",
+      "name": "Leader Hirogen Alpha Hunter Face Visible",
+      "match": ["hirogen", "alpha", "face", "unmasked", "revealed"],
+      "prompt": {
+        "title": "HIROGEN ALPHA HUNTER (FACE VISIBLE - NO HELMET)",
+        "gender": "male",
+        "species": "Hirogen - massive reptilian humanoid hunter species",
+        "cranialStructure": [
+          "ENLARGED DUAL-LOBED CRANIUM - two distinct bulging lobes on top of skull",
+          "Head is OVERSIZED compared to human proportions",
+          "Skull widens at the top into two rounded protrusions",
+          "Completely BALD - no hair whatsoever on head or face",
+          "Cranium gives appearance of enlarged brain case"
+        ],
+        "facialFeatures": [
+          "FLAT NOSE - almost no nasal bridge, nostrils sit flat against face (like a Saurian/reptile)",
+          "NO LIPS - mouth is a lipless reptilian slit",
+          "HEAVY BROW RIDGES protruding over deep-set eyes",
+          "Deep-set PREDATORY EYES with intense hunter's gaze",
+          "Strong angular jaw structure",
+          "Face is clearly REPTILIAN, not mammalian"
+        ],
+        "skin": [
+          "SCALED/PEBBLED TEXTURE - like a Gila monster's skin",
+          "TAN/BEIGE to OLIVE coloring with darker mottled patches",
+          "Rough, weathered appearance from years of hunting",
+          "Battle scars visible across face",
+          "Texture is bumpy/granular, not smooth"
+        ],
+        "armor": [
+          "Heavy BRONZE/OLIVE hunting armor (matches skin tones when unarmored)",
+          "Trophy decorations - bones, teeth, skulls from prey",
+          "Sensor equipment on shoulders and chest",
+          "ALPHA STATUS SYMBOLS - ornate rank markings",
+          "Armor collar frames the exposed face"
+        ],
+        "colorPalette": "Tan/beige/olive mottled skin, bronze armor, bone white trophies",
+        "keyFeatures": "DUAL-LOBED SKULL + FLAT NOSE + NO LIPS + PEBBLED REPTILE SKIN = Hirogen",
+        "criticalNotes": [
+          "HEAD SHAPE is KEY: Two bulging lobes on top of skull - NOT a smooth dome",
+          "NOSE is FLAT - flush with face, just nostrils visible, NO nasal bridge",
+          "NO LIPS at all - reptilian mouth slit",
+          "Skin texture like Gila monster - mottled, pebbly, rough",
+          "Much taller and more massive than humans"
+        ],
+        "reference": "Think: massive reptilian hunter, Gila monster skin texture, dual-lobed alien skull"
+      }
+    },
+    {
+      "id": "hirogen_alpha_partial_helmet",
+      "name": "Leader Hirogen Alpha Hunter Partial Helmet",
+      "match": ["hirogen", "alpha", "partial", "mask"],
+      "prompt": {
+        "title": "HIROGEN ALPHA HUNTER (PARTIAL HELMET - LOWER FACE COVERED)",
+        "gender": "male",
+        "species": "Hirogen - massive reptilian humanoid hunter species",
+        "cranialStructure": [
+          "ENLARGED DUAL-LOBED CRANIUM visible - two distinct bulges on top of skull",
+          "Head is OVERSIZED compared to human proportions",
+          "Completely BALD - no hair",
+          "Upper skull exposed showing the distinctive shape"
+        ],
+        "facialFeatures": [
+          "HEAVY BROW RIDGES visible over deep-set predatory eyes",
+          "TAN/OLIVE SCALED SKIN visible on forehead and around eyes",
+          "Deep-set eyes with intense hunter's gaze"
+        ],
+        "mask": [
+          "RESPIRATOR MASK covering lower face (nose and mouth)",
+          "Mask is SILVER-BLUE METALLIC matching the armor",
+          "Ribbed grille over mouth area for breathing",
+          "Tubes connecting mask to suit/helmet frame",
+          "Mask frames the visible eyes and brow"
+        ],
+        "armor": [
+          "SILVER-BLUE METALLIC armor on body",
+          "Heavy pauldrons with trophy decorations",
+          "Integrated sensor equipment",
+          "Battle-worn finish"
+        ],
+        "colorPalette": "Tan/olive skin on head, silver-blue metallic mask and armor, amber lights",
+        "keyFeatures": "DUAL-LOBED SKULL VISIBLE + RESPIRATOR MASK ON LOWER FACE + SILVER-BLUE ARMOR",
+        "criticalNotes": [
+          "Upper head/skull is EXPOSED showing dual-lobed cranium",
+          "Eyes and brow ridges are visible",
+          "Lower face (nose, mouth) covered by metallic respirator mask",
+          "Creates iconic Hirogen hunter look"
+        ],
+        "reference": "Think: signature Hirogen look - alien skull visible, breathing mask covering lower face"
+      }
+    },
+    {
+      "id": "betazoid_ambassador",
+      "name": "Leader Betazoid Ambassador Female",
+      "match": ["betazoid", "ambassador"],
+      "prompt": {
+        "title": "BETAZOID AMBASSADOR",
+        "gender": "female",
+        "species": "Betazoid - telepathic humanoid species",
+        "appearance": [
+          "Humanoid appearance NEARLY IDENTICAL to human",
+          "SOLID BLACK EYES - completely black, NO visible iris or pupil (KEY FEATURE!)",
+          "Elegant, refined features",
+          "Mature, sophisticated appearance"
+        ],
+        "clothing": [
+          "Flowing elegant robes in PURPLES and LAVENDERS",
+          "Silver accents and jewelry",
+          "Or formal Starfleet dress uniform if serving in fleet",
+          "Sophisticated, diplomatic attire"
+        ],
+        "expression": "Serene, empathic, knowing - shows telepathic awareness",
+        "colorPalette": "Soft purples, lavenders, silver, white",
+        "keyFeatures": "SOLID BLACK EYES + ELEGANT ROBES + SERENE EXPRESSION = Betazoid",
+        "criticalNotes": [
+          "BLACK EYES are the ONLY distinguishing feature from humans",
+          "Eyes are completely black - no iris, no pupil visible",
+          "Otherwise identical to humans in appearance",
+          "Telepathic/empathic - serene, knowing expression"
+        ],
+        "reference": "Think: Lwaxana Troi, Deanna Troi - telepathic counselor/diplomat"
+      }
+    },
+    {
+      "id": "maquis_commander",
+      "name": "Leader Maquis Commander",
+      "match": ["maquis", "resistance"],
+      "prompt": {
+        "title": "MAQUIS COMMANDER",
+        "gender": "male",
+        "species": "Human or Bajoran (resistance fighter)",
+        "appearance": [
+          "HUMAN or BAJORAN appearance",
+          "If Bajoran: distinctive NOSE RIDGES across bridge of nose",
+          "Battle-worn, weathered features",
+          "Scars or signs of hard living common",
+          "Determined, defiant expression"
+        ],
+        "clothing": [
+          "CIVILIAN CLOTHES - NOT Starfleet uniform!",
+          "Leather jacket or practical tactical vest",
+          "Earth tone colors: browns, greens, blacks",
+          "Visible weapons, utilitarian equipment",
+          "Battle-worn appearance"
+        ],
+        "expression": "Intense, passionate, defiant - freedom fighter",
+        "colorPalette": "Earth tones: browns, greens, blacks, rust",
+        "keyFeatures": "CIVILIAN CLOTHES + RESISTANCE LOOK + DETERMINED EXPRESSION = Maquis",
+        "criticalNotes": [
+          "NO Starfleet uniform - they rejected Starfleet",
+          "Resistance fighter aesthetic - NOT military",
+          "Practical, rugged clothing",
+          "Mix of Human and Bajoran members"
+        ],
+        "reference": "Think: Chakotay, Michael Eddington - freedom fighter against Cardassians"
+      }
+    },
+    {
+      "id": "pirate_captain",
+      "name": "Leader Pirate Captain",
+      "match": ["pirate", "raider", "captain"],
+      "prompt": {
+        "title": "PIRATE FLEET COMMANDER",
+        "gender": "male",
+        "species": "Human",
+        "appearance": [
+          "HUMAN male with commanding, authoritative presence",
+          "Middle-aged to older, experienced and hardened",
+          "Cold, calculating eyes",
+          "Clean-shaven or neatly trimmed facial hair",
+          "Scarred but dignified - battle-worn veteran"
+        ],
+        "clothing": [
+          "DARK MILITARY-STYLE UNIFORM - like a corrupted/twisted admiral's uniform",
+          "BLACK or DARK GRAY base color with gold/brass trim",
+          "High collar, formal military cut",
+          "MEDALS AND DECORATIONS on chest - stolen or self-awarded honors",
+          "Rank insignia (self-proclaimed)",
+          "Military boots, polished but worn",
+          "Optional: dark cape or long coat over uniform"
+        ],
+        "expression": "Cold, authoritative, dangerous - fallen military commander",
+        "colorPalette": "Black, dark gray, gold/brass accents, deep red highlights",
+        "keyFeatures": "DARK MILITARY UNIFORM + MEDALS/DECORATIONS + COMMANDING PRESENCE = Pirate Commander",
+        "criticalNotes": [
+          "NOT ragged or mismatched - this is a LEADER with authority",
+          "Uniform is military-style but DARK and corrupted",
+          "Medals and decorations give sense of twisted legitimacy",
+          "Think: rogue admiral, fallen military commander turned pirate lord"
+        ],
+        "reference": "Think: corrupted Starfleet admiral, dark military dictator, pirate fleet commander with military discipline"
+      }
+    },
+    {
+      "id": "species8472_leader",
+      "name": "Leader Species 8472",
+      "match": ["species8472", "8472", "undine"],
+      "prompt": {
+        "title": "SPECIES 8472 LEADER",
+        "gender": "unknown",
+        "species": "Species 8472 / Undine - extradimensional beings",
+        "appearance": [
+          "TRIPEDAL ALIEN - THREE LEGS",
+          "THREE ARMS",
+          "ELONGATED HEAD with MULTIPLE EYES",
+          "NO VISIBLE MOUTH - communicates telepathically",
+          "GRAY-PURPLE SKIN with organic texture",
+          "EXTREMELY TALL and thin, elongated body",
+          "NOT HUMANOID at all"
+        ],
+        "clothing": [
+          "NO CLOTHING - organic exoskeleton/bio-armor",
+          "Bioluminescent markings on skin",
+          "Organic patterns, possibly more elaborate for leader"
+        ],
+        "expression": "Alien, terrifying, unknowable - completely non-human",
+        "colorPalette": "Gray-purple skin, bioluminescent greens and violets",
+        "keyFeatures": "TRIPEDAL + MULTIPLE EYES + NO MOUTH + GRAY-PURPLE = Species 8472",
+        "criticalNotes": [
+          "NOT humanoid - completely alien anatomy",
+          "THREE legs, THREE arms",
+          "Multiple eyes on elongated head",
+          "NO mouth - telepathic communication",
+          "From fluidic space - extradimensional"
+        ],
+        "reference": "Think: ultimate alien threat, terrifying extradimensional beings from Voyager"
+      }
+    },
+    {
+      "id": "nausicaan_chieftain",
+      "name": "Leader Nausicaan Chieftain",
+      "match": ["nausicaan", "chieftain", "warlord"],
+      "prompt": {
+        "title": "NAUSICAAN CHIEFTAIN",
+        "gender": "male",
+        "species": "Nausicaan - Predator-like mercenary alien (NOT orc!)",
+        "appearance": [
+          "VERY TALL - towers over humans (over 2 meters)",
+          "LEAN but muscular athletic build (NOT bulky orc!)",
+          "ELONGATED SKULL - high domed forehead sloping backward (Predator-like)",
+          "TWO TUSKS curving UPWARD from LOWER JAW (KEY FEATURE!)",
+          "DEEP-SET small eyes under heavy brow ridge",
+          "PROMINENT angular CHEEKBONES - gaunt alien face",
+          "GRAY or TAN leathery skin (NOT green!)",
+          "Completely BALD - no hair at all",
+          "Battle scars across face"
+        ],
+        "clothing": [
+          "Heavy LEATHER AND METAL ARMOR",
+          "Battle-worn, practical mercenary gear",
+          "Trophy pieces from defeated enemies",
+          "Visible weapons - blades, disruptors",
+          "Dark colors: brown, gray, black",
+          "Utilitarian but intimidating"
+        ],
+        "expression": "Menacing, predatory, calculating - dangerous mercenary",
+        "colorPalette": "Dark browns, grays, gunmetal, tan",
+        "keyFeatures": "TUSKS CURVING UP + ELONGATED SKULL + LEAN BUILD + GRAY/TAN SKIN = Nausicaan",
+        "criticalNotes": [
+          "NOT AN ORC! Predator-movie aesthetic",
+          "ELONGATED SKULL sloping back - high domed forehead",
+          "TWO TUSKS curving UPWARD from lower jaw",
+          "LEAN athletic build (not bulky)",
+          "GRAY/TAN skin (NOT green)",
+          "Deep-set eyes, prominent cheekbones",
+          "Completely BALD"
+        ],
+        "reference": "Think: Predator movie alien as mercenary, NOT fantasy orc"
       }
     },
     {
@@ -365,6 +768,36 @@
         ],
         "expression": "Calculating, self-reliant expression",
         "reference": "Think: freelance starship captain, survivor"
+      }
+    },
+    {
+      "id": "nausicaan_raider",
+      "name": "Leader Nausicaan Raider Captain",
+      "match": ["nausicaan", "raider", "pirate"],
+      "prompt": {
+        "title": "NAUSICAAN RAIDER CAPTAIN",
+        "gender": "male",
+        "species": "Nausicaan - Predator-like alien mercenary (NOT orc!)",
+        "appearance": [
+          "VERY TALL lean humanoid (Predator aesthetic, NOT orc)",
+          "ELONGATED SKULL with high domed forehead sloping back",
+          "TWO TUSKS curving UPWARD from lower jaw (KEY!)",
+          "Deep-set small eyes, prominent angular cheekbones",
+          "GRAY or TAN leathery skin (NOT green)",
+          "Completely BALD",
+          "Battle scars across face"
+        ],
+        "clothing": [
+          "Rough leather and metal armor",
+          "Mismatched pirate/raider aesthetic",
+          "Trophy items from past raids visible",
+          "Dark colors - black, brown, gunmetal"
+        ],
+        "expression": "Menacing, calculating, predatory",
+        "colorPalette": "Gray/tan skin, dark leather, metal armor",
+        "keyFeatures": "TUSKS CURVING UP + ELONGATED SKULL + LEAN + GRAY/TAN = Nausicaan",
+        "criticalNotes": "NOT an orc! Predator-like appearance with elongated skull and upward-curving tusks",
+        "reference": "Think: Predator movie alien as space pirate, NOT fantasy orc"
       }
     }
   ],

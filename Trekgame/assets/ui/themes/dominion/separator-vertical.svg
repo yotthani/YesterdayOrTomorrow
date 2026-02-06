@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 200" fill="none">
+  <!-- Dominion Vertical Separator -->
+  <defs>
+    <linearGradient id="dominionSepPurple" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#4A2A5A"/>
+      <stop offset="50%" style="stop-color:#7A4A9A"/>
+      <stop offset="100%" style="stop-color:#4A2A5A"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Wavy separator -->
+  <path d="
+    M 4 0
+    Q 0 50 4 100
+    Q 8 150 4 200
+  " fill="none" stroke="url(#dominionSepPurple)" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- Center droplet -->
+  <ellipse cx="4" cy="100" rx="4" ry="6" fill="#D4A030"/>
+</svg>

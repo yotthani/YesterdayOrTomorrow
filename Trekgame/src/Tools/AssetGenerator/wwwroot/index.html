@@ -322,6 +322,141 @@
             });
         };
         
+        // Auto-detect grid from image dimensions (assumes square cells of standard sizes)
+        window.detectGridFromImage = function(base64Image, expectedColumns) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => {
+                    const width = img.width;
+                    const height = img.height;
+
+                    // Common cell sizes to try (in order of preference)
+                    const commonCellSizes = [512, 256, 384, 320, 128, 448, 576, 640];
+
+                    let bestMatch = null;
+
+                    // First, try to detect based on expectedColumns if provided
+                    if (expectedColumns && expectedColumns > 0) {
+                        const cellWidth = Math.floor(width / expectedColumns);
+                        // Check if this gives us integer rows
+                        if (height % cellWidth === 0 || Math.abs(height / cellWidth - Math.round(height / cellWidth)) < 0.1) {
+                            const rows = Math.round(height / cellWidth);
+                            bestMatch = { columns: expectedColumns, rows: rows, cellSize: cellWidth };
+                        }
+                    }
+
+                    // If no match yet, try common cell sizes
+                    if (!bestMatch) {
+                        for (const cellSize of commonCellSizes) {
+                            if (width % cellSize === 0 && height % cellSize === 0) {
+                                bestMatch = {
+                                    columns: width / cellSize,
+                                    rows: height / cellSize,
+                                    cellSize: cellSize
+                                };
+                                break;
+                            }
+                        }
+                    }
+
+                    // Fallback: try to find closest match
+                    if (!bestMatch) {
+                        for (const cellSize of commonCellSizes) {
+                            const cols = Math.round(width / cellSize);
+                            const rows = Math.round(height / cellSize);
+                            if (cols > 0 && rows > 0) {
+                                const actualCellWidth = width / cols;
+                                const actualCellHeight = height / rows;
+                                // Accept if cells are roughly square
+                                if (Math.abs(actualCellWidth - actualCellHeight) < 20) {
+                                    bestMatch = {
+                                        columns: cols,
+                                        rows: rows,
+                                        cellSize: Math.floor(actualCellWidth)
+                                    };
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    resolve({
+                        width: width,
+                        height: height,
+                        detected: bestMatch
+                    });
+                };
+                img.onerror = reject;
+                img.src = 'data:image/png;base64,' + base64Image;
+            });
+        };
+
+        // Split spritesheet into individual images
+        window.splitSpritesheet = function(base64Image, columns, rows) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => {
+                    const cellWidth = Math.floor(img.width / columns);
+                    const cellHeight = Math.floor(img.height / rows);
+
+                    const images = [];
+
+                    for (let row = 0; row < rows; row++) {
+                        for (let col = 0; col < columns; col++) {
+                            const canvas = document.createElement('canvas');
+                            canvas.width = cellWidth;
+                            canvas.height = cellHeight;
+                            const ctx = canvas.getContext('2d');
+
+                            // Extract this cell from the spritesheet
+                            ctx.drawImage(
+                                img,
+                                col * cellWidth, row * cellHeight,  // Source position
+                                cellWidth, cellHeight,               // Source size
+                                0, 0,                                // Destination position
+                                cellWidth, cellHeight                // Destination size
+                            );
+
+                            // Check if cell has content (not entirely black/transparent)
+                            const imageData = ctx.getImageData(0, 0, cellWidth, cellHeight);
+                            let hasContent = false;
+                            for (let i = 0; i < imageData.data.length; i += 4) {
+                                const r = imageData.data[i];
+                                const g = imageData.data[i + 1];
+                                const b = imageData.data[i + 2];
+                                const a = imageData.data[i + 3];
+                                // Check if pixel is visible (not black or transparent)
+                                if (a > 10 && (r > 15 || g > 15 || b > 15)) {
+                                    hasContent = true;
+                                    break;
+                                }
+                            }
+
+                            images.push({
+                                row: row,
+                                col: col,
+                                index: row * columns + col,
+                                hasContent: hasContent,
+                                base64: canvas.toDataURL('image/png').split(',')[1]
+                            });
+                        }
+                    }
+
+                    resolve({
+                        images: images,
+                        cellWidth: cellWidth,
+                        cellHeight: cellHeight,
+                        totalCells: rows * columns
+                    });
+                };
+                img.onerror = (e) => {
+                    console.error('splitSpritesheet: Failed to load image', e);
+                    reject(e);
+                };
+                img.src = 'data:image/png;base64,' + base64Image;
+            });
+        };
+
         // Normalize grid - extract, center, and repack assets
         window.normalizeGrid = function(base64Image, columns, rows, cellSize, padding, autoDetect) {
             return new Promise((resolve, reject) => {

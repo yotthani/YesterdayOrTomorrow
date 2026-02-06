@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 80" fill="none">
+  <defs>
+    <linearGradient id="hirogenHeaderGreen" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#557755"/>
+      <stop offset="100%" style="stop-color:#334433"/>
+    </linearGradient>
+  </defs>
+  <path d="M 0 10 L 10 0 L 100 5 L 200 0 L 300 8 L 400 0 L 500 5 L 590 0 L 600 10 L 600 80 L 0 80 Z" fill="url(#hirogenHeaderGreen)"/>
+  <!-- Trophy marks -->
+  <path d="M 20 60 L 30 70 L 20 67" stroke="#AA8855" stroke-width="2"/>
+  <path d="M 28 60 L 38 70 L 28 67" stroke="#AA8855" stroke-width="2"/>
+  <path d="M 36 60 L 46 70 L 36 67" stroke="#AA8855" stroke-width="2"/>
+</svg>

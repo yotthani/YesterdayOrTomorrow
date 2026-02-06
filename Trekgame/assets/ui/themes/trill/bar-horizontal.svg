@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 40" fill="none">
+  <!-- Trill Bar Horizontal: Organic flowing horizontal bar -->
+  <defs>
+    <linearGradient id="trillBarTeal" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#3D8080"/>
+      <stop offset="50%" style="stop-color:#55AAAA"/>
+      <stop offset="100%" style="stop-color:#3D8080"/>
+    </linearGradient>
+    <linearGradient id="trillBarBeige" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#DDCCAA"/>
+      <stop offset="100%" style="stop-color:#BBA888"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Organic flowing bar with curved ends -->
+  <path d="
+    M 20 0
+    Q 0 0, 0 20
+    Q 0 40, 20 40
+    L 380 40
+    Q 400 40, 400 20
+    Q 400 0, 380 0
+    Z
+  " fill="url(#trillBarTeal)"/>
+
+  <!-- Flowing spot decorations -->
+  <ellipse cx="50" cy="12" rx="8" ry="4" fill="url(#trillBarBeige)" opacity="0.6"/>
+  <ellipse cx="200" cy="28" rx="10" ry="5" fill="url(#trillBarBeige)" opacity="0.5"/>
+  <ellipse cx="350" cy="12" rx="8" ry="4" fill="url(#trillBarBeige)" opacity="0.6"/>
+</svg>

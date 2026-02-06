@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 20" fill="none">
+  <defs>
+    <linearGradient id="tholianProgressFill" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#CC4411"/>
+      <stop offset="50%" style="stop-color:#FF6633"/>
+      <stop offset="100%" style="stop-color:#FFAA44"/>
+    </linearGradient>
+  </defs>
+
+  <path d="M 8 3 L 188 3 L 195 10 L 188 17 L 8 17 L 3 10 Z" fill="url(#tholianProgressFill)"/>
+</svg>

@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <!-- LCARS Elbow Top-Right: Horizontal bar on top, vertical bar on right, rounded inner corner -->
+  <defs>
+    <linearGradient id="lcarsOrange" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF9966"/>
+      <stop offset="100%" style="stop-color:#CC6633"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Main elbow shape -->
+  <path d="
+    M 0 0
+    L 200 0
+    L 200 200
+    L 160 200
+    L 160 80
+    Q 160 40 120 40
+    L 0 40
+    Z
+  " fill="url(#lcarsOrange)"/>
+</svg>

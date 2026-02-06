@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <!-- Vulcan Logic Pattern: Geometric grid pattern -->
+  <defs>
+    <pattern id="vulcanGrid" width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#DD8844" stroke-width="0.5" opacity="0.3"/>
+    </pattern>
+  </defs>
+
+  <!-- Grid background -->
+  <rect x="0" y="0" width="100" height="100" fill="url(#vulcanGrid)"/>
+
+  <!-- Diagonal precision lines -->
+  <line x1="0" y1="0" x2="100" y2="100" stroke="#FFBB77" stroke-width="0.5" opacity="0.4"/>
+  <line x1="100" y1="0" x2="0" y2="100" stroke="#FFBB77" stroke-width="0.5" opacity="0.4"/>
+</svg>

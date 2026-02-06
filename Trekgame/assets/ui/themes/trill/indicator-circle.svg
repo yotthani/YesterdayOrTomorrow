@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" fill="none">
+  <!-- Trill Indicator Circle: Organic spot-shaped indicator -->
+  <defs>
+    <radialGradient id="trillIndicator" cx="40%" cy="40%" r="60%">
+      <stop offset="0%" style="stop-color:#55AAAA"/>
+      <stop offset="100%" style="stop-color:#3D8080"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Organic spot-shaped indicator (slightly elongated ellipse) -->
+  <ellipse cx="15" cy="15" rx="13" ry="11" fill="url(#trillIndicator)" transform="rotate(-15 15 15)"/>
+</svg>

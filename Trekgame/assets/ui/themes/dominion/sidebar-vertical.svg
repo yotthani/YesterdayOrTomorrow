@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 300" fill="none">
+  <!-- Dominion Sidebar Vertical with flowing edge -->
+  <defs>
+    <linearGradient id="dominionSidePurple" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#6A3A8A"/>
+      <stop offset="100%" style="stop-color:#4A2A5A"/>
+    </linearGradient>
+    <linearGradient id="dominionSideGold" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#C89030"/>
+      <stop offset="50%" style="stop-color:#E8C060"/>
+      <stop offset="100%" style="stop-color:#C89030"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Sidebar with organic edge -->
+  <path d="
+    M 0 0
+    L 35 0
+    Q 40 50 38 100
+    Q 36 150 40 200
+    Q 38 250 35 300
+    L 0 300
+    Z
+  " fill="url(#dominionSidePurple)"/>
+
+  <!-- Flowing gold accent -->
+  <path d="
+    M 35 30
+    Q 38 100 35 150
+    Q 32 200 35 270
+  " fill="none" stroke="url(#dominionSideGold)" stroke-width="2"/>
+
+  <!-- Droplet markers -->
+  <ellipse cx="20" cy="75" rx="6" ry="4" fill="#D4A030"/>
+  <ellipse cx="20" cy="150" rx="6" ry="4" fill="#D4A030"/>
+  <ellipse cx="20" cy="225" rx="6" ry="4" fill="#D4A030"/>
+</svg>

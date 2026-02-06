@@ -1,0 +1,340 @@
+{
+  "factionName": "Breen",
+  "categoryName": "MilitaryShips",
+  "grid": {
+    "columns": 6,
+    "rows": 6,
+    "totalAssets": 36,
+    "cellSize": 360,
+    "spriteWidth": 2160,
+    "spriteHeight": 2160
+  },
+  "spriteSheetPath": "breen_militaryships.png",
+  "generatedAt": "2026-02-04T20:03:20.372Z",
+  "assets": [
+    {
+      "row": 0,
+      "col": 0,
+      "name": "Chel Grett Cruiser",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 0,
+      "col": 1,
+      "name": "Plesh Brek Raider",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 0,
+      "col": 2,
+      "name": "Sar Theln Carrier",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 0,
+      "col": 3,
+      "name": "Rezreth Dreadnought",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 0,
+      "col": 4,
+      "name": "Bleth Choas Heavy Cruiser",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 0,
+      "col": 5,
+      "name": "Chel Boalg Warship",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 1,
+      "col": 0,
+      "name": "Breen Frigate",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 1,
+      "col": 1,
+      "name": "Breen Destroyer",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 1,
+      "col": 2,
+      "name": "Breen Light Cruiser",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 1,
+      "col": 3,
+      "name": "Breen Battlecruiser",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 1,
+      "col": 4,
+      "name": "Breen Patrol Ship",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 1,
+      "col": 5,
+      "name": "Breen Scout",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 2,
+      "col": 0,
+      "name": "Breen Interceptor",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 2,
+      "col": 1,
+      "name": "Breen Fighter",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 2,
+      "col": 2,
+      "name": "Breen Assault Ship",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 2,
+      "col": 3,
+      "name": "Breen Strike Cruiser",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 2,
+      "col": 4,
+      "name": "Breen Torpedo Ship",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 2,
+      "col": 5,
+      "name": "Breen Siege Cruiser",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 3,
+      "col": 0,
+      "name": "Breen Command Ship",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 3,
+      "col": 1,
+      "name": "Breen Flagship",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 3,
+      "col": 2,
+      "name": "Energy Dampener Cruiser",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 3,
+      "col": 3,
+      "name": "Breen Fast Attack",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 3,
+      "col": 4,
+      "name": "Breen Border Patrol",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 3,
+      "col": 5,
+      "name": "Breen Escort",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 4,
+      "col": 0,
+      "name": "Breen Corvette",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 4,
+      "col": 1,
+      "name": "Breen Gunship",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 4,
+      "col": 2,
+      "name": "Thot Command Cruiser",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 4,
+      "col": 3,
+      "name": "Breen Mine Layer",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 4,
+      "col": 4,
+      "name": "Breen Blockade Runner",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 4,
+      "col": 5,
+      "name": "Breen Stealth Ship",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 5,
+      "col": 0,
+      "name": "Breen Intelligence Vessel",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 5,
+      "col": 1,
+      "name": "Breen Troop Transport",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 5,
+      "col": 2,
+      "name": "Cryo Assault Ship",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 5,
+      "col": 3,
+      "name": "Breen Defense Ship",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 5,
+      "col": 4,
+      "name": "Breen Battle Carrier",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    },
+    {
+      "row": 5,
+      "col": 5,
+      "name": "Breen Super Dreadnought",
+      "type": "MilitaryShips",
+      "category": null,
+      "description": null,
+      "promptUsed": ""
+    }
+  ]
+}

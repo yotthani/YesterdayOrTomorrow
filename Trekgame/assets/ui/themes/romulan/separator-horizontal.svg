@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 8" fill="none">
+  <!-- Romulan Horizontal Separator with center V -->
+  <defs>
+    <linearGradient id="romulanSepGreen" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#006655"/>
+      <stop offset="50%" style="stop-color:#00FFCC"/>
+      <stop offset="100%" style="stop-color:#006655"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Main line -->
+  <rect x="0" y="2" width="140" height="4" fill="url(#romulanSepGreen)"/>
+  <rect x="160" y="2" width="140" height="4" fill="url(#romulanSepGreen)"/>
+
+  <!-- Center V decoration -->
+  <path d="M 140 0 L 150 8 L 160 0" fill="none" stroke="#CC33CC" stroke-width="2"/>
+</svg>

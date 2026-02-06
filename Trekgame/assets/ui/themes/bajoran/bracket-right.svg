@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 100" fill="none">
+  <!-- Bajoran Bracket Right: Temple scroll bracket with ornamental curve -->
+  <defs>
+    <linearGradient id="bajoranBracketBrown" x1="100%" y1="0%" x2="0%" y2="0%">
+      <stop offset="0%" style="stop-color:#AA7744"/>
+      <stop offset="100%" style="stop-color:#886633"/>
+    </linearGradient>
+    <linearGradient id="bajoranBracketGold" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#DDAA66"/>
+      <stop offset="100%" style="stop-color:#FFCC88"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Curved bracket with scroll ends -->
+  <path d="
+    M 0 0
+    L 15 0
+    Q 30 0 30 15
+    L 30 85
+    Q 30 100 15 100
+    L 0 100
+    L 0 90
+    L 10 90
+    Q 22 90 22 75
+    L 22 25
+    Q 22 10 10 10
+    L 0 10
+    Z
+  " fill="url(#bajoranBracketBrown)"/>
+
+  <!-- Top scroll ornament -->
+  <circle cx="8" cy="5" r="4" fill="url(#bajoranBracketGold)"/>
+
+  <!-- Bottom scroll ornament -->
+  <circle cx="8" cy="95" r="4" fill="url(#bajoranBracketGold)"/>
+
+  <!-- Inner fluting line -->
+  <path d="M 18 20 L 18 80" stroke="#DDAA66" stroke-width="1" opacity="0.5"/>
+</svg>

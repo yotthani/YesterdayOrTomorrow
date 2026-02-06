@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60" fill="none">
+  <!-- Borg Corner Accent: Grid intersection -->
+  <defs>
+    <linearGradient id="borgCornerMetal" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2A3A3A"/>
+      <stop offset="100%" style="stop-color:#1A2A2A"/>
+    </linearGradient>
+  </defs>
+
+  <!-- L-shape corner -->
+  <path d="
+    M 0 0
+    L 60 0
+    L 60 10
+    L 10 10
+    L 10 60
+    L 0 60
+    Z
+  " fill="url(#borgCornerMetal)"/>
+
+  <!-- Circuit lines -->
+  <line x1="5" y1="5" x2="55" y2="5" stroke="#2A5A2A" stroke-width="2"/>
+  <line x1="5" y1="5" x2="5" y2="55" stroke="#2A5A2A" stroke-width="2"/>
+
+  <!-- Corner node -->
+  <circle cx="5" cy="5" r="4" fill="#4A8A4A"/>
+  <circle cx="5" cy="5" r="2" fill="#0a0f0a"/>
+</svg>

@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 400" fill="none">
+  <!-- Bajoran Sidebar Vertical: Temple pillar style sidebar -->
+  <defs>
+    <linearGradient id="bajoranSideBrown" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#886633"/>
+      <stop offset="50%" style="stop-color:#AA7744"/>
+      <stop offset="100%" style="stop-color:#886633"/>
+    </linearGradient>
+    <linearGradient id="bajoranSideGold" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#DDAA66"/>
+      <stop offset="100%" style="stop-color:#FFCC88"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Main pillar shape with arched top and bottom -->
+  <path d="
+    M 10 20
+    Q 10 0 40 0
+    Q 70 0 70 20
+    L 70 380
+    Q 70 400 40 400
+    Q 10 400 10 380
+    Z
+  " fill="url(#bajoranSideBrown)"/>
+
+  <!-- Pillar fluting lines -->
+  <line x1="25" y1="30" x2="25" y2="370" stroke="#DDAA66" stroke-width="1.5" opacity="0.5"/>
+  <line x1="40" y1="25" x2="40" y2="375" stroke="#DDAA66" stroke-width="1.5" opacity="0.5"/>
+  <line x1="55" y1="30" x2="55" y2="370" stroke="#DDAA66" stroke-width="1.5" opacity="0.5"/>
+
+  <!-- Top capital ornament -->
+  <ellipse cx="40" cy="15" rx="20" ry="8" fill="url(#bajoranSideGold)" opacity="0.7"/>
+
+  <!-- Bottom base ornament -->
+  <ellipse cx="40" cy="385" rx="20" ry="8" fill="url(#bajoranSideGold)" opacity="0.7"/>
+
+  <!-- Earring chain decoration top -->
+  <circle cx="40" cy="50" r="5" fill="url(#bajoranSideGold)"/>
+  <circle cx="40" cy="65" r="3" fill="url(#bajoranSideGold)"/>
+  <line x1="40" y1="55" x2="40" y2="62" stroke="#DDAA66" stroke-width="1"/>
+
+  <!-- Earring chain decoration bottom -->
+  <circle cx="40" cy="350" r="5" fill="url(#bajoranSideGold)"/>
+  <circle cx="40" cy="335" r="3" fill="url(#bajoranSideGold)"/>
+  <line x1="40" y1="345" x2="40" y2="338" stroke="#DDAA66" stroke-width="1"/>
+</svg>

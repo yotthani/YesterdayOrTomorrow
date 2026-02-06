@@ -1,0 +1,185 @@
+{
+  "factionName": "Bajoran",
+  "categoryName": "Buildings",
+  "architectureStyle": {
+    "description": "Spiritual, post-occupation recovery - temples and reconstruction after Cardassian oppression",
+    "keyElements": [
+      "Temple of the Prophets aesthetic with religious imagery",
+      "Orange, gold, brown earth tones of Bajor",
+      "Orb arks and shrine elements throughout",
+      "Post-occupation rebuilding - hope emerging from suffering",
+      "Earring-decoration motifs in architectural details",
+      "Celestial Temple imagery honoring the Prophets",
+      "Mix of ancient tradition and recovery from occupation"
+    ],
+    "colors": "Orange, gold, brown, rust, earthy tones with sacred gold accents",
+    "materials": "Traditional stone, recovered materials, symbolic metals, religious iconography"
+  },
+  "buildings": [
+    {
+      "name": "Temple of the Prophets",
+      "category": "Religion",
+      "description": "Sacred site for worship of the beings dwelling in the Celestial Temple"
+    },
+    {
+      "name": "Kai's Residence",
+      "category": "Religion",
+      "description": "Home of the supreme religious leader of the Bajoran faith"
+    },
+    {
+      "name": "Vedek Assembly",
+      "category": "Religion",
+      "description": "Council chamber where religious leaders debate doctrine and policy"
+    },
+    {
+      "name": "Orb Shrine",
+      "category": "Religion",
+      "description": "Holy site housing one of the precious Tears of the Prophets"
+    },
+    {
+      "name": "Monastery",
+      "category": "Religion",
+      "description": "Retreat for prylar monks studying the will of the Prophets"
+    },
+    {
+      "name": "Pilgrimage Station",
+      "category": "Religion",
+      "description": "Rest stop for faithful traveling to sacred sites across Bajor"
+    },
+    {
+      "name": "Blessing Chamber",
+      "category": "Religion",
+      "description": "Room for pagh readings and spiritual guidance from vedeks"
+    },
+    {
+      "name": "Celestial Temple Observatory",
+      "category": "Religion",
+      "description": "Facility for witnessing the wormhole - gateway to the Prophets"
+    },
+    {
+      "name": "Festival Grounds",
+      "category": "Religion",
+      "description": "Celebration space for Bajoran holy days and religious festivals"
+    },
+    {
+      "name": "First Minister's Office",
+      "category": "Government",
+      "description": "Executive leadership of the new Bajoran Republic rebuilding after occupation"
+    },
+    {
+      "name": "Chamber of Ministers",
+      "category": "Government",
+      "description": "Legislative assembly working to restore Bajor to its former glory"
+    },
+    {
+      "name": "Militia Headquarters",
+      "category": "Government",
+      "description": "Command center for Bajoran defense forces - never again to be conquered"
+    },
+    {
+      "name": "Provisional Government",
+      "category": "Government",
+      "description": "Administration managing the transition from occupation to freedom"
+    },
+    {
+      "name": "Militia Barracks",
+      "category": "Military",
+      "description": "Quarters for the Bajoran defense force protecting their world"
+    },
+    {
+      "name": "Resistance Memorial",
+      "category": "Military",
+      "description": "Honoring the heroes who fought against Cardassian occupation"
+    },
+    {
+      "name": "Training Academy",
+      "category": "Military",
+      "description": "Teaching new generations to defend Bajor from future threats"
+    },
+    {
+      "name": "Defense Installation",
+      "category": "Military",
+      "description": "Protection against future occupation - Bajor will remain free"
+    },
+    {
+      "name": "Reconstruction Center",
+      "category": "Production",
+      "description": "Rebuilding Bajor after decades of Cardassian devastation"
+    },
+    {
+      "name": "Mining Reclamation",
+      "category": "Production",
+      "description": "Recovering from the strip-mining exploitation of the occupation"
+    },
+    {
+      "name": "Manufacturing Hub",
+      "category": "Production",
+      "description": "Building Bajoran independence through domestic production"
+    },
+    {
+      "name": "Food Distribution",
+      "category": "FoodProduction",
+      "description": "Ending post-occupation hunger through fair allocation"
+    },
+    {
+      "name": "Agricultural Recovery",
+      "category": "FoodProduction",
+      "description": "Healing the poisoned farmland destroyed by Cardassian industry"
+    },
+    {
+      "name": "Power Generation",
+      "category": "Energy",
+      "description": "Energy independence - no longer relying on Cardassian power"
+    },
+    {
+      "name": "Hospital",
+      "category": "Medical",
+      "description": "Healthcare after occupation neglect - healing body and spirit"
+    },
+    {
+      "name": "Trauma Center",
+      "category": "Medical",
+      "description": "Helping survivors of occupation atrocities recover and heal"
+    },
+    {
+      "name": "University of Bajor",
+      "category": "Education",
+      "description": "Higher learning restored after occupation suppression"
+    },
+    {
+      "name": "Cultural Recovery Center",
+      "category": "Education",
+      "description": "Preserving traditions the Cardassians tried to destroy"
+    },
+    {
+      "name": "History Institute",
+      "category": "Education",
+      "description": "Documenting the occupation truthfully for future generations"
+    },
+    {
+      "name": "Transport Hub",
+      "category": "Infrastructure",
+      "description": "Rebuilt transportation network connecting free Bajor"
+    },
+    {
+      "name": "Communications Center",
+      "category": "Infrastructure",
+      "description": "Connecting all of free Bajor without Cardassian monitoring"
+    },
+    {
+      "name": "Trade Center",
+      "category": "Commerce",
+      "description": "Economic recovery through fair commerce with allies"
+    },
+    {
+      "name": "Housing Project",
+      "category": "Housing",
+      "description": "Homes for refugees and displaced Bajorans returning home"
+    },
+    {
+      "name": "Recreation Center",
+      "category": "Recreation",
+      "description": "Joy returns to Bajor - entertainment and community gathering"
+    }
+  ]
+}

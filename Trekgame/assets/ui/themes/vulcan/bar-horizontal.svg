@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 40" fill="none">
+  <!-- Vulcan Bar Horizontal: Clean geometric bar -->
+  <defs>
+    <linearGradient id="vulcanBarCopper" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#DD8844"/>
+      <stop offset="100%" style="stop-color:#AA6633"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="0" y="0" width="400" height="40" fill="url(#vulcanBarCopper)"/>
+
+  <!-- Accent lines -->
+  <rect x="0" y="35" width="400" height="2" fill="#FFBB77" opacity="0.6"/>
+</svg>

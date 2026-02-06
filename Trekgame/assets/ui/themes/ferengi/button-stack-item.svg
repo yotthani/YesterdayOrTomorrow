@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 35" fill="none">
+  <!-- Ferengi Button Stack Item: Hexagonal menu button -->
+  <defs>
+    <linearGradient id="ferengiStackBtn" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#8B6914"/>
+      <stop offset="100%" style="stop-color:#5C4A0F"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Hexagonal button -->
+  <path d="
+    M 10 0
+    L 140 0
+    L 150 17.5
+    L 140 35
+    L 10 35
+    L 0 17.5
+    Z
+  " fill="url(#ferengiStackBtn)"/>
+
+  <!-- Gold inner line -->
+  <path d="
+    M 14 4
+    L 136 4
+    L 144 17.5
+    L 136 31
+    L 14 31
+    L 6 17.5
+    Z
+  " fill="none" stroke="#D4A017" stroke-width="1"/>
+</svg>

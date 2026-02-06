@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 40" fill="none">
+  <!-- Trill Data Cell Wide: Wider organic flowing data display -->
+  <defs>
+    <linearGradient id="trillCellHighlight" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#88DDDD"/>
+      <stop offset="100%" style="stop-color:#55AAAA"/>
+    </linearGradient>
+    <linearGradient id="trillCellBeige" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#DDCCAA"/>
+      <stop offset="100%" style="stop-color:#BBA888"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Wide organic data cell -->
+  <path d="
+    M 15 0
+    Q 0 5, 0 20
+    Q 0 35, 15 40
+    L 185 40
+    Q 200 35, 200 20
+    Q 200 5, 185 0
+    Z
+  " fill="url(#trillCellHighlight)"/>
+
+  <!-- Decorative spot accents -->
+  <ellipse cx="25" cy="12" rx="6" ry="3" fill="url(#trillCellBeige)" opacity="0.5"/>
+  <ellipse cx="175" cy="28" rx="6" ry="3" fill="url(#trillCellBeige)" opacity="0.5"/>
+</svg>

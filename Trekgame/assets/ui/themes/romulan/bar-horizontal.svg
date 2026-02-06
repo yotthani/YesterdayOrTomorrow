@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 40" fill="none">
+  <!-- Romulan Bar Horizontal -->
+  <defs>
+    <linearGradient id="romulanBarGreen" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#006655"/>
+      <stop offset="50%" style="stop-color:#00CC99"/>
+      <stop offset="100%" style="stop-color:#006655"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Horizontal bar with beveled ends -->
+  <path d="
+    M 10 0
+    L 290 0
+    L 300 10
+    L 300 30
+    L 290 40
+    L 10 40
+    L 0 30
+    L 0 10
+    Z
+  " fill="url(#romulanBarGreen)"/>
+</svg>

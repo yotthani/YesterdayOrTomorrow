@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" fill="none">
+  <!-- Borg Indicator Active: Glowing concentric circles -->
+  <defs>
+    <linearGradient id="borgIndicatorActive" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6AAA6A"/>
+      <stop offset="100%" style="stop-color:#4A8A4A"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Outer ring - brighter -->
+  <circle cx="20" cy="20" r="18" fill="none" stroke="url(#borgIndicatorActive)" stroke-width="3"/>
+
+  <!-- Middle ring -->
+  <circle cx="20" cy="20" r="12" fill="none" stroke="#5A9A5A" stroke-width="2"/>
+
+  <!-- Inner circle - glowing -->
+  <circle cx="20" cy="20" r="6" fill="#3A7A3A"/>
+  <circle cx="20" cy="20" r="3" fill="#8ACA8A"/>
+</svg>

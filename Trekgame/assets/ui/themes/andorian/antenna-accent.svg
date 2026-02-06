@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 80" fill="none">
+  <!-- Andorian Antenna Accent: Unique faction-specific decoration -->
+  <defs>
+    <linearGradient id="antennaGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" style="stop-color:#4499DD"/>
+      <stop offset="100%" style="stop-color:#AAEEFF"/>
+    </linearGradient>
+    <filter id="antennaGlow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Left antenna -->
+  <path d="M 20 80 Q 15 50 10 30 Q 8 20 15 5" fill="none" stroke="url(#antennaGrad)" stroke-width="4" stroke-linecap="round" filter="url(#antennaGlow)"/>
+
+  <!-- Right antenna -->
+  <path d="M 40 80 Q 45 50 50 30 Q 52 20 45 5" fill="none" stroke="url(#antennaGrad)" stroke-width="4" stroke-linecap="round" filter="url(#antennaGlow)"/>
+
+  <!-- Antenna tips -->
+  <circle cx="15" cy="5" r="5" fill="#AAEEFF" filter="url(#antennaGlow)"/>
+  <circle cx="45" cy="5" r="5" fill="#AAEEFF" filter="url(#antennaGlow)"/>
+</svg>

@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 10" fill="none">
+  <!-- Orion Horizontal Separator: Elegant curved separator with gold accents -->
+  <defs>
+    <linearGradient id="orionSepGreen" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#227744" stop-opacity="0"/>
+      <stop offset="30%" style="stop-color:#33AA55"/>
+      <stop offset="70%" style="stop-color:#33AA55"/>
+      <stop offset="100%" style="stop-color:#227744" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="orionSepGold" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#FFCC00" stop-opacity="0"/>
+      <stop offset="40%" style="stop-color:#FFCC00"/>
+      <stop offset="60%" style="stop-color:#FFCC00"/>
+      <stop offset="100%" style="stop-color:#FFCC00" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Main separator line with fading ends -->
+  <path d="
+    M 0 4
+    Q 20 2 50 3
+    L 150 3
+    Q 180 2 200 4
+    L 200 6
+    Q 180 8 150 7
+    L 50 7
+    Q 20 8 0 6
+    Z
+  " fill="url(#orionSepGreen)"/>
+
+  <!-- Center gold diamond accent -->
+  <path d="M 100 0 L 105 5 L 100 10 L 95 5 Z" fill="url(#orionSepGold)"/>
+</svg>

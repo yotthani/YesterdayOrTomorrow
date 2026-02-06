@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 40" fill="none">
+  <defs>
+    <linearGradient id="hirogenStackGreen" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#557755"/>
+      <stop offset="100%" style="stop-color:#334433"/>
+    </linearGradient>
+  </defs>
+  <path d="M 0 0 L 185 0 L 195 8 L 190 20 L 200 32 L 190 40 L 0 40 Z" fill="url(#hirogenStackGreen)"/>
+  <path d="M 5 10 L 12 20 L 5 17" stroke="#AA8855" stroke-width="2"/>
+</svg>

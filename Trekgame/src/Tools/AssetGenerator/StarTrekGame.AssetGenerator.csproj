@@ -13,4 +13,17 @@
     <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
   </ItemGroup>
 
+  <!-- JSON prompt data files are served from wwwroot/data/prompts/ via HTTP -->
+  <!-- This copies source files to wwwroot during build for development -->
+  <Target Name="CopyPromptJsonToWwwroot" BeforeTargets="Build">
+    <MakeDir Directories="wwwroot\data\prompts" Condition="!Exists('wwwroot\data\prompts')" />
+    <ItemGroup>
+      <PromptJsonFiles Include="Data\Prompts\*.json" />
+    </ItemGroup>
+    <Copy SourceFiles="@(PromptJsonFiles)"
+          DestinationFolder="wwwroot\data\prompts"
+          SkipUnchangedFiles="true" />
+    <Message Text="Copied prompt JSON files to wwwroot/data/prompts/" Importance="high" />
+  </Target>
+
 </Project>

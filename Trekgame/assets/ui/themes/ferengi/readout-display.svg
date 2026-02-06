@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 60" fill="none">
+  <!-- Ferengi Readout Display: Bronze frame with dark display -->
+  <defs>
+    <linearGradient id="ferengiReadoutBorder" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#5C4A0F"/>
+      <stop offset="50%" style="stop-color:#8B6914"/>
+      <stop offset="100%" style="stop-color:#5C4A0F"/>
+    </linearGradient>
+    <linearGradient id="ferengiReadoutBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1408"/>
+      <stop offset="100%" style="stop-color:#0f0a05"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Outer hexagonal border -->
+  <path d="
+    M 15 0
+    L 165 0
+    L 180 30
+    L 165 60
+    L 15 60
+    L 0 30
+    Z
+  " fill="url(#ferengiReadoutBorder)"/>
+
+  <!-- Inner dark display -->
+  <path d="
+    M 20 6
+    L 160 6
+    L 173 30
+    L 160 54
+    L 20 54
+    L 7 30
+    Z
+  " fill="url(#ferengiReadoutBg)"/>
+
+  <!-- Gold trim -->
+  <path d="
+    M 20 6
+    L 160 6
+    L 173 30
+    L 160 54
+    L 20 54
+    L 7 30
+    Z
+  " fill="none" stroke="#D4A017" stroke-width="1"/>
+</svg>

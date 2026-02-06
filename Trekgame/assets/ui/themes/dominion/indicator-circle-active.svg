@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" fill="none">
+  <!-- Dominion Indicator Active: Glowing gold droplet -->
+  <defs>
+    <linearGradient id="dominionIndicatorActive" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#E8C060"/>
+      <stop offset="50%" style="stop-color:#D4A030"/>
+      <stop offset="100%" style="stop-color:#C89030"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Active droplet indicator -->
+  <path d="
+    M 20 4
+    Q 36 12 36 24
+    Q 36 36 20 36
+    Q 4 36 4 24
+    Q 4 12 20 4
+    Z
+  " fill="url(#dominionIndicatorActive)"/>
+
+  <!-- Inner bright glow -->
+  <ellipse cx="20" cy="20" rx="8" ry="6" fill="#FFE8A0"/>
+</svg>

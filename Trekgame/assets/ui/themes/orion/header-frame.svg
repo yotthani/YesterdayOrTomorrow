@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 80" fill="none">
+  <!-- Orion Header Frame: Luxurious header with ornate curves and gold accents -->
+  <defs>
+    <linearGradient id="orionHeaderGreen" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#227744"/>
+      <stop offset="25%" style="stop-color:#33AA55"/>
+      <stop offset="75%" style="stop-color:#33AA55"/>
+      <stop offset="100%" style="stop-color:#227744"/>
+    </linearGradient>
+    <linearGradient id="orionHeaderGold" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#CC9900"/>
+      <stop offset="50%" style="stop-color:#FFE066"/>
+      <stop offset="100%" style="stop-color:#CC9900"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Main header with flowing curves -->
+  <path d="
+    M 40 0
+    Q 0 0 0 40
+    Q 0 80 40 80
+    L 560 80
+    Q 600 80 600 40
+    Q 600 0 560 0
+    Z
+  " fill="url(#orionHeaderGreen)"/>
+
+  <!-- Top gold trim -->
+  <path d="
+    M 50 3
+    L 550 3
+    Q 585 3 590 15
+    L 595 25
+    L 590 25
+    Q 585 15 555 10
+    L 45 10
+    Q 15 15 10 25
+    L 5 25
+    L 10 15
+    Q 15 3 50 3
+  " fill="url(#orionHeaderGold)" opacity="0.7"/>
+
+  <!-- Left ornate flourish -->
+  <path d="
+    M 20 30
+    Q 25 20 35 25
+    Q 45 30 40 40
+    Q 35 50 25 45
+    Q 15 40 20 30
+  " fill="url(#orionHeaderGold)"/>
+
+  <!-- Right ornate flourish -->
+  <path d="
+    M 580 30
+    Q 575 20 565 25
+    Q 555 30 560 40
+    Q 565 50 575 45
+    Q 585 40 580 30
+  " fill="url(#orionHeaderGold)"/>
+
+  <!-- Center decorative element -->
+  <ellipse cx="300" cy="40" rx="40" ry="6" fill="url(#orionHeaderGold)" opacity="0.5"/>
+</svg>

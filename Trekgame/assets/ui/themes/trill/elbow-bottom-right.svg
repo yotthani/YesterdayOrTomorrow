@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <!-- Trill Elbow Bottom-Right: Organic flowing curve with spot pattern -->
+  <defs>
+    <linearGradient id="trillTeal" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#55AAAA"/>
+      <stop offset="100%" style="stop-color:#3D8080"/>
+    </linearGradient>
+    <linearGradient id="trillBeige" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#DDCCAA"/>
+      <stop offset="100%" style="stop-color:#BBA888"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Organic curved elbow shape -->
+  <path d="
+    M 95 0
+    L 120 0
+    L 120 120
+    L 0 120
+    L 0 95
+    Q 40 95, 70 85
+    Q 95 75, 95 40
+    Z
+  " fill="url(#trillTeal)"/>
+
+  <!-- Decorative spots along the curve -->
+  <ellipse cx="88" cy="45" rx="4" ry="3" fill="url(#trillBeige)" transform="rotate(60 88 45)"/>
+  <ellipse cx="75" cy="70" rx="5" ry="3" fill="url(#trillBeige)" transform="rotate(30 75 70)"/>
+  <ellipse cx="50" cy="88" rx="6" ry="4" fill="url(#trillBeige)" transform="rotate(5 50 88)"/>
+</svg>

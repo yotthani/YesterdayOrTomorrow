@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" fill="none">
+  <!-- Trill Indicator Circle Active: Glowing organic spot -->
+  <defs>
+    <radialGradient id="trillIndicatorActive" cx="40%" cy="40%" r="60%">
+      <stop offset="0%" style="stop-color:#DDCCAA"/>
+      <stop offset="50%" style="stop-color:#88DDDD"/>
+      <stop offset="100%" style="stop-color:#55AAAA"/>
+    </radialGradient>
+    <filter id="trillGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Active glowing organic spot indicator -->
+  <ellipse cx="15" cy="15" rx="13" ry="11" fill="url(#trillIndicatorActive)" transform="rotate(-15 15 15)" filter="url(#trillGlow)"/>
+</svg>
