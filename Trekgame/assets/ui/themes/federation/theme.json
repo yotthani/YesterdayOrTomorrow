@@ -1,6 +1,6 @@
 {
-  "id": "lcars",
-  "name": "LCARS",
+  "id": "federation",
+  "name": "Federation",
   "description": "Federation Library Computer Access/Retrieval System interface",
   "faction": "federation",
   "fonts": {

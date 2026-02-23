@@ -1,5 +1,5 @@
 /* ============================================
-   GALACTIC STRATEGY - LCARS-INSPIRED THEME
+   GALACTIC STRATEGY - FEDERATION-INSPIRED THEME
    Star Trek-style interface with modern touch
    ============================================ */
 
@@ -8,21 +8,28 @@
    ========================================== */
 :root {
     /* Base colors */
-    --lcars-bg-dark: #000000;
-    --lcars-bg-medium: #0a0a14;
-    --lcars-bg-light: #141428;
-    --lcars-panel-bg: rgba(10, 10, 20, 0.95);
+    --federation-bg-dark: #000000;
+    --federation-bg-medium: #0a0a14;
+    --federation-bg-light: #141428;
+    --federation-panel-bg: rgba(10, 10, 20, 0.95);
     
-    /* LCARS accent colors */
-    --lcars-orange: #ff9900;
-    --lcars-gold: #ffcc00;
-    --lcars-tan: #cc9966;
-    --lcars-lavender: #cc99cc;
-    --lcars-blue: #9999ff;
-    --lcars-sky: #99ccff;
-    --lcars-red: #cc6666;
-    --lcars-purple: #9966cc;
-    --lcars-teal: #66cccc;
+    /* Primary colors */
+    --federation-primary: #0099ff;
+    --federation-primary-dark: #0066cc;
+    --federation-primary-light: #66ccff;
+
+    /* Accent colors */
+    --federation-accent: #ff9900;
+    --federation-accent-dark: #cc6600;
+    --federation-accent-light: #ffcc66;
+
+    /* UI colors */
+    --federation-text: #ffffff;
+    --federation-text-dim: #99aacc;
+    --federation-border: #336699;
+    --federation-success: #33cc66;
+    --federation-warning: #ffcc00;
+    --federation-danger: #ff3333;
     
     /* Faction colors */
     --faction-federation: #1a5fb4;
@@ -66,8 +73,8 @@
     --planet-gas-giant: #cc8866;
     
     /* UI metrics */
-    --lcars-corner-radius: 20px;
-    --lcars-button-radius: 12px;
+    --federation-corner-radius: 20px;
+    --federation-button-radius: 12px;
     --panel-padding: 16px;
     --header-height: 60px;
     
@@ -82,17 +89,17 @@
     --transition-slow: 500ms ease;
     
     /* Glow effects */
-    --glow-federation: 0 0 10px rgba(26, 95, 180, 0.5);
-    --glow-alert: 0 0 15px rgba(255, 68, 68, 0.7);
-    --glow-success: 0 0 10px rgba(68, 255, 68, 0.5);
+    --glow-federation: 0 0 10px rgba(0, 153, 255, 0.5);
+    --glow-alert: 0 0 15px rgba(255, 51, 51, 0.7);
+    --glow-success: 0 0 10px rgba(51, 204, 102, 0.5);
 }
 
 /* ==========================================
    BASE STYLES
    ========================================== */
 body {
-    background: var(--lcars-bg-dark);
-    color: var(--lcars-sky);
+    background: var(--federation-bg-dark) url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="4" height="4" viewBox="0 0 4 4"><path fill="%230a0a14" d="M0 0h2v2H0zM2 2h2v2H2z"/></svg>');
+    color: var(--federation-text);
     font-family: var(--font-main);
     margin: 0;
     padding: 0;
@@ -106,31 +113,32 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-    background: var(--lcars-bg-medium);
+    background: var(--federation-bg-medium);
     border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: var(--lcars-orange);
+    background: var(--federation-primary);
     border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: var(--lcars-gold);
+    background: var(--federation-primary-light);
 }
 
 /* ==========================================
-   LCARS PANEL COMPONENTS
+   FEDERATION PANEL COMPONENTS
    ========================================== */
-.lcars-panel {
-    background: var(--lcars-panel-bg);
-    border: 2px solid var(--lcars-orange);
-    border-radius: var(--lcars-corner-radius);
+.federation-panel {
+    background: var(--federation-panel-bg);
+    border: 2px solid var(--federation-border);
+    border-radius: var(--federation-corner-radius);
     padding: var(--panel-padding);
     position: relative;
+    box-shadow: inset 0 0 15px rgba(0, 153, 255, 0.1), 0 0 20px rgba(0, 0, 0, 0.5);
 }
 
-.lcars-panel::before {
+.federation-panel::before {
     content: '';
     position: absolute;
     top: -2px;
@@ -138,15 +146,15 @@ body {
     right: 20px;
     height: 4px;
     background: linear-gradient(90deg, 
-        var(--lcars-orange), 
-        var(--lcars-gold), 
-        var(--lcars-orange));
+        var(--federation-primary-dark), 
+        var(--federation-primary-light), 
+        var(--federation-primary-dark));
     border-radius: 0 0 4px 4px;
 }
 
-.lcars-panel-header {
-    background: linear-gradient(90deg, var(--lcars-orange) 0%, var(--lcars-gold) 100%);
-    color: var(--lcars-bg-dark);
+.federation-panel-header {
+    background: linear-gradient(90deg, var(--federation-primary) 0%, var(--federation-primary-light) 100%);
+    color: var(--federation-bg-dark);
     padding: 8px 16px;
     margin: -16px -16px 16px -16px;
     border-radius: 18px 18px 0 0;
@@ -157,14 +165,14 @@ body {
 }
 
 /* ==========================================
-   LCARS BUTTONS
+   FEDERATION BUTTONS
    ========================================== */
-.lcars-button {
-    background: var(--lcars-orange);
-    color: var(--lcars-bg-dark);
-    border: none;
+.federation-button {
+    background: var(--federation-primary);
+    color: var(--federation-text);
+    border: 1px solid var(--federation-border);
     padding: 10px 20px;
-    border-radius: var(--lcars-button-radius);
+    border-radius: var(--federation-button-radius);
     font-family: var(--font-display);
     font-weight: 600;
     text-transform: uppercase;
@@ -173,42 +181,47 @@ body {
     transition: all var(--transition-fast);
     position: relative;
     overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
 }
 
-.lcars-button:hover {
-    background: var(--lcars-gold);
-    box-shadow: var(--glow-federation);
+.federation-button:hover {
+    background: var(--federation-primary-light);
+    color: var(--federation-bg-dark);
+    box-shadow: 0 0 10px var(--glow-federation);
     transform: translateY(-1px);
 }
 
-.lcars-button:active {
+.federation-button:active {
+    background: var(--federation-primary-dark);
     transform: translateY(0);
+    box-shadow: none;
 }
 
-.lcars-button.primary {
-    background: var(--lcars-blue);
+.federation-button.primary {
+    background: var(--federation-primary);
 }
 
-.lcars-button.success {
-    background: var(--lcars-teal);
+.federation-button.success {
+    background: var(--federation-success);
 }
 
-.lcars-button.danger {
-    background: var(--lcars-red);
+.federation-button.danger {
+    background: var(--federation-danger);
 }
 
-.lcars-button.secondary {
-    background: var(--lcars-lavender);
+.federation-button.secondary {
+    background: var(--federation-accent);
 }
 
-.lcars-button:disabled {
+.federation-button:disabled {
     background: #444;
     color: #888;
     cursor: not-allowed;
+    box-shadow: none;
 }
 
 /* Button ripple effect */
-.lcars-button::after {
+.federation-button::after {
     content: '';
     position: absolute;
     top: 50%;
@@ -221,7 +234,7 @@ body {
     transition: transform 0.4s ease;
 }
 
-.lcars-button:active::after {
+.federation-button:active::after {
     transform: translate(-50%, -50%) scale(40);
     opacity: 0;
 }
@@ -234,8 +247,8 @@ body {
     width: 100%;
     height: 100vh;
     background: 
-        radial-gradient(ellipse at center, rgba(20, 20, 50, 0.8) 0%, transparent 70%),
-        var(--lcars-bg-dark);
+        radial-gradient(ellipse at center, rgba(0, 153, 255, 0.1) 0%, transparent 70%),
+        var(--federation-bg-dark);
     overflow: hidden;
 }
 
@@ -249,25 +262,25 @@ body {
 
 /* Hyperlane styling */
 .hyperlane {
-    stroke: rgba(100, 150, 255, 0.3);
+    stroke: rgba(51, 102, 153, 0.5);
     stroke-width: 1;
     fill: none;
     transition: all var(--transition-normal);
 }
 
 .hyperlane:hover {
-    stroke: rgba(100, 150, 255, 0.6);
+    stroke: rgba(102, 170, 255, 0.8);
     stroke-width: 2;
 }
 
 .hyperlane.active {
-    stroke: var(--lcars-gold);
+    stroke: var(--federation-accent-light);
     stroke-width: 2;
-    filter: drop-shadow(0 0 5px var(--lcars-gold));
+    filter: drop-shadow(0 0 5px var(--federation-accent-light));
 }
 
 .hyperlane.blocked {
-    stroke: rgba(255, 68, 68, 0.4);
+    stroke: rgba(255, 51, 51, 0.4);
     stroke-dasharray: 5, 5;
 }
 
@@ -282,7 +295,7 @@ body {
 }
 
 .star-system.selected {
-    filter: drop-shadow(0 0 15px var(--lcars-gold));
+    filter: drop-shadow(0 0 15px var(--federation-accent-light));
 }
 
 .star-glow {
@@ -318,7 +331,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: var(--lcars-bg-dark);
+    background: var(--federation-bg-dark);
     z-index: 100;
 }
 
@@ -336,7 +349,7 @@ body {
 
 .planet-orbit {
     position: absolute;
-    border: 1px dashed rgba(255, 255, 255, 0.1);
+    border: 1px dashed rgba(51, 102, 153, 0.4);
     border-radius: 50%;
     top: 50%;
     left: 50%;
@@ -358,7 +371,7 @@ body {
 }
 
 .planet.selected {
-    box-shadow: 0 0 30px var(--lcars-gold);
+    box-shadow: 0 0 30px var(--federation-accent-light);
 }
 
 .planet-label {
@@ -367,7 +380,7 @@ body {
     left: 50%;
     transform: translateX(-50%);
     font-size: 10px;
-    color: var(--lcars-sky);
+    color: var(--federation-text-dim);
     white-space: nowrap;
 }
 
@@ -386,7 +399,7 @@ body {
 }
 
 .fleet-icon.selected {
-    filter: drop-shadow(0 0 15px var(--lcars-gold));
+    filter: drop-shadow(0 0 15px var(--federation-accent-light));
 }
 
 .fleet-icon.moving {
@@ -399,7 +412,7 @@ body {
 }
 
 .fleet-path {
-    stroke: var(--lcars-gold);
+    stroke: var(--federation-accent-light);
     stroke-width: 2;
     stroke-dasharray: 10, 5;
     fill: none;
@@ -428,8 +441,8 @@ body {
    ========================================== */
 .info-panel {
     position: fixed;
-    background: var(--lcars-panel-bg);
-    border-left: 4px solid var(--lcars-orange);
+    background: var(--federation-panel-bg);
+    border-left: 4px solid var(--federation-border);
     padding: 16px;
     box-shadow: -5px 0 20px rgba(0, 0, 0, 0.5);
     z-index: 200;
@@ -440,7 +453,7 @@ body {
     top: var(--header-height);
     bottom: 0;
     width: 320px;
-    border-left: 4px solid var(--lcars-orange);
+    border-left: 4px solid var(--federation-primary);
 }
 
 .info-panel.bottom {
@@ -449,18 +462,18 @@ body {
     right: 0;
     height: auto;
     max-height: 40%;
-    border-top: 4px solid var(--lcars-orange);
+    border-top: 4px solid var(--federation-primary);
     border-left: none;
 }
 
 .info-panel-title {
     font-family: var(--font-display);
     font-size: 18px;
-    color: var(--lcars-gold);
+    color: var(--federation-accent-light);
     margin-bottom: 12px;
     text-transform: uppercase;
     letter-spacing: 2px;
-    border-bottom: 1px solid var(--lcars-orange);
+    border-bottom: 1px solid var(--federation-border);
     padding-bottom: 8px;
 }
 
@@ -468,17 +481,17 @@ body {
     display: flex;
     justify-content: space-between;
     padding: 6px 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(51, 102, 153, 0.3);
 }
 
 .info-label {
-    color: var(--lcars-lavender);
+    color: var(--federation-text-dim);
     font-size: 12px;
     text-transform: uppercase;
 }
 
 .info-value {
-    color: var(--lcars-sky);
+    color: var(--federation-text);
     font-weight: 600;
 }
 
@@ -500,7 +513,7 @@ body {
 .resource-progress {
     flex: 1;
     height: 8px;
-    background: var(--lcars-bg-light);
+    background: var(--federation-bg-light);
     border-radius: 4px;
     overflow: hidden;
 }
@@ -511,10 +524,10 @@ body {
     transition: width var(--transition-normal);
 }
 
-.resource-fill.credits { background: var(--lcars-gold); }
-.resource-fill.dilithium { background: var(--lcars-blue); }
-.resource-fill.deuterium { background: var(--lcars-teal); }
-.resource-fill.duranium { background: var(--lcars-lavender); }
+.resource-fill.credits { background: var(--federation-accent-light); }
+.resource-fill.dilithium { background: var(--federation-primary); }
+.resource-fill.deuterium { background: #66ccff; }
+.resource-fill.duranium { background: #cc99ff; }
 
 .resource-text {
     min-width: 60px;
@@ -532,17 +545,17 @@ body {
     left: 16px;
     width: 200px;
     height: 200px;
-    background: var(--lcars-panel-bg);
-    border: 2px solid var(--lcars-orange);
-    border-radius: var(--lcars-corner-radius);
+    background: var(--federation-panel-bg);
+    border: 2px solid var(--federation-border);
+    border-radius: var(--federation-corner-radius);
     overflow: hidden;
     z-index: 150;
 }
 
 .minimap-viewport {
     position: absolute;
-    border: 2px solid var(--lcars-gold);
-    background: rgba(255, 204, 0, 0.1);
+    border: 2px solid var(--federation-accent-light);
+    background: rgba(255, 204, 102, 0.1);
     pointer-events: none;
 }
 
@@ -551,8 +564,8 @@ body {
    ========================================== */
 .tooltip {
     position: absolute;
-    background: var(--lcars-panel-bg);
-    border: 1px solid var(--lcars-orange);
+    background: var(--federation-panel-bg);
+    border: 1px solid var(--federation-border);
     border-radius: 8px;
     padding: 8px 12px;
     font-size: 12px;
@@ -563,13 +576,13 @@ body {
 }
 
 .tooltip-title {
-    color: var(--lcars-gold);
+    color: var(--federation-accent-light);
     font-weight: 600;
     margin-bottom: 4px;
 }
 
 .tooltip-content {
-    color: var(--lcars-sky);
+    color: var(--federation-text);
 }
 
 /* ==========================================
@@ -581,8 +594,8 @@ body {
     left: 0;
     right: 0;
     height: var(--header-height);
-    background: linear-gradient(180deg, var(--lcars-bg-medium) 0%, var(--lcars-bg-dark) 100%);
-    border-bottom: 3px solid var(--lcars-orange);
+    background: linear-gradient(180deg, var(--federation-bg-medium) 0%, var(--federation-bg-dark) 100%);
+    border-bottom: 3px solid var(--federation-primary);
     display: flex;
     align-items: center;
     padding: 0 16px;
@@ -592,7 +605,7 @@ body {
 .header-logo {
     font-family: var(--font-display);
     font-size: 24px;
-    color: var(--lcars-gold);
+    color: var(--federation-accent-light);
     text-transform: uppercase;
     letter-spacing: 4px;
 }
@@ -605,9 +618,9 @@ body {
 
 .header-nav-item {
     padding: 8px 16px;
-    background: var(--lcars-bg-light);
-    border-radius: var(--lcars-button-radius);
-    color: var(--lcars-sky);
+    background: var(--federation-bg-light);
+    border-radius: var(--federation-button-radius);
+    color: var(--federation-text-dim);
     cursor: pointer;
     transition: all var(--transition-fast);
     font-size: 14px;
@@ -616,13 +629,13 @@ body {
 }
 
 .header-nav-item:hover {
-    background: var(--lcars-orange);
-    color: var(--lcars-bg-dark);
+    background: var(--federation-primary-light);
+    color: var(--federation-bg-dark);
 }
 
 .header-nav-item.active {
-    background: var(--lcars-gold);
-    color: var(--lcars-bg-dark);
+    background: var(--federation-primary);
+    color: var(--federation-text);
 }
 
 .header-resources {
@@ -653,7 +666,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: var(--lcars-bg-dark);
+    background: var(--federation-bg-dark);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -664,8 +677,8 @@ body {
 .loading-spinner {
     width: 60px;
     height: 60px;
-    border: 4px solid var(--lcars-bg-light);
-    border-top-color: var(--lcars-orange);
+    border: 4px solid var(--federation-bg-light);
+    border-top-color: var(--federation-primary);
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
@@ -678,7 +691,7 @@ body {
     margin-top: 20px;
     font-family: var(--font-display);
     font-size: 16px;
-    color: var(--lcars-gold);
+    color: var(--federation-accent-light);
     text-transform: uppercase;
     letter-spacing: 4px;
 }
@@ -702,9 +715,9 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: var(--lcars-panel-bg);
-    border: 3px solid var(--lcars-orange);
-    border-radius: var(--lcars-corner-radius);
+    background: var(--federation-panel-bg);
+    border: 3px solid var(--federation-primary);
+    border-radius: var(--federation-corner-radius);
     padding: 24px;
     min-width: 400px;
     max-width: 90vw;
@@ -719,13 +732,13 @@ body {
     align-items: center;
     margin-bottom: 16px;
     padding-bottom: 12px;
-    border-bottom: 2px solid var(--lcars-orange);
+    border-bottom: 2px solid var(--federation-primary);
 }
 
 .modal-title {
     font-family: var(--font-display);
     font-size: 20px;
-    color: var(--lcars-gold);
+    color: var(--federation-accent-light);
     text-transform: uppercase;
     letter-spacing: 2px;
 }
@@ -734,7 +747,7 @@ body {
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    background: var(--lcars-red);
+    background: var(--federation-danger);
     border: none;
     color: white;
     font-size: 18px;
@@ -743,7 +756,7 @@ body {
 }
 
 .modal-close:hover {
-    background: #ff4444;
+    background: #ff6666;
     transform: scale(1.1);
 }
 
@@ -756,35 +769,35 @@ body {
     justify-content: flex-end;
     gap: 12px;
     padding-top: 12px;
-    border-top: 1px solid var(--lcars-orange);
+    border-top: 1px solid var(--federation-border);
 }
 
 /* ==========================================
    FACTION-SPECIFIC THEMES
    ========================================== */
 .theme-federation {
-    --lcars-orange: #4488ff;
-    --lcars-gold: #99c1f1;
+    --federation-primary: #0099ff;
+    --federation-accent: #ff9900;
 }
 
 .theme-klingon {
-    --lcars-orange: #8b0000;
-    --lcars-gold: #cd5c5c;
+    --federation-primary: #8b0000;
+    --federation-accent: #cd5c5c;
 }
 
 .theme-romulan {
-    --lcars-orange: #2e7d32;
-    --lcars-gold: #81c784;
+    --federation-primary: #2e7d32;
+    --federation-accent: #81c784;
 }
 
 .theme-cardassian {
-    --lcars-orange: #5d4037;
-    --lcars-gold: #a1887f;
+    --federation-primary: #5d4037;
+    --federation-accent: #a1887f;
 }
 
 .theme-ferengi {
-    --lcars-orange: #f57c00;
-    --lcars-gold: #ffb74d;
+    --federation-primary: #f57c00;
+    --federation-accent: #ffb74d;
 }
 
 /* ==========================================
@@ -797,7 +810,7 @@ body {
         top: auto;
         bottom: 0;
         border-left: none;
-        border-top: 4px solid var(--lcars-orange);
+        border-top: 4px solid var(--federation-primary);
     }
     
     .minimap {
@@ -813,20 +826,19 @@ body {
 /* ==========================================
    UTILITY CLASSES
    ========================================== */
-.text-gold { color: var(--lcars-gold); }
-.text-orange { color: var(--lcars-orange); }
-.text-blue { color: var(--lcars-blue); }
-.text-sky { color: var(--lcars-sky); }
-.text-red { color: var(--lcars-red); }
-.text-teal { color: var(--lcars-teal); }
+.text-accent { color: var(--federation-accent); }
+.text-primary { color: var(--federation-primary); }
+.text-danger { color: var(--federation-danger); }
+.text-success { color: var(--federation-success); }
+.text-warning { color: var(--federation-warning); }
 
-.bg-panel { background: var(--lcars-panel-bg); }
-.bg-dark { background: var(--lcars-bg-dark); }
-.bg-medium { background: var(--lcars-bg-medium); }
+.bg-panel { background: var(--federation-panel-bg); }
+.bg-dark { background: var(--federation-bg-dark); }
+.bg-medium { background: var(--federation-bg-medium); }
 
-.glow-gold { box-shadow: 0 0 15px var(--lcars-gold); }
-.glow-blue { box-shadow: 0 0 15px var(--lcars-blue); }
-.glow-red { box-shadow: 0 0 15px var(--lcars-red); }
+.glow-accent { box-shadow: 0 0 15px var(--federation-accent); }
+.glow-primary { box-shadow: 0 0 15px var(--federation-primary); }
+.glow-danger { box-shadow: 0 0 15px var(--federation-danger); }
 
 .font-display { font-family: var(--font-display); }
 .font-mono { font-family: var(--font-mono); }

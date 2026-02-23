@@ -1,17 +1,17 @@
 @namespace StarTrekGame.Web.Components.UI
 
-<div class="lcars-panel @PanelClass @TextureClass" style="@Style">
+<div class="federation-panel @PanelClass @TextureClass" style="@Style">
     @if (!string.IsNullOrEmpty(Title))
     {
-        <div class="lcars-header">
-            <div class="lcars-header__elbow" style="background: var(--ui-@HeaderColor);"></div>
-            <div class="lcars-header__bar" style="background: var(--ui-@HeaderColor);">
-                <span class="lcars-header__title">@Title</span>
+        <div class="federation-header">
+            <div class="federation-header__elbow" style="background: var(--ui-@HeaderColor);"></div>
+            <div class="federation-header__bar" style="background: var(--ui-@HeaderColor);">
+                <span class="federation-header__title">@Title</span>
             </div>
-            <div class="lcars-header__cap" style="background: var(--ui-@AccentColor);"></div>
+            <div class="federation-header__cap" style="background: var(--ui-@AccentColor);"></div>
         </div>
     }
-    <div class="lcars-panel__content" style="padding: @Padding;">
+    <div class="federation-panel__content" style="padding: @Padding;">
         @ChildContent
     </div>
 </div>
@@ -31,10 +31,10 @@
         get
         {
             var classes = new List<string>();
-            if (Rounded.Contains("tl")) classes.Add("lcars-panel--rounded-tl");
-            if (Rounded.Contains("tr")) classes.Add("lcars-panel--rounded-tr");
-            if (Rounded.Contains("bl")) classes.Add("lcars-panel--rounded-bl");
-            if (Rounded.Contains("br")) classes.Add("lcars-panel--rounded-br");
+            if (Rounded.Contains("tl")) classes.Add("federation-panel--rounded-tl");
+            if (Rounded.Contains("tr")) classes.Add("federation-panel--rounded-tr");
+            if (Rounded.Contains("bl")) classes.Add("federation-panel--rounded-bl");
+            if (Rounded.Contains("br")) classes.Add("federation-panel--rounded-br");
             return string.Join(" ", classes);
         }
     }
@@ -57,7 +57,7 @@
 }
 
 <style>
-    .lcars-panel__content {
+    .federation-panel__content {
         position: relative;
     }
 </style>

@@ -1,0 +1,227 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UI Preview</title>
+    <style>
+        /* Copied from federation-theme.css */
+        :root {
+            --federation-bg-dark: #000000;
+            --federation-bg-medium: #0a0a14;
+            --federation-bg-light: #141428;
+            --federation-panel-bg: rgba(10, 10, 20, 0.95);
+            --federation-primary: #0099ff;
+            --federation-primary-dark: #0066cc;
+            --federation-primary-light: #66ccff;
+            --federation-accent: #ff9900;
+            --federation-accent-dark: #cc6600;
+            --federation-accent-light: #ffcc66;
+            --federation-text: #ffffff;
+            --federation-text-dim: #99aacc;
+            --federation-border: #336699;
+            --federation-success: #33cc66;
+            --federation-warning: #ffcc00;
+            --federation-danger: #ff3333;
+            --federation-corner-radius: 20px;
+            --federation-button-radius: 12px;
+            --panel-padding: 16px;
+            --font-main: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            --font-display: 'Orbitron', 'Audiowide', 'Segoe UI', sans-serif;
+            --transition-fast: 150ms ease;
+            --transition-normal: 300ms ease;
+        }
+        body {
+            background: var(--federation-bg-dark);
+            color: var(--federation-text);
+            font-family: var(--font-main);
+            margin: 0;
+            padding: 2rem;
+        }
+        .federation-panel {
+            background: var(--federation-panel-bg);
+            border: 2px solid var(--federation-border);
+            border-radius: var(--federation-corner-radius);
+            padding: var(--panel-padding);
+            position: relative;
+            box-shadow: inset 0 0 15px rgba(0, 153, 255, 0.1), 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+        .federation-panel-header {
+            background: linear-gradient(90deg, var(--federation-primary) 0%, var(--federation-primary-light) 100%);
+            color: var(--federation-bg-dark);
+            padding: 8px 16px;
+            margin: -16px -16px 16px -16px;
+            border-radius: 18px 18px 0 0;
+            font-family: var(--font-display);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .federation-button {
+            background: var(--federation-primary);
+            color: var(--federation-text);
+            border: 1px solid var(--federation-border);
+            padding: 10px 20px;
+            border-radius: var(--federation-button-radius);
+            font-family: var(--font-display);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        .federation-button:hover {
+            background: var(--federation-primary-light);
+            color: var(--federation-bg-dark);
+        }
+        .federation-button.secondary { background: var(--federation-accent); }
+        .federation-button.success { background: var(--federation-success); }
+        .federation-button.danger { background: var(--federation-danger); }
+        .federation-button.outline {
+            background: transparent;
+            color: var(--federation-primary);
+        }
+        .federation-button.pill { border-radius: 999px; }
+        .federation-button:disabled {
+            background: #444;
+            color: #888;
+            cursor: not-allowed;
+        }
+
+        /* Additional styles from showcase */
+        .showcase-container {
+            padding: 2rem;
+        }
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .component-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        .showcase-item {
+            padding: 1.5rem;
+        }
+        .button-showcase, .card-showcase {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+        }
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-dialog {
+            width: 500px;
+        }
+        .dialog-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--federation-border);
+        }
+         /* Data Card styles */
+        .federation-data-card {
+            background: var(--federation-bg-light);
+            border: 1px solid var(--federation-border);
+            border-radius: 8px;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .federation-data-card .icon { font-size: 2rem; }
+        .federation-data-card .label { color: var(--federation-text-dim); }
+        .federation-data-card .value { font-size: 1.5rem; font-weight: bold; }
+        .federation-data-card.success { border-left: 4px solid var(--federation-success); }
+        .federation-data-card.danger { border-left: 4px solid var(--federation-danger); }
+        .federation-data-card.primary { border-left: 4px solid var(--federation-primary); }
+        .federation-data-card.accent { border-left: 4px solid var(--federation-accent); }
+    </style>
+</head>
+<body>
+
+    <div class="showcase-container">
+        <div class="federation-panel">
+            <div class="federation-panel-header">UI Component Showcase</div>
+            
+            <div class="component-section" style="padding-top: 1rem;">
+                <div class="federation-panel">
+                    <div class="federation-panel-header">Buttons</div>
+                    <div class="button-showcase" style="padding-top: 1rem;">
+                        <button class="federation-button">Primary</button>
+                        <button class="federation-button secondary">Secondary</button>
+                        <button class="federation-button success">Success</button>
+                        <button class="federation-button danger">Danger</button>
+                        <button class="federation-button outline">Outline</button>
+                        <button class="federation-button pill">Pill</button>
+                        <button class="federation-button" disabled>Disabled</button>
+                    </div>
+                </div>
+                
+                <div class="federation-panel">
+                    <div class="federation-panel-header">Data Cards</div>
+                    <div class="card-showcase" style="padding-top: 1rem;">
+                        <div class="federation-data-card">
+                            <div class="icon">🧑‍🤝‍🧑</div>
+                            <div>
+                                <div class="label">Population</div>
+                                <div class="value">7.8B</div>
+                            </div>
+                        </div>
+                        <div class="federation-data-card success">
+                            <div class="icon">👍</div>
+                            <div>
+                                <div class="label">Approval</div>
+                                <div class="value">88%</div>
+                            </div>
+                        </div>
+                        <div class="federation-data-card danger">
+                            <div class="icon">⚡</div>
+                            <div>
+                                <div class="label">Energy</div>
+                                <div class="value">-500</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="federation-panel">
+                    <div class="federation-panel-header">Modal</div>
+                     <div style="padding-top: 1rem;">
+                        <p>This shows what a modal dialog would look like.</p>
+                        <div class="modal-backdrop" style="position: relative; height: 300px; overflow: hidden; border-radius: 15px;">
+                            <div class="federation-panel modal-dialog">
+                                <div class="federation-panel-header">Example Modal</div>
+                                <div style="padding-top: 1rem;">
+                                    <p>This is a modal dialog. You can put any content you want here.</p>
+                                    <div class="dialog-actions">
+                                        <button class="federation-button secondary">Cancel</button>
+                                        <button class="federation-button">Confirm</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,18 +1,18 @@
 /* ===========================================
-   GALACTIC STRATEGY - LCARS DESIGN SYSTEM
+   GALACTIC STRATEGY - FEDERATION DESIGN SYSTEM
    Shared CSS Variables & Common Styles
    =========================================== */
 
 /* ===== CSS CUSTOM PROPERTIES ===== */
 :root {
-    /* LCARS Color Palette */
-    --lcars-orange: #ff9900;
-    --lcars-gold: #ffcc00;
-    --lcars-blue: #99ccff;
-    --lcars-purple: #cc99ff;
-    --lcars-red: #ff4444;
-    --lcars-green: #66ff99;
-    --lcars-cyan: #4488ff;
+    /* FEDERATION Color Palette */
+    --federation-orange: #ff9900;
+    --federation-gold: #ffcc00;
+    --federation-blue: #99ccff;
+    --federation-purple: #cc99ff;
+    --federation-red: #ff4444;
+    --federation-green: #66ff99;
+    --federation-cyan: #4488ff;
     
     /* Background Colors */
     --bg-dark: #000000;
@@ -76,59 +76,59 @@
     --font-mono: 'Roboto Mono', 'Consolas', monospace;
 }
 
-/* ===== LCARS LAYOUT COMPONENTS ===== */
+/* ===== FEDERATION LAYOUT COMPONENTS ===== */
 
 /* Page Wrapper */
-.lcars-page {
+.federation-page {
     min-height: 100vh;
     background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-panel) 100%);
     color: var(--text-primary);
 }
 
 /* Header */
-.lcars-header {
+.federation-header {
     height: 60px;
     background: linear-gradient(180deg, var(--bg-surface) 0%, var(--bg-panel) 100%);
-    border-bottom: 3px solid var(--lcars-orange);
+    border-bottom: 3px solid var(--federation-orange);
     display: flex;
     align-items: center;
     padding: 0 var(--space-lg);
     gap: var(--space-lg);
 }
 
-.lcars-header .page-title {
-    color: var(--lcars-gold);
+.federation-header .page-title {
+    color: var(--federation-gold);
     font-size: 20px;
     font-weight: 700;
     letter-spacing: 4px;
     margin: 0;
 }
 
-.lcars-header .back-link {
-    color: var(--lcars-orange);
+.federation-header .back-link {
+    color: var(--federation-orange);
     text-decoration: none;
     font-weight: 600;
     padding: var(--space-sm) var(--space-md);
-    border: 1px solid var(--lcars-orange);
+    border: 1px solid var(--federation-orange);
     border-radius: var(--radius-sm);
     transition: var(--transition-fast);
 }
 
-.lcars-header .back-link:hover {
-    background: var(--lcars-orange);
+.federation-header .back-link:hover {
+    background: var(--federation-orange);
     color: var(--bg-dark);
 }
 
 /* Panel */
-.lcars-panel {
+.federation-panel {
     background: var(--bg-card);
     border: 2px solid var(--border-default);
     border-radius: var(--radius-lg);
     overflow: hidden;
 }
 
-.lcars-panel-header {
-    background: linear-gradient(90deg, var(--lcars-orange), var(--lcars-gold));
+.federation-panel-header {
+    background: linear-gradient(90deg, var(--federation-orange), var(--federation-gold));
     color: var(--bg-dark);
     font-size: 12px;
     font-weight: 700;
@@ -136,12 +136,12 @@
     padding: var(--space-sm) var(--space-md);
 }
 
-.lcars-panel-content {
+.federation-panel-content {
     padding: var(--space-md);
 }
 
 /* Cards */
-.lcars-card {
+.federation-card {
     background: var(--bg-card);
     border: 1px solid var(--border-default);
     border-radius: var(--radius-md);
@@ -149,74 +149,74 @@
     transition: var(--transition-fast);
 }
 
-.lcars-card:hover {
-    border-color: var(--lcars-orange);
+.federation-card:hover {
+    border-color: var(--federation-orange);
 }
 
-.lcars-card.selected {
-    border-color: var(--lcars-gold);
+.federation-card.selected {
+    border-color: var(--federation-gold);
     background: rgba(255, 200, 0, 0.1);
 }
 
 /* ===== BUTTONS ===== */
 
-.lcars-btn {
+.federation-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: var(--space-sm);
     padding: var(--space-sm) var(--space-md);
-    border: 2px solid var(--lcars-orange);
+    border: 2px solid var(--federation-orange);
     border-radius: var(--radius-md);
     background: transparent;
-    color: var(--lcars-orange);
+    color: var(--federation-orange);
     font-weight: 600;
     cursor: pointer;
     transition: var(--transition-fast);
 }
 
-.lcars-btn:hover:not(:disabled) {
-    background: var(--lcars-orange);
+.federation-btn:hover:not(:disabled) {
+    background: var(--federation-orange);
     color: var(--bg-dark);
 }
 
-.lcars-btn:disabled {
+.federation-btn:disabled {
     opacity: 0.4;
     cursor: not-allowed;
 }
 
-.lcars-btn.primary {
-    background: var(--lcars-orange);
+.federation-btn.primary {
+    background: var(--federation-orange);
     color: var(--bg-dark);
 }
 
-.lcars-btn.primary:hover:not(:disabled) {
-    background: var(--lcars-gold);
+.federation-btn.primary:hover:not(:disabled) {
+    background: var(--federation-gold);
 }
 
-.lcars-btn.danger {
-    border-color: var(--lcars-red);
-    color: var(--lcars-red);
+.federation-btn.danger {
+    border-color: var(--federation-red);
+    color: var(--federation-red);
 }
 
-.lcars-btn.danger:hover:not(:disabled) {
-    background: var(--lcars-red);
+.federation-btn.danger:hover:not(:disabled) {
+    background: var(--federation-red);
     color: var(--text-primary);
 }
 
-.lcars-btn.success {
-    border-color: var(--lcars-green);
-    color: var(--lcars-green);
+.federation-btn.success {
+    border-color: var(--federation-green);
+    color: var(--federation-green);
 }
 
-.lcars-btn.success:hover:not(:disabled) {
-    background: var(--lcars-green);
+.federation-btn.success:hover:not(:disabled) {
+    background: var(--federation-green);
     color: var(--bg-dark);
 }
 
 /* ===== FORM ELEMENTS ===== */
 
-.lcars-input {
+.federation-input {
     background: rgba(20, 20, 40, 0.8);
     border: 2px solid var(--border-default);
     border-radius: var(--radius-sm);
@@ -225,13 +225,13 @@
     transition: var(--transition-fast);
 }
 
-.lcars-input:focus {
+.federation-input:focus {
     outline: none;
-    border-color: var(--lcars-orange);
+    border-color: var(--federation-orange);
     box-shadow: var(--shadow-glow);
 }
 
-.lcars-select {
+.federation-select {
     background: rgba(20, 20, 40, 0.8);
     border: 2px solid var(--border-default);
     border-radius: var(--radius-sm);
@@ -241,83 +241,83 @@
 
 /* ===== DATA DISPLAY ===== */
 
-.lcars-table {
+.federation-table {
     width: 100%;
     border-collapse: collapse;
 }
 
-.lcars-table th {
+.federation-table th {
     background: rgba(255, 153, 0, 0.2);
-    color: var(--lcars-gold);
+    color: var(--federation-gold);
     text-align: left;
     padding: var(--space-sm) var(--space-md);
-    border-bottom: 2px solid var(--lcars-orange);
+    border-bottom: 2px solid var(--federation-orange);
     font-size: 12px;
     letter-spacing: 1px;
 }
 
-.lcars-table td {
+.federation-table td {
     padding: var(--space-sm) var(--space-md);
     border-bottom: 1px solid var(--border-default);
-    color: var(--lcars-blue);
+    color: var(--federation-blue);
 }
 
-.lcars-table tr:hover td {
+.federation-table tr:hover td {
     background: rgba(255, 153, 0, 0.1);
 }
 
 /* Progress Bars */
-.lcars-progress {
+.federation-progress {
     height: 8px;
     background: var(--bg-panel);
     border-radius: var(--radius-sm);
     overflow: hidden;
 }
 
-.lcars-progress-fill {
+.federation-progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, var(--lcars-orange), var(--lcars-gold));
+    background: linear-gradient(90deg, var(--federation-orange), var(--federation-gold));
     transition: width var(--transition-normal);
 }
 
-.lcars-progress-fill.health {
-    background: linear-gradient(90deg, var(--lcars-green), #88ff88);
+.federation-progress-fill.health {
+    background: linear-gradient(90deg, var(--federation-green), #88ff88);
 }
 
-.lcars-progress-fill.shields {
-    background: linear-gradient(90deg, var(--lcars-cyan), var(--lcars-blue));
+.federation-progress-fill.shields {
+    background: linear-gradient(90deg, var(--federation-cyan), var(--federation-blue));
 }
 
-.lcars-progress-fill.danger {
-    background: linear-gradient(90deg, var(--lcars-red), #ff6666);
+.federation-progress-fill.danger {
+    background: linear-gradient(90deg, var(--federation-red), #ff6666);
 }
 
 /* ===== STATS & BADGES ===== */
 
-.lcars-stat {
+.federation-stat {
     display: flex;
     align-items: center;
     gap: var(--space-sm);
 }
 
-.lcars-stat-icon {
+.federation-stat-icon {
     font-size: 20px;
 }
 
-.lcars-stat-value {
+.federation-stat-value {
     font-size: 24px;
     font-weight: 700;
-    color: var(--lcars-gold);
+    color: var(--federation-gold);
 }
 
-.lcars-stat-label {
+.federation-stat-label {
     font-size: 11px;
     color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 1px;
 }
 
-.lcars-badge {
+.federation-badge {
     display: inline-flex;
     align-items: center;
     gap: var(--space-xs);
@@ -327,64 +327,64 @@
     font-weight: 600;
 }
 
-.lcars-badge.info {
+.federation-badge.info {
     background: rgba(68, 136, 255, 0.2);
-    color: var(--lcars-cyan);
-    border: 1px solid var(--lcars-cyan);
+    color: var(--federation-cyan);
+    border: 1px solid var(--federation-cyan);
 }
 
-.lcars-badge.success {
+.federation-badge.success {
     background: rgba(102, 255, 153, 0.2);
-    color: var(--lcars-green);
-    border: 1px solid var(--lcars-green);
+    color: var(--federation-green);
+    border: 1px solid var(--federation-green);
 }
 
-.lcars-badge.warning {
+.federation-badge.warning {
     background: rgba(255, 153, 0, 0.2);
-    color: var(--lcars-orange);
-    border: 1px solid var(--lcars-orange);
+    color: var(--federation-orange);
+    border: 1px solid var(--federation-orange);
 }
 
-.lcars-badge.danger {
+.federation-badge.danger {
     background: rgba(255, 68, 68, 0.2);
-    color: var(--lcars-red);
-    border: 1px solid var(--lcars-red);
+    color: var(--federation-red);
+    border: 1px solid var(--federation-red);
 }
 
 /* ===== ANIMATIONS ===== */
 
-@keyframes lcars-pulse {
+@keyframes federation-pulse {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.6; }
 }
 
-@keyframes lcars-glow {
-    0%, 100% { box-shadow: 0 0 5px var(--lcars-orange); }
-    50% { box-shadow: 0 0 20px var(--lcars-orange); }
+@keyframes federation-glow {
+    0%, 100% { box-shadow: 0 0 5px var(--federation-orange); }
+    50% { box-shadow: 0 0 20px var(--federation-orange); }
 }
 
-@keyframes lcars-scan {
+@keyframes federation-scan {
     0% { transform: translateX(-100%); }
     100% { transform: translateX(100%); }
 }
 
-.lcars-pulse {
-    animation: lcars-pulse 2s ease-in-out infinite;
+.federation-pulse {
+    animation: federation-pulse 2s ease-in-out infinite;
 }
 
-.lcars-glow {
-    animation: lcars-glow 2s ease-in-out infinite;
+.federation-glow {
+    animation: federation-glow 2s ease-in-out infinite;
 }
 
 /* ===== RESPONSIVE ===== */
 
 @media (max-width: 768px) {
-    .lcars-header {
+    .federation-header {
         padding: 0 var(--space-md);
         gap: var(--space-md);
     }
     
-    .lcars-header .page-title {
+    .federation-header .page-title {
         font-size: 16px;
         letter-spacing: 2px;
     }
@@ -394,11 +394,11 @@
 
 .text-center { text-align: center; }
 .text-right { text-align: right; }
-.text-gold { color: var(--lcars-gold); }
-.text-blue { color: var(--lcars-blue); }
-.text-orange { color: var(--lcars-orange); }
-.text-red { color: var(--lcars-red); }
-.text-green { color: var(--lcars-green); }
+.text-gold { color: var(--federation-gold); }
+.text-blue { color: var(--federation-blue); }
+.text-orange { color: var(--federation-orange); }
+.text-red { color: var(--federation-red); }
+.text-green { color: var(--federation-green); }
 .text-muted { color: var(--text-muted); }
 
 .mt-1 { margin-top: var(--space-sm); }

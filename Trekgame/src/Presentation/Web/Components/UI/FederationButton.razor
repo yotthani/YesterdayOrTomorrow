@@ -1,16 +1,16 @@
 @namespace StarTrekGame.Web.Components.UI
 
-<button class="lcars-btn @VariantClass @SizeClass @(GlowPulse ? "glow-pulse" : "")" 
+<button class="federation-btn @VariantClass @SizeClass @(GlowPulse ? "glow-pulse" : "")" 
         style="@Style" 
         disabled="@Disabled"
         @onclick="OnClick">
     @if (!string.IsNullOrEmpty(Icon))
     {
-        <span class="lcars-btn__icon">@Icon</span>
+        <span class="federation-btn__icon">@Icon</span>
     }
     @if (!string.IsNullOrEmpty(Text))
     {
-        <span class="lcars-btn__text">@Text</span>
+        <span class="federation-btn__text">@Text</span>
     }
     @ChildContent
 </button>
@@ -28,42 +28,42 @@
 
     private string VariantClass => Variant switch
     {
-        "secondary" => "lcars-btn--secondary",
-        "danger" => "lcars-btn--danger",
-        "success" => "lcars-btn--success",
-        "outline" => "lcars-btn--outline",
-        "pill" => "lcars-btn--pill",
+        "secondary" => "federation-btn--secondary",
+        "danger" => "federation-btn--danger",
+        "success" => "federation-btn--success",
+        "outline" => "federation-btn--outline",
+        "pill" => "federation-btn--pill",
         _ => ""
     };
 
     private string SizeClass => Size switch
     {
-        "small" => "lcars-btn--sm",
-        "large" => "lcars-btn--lg",
+        "small" => "federation-btn--sm",
+        "large" => "federation-btn--lg",
         _ => ""
     };
 }
 
 <style>
-    .lcars-btn__icon {
+    .federation-btn__icon {
         margin-right: 6px;
     }
 
-    .lcars-btn--sm {
+    .federation-btn--sm {
         padding: 4px 12px;
         font-size: 10px;
     }
 
-    .lcars-btn--lg {
+    .federation-btn--lg {
         padding: 12px 28px;
         font-size: 14px;
     }
 
-    .lcars-btn--secondary {
+    .federation-btn--secondary {
         background: var(--ui-secondary);
     }
 
-    .lcars-btn:disabled {
+    .federation-btn:disabled {
         opacity: 0.5;
         cursor: not-allowed;
         filter: grayscale(50%);
