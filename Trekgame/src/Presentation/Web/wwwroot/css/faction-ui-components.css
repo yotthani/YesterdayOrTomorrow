@@ -1,0 +1,5966 @@
+/* ===========================================
+   FACTION UI COMPONENTS - Structure Styles
+
+   These styles define the STRUCTURE of faction-specific
+   UI elements. Colors come from theme CSS variables.
+   =========================================== */
+
+/* ===========================================
+   COMMON BASE STYLES
+   =========================================== */
+.faction-btn,
+.faction-panel,
+.faction-sidebar,
+.faction-header {
+    font-family: var(--theme-font-display, 'Orbitron', sans-serif);
+}
+
+
+/* ===========================================
+   FEDERATION / LCARS COMPONENTS
+   Pill shapes, color bars, elbow corners
+   =========================================== */
+
+/* LCARS Button - Horizontal pill */
+.lcars-btn {
+    display: inline-flex;
+    align-items: center;
+    background: linear-gradient(180deg, #FF9944 0%, #DD7722 100%);
+    border: none;
+    border-radius: 25px;
+    padding: 0;
+    cursor: pointer;
+    overflow: hidden;
+    min-width: 120px;
+    height: 40px;
+}
+
+.lcars-btn-inner {
+    flex: 1;
+    padding: 8px 20px;
+    color: #000;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-size: 12px;
+}
+
+.lcars-btn:hover {
+    filter: brightness(1.2);
+    box-shadow: 0 0 20px rgba(255, 153, 0, 0.5);
+}
+
+.lcars-btn.active {
+    background: linear-gradient(180deg, #CC99FF 0%, #9966CC 100%);
+}
+
+/* LCARS Panel */
+.lcars-panel {
+    display: flex;
+    background: #000011;
+    border-radius: 0 20px 20px 0;
+    overflow: hidden;
+    position: relative;
+}
+
+.lcars-sidebar-strip {
+    width: 60px;
+    display: flex;
+    flex-direction: column;
+}
+
+.lcars-color-block {
+    flex: 1;
+    min-height: 30px;
+}
+.lcars-color-block.orange { background: linear-gradient(180deg, #FF9944, #DD7722); }
+.lcars-color-block.tan { background: linear-gradient(180deg, #FFCC99, #DDAA77); }
+.lcars-color-block.purple { background: linear-gradient(180deg, #CC99FF, #9966CC); }
+.lcars-color-block.blue { background: linear-gradient(180deg, #99CCFF, #6699CC); }
+
+.lcars-panel-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.lcars-panel-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 15px;
+    background: #1a1a30;
+}
+
+.lcars-header-bar {
+    width: 80px;
+    height: 8px;
+    background: linear-gradient(90deg, #FF9944, #FFCC99);
+    border-radius: 4px;
+}
+
+.lcars-header-text {
+    color: #FF9944;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.lcars-panel-body {
+    flex: 1;
+    padding: 15px;
+    color: #aaddff;
+}
+
+.lcars-elbow-bottom {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 60px;
+    height: 40px;
+    background: #CC99FF;
+    border-radius: 0 20px 0 0;
+}
+
+/* LCARS Sidebar */
+.lcars-sidebar {
+    display: flex;
+    background: #000011;
+    width: 120px;
+}
+
+.lcars-vertical-bar {
+    width: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.lcars-cap {
+    width: 20px;
+    height: 30px;
+    border-radius: 10px 10px 0 0;
+}
+.lcars-cap.bottom { border-radius: 0 0 10px 10px; }
+.lcars-cap.orange { background: #FF9944; }
+.lcars-cap.purple { background: #CC99FF; }
+
+.lcars-segment {
+    flex: 1;
+    min-height: 40px;
+}
+.lcars-segment.orange { background: #FF9944; }
+.lcars-segment.tan { background: #FFCC99; }
+.lcars-segment.purple { background: #CC99FF; }
+.lcars-segment.blue { background: #99CCFF; }
+
+.lcars-nav {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px;
+}
+
+.lcars-nav-pill {
+    display: flex;
+    align-items: center;
+    background: #CC99FF;
+    border: none;
+    border-radius: 0 15px 15px 0;
+    height: 35px;
+    cursor: pointer;
+    padding: 0;
+}
+
+.lcars-nav-pill.active {
+    background: #FF9944;
+}
+
+.lcars-pill-label {
+    flex: 1;
+    text-align: center;
+    color: #000;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.lcars-elbow-corner {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 40px;
+    height: 60px;
+    background:
+        linear-gradient(to bottom right, transparent 50%, #FF9944 50%);
+}
+
+
+/* ===========================================
+   KLINGON COMPONENTS
+   Angular, aggressive, metallic
+   =========================================== */
+
+/* Klingon Button - Angular blade shape */
+.klingon-btn {
+    display: inline-flex;
+    align-items: center;
+    position: relative;
+    background: linear-gradient(180deg, #880000 0%, #440000 50%, #660000 100%);
+    border: 2px solid #CC0000;
+    padding: 10px 20px;
+    cursor: pointer;
+    clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+    min-width: 100px;
+}
+
+.klingon-btn-text {
+    color: #FFCCAA;
+    font-weight: 900;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-size: 11px;
+    text-shadow: 0 1px 2px #000;
+}
+
+.klingon-corner-tl, .klingon-corner-br {
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-style: solid;
+}
+
+.klingon-corner-tl {
+    top: -2px;
+    left: -2px;
+    border-width: 12px 12px 0 0;
+    border-color: #FF4444 transparent transparent transparent;
+}
+
+.klingon-corner-br {
+    bottom: -2px;
+    right: -2px;
+    border-width: 0 0 12px 12px;
+    border-color: transparent transparent #FF4444 transparent;
+}
+
+.klingon-btn:hover {
+    background: linear-gradient(180deg, #AA0000 0%, #660000 50%, #880000 100%);
+    box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+}
+
+/* Klingon Panel */
+.klingon-panel {
+    position: relative;
+    background: linear-gradient(180deg, #1a0808 0%, #0a0202 100%);
+    border: 2px solid #880000;
+    clip-path: polygon(15px 0, calc(100% - 15px) 0, 100% 15px, 100% calc(100% - 15px), calc(100% - 15px) 100%, 15px 100%, 0 calc(100% - 15px), 0 15px);
+}
+
+.klingon-corner-accent {
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-style: solid;
+}
+.klingon-corner-accent.tl { top: 0; left: 0; border-width: 25px 25px 0 0; border-color: #CC0000 transparent transparent transparent; }
+.klingon-corner-accent.tr { top: 0; right: 0; border-width: 0 25px 25px 0; border-color: transparent #CC0000 transparent transparent; }
+.klingon-corner-accent.bl { bottom: 0; left: 0; border-width: 25px 0 0 25px; border-color: transparent transparent transparent #CC0000; }
+.klingon-corner-accent.br { bottom: 0; right: 0; border-width: 0 0 25px 25px; border-color: transparent transparent #CC0000 transparent; }
+
+.klingon-rivet {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: radial-gradient(circle, #666 30%, #333 70%);
+    border-radius: 50%;
+    border: 1px solid #888;
+}
+.klingon-rivet.tl { top: 30px; left: 10px; }
+.klingon-rivet.tr { top: 30px; right: 10px; }
+.klingon-rivet.bl { bottom: 30px; left: 10px; }
+.klingon-rivet.br { bottom: 30px; right: 10px; }
+
+.klingon-panel-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    background: linear-gradient(90deg, #330000, #1a0808);
+    border-bottom: 2px solid #660000;
+}
+
+.klingon-spike {
+    width: 0;
+    height: 0;
+    border-style: solid;
+}
+.klingon-spike.left { border-width: 8px 12px 8px 0; border-color: transparent #CC0000 transparent transparent; }
+.klingon-spike.right { border-width: 8px 0 8px 12px; border-color: transparent transparent transparent #CC0000; }
+
+.klingon-header-text {
+    flex: 1;
+    color: #FF6644;
+    font-weight: 900;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-size: 12px;
+}
+
+.klingon-panel-body {
+    padding: 20px;
+    color: #FFCCAA;
+}
+
+
+/* ===========================================
+   ROMULAN COMPONENTS
+   Elegant curves, wing motifs, bronze
+   =========================================== */
+
+/* Romulan Button - Lens shape */
+.romulan-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background: linear-gradient(180deg, #00AA44 0%, #006633 100%);
+    border: 1px solid #44FFAA;
+    border-radius: 4px 20px 20px 4px;
+    padding: 10px 25px;
+    cursor: pointer;
+    min-width: 100px;
+}
+
+.romulan-btn-text {
+    color: #CCFFDD;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: capitalize;
+    font-size: 12px;
+}
+
+.romulan-wing-left, .romulan-wing-right {
+    position: absolute;
+    width: 8px;
+    height: 100%;
+    background: linear-gradient(180deg, #D4AF37, #B8860B);
+}
+.romulan-wing-left { left: 0; border-radius: 4px 0 0 4px; }
+.romulan-wing-right { right: 0; border-radius: 0 4px 4px 0; width: 3px; }
+
+.romulan-btn:hover {
+    box-shadow: 0 0 20px rgba(68, 255, 170, 0.4);
+}
+
+/* Romulan Panel */
+.romulan-panel {
+    position: relative;
+    background: linear-gradient(180deg, #0a1a15 0%, #051008 100%);
+    border: 1px solid rgba(0, 170, 68, 0.5);
+    border-left: 4px solid #00AA44;
+    border-radius: 2px;
+}
+
+.romulan-wing-top {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 40px solid transparent;
+    border-right: 40px solid transparent;
+    border-bottom: 20px solid #00AA44;
+}
+
+.romulan-panel-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    background: linear-gradient(90deg, rgba(0, 170, 68, 0.2), transparent);
+    border-bottom: 1px solid rgba(0, 170, 68, 0.3);
+}
+
+.romulan-bronze-accent {
+    width: 30px;
+    height: 3px;
+    background: linear-gradient(90deg, #D4AF37, #B8860B);
+    border-radius: 2px;
+}
+
+.romulan-header-text {
+    flex: 1;
+    color: #44FFAA;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: capitalize;
+    font-size: 12px;
+}
+
+.romulan-panel-body {
+    padding: 16px;
+    color: #CCFFDD;
+}
+
+
+/* ===========================================
+   BORG COMPONENTS
+   Hexagonal, grid, green glow
+   =========================================== */
+
+/* Borg Button - Hexagonal */
+.borg-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 255, 0, 0.1);
+    border: 1px solid rgba(0, 255, 0, 0.5);
+    padding: 0;
+    cursor: pointer;
+    clip-path: polygon(15% 0%, 85% 0%, 100% 50%, 85% 100%, 15% 100%, 0% 50%);
+    min-width: 100px;
+    height: 45px;
+}
+
+.borg-hex-frame {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+.borg-btn-text {
+    color: #00FF00;
+    font-family: 'Roboto Mono', monospace;
+    font-weight: 400;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    font-size: 10px;
+    text-shadow: 0 0 10px rgba(0, 255, 0, 0.8);
+}
+
+.borg-btn:hover {
+    background: rgba(0, 255, 0, 0.2);
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.5), inset 0 0 15px rgba(0, 255, 0, 0.2);
+}
+
+/* Borg Panel */
+.borg-panel {
+    position: relative;
+    background:
+        repeating-linear-gradient(0deg, rgba(0, 255, 0, 0.02) 0px, transparent 1px, transparent 30px),
+        repeating-linear-gradient(90deg, rgba(0, 255, 0, 0.02) 0px, transparent 1px, transparent 30px),
+        rgba(0, 17, 0, 0.95);
+    border: 1px solid rgba(0, 255, 0, 0.5);
+}
+
+.borg-hex-corner {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    background: rgba(0, 255, 0, 0.8);
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+}
+.borg-hex-corner.tl { top: 5px; left: 5px; }
+.borg-hex-corner.tr { top: 5px; right: 5px; }
+.borg-hex-corner.bl { bottom: 5px; left: 5px; }
+.borg-hex-corner.br { bottom: 5px; right: 5px; }
+
+.borg-panel-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    border-bottom: 1px solid rgba(0, 255, 0, 0.3);
+}
+
+.borg-designation {
+    flex: 1;
+    color: #00FF00;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+}
+
+.borg-node-indicator {
+    width: 10px;
+    height: 10px;
+    background: #00FF00;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #00FF00;
+    animation: borg-pulse 1s ease-in-out infinite;
+}
+
+@keyframes borg-pulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 10px #00FF00; }
+    50% { opacity: 0.6; box-shadow: 0 0 20px #00FF00; }
+}
+
+.borg-panel-body {
+    position: relative;
+    padding: 16px;
+    color: #00FF00;
+    font-family: 'Roboto Mono', monospace;
+}
+
+.borg-scanlines {
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 255, 0, 0.03) 2px,
+        rgba(0, 255, 0, 0.03) 4px
+    );
+    pointer-events: none;
+}
+
+.borg-data-stream {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #00FF00, transparent);
+    animation: borg-data-flow 2s linear infinite;
+}
+
+@keyframes borg-data-flow {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+
+/* ===========================================
+   CARDASSIAN COMPONENTS
+   Geometric, amber, surveillance
+   =========================================== */
+
+/* Cardassian Button - Notched rectangle */
+.cardassian-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background: linear-gradient(180deg, #FF8800 0%, #AA5500 50%, #CC6600 100%);
+    border: 1px solid #FFAA44;
+    padding: 10px 20px;
+    cursor: pointer;
+    clip-path: polygon(6px 0, calc(100% - 6px) 0, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 0 calc(100% - 6px), 0 6px);
+    min-width: 100px;
+}
+
+.cardassian-btn-text {
+    color: #000;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-size: 11px;
+}
+
+.cardassian-btn:hover {
+    filter: brightness(1.2);
+    box-shadow: 0 0 15px rgba(255, 136, 0, 0.5);
+}
+
+/* Cardassian Panel */
+.cardassian-panel {
+    position: relative;
+    background: linear-gradient(180deg, rgba(26, 16, 5, 0.95) 0%, rgba(15, 8, 2, 0.98) 100%);
+    border: 2px solid rgba(255, 136, 0, 0.5);
+    clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px), 0 8px);
+}
+
+.cardassian-notch {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: #FF8800;
+}
+.cardassian-notch.tl { top: 0; left: 0; clip-path: polygon(0 0, 100% 0, 0 100%); }
+.cardassian-notch.tr { top: 0; right: 0; clip-path: polygon(0 0, 100% 0, 100% 100%); }
+.cardassian-notch.bl { bottom: 0; left: 0; clip-path: polygon(0 0, 0 100%, 100% 100%); }
+.cardassian-notch.br { bottom: 0; right: 0; clip-path: polygon(100% 0, 0 100%, 100% 100%); }
+
+.cardassian-panel-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    background: linear-gradient(90deg, rgba(255, 136, 0, 0.2), transparent);
+    border-bottom: 1px solid rgba(255, 136, 0, 0.3);
+}
+
+.cardassian-status-light {
+    width: 8px;
+    height: 8px;
+    background: #FF8800;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #FF8800;
+}
+
+.cardassian-header-text {
+    flex: 1;
+    color: #FFAA44;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-size: 11px;
+}
+
+.cardassian-panel-body {
+    padding: 16px;
+    color: #FFDDAA;
+}
+
+
+/* ===========================================
+   DOMINION COMPONENTS
+   Imperial, purple, gold
+   =========================================== */
+
+/* Dominion Button - Diamond-accented */
+.dominion-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background: linear-gradient(180deg, #AA44FF 0%, #7722CC 50%, #9933FF 100%);
+    border: 1px solid #CC99FF;
+    border-radius: 8px;
+    padding: 10px 25px;
+    cursor: pointer;
+    min-width: 100px;
+}
+
+.dominion-diamond {
+    position: absolute;
+    left: 8px;
+    width: 12px;
+    height: 12px;
+    background: linear-gradient(135deg, #FFD700, #FFEE88);
+    transform: rotate(45deg);
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.dominion-btn-text {
+    color: #fff;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: capitalize;
+    font-size: 12px;
+    margin-left: 10px;
+}
+
+.dominion-btn:hover {
+    box-shadow: 0 0 25px rgba(153, 51, 255, 0.6), 0 0 35px rgba(255, 215, 0, 0.3);
+}
+
+/* Dominion Panel */
+.dominion-panel {
+    position: relative;
+    background: linear-gradient(180deg, rgba(16, 5, 32, 0.95) 0%, rgba(8, 2, 18, 0.98) 100%);
+    border: 2px solid rgba(153, 51, 255, 0.5);
+    border-radius: 8px;
+}
+
+.dominion-diamond-accent {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    background: linear-gradient(135deg, #FFD700, #FFEE88);
+    transform: rotate(45deg);
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+}
+.dominion-diamond-accent.top {
+    top: -8px;
+    left: 50%;
+    margin-left: -8px;
+}
+
+.dominion-panel-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    background: linear-gradient(90deg, rgba(153, 51, 255, 0.2), transparent);
+    border-bottom: 1px solid rgba(153, 51, 255, 0.3);
+}
+
+.dominion-founder-symbol {
+    width: 16px;
+    height: 16px;
+    background: linear-gradient(135deg, #FFD700, #FFEE88);
+    clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.dominion-header-text {
+    flex: 1;
+    color: #CC99FF;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: capitalize;
+    font-size: 12px;
+}
+
+.dominion-panel-body {
+    padding: 16px;
+    color: #EEDDFF;
+}
+
+.dominion-shimmer-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.05), transparent);
+    background-size: 200% 100%;
+    animation: dominion-shimmer 4s linear infinite;
+    pointer-events: none;
+    border-radius: 8px;
+}
+
+@keyframes dominion-shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+
+/* ===========================================
+   DEFAULT / STELLARIS COMPONENTS
+   Neutral blue sci-fi
+   =========================================== */
+
+.default-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(180deg, #4a9eff 0%, #2a6ecc 100%);
+    border: none;
+    border-radius: 6px;
+    padding: 10px 20px;
+    cursor: pointer;
+    color: #fff;
+    font-weight: 600;
+    letter-spacing: 1px;
+    font-size: 12px;
+}
+
+.default-btn:hover {
+    filter: brightness(1.15);
+    box-shadow: 0 0 15px rgba(74, 158, 255, 0.5);
+}
+
+.default-panel {
+    background: linear-gradient(180deg, rgba(20, 30, 45, 0.95) 0%, rgba(10, 15, 25, 0.98) 100%);
+    border: 1px solid rgba(74, 158, 255, 0.4);
+    border-radius: 8px;
+}
+
+.default-panel-header {
+    padding: 10px 16px;
+    background: rgba(16, 24, 32, 0.8);
+    color: #4a9eff;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border-bottom: 1px solid rgba(74, 158, 255, 0.2);
+}
+
+.default-panel-body {
+    padding: 16px;
+    color: #d0e4f8;
+}
+
+.default-sidebar {
+    background: #080c10;
+    border-right: 1px solid rgba(74, 158, 255, 0.3);
+    width: 120px;
+}
+
+.default-nav {
+    display: flex;
+    flex-direction: column;
+    padding: 8px;
+    gap: 4px;
+}
+
+.default-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px 8px;
+    background: transparent;
+    border: none;
+    color: #708898;
+    cursor: pointer;
+    border-left: 3px solid transparent;
+    transition: all 0.15s;
+}
+
+.default-nav-item:hover {
+    background: #182028;
+    color: #d0e4f8;
+}
+
+.default-nav-item.active {
+    background: #182028;
+    color: #4a9eff;
+    border-left-color: #4a9eff;
+}
+
+.nav-icon { font-size: 20px; margin-bottom: 4px; }
+.nav-label { font-size: 9px; letter-spacing: 1px; text-transform: uppercase; }
+
+.default-header {
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    height: 60px;
+    background: linear-gradient(180deg, #101820 0%, #080c10 100%);
+    border-bottom: 2px solid #4a9eff;
+    gap: 20px;
+}
+
+.default-title-block {
+    display: flex;
+    flex-direction: column;
+}
+
+.default-title {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: #4a9eff;
+}
+
+.default-subtitle {
+    font-size: 10px;
+    color: #708898;
+}
+
+
+/* ===========================================
+   TEMPLATED COMPONENT STYLES
+   Data-driven components that render based on
+   FactionTemplateService definitions
+   =========================================== */
+
+/* === TEMPLATED BUTTON BASE === */
+.templated-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    cursor: pointer;
+    border: none;
+    font-family: var(--theme-font-display, 'Orbitron', sans-serif);
+    transition: all 0.15s ease;
+}
+
+.templated-btn .btn-content {
+    color: inherit;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-size: 11px;
+    z-index: 2;
+    padding: 10px 20px;
+}
+
+/* DEFAULT button styling */
+.templated-btn.default-btn {
+    background: linear-gradient(180deg, #4a9eff 0%, #2a6ecc 100%);
+    color: #fff;
+    padding: 10px 20px;
+}
+
+.templated-btn.default-btn:hover {
+    filter: brightness(1.15);
+    box-shadow: 0 0 15px rgba(74, 158, 255, 0.5);
+}
+
+/* LCARS / Federation button styling */
+.templated-btn.lcars-btn {
+    background: linear-gradient(180deg, #FF9944 0%, #DD7722 100%);
+    color: #000;
+    min-width: 120px;
+    padding: 0;
+    overflow: hidden;
+}
+
+.templated-btn.lcars-btn .btn-content {
+    flex: 1;
+    padding: 10px 20px;
+    color: #000;
+    font-weight: 700;
+}
+
+.templated-btn.lcars-btn .btn-pill-end {
+    width: 15px;
+    height: 100%;
+    flex-shrink: 0;
+}
+
+.templated-btn.lcars-btn .btn-pill-end.left {
+    background: linear-gradient(180deg, #FFCC99, #DDAA77);
+}
+
+.templated-btn.lcars-btn .btn-pill-end.right {
+    background: linear-gradient(180deg, #CC99FF, #9966CC);
+}
+
+.templated-btn.lcars-btn:hover {
+    filter: brightness(1.2);
+    box-shadow: 0 0 20px rgba(255, 153, 0, 0.5);
+}
+
+.templated-btn.lcars-btn.active,
+.templated-btn.lcars-btn.secondary {
+    background: linear-gradient(180deg, #CC99FF 0%, #9966CC 100%);
+}
+
+.templated-btn.lcars-btn.danger {
+    background: linear-gradient(180deg, #FF6644 0%, #CC4422 100%);
+}
+
+/* KLINGON button styling */
+.templated-btn.klingon-btn {
+    background: linear-gradient(180deg, #880000 0%, #440000 50%, #660000 100%);
+    border: 2px solid #CC0000;
+    color: #FFCCAA;
+    min-width: 100px;
+    padding: 0;
+}
+
+.templated-btn.klingon-btn .btn-content {
+    padding: 10px 20px;
+    color: #FFCCAA;
+    font-weight: 900;
+    letter-spacing: 3px;
+    text-shadow: 0 1px 2px #000;
+}
+
+.templated-btn.klingon-btn .btn-corner-accent {
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-style: solid;
+}
+
+.templated-btn.klingon-btn .btn-corner-accent.tl {
+    top: -2px;
+    left: -2px;
+    border-width: 12px 12px 0 0;
+    border-color: #FF4444 transparent transparent transparent;
+}
+
+.templated-btn.klingon-btn .btn-corner-accent.br {
+    bottom: -2px;
+    right: -2px;
+    border-width: 0 0 12px 12px;
+    border-color: transparent transparent #FF4444 transparent;
+}
+
+.templated-btn.klingon-btn:hover {
+    background: linear-gradient(180deg, #AA0000 0%, #660000 50%, #880000 100%);
+    box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+}
+
+.templated-btn.klingon-btn.secondary {
+    background: linear-gradient(180deg, #664400 0%, #442200 100%);
+    border-color: #886600;
+}
+
+.templated-btn.klingon-btn.danger {
+    background: linear-gradient(180deg, #CC0000 0%, #880000 100%);
+    border-color: #FF4444;
+}
+
+/* ROMULAN button styling */
+.templated-btn.romulan-btn {
+    background: linear-gradient(180deg, #00AA44 0%, #006633 100%);
+    border: 1px solid #44FFAA;
+    color: #CCFFDD;
+    min-width: 100px;
+    padding: 0;
+}
+
+.templated-btn.romulan-btn .btn-content {
+    padding: 10px 20px;
+    color: #CCFFDD;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: capitalize;
+}
+
+.templated-btn.romulan-btn .btn-wing {
+    position: absolute;
+    height: 100%;
+    background: linear-gradient(180deg, #D4AF37, #B8860B);
+}
+
+.templated-btn.romulan-btn .btn-wing.left {
+    left: 0;
+    width: 6px;
+    border-radius: 4px 0 0 4px;
+}
+
+.templated-btn.romulan-btn .btn-wing.right {
+    right: 0;
+    width: 3px;
+}
+
+.templated-btn.romulan-btn:hover {
+    box-shadow: 0 0 20px rgba(68, 255, 170, 0.4);
+}
+
+.templated-btn.romulan-btn.secondary {
+    background: linear-gradient(180deg, #006633 0%, #004422 100%);
+}
+
+.templated-btn.romulan-btn.danger {
+    background: linear-gradient(180deg, #AA4400 0%, #662200 100%);
+    border-color: #FF8844;
+}
+
+/* BORG button styling */
+.templated-btn.borg-btn {
+    background: rgba(0, 255, 0, 0.1);
+    border: 1px solid rgba(0, 255, 0, 0.5);
+    color: #00FF00;
+    min-width: 100px;
+    padding: 0;
+}
+
+.templated-btn.borg-btn .btn-content {
+    padding: 10px 20px;
+    color: #00FF00;
+    font-family: 'Roboto Mono', monospace;
+    font-weight: 400;
+    letter-spacing: 4px;
+    text-shadow: 0 0 10px rgba(0, 255, 0, 0.8);
+}
+
+.templated-btn.borg-btn .btn-hex-frame {
+    position: absolute;
+    inset: 2px;
+    border: 1px solid rgba(0, 255, 0, 0.3);
+    clip-path: polygon(15% 0%, 85% 0%, 100% 50%, 85% 100%, 15% 100%, 0% 50%);
+}
+
+.templated-btn.borg-btn:hover {
+    background: rgba(0, 255, 0, 0.2);
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.5), inset 0 0 15px rgba(0, 255, 0, 0.2);
+}
+
+.templated-btn.borg-btn.secondary {
+    background: rgba(0, 128, 0, 0.1);
+    border-color: rgba(0, 180, 0, 0.5);
+}
+
+.templated-btn.borg-btn.danger {
+    background: rgba(255, 0, 0, 0.1);
+    border-color: rgba(255, 0, 0, 0.5);
+}
+
+.templated-btn.borg-btn.danger .btn-content {
+    color: #FF4444;
+    text-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
+}
+
+/* CARDASSIAN button styling */
+.templated-btn.cardassian-btn {
+    background: linear-gradient(180deg, #FF8800 0%, #AA5500 50%, #CC6600 100%);
+    border: 1px solid #FFAA44;
+    color: #000;
+    min-width: 100px;
+    padding: 0;
+}
+
+.templated-btn.cardassian-btn .btn-content {
+    padding: 10px 20px;
+    color: #000;
+    font-weight: 600;
+}
+
+.templated-btn.cardassian-btn .btn-notch {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: #FFCC00;
+}
+
+.templated-btn.cardassian-btn .btn-notch.tl {
+    top: 0;
+    left: 0;
+    clip-path: polygon(0 0, 100% 0, 0 100%);
+}
+
+.templated-btn.cardassian-btn .btn-notch.br {
+    bottom: 0;
+    right: 0;
+    clip-path: polygon(100% 0, 100% 100%, 0 100%);
+}
+
+.templated-btn.cardassian-btn:hover {
+    filter: brightness(1.2);
+    box-shadow: 0 0 15px rgba(255, 136, 0, 0.5);
+}
+
+.templated-btn.cardassian-btn.secondary {
+    background: linear-gradient(180deg, #996600 0%, #664400 100%);
+}
+
+.templated-btn.cardassian-btn.danger {
+    background: linear-gradient(180deg, #CC4400 0%, #882200 100%);
+    border-color: #FF6644;
+}
+
+/* DOMINION button styling */
+.templated-btn.dominion-btn {
+    background: linear-gradient(180deg, #AA44FF 0%, #7722CC 50%, #9933FF 100%);
+    border: 1px solid #CC99FF;
+    color: #fff;
+    min-width: 100px;
+    padding: 0;
+}
+
+.templated-btn.dominion-btn .btn-content {
+    padding: 10px 25px 10px 30px;
+    color: #fff;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: capitalize;
+}
+
+.templated-btn.dominion-btn .btn-diamond {
+    position: absolute;
+    left: 10px;
+    width: 12px;
+    height: 12px;
+    background: linear-gradient(135deg, #FFD700, #FFEE88);
+    transform: rotate(45deg);
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.templated-btn.dominion-btn:hover {
+    box-shadow: 0 0 25px rgba(153, 51, 255, 0.6), 0 0 35px rgba(255, 215, 0, 0.3);
+}
+
+.templated-btn.dominion-btn.secondary {
+    background: linear-gradient(180deg, #6622AA 0%, #441188 100%);
+}
+
+.templated-btn.dominion-btn.danger {
+    background: linear-gradient(180deg, #CC2244 0%, #881122 100%);
+    border-color: #FF6688;
+}
+
+
+/* === TEMPLATED PANEL BASE === */
+.templated-panel {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    font-family: var(--theme-font-display, 'Orbitron', sans-serif);
+}
+
+.templated-panel .panel-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+}
+
+.templated-panel .panel-title-text {
+    flex: 1;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.templated-panel .panel-body {
+    flex: 1;
+    padding: 16px;
+}
+
+/* DEFAULT panel styling */
+.templated-panel.default-panel {
+    background: linear-gradient(180deg, rgba(20, 30, 45, 0.95) 0%, rgba(10, 15, 25, 0.98) 100%);
+    border: 1px solid rgba(74, 158, 255, 0.4);
+}
+
+.templated-panel.default-panel .panel-header {
+    background: rgba(16, 24, 32, 0.8);
+    border-bottom: 1px solid rgba(74, 158, 255, 0.2);
+}
+
+.templated-panel.default-panel .panel-title-text {
+    color: #4a9eff;
+}
+
+.templated-panel.default-panel .panel-body {
+    color: #d0e4f8;
+}
+
+/* LCARS / Federation panel styling */
+.templated-panel.lcars-panel {
+    background: #000011;
+    flex-direction: row;
+    overflow: hidden;
+}
+
+.templated-panel.lcars-panel .panel-color-sidebar {
+    width: 50px;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+}
+
+.templated-panel.lcars-panel .panel-header {
+    background: #1a1a30;
+    border-bottom: none;
+}
+
+.templated-panel.lcars-panel .panel-header.header {
+    flex-direction: row;
+}
+
+.templated-panel.lcars-panel .panel-title-text {
+    color: #FF9944;
+}
+
+.templated-panel.lcars-panel .panel-body {
+    color: #aaddff;
+    flex: 1;
+}
+
+.templated-panel.lcars-panel .panel-part.elbow-corner {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 50px;
+    height: 40px;
+    background: #CC99FF;
+    border-radius: 0 20px 0 0;
+}
+
+/* Color bar decoration for LCARS */
+.templated-panel .panel-decoration.color-bar {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+}
+
+.templated-panel .panel-decoration.color-bar.left {
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 50px;
+}
+
+.templated-panel .panel-decoration.color-bar .color-segment {
+    flex: 1;
+    min-height: 25px;
+}
+
+.templated-panel .panel-decoration.color-bar .color-segment.orange {
+    background: linear-gradient(180deg, #FF9944, #DD7722);
+}
+
+.templated-panel .panel-decoration.color-bar .color-segment.tan {
+    background: linear-gradient(180deg, #FFCC99, #DDAA77);
+}
+
+.templated-panel .panel-decoration.color-bar .color-segment.purple {
+    background: linear-gradient(180deg, #CC99FF, #9966CC);
+}
+
+.templated-panel .panel-decoration.color-bar .color-segment.blue {
+    background: linear-gradient(180deg, #99CCFF, #6699CC);
+}
+
+/* KLINGON panel styling */
+.templated-panel.klingon-panel {
+    background: linear-gradient(180deg, #1a0808 0%, #0a0202 100%);
+    border: 2px solid #880000;
+}
+
+.templated-panel.klingon-panel .panel-header {
+    background: linear-gradient(90deg, #330000, #1a0808);
+    border-bottom: 2px solid #660000;
+}
+
+.templated-panel.klingon-panel .panel-title-text {
+    color: #FF6644;
+    font-weight: 900;
+    letter-spacing: 3px;
+}
+
+.templated-panel.klingon-panel .panel-body {
+    color: #FFCCAA;
+}
+
+/* Klingon decorations */
+.templated-panel .panel-decoration.triangle {
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-style: solid;
+}
+
+.templated-panel .panel-decoration.triangle.corner-tl {
+    top: 0;
+    left: 0;
+    border-width: 25px 25px 0 0;
+    border-color: #CC0000 transparent transparent transparent;
+}
+
+.templated-panel .panel-decoration.triangle.corner-tr {
+    top: 0;
+    right: 0;
+    border-width: 0 25px 25px 0;
+    border-color: transparent #CC0000 transparent transparent;
+}
+
+.templated-panel .panel-decoration.triangle.corner-bl {
+    bottom: 0;
+    left: 0;
+    border-width: 25px 0 0 25px;
+    border-color: transparent transparent transparent #CC0000;
+}
+
+.templated-panel .panel-decoration.triangle.corner-br {
+    bottom: 0;
+    right: 0;
+    border-width: 0 0 25px 25px;
+    border-color: transparent transparent #CC0000 transparent;
+}
+
+.templated-panel .panel-decoration.rivet {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: radial-gradient(circle, #666 30%, #333 70%);
+    border-radius: 50%;
+    border: 1px solid #888;
+}
+
+.templated-panel .panel-decoration.rivet.tl { top: 35px; left: 10px; }
+.templated-panel .panel-decoration.rivet.tr { top: 35px; right: 10px; }
+.templated-panel .panel-decoration.rivet.bl { bottom: 10px; left: 10px; }
+.templated-panel .panel-decoration.rivet.br { bottom: 10px; right: 10px; }
+
+/* ROMULAN panel styling */
+.templated-panel.romulan-panel {
+    background: linear-gradient(180deg, #0a1a15 0%, #051008 100%);
+    border: 1px solid rgba(0, 170, 68, 0.5);
+    border-left: 4px solid #00AA44;
+}
+
+.templated-panel.romulan-panel .panel-header {
+    background: linear-gradient(90deg, rgba(0, 170, 68, 0.2), transparent);
+    border-bottom: 1px solid rgba(0, 170, 68, 0.3);
+}
+
+.templated-panel.romulan-panel .panel-header.bronze-header::before {
+    content: '';
+    width: 30px;
+    height: 3px;
+    background: linear-gradient(90deg, #D4AF37, #B8860B);
+    border-radius: 2px;
+}
+
+.templated-panel.romulan-panel .panel-title-text {
+    color: #44FFAA;
+    font-weight: 500;
+    text-transform: capitalize;
+}
+
+.templated-panel.romulan-panel .panel-body {
+    color: #CCFFDD;
+}
+
+.templated-panel .panel-part.wing-top {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 35px solid transparent;
+    border-right: 35px solid transparent;
+    border-bottom: 18px solid #00AA44;
+}
+
+/* BORG panel styling */
+.templated-panel.borg-panel {
+    background:
+        repeating-linear-gradient(0deg, rgba(0, 255, 0, 0.02) 0px, transparent 1px, transparent 30px),
+        repeating-linear-gradient(90deg, rgba(0, 255, 0, 0.02) 0px, transparent 1px, transparent 30px),
+        rgba(0, 17, 0, 0.95);
+    border: 1px solid rgba(0, 255, 0, 0.5);
+}
+
+.templated-panel.borg-panel .panel-header {
+    border-bottom: 1px solid rgba(0, 255, 0, 0.3);
+}
+
+.templated-panel.borg-panel .panel-header.designation-header::after {
+    content: '';
+    width: 10px;
+    height: 10px;
+    background: #00FF00;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #00FF00;
+    animation: borg-node-pulse 1s ease-in-out infinite;
+}
+
+@keyframes borg-node-pulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 10px #00FF00; }
+    50% { opacity: 0.6; box-shadow: 0 0 20px #00FF00; }
+}
+
+.templated-panel.borg-panel .panel-title-text {
+    color: #00FF00;
+    font-family: 'Roboto Mono', monospace;
+    letter-spacing: 3px;
+    text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+}
+
+.templated-panel.borg-panel .panel-body {
+    color: #00FF00;
+    font-family: 'Roboto Mono', monospace;
+}
+
+.templated-panel .panel-decoration.hex {
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    background: rgba(0, 255, 0, 0.8);
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+}
+
+.templated-panel .panel-decoration.hex.corners.tl,
+.templated-panel .panel-decoration.hex.tl { top: 5px; left: 5px; }
+.templated-panel .panel-decoration.hex.corners.tr,
+.templated-panel .panel-decoration.hex.tr { top: 5px; right: 5px; }
+.templated-panel .panel-decoration.hex.corners.bl,
+.templated-panel .panel-decoration.hex.bl { bottom: 5px; left: 5px; }
+.templated-panel .panel-decoration.hex.corners.br,
+.templated-panel .panel-decoration.hex.br { bottom: 5px; right: 5px; }
+
+.templated-panel .panel-decoration.scanlines.overlay,
+.templated-panel .panel-effect.scanlines {
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 255, 0, 0.03) 2px,
+        rgba(0, 255, 0, 0.03) 4px
+    );
+    pointer-events: none;
+}
+
+.templated-panel .panel-decoration.data-stream,
+.templated-panel .panel-effect.data-stream {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #00FF00, transparent);
+    animation: borg-data-stream 2s linear infinite;
+}
+
+@keyframes borg-data-stream {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* CARDASSIAN panel styling */
+.templated-panel.cardassian-panel {
+    background: linear-gradient(180deg, rgba(26, 16, 5, 0.95) 0%, rgba(15, 8, 2, 0.98) 100%);
+    border: 2px solid rgba(255, 136, 0, 0.5);
+}
+
+.templated-panel.cardassian-panel .panel-header {
+    background: linear-gradient(90deg, rgba(255, 136, 0, 0.2), transparent);
+    border-bottom: 1px solid rgba(255, 136, 0, 0.3);
+}
+
+.templated-panel.cardassian-panel .panel-header.status-header::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background: #FF8800;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #FF8800;
+}
+
+.templated-panel.cardassian-panel .panel-title-text {
+    color: #FFAA44;
+    font-weight: 600;
+}
+
+.templated-panel.cardassian-panel .panel-body {
+    color: #FFDDAA;
+}
+
+.templated-panel .panel-decoration.notch {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: #FF8800;
+}
+
+.templated-panel .panel-decoration.notch.corners.tl,
+.templated-panel .panel-decoration.notch.tl { top: 0; left: 0; clip-path: polygon(0 0, 100% 0, 0 100%); }
+.templated-panel .panel-decoration.notch.corners.tr,
+.templated-panel .panel-decoration.notch.tr { top: 0; right: 0; clip-path: polygon(0 0, 100% 0, 100% 100%); }
+.templated-panel .panel-decoration.notch.corners.bl,
+.templated-panel .panel-decoration.notch.bl { bottom: 0; left: 0; clip-path: polygon(0 0, 0 100%, 100% 100%); }
+.templated-panel .panel-decoration.notch.corners.br,
+.templated-panel .panel-decoration.notch.br { bottom: 0; right: 0; clip-path: polygon(100% 0, 0 100%, 100% 100%); }
+
+.templated-panel .panel-decoration.status-light {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: #FF8800;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #FF8800;
+}
+
+.templated-panel .panel-decoration.status-light.header-left {
+    top: 15px;
+    left: 16px;
+}
+
+/* DOMINION panel styling */
+.templated-panel.dominion-panel {
+    background: linear-gradient(180deg, rgba(16, 5, 32, 0.95) 0%, rgba(8, 2, 18, 0.98) 100%);
+    border: 2px solid rgba(153, 51, 255, 0.5);
+}
+
+.templated-panel.dominion-panel .panel-header {
+    background: linear-gradient(90deg, rgba(153, 51, 255, 0.2), transparent);
+    border-bottom: 1px solid rgba(153, 51, 255, 0.3);
+}
+
+.templated-panel.dominion-panel .panel-header.founder-header::before {
+    content: '';
+    width: 16px;
+    height: 16px;
+    background: linear-gradient(135deg, #FFD700, #FFEE88);
+    clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.templated-panel.dominion-panel .panel-title-text {
+    color: #CC99FF;
+    font-weight: 500;
+    text-transform: capitalize;
+}
+
+.templated-panel.dominion-panel .panel-body {
+    color: #EEDDFF;
+}
+
+.templated-panel .panel-decoration.diamond {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    background: linear-gradient(135deg, #FFD700, #FFEE88);
+    transform: rotate(45deg);
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+}
+
+.templated-panel .panel-decoration.diamond.top-center {
+    top: -8px;
+    left: 50%;
+    margin-left: -8px;
+}
+
+.templated-panel .panel-decoration.shimmer.overlay,
+.templated-panel .panel-effect.shimmer-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.05), transparent);
+    background-size: 200% 100%;
+    animation: dominion-shimmer-effect 4s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes dominion-shimmer-effect {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+.templated-panel .panel-decoration.gold-line,
+.templated-panel .panel-decoration.glow-line {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #FFD700, transparent);
+}
+
+.templated-panel .panel-decoration.founder-symbol {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: linear-gradient(135deg, #FFD700, #FFEE88);
+    clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+    box-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+}
+
+.templated-panel .panel-decoration.founder-symbol.header-left {
+    top: 12px;
+    left: 16px;
+}
+
+.templated-panel .panel-decoration.node-indicator {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: #00FF00;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #00FF00;
+}
+
+.templated-panel .panel-decoration.node-indicator.header-right {
+    top: 12px;
+    right: 16px;
+}
+
+.templated-panel .panel-decoration.hierarchy-badge {
+    position: absolute;
+    width: 20px;
+    height: 10px;
+    background: linear-gradient(90deg, #FF8800, #FFAA44);
+    clip-path: polygon(10% 0%, 90% 0%, 100% 50%, 90% 100%, 10% 100%, 0% 50%);
+}
+
+.templated-panel .panel-decoration.hierarchy-badge.header-right {
+    top: 14px;
+    right: 16px;
+}
+
+.templated-panel .panel-decoration.surveillance-line {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #FF8800, transparent);
+    animation: cardassian-scan 3s linear infinite;
+}
+
+@keyframes cardassian-scan {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+
+/* === TEMPLATED SIDEBAR BASE === */
+.templated-sidebar {
+    display: flex;
+    flex-direction: column;
+    font-family: var(--theme-font-display, 'Orbitron', sans-serif);
+}
+
+.templated-sidebar .sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px;
+}
+
+.templated-sidebar .nav-item {
+    display: flex;
+    align-items: center;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.templated-sidebar .nav-part.label {
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+/* DEFAULT sidebar */
+.templated-sidebar.default-sidebar {
+    background: #080c10;
+    border-right: 1px solid rgba(74, 158, 255, 0.3);
+    width: 120px;
+}
+
+.templated-sidebar.default-sidebar .nav-item {
+    padding: 12px 8px;
+    color: #708898;
+    border-left: 3px solid transparent;
+    flex-direction: column;
+}
+
+.templated-sidebar.default-sidebar .nav-item:hover {
+    background: #182028;
+    color: #d0e4f8;
+}
+
+.templated-sidebar.default-sidebar .nav-item.active {
+    background: #182028;
+    color: #4a9eff;
+    border-left-color: #4a9eff;
+}
+
+/* LCARS sidebar */
+.templated-sidebar.lcars-sidebar {
+    background: #000011;
+    width: 130px;
+    display: flex;
+    flex-direction: row;
+}
+
+.templated-sidebar.lcars-sidebar .sidebar-part.vertical-bar {
+    width: 20px;
+    background: linear-gradient(180deg, #FF9944 0%, #FF9944 40%, #CC99FF 40%);
+    border-radius: 10px 0 0 10px;
+}
+
+.templated-sidebar.lcars-sidebar .sidebar-nav {
+    flex: 1;
+    padding: 10px 8px;
+}
+
+.templated-sidebar.lcars-sidebar .nav-item {
+    background: #CC99FF;
+    border-radius: 0 15px 15px 0;
+    height: 35px;
+    padding: 0 10px;
+}
+
+.templated-sidebar.lcars-sidebar .nav-item.active {
+    background: #FF9944;
+}
+
+.templated-sidebar.lcars-sidebar .nav-part.label {
+    color: #000;
+    font-weight: 700;
+    font-size: 9px;
+}
+
+/* KLINGON sidebar */
+.templated-sidebar.klingon-sidebar {
+    background: linear-gradient(180deg, #1a0808 0%, #0a0202 100%);
+    border-right: 2px solid #880000;
+    width: 130px;
+}
+
+.templated-sidebar.klingon-sidebar .sidebar-emblem {
+    height: 50px;
+    background: linear-gradient(180deg, #CC0000, #880000);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.templated-sidebar.klingon-sidebar .nav-item {
+    background: linear-gradient(90deg, #330000, #1a0808);
+    padding: 12px 10px;
+    clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 50%, calc(100% - 8px) 100%, 0 100%);
+    border-bottom: 1px solid #660000;
+}
+
+.templated-sidebar.klingon-sidebar .nav-item:hover {
+    background: linear-gradient(90deg, #440000, #220000);
+}
+
+.templated-sidebar.klingon-sidebar .nav-item.active {
+    background: linear-gradient(90deg, #880000, #440000);
+    border-left: 3px solid #FF4444;
+}
+
+.templated-sidebar.klingon-sidebar .nav-part.label {
+    color: #FFCCAA;
+    font-weight: 900;
+    letter-spacing: 2px;
+}
+
+/* ROMULAN sidebar */
+.templated-sidebar.romulan-sidebar {
+    background: linear-gradient(180deg, #0a1a15 0%, #051008 100%);
+    border-right: 1px solid rgba(0, 170, 68, 0.5);
+    width: 130px;
+}
+
+.templated-sidebar.romulan-sidebar .sidebar-emblem.bird-emblem {
+    height: 60px;
+    background: linear-gradient(180deg, rgba(0, 170, 68, 0.3), transparent);
+    border-bottom: 2px solid #D4AF37;
+}
+
+.templated-sidebar.romulan-sidebar .nav-item {
+    background: transparent;
+    padding: 10px 12px;
+    border-left: 3px solid transparent;
+    border-radius: 0 12px 12px 0;
+}
+
+.templated-sidebar.romulan-sidebar .nav-item:hover {
+    background: rgba(0, 170, 68, 0.1);
+    border-left-color: rgba(0, 170, 68, 0.5);
+}
+
+.templated-sidebar.romulan-sidebar .nav-item.active {
+    background: rgba(0, 170, 68, 0.2);
+    border-left-color: #00AA44;
+}
+
+.templated-sidebar.romulan-sidebar .nav-part.label {
+    color: #CCFFDD;
+    font-weight: 500;
+    text-transform: capitalize;
+}
+
+/* BORG sidebar */
+.templated-sidebar.borg-sidebar {
+    background:
+        repeating-linear-gradient(0deg, rgba(0, 255, 0, 0.02) 0px, transparent 1px, transparent 20px),
+        repeating-linear-gradient(90deg, rgba(0, 255, 0, 0.02) 0px, transparent 1px, transparent 20px),
+        rgba(0, 17, 0, 0.95);
+    border-right: 1px solid rgba(0, 255, 0, 0.5);
+    width: 130px;
+}
+
+.templated-sidebar.borg-sidebar .sidebar-emblem.collective-node {
+    height: 50px;
+    background: rgba(0, 255, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid rgba(0, 255, 0, 0.3);
+}
+
+.templated-sidebar.borg-sidebar .sidebar-emblem.collective-node::after {
+    content: '';
+    width: 30px;
+    height: 30px;
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    background: #00FF00;
+    box-shadow: 0 0 15px #00FF00;
+}
+
+.templated-sidebar.borg-sidebar .nav-item {
+    background: rgba(0, 255, 0, 0.05);
+    padding: 10px;
+    border: 1px solid rgba(0, 255, 0, 0.2);
+    clip-path: polygon(10% 0%, 90% 0%, 100% 50%, 90% 100%, 10% 100%, 0% 50%);
+    margin: 4px 8px;
+}
+
+.templated-sidebar.borg-sidebar .nav-item:hover {
+    background: rgba(0, 255, 0, 0.15);
+}
+
+.templated-sidebar.borg-sidebar .nav-item.active {
+    background: rgba(0, 255, 0, 0.2);
+    border-color: rgba(0, 255, 0, 0.6);
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+}
+
+.templated-sidebar.borg-sidebar .nav-part.label,
+.templated-sidebar.borg-sidebar .nav-part.designation {
+    color: #00FF00;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+}
+
+/* CARDASSIAN sidebar */
+.templated-sidebar.cardassian-sidebar {
+    background: linear-gradient(180deg, rgba(26, 16, 5, 0.95) 0%, rgba(15, 8, 2, 0.98) 100%);
+    border-right: 2px solid rgba(255, 136, 0, 0.5);
+    width: 130px;
+}
+
+.templated-sidebar.cardassian-sidebar .sidebar-emblem {
+    height: 50px;
+    background: linear-gradient(180deg, rgba(255, 136, 0, 0.3), transparent);
+    border-bottom: 1px solid rgba(255, 136, 0, 0.3);
+}
+
+.templated-sidebar.cardassian-sidebar .nav-item {
+    background: rgba(255, 136, 0, 0.1);
+    padding: 10px 12px;
+    border-left: 3px solid transparent;
+    clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px);
+    margin: 4px 8px;
+}
+
+.templated-sidebar.cardassian-sidebar .nav-item:hover {
+    background: rgba(255, 136, 0, 0.2);
+}
+
+.templated-sidebar.cardassian-sidebar .nav-item.active {
+    background: rgba(255, 136, 0, 0.25);
+    border-left-color: #FF8800;
+}
+
+.templated-sidebar.cardassian-sidebar .nav-part.label {
+    color: #FFDDAA;
+    font-weight: 600;
+}
+
+/* DOMINION sidebar */
+.templated-sidebar.dominion-sidebar {
+    background: linear-gradient(180deg, rgba(16, 5, 32, 0.95) 0%, rgba(8, 2, 18, 0.98) 100%);
+    border-right: 2px solid rgba(153, 51, 255, 0.5);
+    width: 130px;
+}
+
+.templated-sidebar.dominion-sidebar .sidebar-emblem.founder-emblem {
+    height: 60px;
+    background: linear-gradient(180deg, rgba(153, 51, 255, 0.3), transparent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 2px solid rgba(255, 215, 0, 0.5);
+}
+
+.templated-sidebar.dominion-sidebar .sidebar-emblem.founder-emblem::after {
+    content: '';
+    width: 25px;
+    height: 25px;
+    background: linear-gradient(135deg, #FFD700, #FFEE88);
+    clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+}
+
+.templated-sidebar.dominion-sidebar .nav-item {
+    background: rgba(153, 51, 255, 0.1);
+    padding: 10px 12px;
+    border-radius: 6px;
+    margin: 4px 8px;
+    border-left: 3px solid transparent;
+}
+
+.templated-sidebar.dominion-sidebar .nav-item:hover {
+    background: rgba(153, 51, 255, 0.2);
+}
+
+.templated-sidebar.dominion-sidebar .nav-item.active {
+    background: rgba(153, 51, 255, 0.25);
+    border-left-color: #FFD700;
+}
+
+.templated-sidebar.dominion-sidebar .nav-part.label {
+    color: #EEDDFF;
+    font-weight: 500;
+    text-transform: capitalize;
+}
+
+
+/* === TEMPLATED HEADER BASE === */
+.templated-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    position: relative;
+    font-family: var(--theme-font-display, 'Orbitron', sans-serif);
+}
+
+.templated-header .header-title-block {
+    display: flex;
+    flex-direction: column;
+}
+
+.templated-header .header-title {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 3px;
+}
+
+.templated-header .header-subtitle {
+    font-size: 10px;
+    margin-top: 2px;
+}
+
+.templated-header .header-resources {
+    display: flex;
+    gap: 16px;
+    flex: 1;
+}
+
+.templated-header .header-actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* DEFAULT header */
+.templated-header.default-header {
+    background: linear-gradient(180deg, #101820 0%, #080c10 100%);
+    border-bottom: 2px solid #4a9eff;
+    padding: 0 20px;
+    height: 60px;
+}
+
+.templated-header.default-header .header-title {
+    color: #4a9eff;
+}
+
+.templated-header.default-header .header-subtitle {
+    color: #708898;
+}
+
+/* LCARS header */
+.templated-header.lcars-header {
+    background: linear-gradient(180deg, #000011 0%, #000008 100%);
+    padding: 0;
+    height: 70px;
+}
+
+.templated-header.lcars-header .header-part.elbow {
+    width: 80px;
+    height: 100%;
+    background: #FF9944;
+    border-radius: 0 0 40px 0;
+    flex-shrink: 0;
+}
+
+.templated-header.lcars-header .header-decoration.color-bars {
+    display: flex;
+    height: 8px;
+    position: absolute;
+    top: 0;
+    left: 80px;
+    right: 0;
+}
+
+.templated-header.lcars-header .header-decoration.color-bars .color-bar-segment {
+    flex: 1;
+    min-width: 60px;
+}
+
+.templated-header.lcars-header .header-decoration.color-bars .color-bar-segment.orange { background: #FF9944; }
+.templated-header.lcars-header .header-decoration.color-bars .color-bar-segment.tan { background: #FFCC99; }
+.templated-header.lcars-header .header-decoration.color-bars .color-bar-segment.purple { background: #CC99FF; }
+.templated-header.lcars-header .header-decoration.color-bars .color-bar-segment.blue { background: #99CCFF; }
+
+.templated-header.lcars-header .header-title-block {
+    margin-left: 20px;
+}
+
+.templated-header.lcars-header .header-title {
+    color: #FF9944;
+}
+
+.templated-header.lcars-header .header-subtitle {
+    color: #AADDFF;
+}
+
+.templated-header.lcars-header .header-part.cap {
+    width: 20px;
+    height: 60%;
+    background: #CC99FF;
+    border-radius: 10px;
+    margin-left: auto;
+    margin-right: 15px;
+}
+
+/* KLINGON header */
+.templated-header.klingon-header {
+    background: linear-gradient(180deg, #1a0808 0%, #0a0202 100%);
+    border-bottom: 3px solid #880000;
+    padding: 0 20px;
+    height: 65px;
+}
+
+.templated-header.klingon-header .header-part.blade-left,
+.templated-header.klingon-header .header-part.blade-right {
+    width: 30px;
+    height: 100%;
+    background: linear-gradient(180deg, #880000, #440000);
+    clip-path: polygon(0 0, 100% 20%, 100% 80%, 0 100%);
+}
+
+.templated-header.klingon-header .header-part.trefoil {
+    width: 40px;
+    height: 40px;
+    background: #CC0000;
+    border-radius: 50%;
+    margin: 0 10px;
+}
+
+.templated-header.klingon-header .header-title {
+    color: #FF6644;
+    font-weight: 900;
+    letter-spacing: 4px;
+}
+
+.templated-header.klingon-header .header-subtitle {
+    color: #FFCCAA;
+}
+
+.templated-header.klingon-header .header-decoration.spike {
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 15px solid transparent;
+    border-right: 15px solid transparent;
+    border-top: 10px solid #CC0000;
+}
+
+/* ROMULAN header */
+.templated-header.romulan-header {
+    background: linear-gradient(180deg, #0a1a15 0%, #051008 100%);
+    border-bottom: 1px solid rgba(0, 170, 68, 0.5);
+    padding: 0 20px;
+    height: 65px;
+}
+
+.templated-header.romulan-header .header-part.wing-left,
+.templated-header.romulan-header .header-part.wing-right {
+    width: 50px;
+    height: 100%;
+    background: linear-gradient(180deg, rgba(0, 170, 68, 0.3), transparent);
+}
+
+.templated-header.romulan-header .header-part.wing-left {
+    clip-path: polygon(0 50%, 100% 0, 100% 100%);
+}
+
+.templated-header.romulan-header .header-part.wing-right {
+    clip-path: polygon(0 0, 100% 50%, 0 100%);
+}
+
+.templated-header.romulan-header .header-part.bird-icon {
+    width: 35px;
+    height: 35px;
+    background: linear-gradient(180deg, #00AA44, #006633);
+    clip-path: polygon(50% 0%, 100% 35%, 80% 100%, 50% 70%, 20% 100%, 0% 35%);
+    margin: 0 10px;
+}
+
+.templated-header.romulan-header .header-title {
+    color: #44FFAA;
+    font-weight: 500;
+    text-transform: capitalize;
+}
+
+.templated-header.romulan-header .header-subtitle {
+    color: #CCFFDD;
+}
+
+.templated-header.romulan-header .header-decoration.bronze-divider {
+    width: 2px;
+    height: 40px;
+    background: linear-gradient(180deg, #D4AF37, #B8860B);
+    margin: 0 15px;
+}
+
+.templated-header.romulan-header .header-decoration.v-motif {
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 20px solid transparent;
+    border-right: 20px solid transparent;
+    border-top: 12px solid #00AA44;
+}
+
+/* BORG header */
+.templated-header.borg-header {
+    background:
+        repeating-linear-gradient(0deg, rgba(0, 255, 0, 0.02) 0px, transparent 1px, transparent 20px),
+        repeating-linear-gradient(90deg, rgba(0, 255, 0, 0.02) 0px, transparent 1px, transparent 20px),
+        rgba(0, 17, 0, 0.95);
+    border-bottom: 1px solid rgba(0, 255, 0, 0.5);
+    padding: 0 20px;
+    height: 60px;
+}
+
+.templated-header.borg-header .header-title {
+    color: #00FF00;
+    font-family: 'Roboto Mono', monospace;
+    letter-spacing: 4px;
+    text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+}
+
+.templated-header.borg-header .header-subtitle,
+.templated-header.borg-header .header-subroutine {
+    color: rgba(0, 255, 0, 0.7);
+    font-family: 'Roboto Mono', monospace;
+    font-size: 9px;
+}
+
+.templated-header.borg-header .header-part.status-nodes {
+    display: flex;
+    gap: 8px;
+    margin-left: auto;
+}
+
+.templated-header.borg-header .header-part.status-nodes::before,
+.templated-header.borg-header .header-part.status-nodes::after {
+    content: '';
+    width: 10px;
+    height: 10px;
+    background: #00FF00;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #00FF00;
+}
+
+.templated-header.borg-header .header-decoration.glow-line {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #00FF00, transparent);
+}
+
+/* CARDASSIAN header */
+.templated-header.cardassian-header {
+    background: linear-gradient(180deg, rgba(26, 16, 5, 0.95) 0%, rgba(15, 8, 2, 0.98) 100%);
+    border-bottom: 2px solid rgba(255, 136, 0, 0.5);
+    padding: 0 20px;
+    height: 60px;
+}
+
+.templated-header.cardassian-header .header-decoration.status-light {
+    position: absolute;
+    left: 15px;
+    width: 10px;
+    height: 10px;
+    background: #FF8800;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #FF8800;
+}
+
+.templated-header.cardassian-header .header-title {
+    color: #FFAA44;
+    font-weight: 600;
+}
+
+.templated-header.cardassian-header .header-subtitle {
+    color: #FFDDAA;
+}
+
+.templated-header.cardassian-header .header-decoration.surveillance-line {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #FF8800, transparent);
+    background-size: 200% 100%;
+    animation: surveillance-sweep 3s linear infinite;
+}
+
+@keyframes surveillance-sweep {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+/* DOMINION header */
+.templated-header.dominion-header {
+    background: linear-gradient(180deg, rgba(16, 5, 32, 0.95) 0%, rgba(8, 2, 18, 0.98) 100%);
+    border-bottom: 2px solid rgba(153, 51, 255, 0.5);
+    padding: 0 20px;
+    height: 65px;
+}
+
+.templated-header.dominion-header .header-part.diamond-left,
+.templated-header.dominion-header .header-part.diamond-right {
+    width: 20px;
+    height: 20px;
+    background: linear-gradient(135deg, #FFD700, #FFEE88);
+    transform: rotate(45deg);
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+    flex-shrink: 0;
+}
+
+.templated-header.dominion-header .header-part.founder-icon {
+    width: 30px;
+    height: 30px;
+    background: linear-gradient(135deg, #FFD700, #FFEE88);
+    clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+    margin: 0 15px;
+}
+
+.templated-header.dominion-header .header-title {
+    color: #CC99FF;
+    font-weight: 500;
+    text-transform: capitalize;
+}
+
+.templated-header.dominion-header .header-subtitle {
+    color: #EEDDFF;
+}
+
+.templated-header.dominion-header .header-decoration.golden-line {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #FFD700, transparent);
+}
+
+.templated-header.dominion-header .header-decoration.shimmer {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.03), transparent);
+    background-size: 200% 100%;
+    animation: dominion-header-shimmer 4s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes dominion-header-shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+
+/* === TEMPLATED LAYOUT BASE === */
+.templated-layout {
+    display: grid;
+    min-height: 100vh;
+    font-family: var(--theme-font-display, 'Orbitron', sans-serif);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Grid area assignments */
+.templated-layout .area-header { grid-area: header; }
+.templated-layout .area-sidebar-left { grid-area: sidebar; }
+.templated-layout .area-main { grid-area: main; overflow: auto; }
+.templated-layout .area-sidebar-right { grid-area: context; }
+.templated-layout .area-footer { grid-area: footer; }
+.templated-layout .area-command { grid-area: command; }
+
+/* Alternative grid area names */
+.templated-layout.layout-borg .area-sidebar-left { grid-area: sidebar-l; }
+.templated-layout.layout-borg .area-sidebar-right { grid-area: sidebar-r; }
+.templated-layout.layout-cardassian .area-sidebar-left { grid-area: info-l; }
+.templated-layout.layout-cardassian .area-sidebar-right { grid-area: info-r; }
+.templated-layout.layout-cardassian .area-footer { grid-area: status; }
+.templated-layout.layout-dominion .area-footer { grid-area: subjects; }
+
+/* DEFAULT layout styling */
+.templated-layout.layout-default {
+    background: var(--theme-bg, #020304);
+}
+
+.templated-layout.layout-default .area-header {
+    background: linear-gradient(180deg, #101820 0%, #080c10 100%);
+    border-bottom: 2px solid #4a9eff;
+}
+
+.templated-layout.layout-default .area-sidebar-left {
+    background: #080c10;
+    border-right: 1px solid rgba(74, 158, 255, 0.3);
+}
+
+.templated-layout.layout-default .area-sidebar-right {
+    background: #080c10;
+    border-left: 1px solid rgba(74, 158, 255, 0.3);
+}
+
+/* FEDERATION layout styling — SNW / Strange New Worlds modern LCARS
+   Flat dark panels, thin cyan borders, no TNG color bars */
+.templated-layout.layout-federation {
+    background: #020814;
+    position: relative;
+}
+
+/* No large decorative corner pieces in SNW style */
+.templated-layout.layout-federation::before,
+.templated-layout.layout-federation::after {
+    content: none;
+}
+
+.templated-layout.layout-federation .area-header {
+    background: #010b1e;
+    border-bottom: 1px solid rgba(0, 200, 232, 0.45);
+    position: relative;
+    z-index: 5;
+}
+
+.templated-layout.layout-federation .area-sidebar-left {
+    background: #010b1e;
+    border-right: 1px solid rgba(0, 200, 232, 0.2);
+    position: relative;
+    z-index: 5;
+    overflow: auto;
+}
+
+/* Remove old TNG color bar pseudo-elements */
+.templated-layout.layout-federation .area-sidebar-left::before,
+.templated-layout.layout-federation .area-sidebar-left::after {
+    content: none;
+}
+
+.templated-layout.layout-federation .area-sidebar-right {
+    background: #010b1e;
+    border-left: 1px solid rgba(0, 200, 232, 0.2);
+    position: relative;
+    z-index: 5;
+}
+
+.templated-layout.layout-federation .area-main {
+    background: #020814;
+    position: relative;
+    z-index: 5;
+}
+
+/* SNW decorations are invisible — no TNG elbow pieces */
+.templated-layout.layout-federation .layout-decoration.snw-lcars,
+.templated-layout.layout-federation .layout-decoration.data-readouts,
+.templated-layout.layout-federation .layout-decoration.lcars-curves,
+.templated-layout.layout-federation .layout-decoration.color-bars {
+    display: none;
+}
+
+.templated-layout.layout-federation .area-footer {
+    background: #010b1e;
+    border-top: 1px solid rgba(0, 200, 232, 0.2);
+    position: relative;
+}
+
+.templated-layout.layout-federation .area-footer::after {
+    content: none;
+}
+
+/* KLINGON layout styling - CHAOTIC ANGULAR WARRIOR DESIGN */
+.templated-layout.layout-klingon {
+    background:
+        /* Hexagonal grid pattern */
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='52'%3E%3Cpath d='M30 0 L60 15 L60 37 L30 52 L0 37 L0 15 Z' fill='none' stroke='rgba(200,0,0,0.08)' stroke-width='1'/%3E%3C/svg%3E"),
+        radial-gradient(ellipse at 20% 30%, rgba(180, 0, 0, 0.12) 0%, transparent 40%),
+        radial-gradient(ellipse at 80% 70%, rgba(180, 0, 0, 0.08) 0%, transparent 40%),
+        linear-gradient(135deg, #0a0202 0%, #150505 50%, #0a0202 100%);
+    position: relative;
+}
+
+/* TOP-LEFT angular corner - aggressive triangle */
+.templated-layout.layout-klingon::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    border-top: 80px solid #CC0000;
+    border-right: 120px solid transparent;
+    z-index: 10;
+    pointer-events: none;
+}
+
+/* TOP-RIGHT angular corner - opposing triangle */
+.templated-layout.layout-klingon::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 0;
+    height: 0;
+    border-top: 60px solid #880000;
+    border-left: 100px solid transparent;
+    z-index: 10;
+    pointer-events: none;
+}
+
+.templated-layout.layout-klingon .area-header {
+    background: linear-gradient(180deg, #200808 0%, #100404 100%);
+    border-bottom: 3px solid #CC0000;
+    position: relative;
+    clip-path: polygon(0 0, 100% 0, 98% 100%, 2% 100%);
+    margin: 0 10px;
+}
+
+/* Header triangular accents */
+.templated-layout.layout-klingon .area-header::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 60px solid transparent;
+    border-right: 60px solid transparent;
+    border-bottom: 20px solid #CC0000;
+    z-index: 5;
+}
+
+.templated-layout.layout-klingon .area-header::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    height: 4px;
+    background: linear-gradient(90deg, transparent, #FF4400, #FFAA00, #FF4400, transparent);
+}
+
+.templated-layout.layout-klingon .area-sidebar-left {
+    background: linear-gradient(180deg, #1a0606 0%, #0a0202 100%);
+    position: relative;
+    clip-path: polygon(0 0, 100% 2%, 100% 98%, 0 100%);
+}
+
+/* Angular red strips on sidebar */
+.templated-layout.layout-klingon .area-sidebar-left::before {
+    content: '';
+    position: absolute;
+    top: 20%;
+    left: 0;
+    width: 12px;
+    height: 60%;
+    background: linear-gradient(180deg,
+        transparent 0%,
+        #CC0000 10%, #FF0000 20%,
+        #CC0000 50%,
+        #FF0000 80%, #CC0000 90%,
+        transparent 100%
+    );
+    clip-path: polygon(0 0, 100% 5%, 100% 95%, 0 100%);
+}
+
+/* Triangular accent on sidebar */
+.templated-layout.layout-klingon .area-sidebar-left::after {
+    content: '';
+    position: absolute;
+    top: 10%;
+    right: 5px;
+    width: 0;
+    height: 0;
+    border-top: 25px solid transparent;
+    border-bottom: 25px solid transparent;
+    border-right: 15px solid rgba(200, 0, 0, 0.4);
+}
+
+.templated-layout.layout-klingon .area-main {
+    background:
+        /* Subtle triangle pattern */
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='35'%3E%3Cpath d='M20 0 L40 35 L0 35 Z' fill='none' stroke='rgba(150,0,0,0.04)' stroke-width='1'/%3E%3C/svg%3E"),
+        linear-gradient(180deg, #080303 0%, #040101 100%);
+    border-left: 2px solid rgba(200, 0, 0, 0.3);
+    border-right: 2px solid rgba(200, 0, 0, 0.3);
+}
+
+.templated-layout.layout-klingon .area-footer {
+    background: linear-gradient(0deg, #330000 0%, #1a0808 100%);
+    border-top: 3px solid #CC0000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    position: relative;
+    clip-path: polygon(2% 0, 98% 0, 100% 100%, 0 100%);
+    margin: 0 10px;
+}
+
+/* BOTTOM-LEFT angular corner */
+.templated-layout.layout-klingon .layout-decoration.bottom-action-bar::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    border-bottom: 60px solid #880000;
+    border-right: 100px solid transparent;
+    z-index: 10;
+    pointer-events: none;
+}
+
+/* BOTTOM-RIGHT angular corner */
+.templated-layout.layout-klingon .layout-decoration.bottom-action-bar::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 0;
+    height: 0;
+    border-bottom: 70px solid #CC0000;
+    border-left: 110px solid transparent;
+    z-index: 10;
+    pointer-events: none;
+}
+
+/* Angular edges decoration */
+.templated-layout.layout-klingon .layout-decoration.angular-edges::before {
+    content: '';
+    position: absolute;
+    top: 80px;
+    left: 0;
+    width: 8px;
+    height: calc(100% - 140px);
+    background: linear-gradient(180deg,
+        #CC0000 0%, #880000 20%,
+        #440000 50%,
+        #880000 80%, #CC0000 100%
+    );
+    clip-path: polygon(0 0, 100% 3%, 100% 97%, 0 100%);
+    z-index: 10;
+}
+
+.templated-layout.layout-klingon .layout-decoration.angular-edges::after {
+    content: '';
+    position: absolute;
+    top: 60px;
+    right: 0;
+    width: 6px;
+    height: calc(100% - 130px);
+    background: linear-gradient(180deg,
+        #880000 0%, #660000 30%,
+        #440000 50%,
+        #660000 70%, #880000 100%
+    );
+    clip-path: polygon(0 2%, 100% 0, 100% 100%, 0 98%);
+    z-index: 10;
+}
+
+/* ==== KLINGON EDGE-HUGGING NAV BUTTONS ==== */
+/* PARALLELOGRAM style - Birth of the Federation inspired, sharp angular edges */
+
+/* LEFT EDGE - Main navigation parallelograms */
+.templated-layout.layout-klingon .edge-nav-container {
+    position: fixed;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    z-index: 100;
+}
+
+.templated-layout.layout-klingon .edge-nav-btn {
+    position: relative;
+    width: 140px;
+    height: 38px;
+    background: linear-gradient(135deg, #AA0000 0%, #770000 50%, #550000 100%);
+    /* Parallelogram: top-left cut, bottom extends right */
+    clip-path: polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    padding-left: 20px;
+    color: #FFAA00;
+    font-family: var(--st-font-display);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    transition: all 0.12s ease;
+    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.5);
+}
+
+.templated-layout.layout-klingon .edge-nav-btn:hover {
+    width: 160px;
+    background: linear-gradient(135deg, #CC2200 0%, #AA0000 50%, #880000 100%);
+    color: #FFCC00;
+    box-shadow: 3px 3px 10px rgba(200, 50, 0, 0.4);
+}
+
+/* Sharp accent line on edge */
+.templated-layout.layout-klingon .edge-nav-btn::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 3px;
+    height: 100%;
+    background: linear-gradient(180deg, #FFAA00, #FF6600);
+    clip-path: polygon(0 0, 100% 10%, 100% 90%, 0 100%);
+}
+
+.templated-layout.layout-klingon .edge-nav-btn.active {
+    width: 170px;
+    background: linear-gradient(135deg, #FF4400 0%, #CC2200 50%, #AA0000 100%);
+    color: #FFDD44;
+}
+
+.templated-layout.layout-klingon .edge-nav-btn.active::before {
+    background: linear-gradient(180deg, #FFCC00, #FFAA00);
+    width: 5px;
+}
+
+/* RIGHT EDGE - Status/Secondary parallelograms (mirrored) */
+.templated-layout.layout-klingon .edge-status-container {
+    position: fixed;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    z-index: 100;
+}
+
+.templated-layout.layout-klingon .edge-status-btn {
+    position: relative;
+    width: 110px;
+    height: 34px;
+    background: linear-gradient(225deg, #880000 0%, #550000 50%, #330000 100%);
+    /* Mirrored parallelogram */
+    clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 100%, 10px 100%);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 16px;
+    color: #FF8866;
+    font-family: var(--st-font-display);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    transition: all 0.12s ease;
+    box-shadow: -2px 2px 6px rgba(0, 0, 0, 0.5);
+}
+
+.templated-layout.layout-klingon .edge-status-btn:hover {
+    width: 130px;
+    background: linear-gradient(225deg, #AA2200 0%, #770000 50%, #550000 100%);
+    color: #FFAA88;
+}
+
+.templated-layout.layout-klingon .edge-status-btn::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 3px;
+    height: 100%;
+    background: linear-gradient(180deg, #FF6644, #CC3322);
+    clip-path: polygon(0 10%, 100% 0, 100% 100%, 0 90%);
+}
+
+/* BOTTOM EDGE - Horizontal parallelogram action bar */
+.templated-layout.layout-klingon .edge-bottom-container {
+    position: fixed;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 4px;
+    z-index: 100;
+}
+
+.templated-layout.layout-klingon .edge-tooth-btn {
+    width: 70px;
+    height: 40px;
+    background: linear-gradient(180deg, #880000 0%, #660000 50%, #440000 100%);
+    /* Subtle parallelogram - not full teeth */
+    clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #FFAA00;
+    font-size: 18px;
+    transition: all 0.12s ease;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.6);
+}
+
+.templated-layout.layout-klingon .edge-tooth-btn:hover {
+    background: linear-gradient(180deg, #CC2200 0%, #AA0000 50%, #880000 100%);
+    color: #FFCC00;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(200, 50, 0, 0.4);
+}
+
+.templated-layout.layout-klingon .edge-tooth-btn.primary {
+    width: 90px;
+    height: 46px;
+    background: linear-gradient(180deg, #CC2200 0%, #AA0000 50%, #880000 100%);
+}
+
+.templated-layout.layout-klingon .edge-tooth-btn.primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 8px;
+    right: 8px;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #FFAA00, transparent);
+}
+
+.templated-layout.layout-klingon .edge-tooth-btn.primary:hover {
+    background: linear-gradient(180deg, #FF4400 0%, #CC2200 50%, #AA0000 100%);
+}
+
+/* TOP CENTER - Asymmetric angular title bar */
+.templated-layout.layout-klingon .edge-top-title {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 350px;
+    height: 55px;
+    background: linear-gradient(180deg, #AA0000 0%, #770000 60%, #440000 100%);
+    /* Asymmetric parallelogram - left more angled than right */
+    clip-path: polygon(25px 0, calc(100% - 15px) 0, 100% 100%, 0 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+}
+
+/* Gold accent bar at top */
+.templated-layout.layout-klingon .edge-top-title::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 30px;
+    right: 20px;
+    height: 4px;
+    background: linear-gradient(90deg, #FFAA00, #FF6600, #FFAA00);
+}
+
+.templated-layout.layout-klingon .edge-top-title h1 {
+    color: #FFCC00;
+    font-family: var(--st-font-display);
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    text-shadow: 0 0 12px rgba(255, 200, 0, 0.5), 0 2px 4px rgba(0,0,0,0.8);
+    margin: 0;
+    padding-top: 8px;
+}
+
+/* Klingon central emblem - trefoil inspired */
+.templated-layout.layout-klingon .klingon-emblem {
+    position: fixed;
+    top: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #FFAA00 0%, #CC7700 50%, #884400 100%);
+    /* Asymmetric pentagon */
+    clip-path: polygon(50% 0%, 95% 35%, 80% 100%, 20% 100%, 5% 35%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    z-index: 101;
+    box-shadow: 0 0 25px rgba(255, 150, 0, 0.4), inset 0 0 10px rgba(0,0,0,0.3);
+}
+
+/* ==== CHAOTIC ASYMMETRIC CORNER SHAPES ==== */
+/* Each corner is different - chaotic like Klingon architecture */
+
+/* TOP-LEFT: Large aggressive triangle extending down left side */
+.templated-layout.layout-klingon .corner-accent-tl {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 180px;
+    height: 130px;
+    background: linear-gradient(135deg, #CC0000 0%, #880000 60%, #550000 100%);
+    /* Jagged polygon - extends down to connect with nav buttons */
+    clip-path: polygon(
+        0 0, 100% 0,
+        65% 40%, 50% 45%,
+        35% 70%, 20% 100%,
+        0 100%
+    );
+    z-index: 99;
+    box-shadow: 4px 4px 15px rgba(0, 0, 0, 0.5);
+}
+
+/* Inner glow/accent */
+.templated-layout.layout-klingon .corner-accent-tl::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background: linear-gradient(90deg, #FFAA00, #FF6600 30%, transparent);
+}
+
+/* TOP-RIGHT: Different angle, smaller */
+.templated-layout.layout-klingon .corner-accent-tr {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 140px;
+    height: 100px;
+    background: linear-gradient(225deg, #990000 0%, #660000 60%, #440000 100%);
+    /* Different jagged shape */
+    clip-path: polygon(
+        40% 0, 100% 0,
+        100% 100%,
+        70% 80%, 55% 50%,
+        30% 35%, 0 25%
+    );
+    z-index: 99;
+    box-shadow: -3px 3px 12px rgba(0, 0, 0, 0.5);
+}
+
+.templated-layout.layout-klingon .corner-accent-tr::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 60%;
+    height: 4px;
+    background: linear-gradient(90deg, transparent, #FF6600);
+}
+
+/* BOTTOM-LEFT: Connects to bottom button area */
+.templated-layout.layout-klingon .corner-accent-bl {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 160px;
+    height: 90px;
+    background: linear-gradient(45deg, #770000 0%, #550000 60%, #330000 100%);
+    clip-path: polygon(
+        0 30%, 25% 20%,
+        45% 35%, 60% 0,
+        80% 40%, 100% 60%,
+        100% 100%, 0 100%
+    );
+    z-index: 99;
+    box-shadow: 3px -3px 12px rgba(0, 0, 0, 0.5);
+}
+
+/* BOTTOM-RIGHT: Largest, most aggressive */
+.templated-layout.layout-klingon .corner-accent-br {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    width: 200px;
+    height: 110px;
+    background: linear-gradient(315deg, #AA0000 0%, #770000 50%, #440000 100%);
+    clip-path: polygon(
+        30% 0, 50% 25%,
+        70% 10%, 85% 35%,
+        100% 20%, 100% 100%,
+        0 100%, 0 70%,
+        15% 50%
+    );
+    z-index: 99;
+    box-shadow: -4px -4px 15px rgba(0, 0, 0, 0.5);
+}
+
+.templated-layout.layout-klingon .corner-accent-br::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 70%;
+    height: 4px;
+    background: linear-gradient(90deg, transparent, #FF6600, #FFAA00);
+}
+
+/* ==== CONNECTING ELEMENTS ==== */
+/* Thin strips that connect corners to nav areas */
+.templated-layout.layout-klingon .corner-accent-tl::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 4px;
+    height: calc(50vh - 180px);
+    background: linear-gradient(180deg, #AA0000, #550000, transparent);
+}
+
+/* ROMULAN layout styling - CYAN/TEAL + MAGENTA/PINK ANGULAR DESIGN */
+/* Based on reference images: chevron frames, grid buttons, trapezoid displays */
+.templated-layout.layout-romulan {
+    --rom-cyan: #00D4E8;
+    --rom-cyan-dark: #008899;
+    --rom-cyan-glow: rgba(0, 212, 232, 0.4);
+    --rom-magenta: #E800D4;
+    --rom-magenta-dark: #990088;
+    --rom-pink: #FF66CC;
+    --rom-teal: #00AAAA;
+    --rom-bg: #0a0a12;
+    --rom-bg-dark: #050508;
+
+    background:
+        radial-gradient(ellipse at 30% 20%, rgba(0, 212, 232, 0.06) 0%, transparent 50%),
+        radial-gradient(ellipse at 70% 80%, rgba(232, 0, 212, 0.04) 0%, transparent 50%),
+        linear-gradient(180deg, var(--rom-bg) 0%, var(--rom-bg-dark) 50%, var(--rom-bg) 100%);
+    position: relative;
+}
+
+/* Chevron frame borders on left and right */
+.templated-layout.layout-romulan::before,
+.templated-layout.layout-romulan::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 60%;
+    background: linear-gradient(180deg, var(--rom-cyan) 0%, var(--rom-magenta) 100%);
+    clip-path: polygon(0 0, 100% 10%, 100% 90%, 0 100%);
+    z-index: 10;
+}
+
+.templated-layout.layout-romulan::before {
+    left: 0;
+}
+
+.templated-layout.layout-romulan::after {
+    right: 0;
+    transform: translateY(-50%) scaleX(-1);
+}
+
+.templated-layout.layout-romulan .area-header {
+    background: linear-gradient(180deg, #0c0c18 0%, #08080f 100%);
+    border-bottom: 2px solid var(--rom-cyan);
+    position: relative;
+    box-shadow: 0 2px 20px var(--rom-cyan-glow);
+}
+
+/* Romulan angular chevron header decorations */
+.templated-layout.layout-romulan .area-header::before,
+.templated-layout.layout-romulan .area-header::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    width: 120px;
+    height: 30px;
+    background: linear-gradient(90deg, var(--rom-cyan), var(--rom-magenta));
+    clip-path: polygon(0 100%, 50% 0, 100% 100%);
+}
+
+.templated-layout.layout-romulan .area-header::before {
+    left: 20%;
+}
+
+.templated-layout.layout-romulan .area-header::after {
+    right: 20%;
+}
+
+.templated-layout.layout-romulan .area-main {
+    background: linear-gradient(180deg, #08080f 0%, #050508 100%);
+    border-left: 2px solid rgba(0, 212, 232, 0.3);
+    border-right: 2px solid rgba(0, 212, 232, 0.3);
+    margin: 0 25px;
+}
+
+.templated-layout.layout-romulan .area-sidebar-left,
+.templated-layout.layout-romulan .area-sidebar-right {
+    background: linear-gradient(180deg, #0a0a14 0%, #060608 100%);
+    border: 2px solid var(--rom-cyan-dark);
+    position: relative;
+}
+
+/* Trapezoid-shaped sidebar frames */
+.templated-layout.layout-romulan .area-sidebar-left {
+    clip-path: polygon(0 5%, 100% 0, 100% 100%, 0 95%);
+    border-right: 3px solid var(--rom-magenta);
+}
+
+.templated-layout.layout-romulan .area-sidebar-right {
+    clip-path: polygon(0 0, 100% 5%, 100% 95%, 0 100%);
+    border-left: 3px solid var(--rom-magenta);
+}
+
+.templated-layout.layout-romulan .area-footer {
+    background: linear-gradient(0deg, #0c0c18 0%, #08080f 100%);
+    border-top: 2px solid var(--rom-cyan);
+    box-shadow: 0 -2px 20px var(--rom-cyan-glow);
+}
+
+/* Romulan V-shaped chevron accent at center */
+.templated-layout.layout-romulan .layout-decoration.v-shaped-accents {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    height: 50px;
+    pointer-events: none;
+    z-index: 20;
+}
+
+.templated-layout.layout-romulan .layout-decoration.v-shaped-accents::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 60px solid transparent;
+    border-right: 60px solid transparent;
+    border-top: 25px solid var(--rom-cyan);
+}
+
+.templated-layout.layout-romulan .layout-decoration.v-shaped-accents::after {
+    content: '';
+    position: absolute;
+    top: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 45px solid transparent;
+    border-right: 45px solid transparent;
+    border-top: 18px solid var(--rom-magenta);
+}
+
+/* Romulan grid button area styling */
+.templated-layout.layout-romulan .romulan-grid-buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+    padding: 10px;
+    background: rgba(0, 20, 25, 0.8);
+    border: 1px solid var(--rom-cyan-dark);
+}
+
+.templated-layout.layout-romulan .romulan-grid-btn {
+    background: linear-gradient(180deg, var(--rom-cyan-dark) 0%, #004455 100%);
+    border: 1px solid var(--rom-cyan);
+    padding: 8px 4px;
+    color: var(--rom-cyan);
+    font-size: 10px;
+    text-transform: uppercase;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.templated-layout.layout-romulan .romulan-grid-btn:hover {
+    background: linear-gradient(180deg, var(--rom-cyan) 0%, var(--rom-cyan-dark) 100%);
+    color: #001515;
+    box-shadow: 0 0 15px var(--rom-cyan-glow);
+}
+
+.templated-layout.layout-romulan .romulan-grid-btn.magenta {
+    background: linear-gradient(180deg, var(--rom-magenta-dark) 0%, #550044 100%);
+    border-color: var(--rom-magenta);
+    color: var(--rom-pink);
+}
+
+.templated-layout.layout-romulan .romulan-grid-btn.magenta:hover {
+    background: linear-gradient(180deg, var(--rom-magenta) 0%, var(--rom-magenta-dark) 100%);
+    color: #150015;
+}
+
+/* BORG layout styling - AUTHENTIC GREEN TECHNO-ORGANIC NETWORK */
+/* Enhanced based on detailed reference images showing:
+   - Concentric targeting circles with crosshairs
+   - Yellow/gold accent lines crossing the green
+   - Organic vine-like network connections
+   - Multiple circular status displays of varying sizes */
+.templated-layout.layout-borg {
+    /* Borg color palette from authentic references */
+    --borg-green: #33CC33;
+    --borg-green-bright: #00FF00;
+    --borg-green-dark: #006600;
+    --borg-green-dim: #225522;
+    --borg-olive: #666633;
+    --borg-yellow: #CCCC33;
+    --borg-yellow-bright: #FFFF00;
+    --borg-gold: #AA9933;
+    --borg-cyan: #33CCCC;
+    --borg-bg: #000800;
+    --borg-bg-dark: #000400;
+
+    background:
+        /* Hexagonal-style grid pattern */
+        repeating-linear-gradient(60deg, rgba(51, 204, 51, 0.03) 0px, transparent 1px, transparent 20px),
+        repeating-linear-gradient(-60deg, rgba(51, 204, 51, 0.03) 0px, transparent 1px, transparent 20px),
+        /* Yellow accent crossing lines - diagonal */
+        repeating-linear-gradient(30deg, rgba(204, 204, 51, 0.02) 0px, transparent 1px, transparent 80px),
+        repeating-linear-gradient(-30deg, rgba(204, 204, 51, 0.02) 0px, transparent 1px, transparent 80px),
+        /* Standard grid */
+        repeating-linear-gradient(0deg, rgba(51, 204, 51, 0.04) 0px, transparent 1px, transparent 30px),
+        repeating-linear-gradient(90deg, rgba(51, 204, 51, 0.04) 0px, transparent 1px, transparent 30px),
+        /* Central collective glow */
+        radial-gradient(circle at 50% 50%, rgba(51, 204, 51, 0.15) 0%, transparent 40%),
+        linear-gradient(180deg, var(--borg-bg) 0%, var(--borg-bg-dark) 50%, var(--borg-bg) 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Borg header - network node style with LCARS 47 aesthetic */
+.templated-layout.layout-borg .area-header {
+    background:
+        /* Horizontal scan lines */
+        repeating-linear-gradient(0deg,
+            transparent 0px, transparent 2px,
+            rgba(51, 204, 51, 0.03) 3px, transparent 4px),
+        /* Vertical data conduits */
+        repeating-linear-gradient(90deg, rgba(51, 204, 51, 0.06) 0px, transparent 1px, transparent 20px),
+        /* Yellow accent stripe */
+        linear-gradient(90deg,
+            transparent 30%, rgba(204, 204, 51, 0.1) 35%, rgba(204, 204, 51, 0.1) 65%, transparent 70%),
+        linear-gradient(180deg, #002200 0%, #001100 100%);
+    border-bottom: 3px solid var(--borg-green);
+    box-shadow:
+        0 0 25px rgba(51, 204, 51, 0.4),
+        0 3px 15px rgba(51, 204, 51, 0.2),
+        inset 0 -8px 20px rgba(51, 204, 51, 0.15);
+    position: relative;
+    z-index: 10;
+}
+
+/* Header connection nodes - larger with targeting rings */
+.templated-layout.layout-borg .area-header .borg-header-node {
+    position: absolute;
+    bottom: -12px;
+    width: 24px;
+    height: 24px;
+    background:
+        radial-gradient(circle, transparent 30%, var(--borg-green) 32%, transparent 34%),
+        radial-gradient(circle, transparent 55%, var(--borg-green) 57%, transparent 59%),
+        radial-gradient(circle, var(--borg-green-bright) 0%, var(--borg-green-bright) 20%, transparent 22%);
+    border-radius: 50%;
+    box-shadow:
+        0 0 15px var(--borg-green-bright),
+        0 0 30px rgba(51, 204, 51, 0.3);
+}
+
+.templated-layout.layout-borg .area-header .borg-header-node.left {
+    left: 18%;
+}
+
+.templated-layout.layout-borg .area-header .borg-header-node.right {
+    right: 18%;
+}
+
+.templated-layout.layout-borg .area-header .borg-header-node.center {
+    left: 50%;
+    transform: translateX(-50%);
+    width: 32px;
+    height: 32px;
+    bottom: -16px;
+    /* Yellow accent center node */
+    background:
+        radial-gradient(circle, transparent 25%, var(--borg-yellow) 27%, transparent 29%),
+        radial-gradient(circle, transparent 45%, var(--borg-green) 47%, transparent 49%),
+        radial-gradient(circle, transparent 65%, var(--borg-green) 67%, transparent 69%),
+        radial-gradient(circle, var(--borg-yellow-bright) 0%, var(--borg-yellow) 15%, transparent 18%);
+    box-shadow:
+        0 0 20px rgba(204, 204, 51, 0.6),
+        0 0 40px rgba(51, 204, 51, 0.3);
+}
+
+/* Borg sidebars - alcove/regeneration chamber style */
+.templated-layout.layout-borg .area-sidebar-left,
+.templated-layout.layout-borg .area-sidebar-right {
+    background:
+        /* Vertical data conduits */
+        repeating-linear-gradient(0deg,
+            rgba(51, 204, 51, 0.08) 0px,
+            transparent 2px,
+            transparent 18px,
+            rgba(51, 204, 51, 0.08) 20px),
+        linear-gradient(180deg, #001500 0%, #000a00 50%, #001500 100%);
+    border: 2px solid rgba(51, 204, 51, 0.5);
+    box-shadow:
+        inset 0 0 30px rgba(51, 204, 51, 0.1),
+        inset 0 0 60px rgba(0, 0, 0, 0.5);
+    position: relative;
+}
+
+/* Concentric targeting circle display in sidebars - multiple rings */
+.templated-layout.layout-borg .area-sidebar-left::before,
+.templated-layout.layout-borg .area-sidebar-right::before {
+    content: '';
+    position: absolute;
+    top: 12%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 70px;
+    height: 70px;
+    /* Multiple concentric rings like targeting display */
+    background:
+        radial-gradient(circle, transparent 0%, transparent 20%, var(--borg-green) 21%, transparent 22%),
+        radial-gradient(circle, transparent 0%, transparent 40%, var(--borg-green) 41%, transparent 42%),
+        radial-gradient(circle, transparent 0%, transparent 60%, rgba(51, 204, 51, 0.7) 61%, transparent 62%),
+        radial-gradient(circle, transparent 0%, transparent 80%, rgba(51, 204, 51, 0.5) 81%, transparent 82%),
+        /* Crosshair lines */
+        linear-gradient(0deg, transparent 45%, var(--borg-yellow) 49%, transparent 51%),
+        linear-gradient(90deg, transparent 45%, var(--borg-yellow) 49%, transparent 51%),
+        /* Center glow */
+        radial-gradient(circle, rgba(51, 204, 51, 0.4) 0%, transparent 30%);
+    border: 2px solid var(--borg-green);
+    border-radius: 50%;
+    box-shadow:
+        0 0 20px rgba(51, 204, 51, 0.5),
+        0 0 40px rgba(51, 204, 51, 0.2),
+        inset 0 0 15px rgba(51, 204, 51, 0.3);
+    animation: borg-targeting-pulse 3s ease-in-out infinite;
+}
+
+/* Secondary circular node display with yellow accent */
+.templated-layout.layout-borg .area-sidebar-left::after,
+.templated-layout.layout-borg .area-sidebar-right::after {
+    content: '';
+    position: absolute;
+    bottom: 12%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50px;
+    height: 50px;
+    /* Concentric rings with yellow/gold accents */
+    background:
+        radial-gradient(circle, transparent 0%, transparent 30%, var(--borg-olive) 31%, transparent 32%),
+        radial-gradient(circle, transparent 0%, transparent 55%, var(--borg-gold) 56%, transparent 57%),
+        radial-gradient(circle, transparent 0%, transparent 75%, rgba(102, 102, 51, 0.6) 76%, transparent 77%),
+        /* Center dot */
+        radial-gradient(circle, var(--borg-yellow) 0%, var(--borg-yellow) 15%, transparent 16%);
+    border: 2px solid var(--borg-olive);
+    border-radius: 50%;
+    box-shadow: 0 0 12px rgba(204, 204, 51, 0.3);
+}
+
+/* Borg main area - central plexus */
+.templated-layout.layout-borg .area-main {
+    background:
+        /* Dense network grid */
+        repeating-linear-gradient(0deg, rgba(51, 204, 51, 0.03) 0px, transparent 1px, transparent 25px),
+        repeating-linear-gradient(90deg, rgba(51, 204, 51, 0.03) 0px, transparent 1px, transparent 25px),
+        repeating-linear-gradient(45deg, rgba(51, 204, 51, 0.02) 0px, transparent 1px, transparent 35px),
+        repeating-linear-gradient(-45deg, rgba(51, 204, 51, 0.02) 0px, transparent 1px, transparent 35px),
+        linear-gradient(180deg, #000c00 0%, #000600 50%, #000c00 100%);
+    position: relative;
+}
+
+/* Central collective targeting display - large multi-ring crosshair */
+.templated-layout.layout-borg .area-main::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 140px;
+    height: 140px;
+    /* Multi-ring concentric targeting reticle */
+    background:
+        /* Outer rings */
+        radial-gradient(circle, transparent 0%, transparent 45%, rgba(51, 204, 51, 0.25) 46%, transparent 47%),
+        radial-gradient(circle, transparent 0%, transparent 60%, rgba(51, 204, 51, 0.35) 61%, transparent 62%),
+        radial-gradient(circle, transparent 0%, transparent 75%, rgba(51, 204, 51, 0.45) 76%, transparent 77%),
+        radial-gradient(circle, transparent 0%, transparent 90%, rgba(51, 204, 51, 0.2) 91%, transparent 92%),
+        /* Yellow crosshair lines extending to edges */
+        linear-gradient(0deg, transparent 0%, transparent 42%, rgba(204, 204, 51, 0.4) 48%, rgba(204, 204, 51, 0.6) 50%, rgba(204, 204, 51, 0.4) 52%, transparent 58%, transparent 100%),
+        linear-gradient(90deg, transparent 0%, transparent 42%, rgba(204, 204, 51, 0.4) 48%, rgba(204, 204, 51, 0.6) 50%, rgba(204, 204, 51, 0.4) 52%, transparent 58%, transparent 100%),
+        /* Center targeting dot */
+        radial-gradient(circle, var(--borg-green-bright) 0%, var(--borg-green-bright) 4%, rgba(51, 204, 51, 0.5) 8%, transparent 12%);
+    border: 2px solid rgba(51, 204, 51, 0.4);
+    border-radius: 50%;
+    box-shadow:
+        0 0 30px rgba(51, 204, 51, 0.3),
+        0 0 60px rgba(51, 204, 51, 0.15);
+    pointer-events: none;
+    animation: borg-pulse 4s ease-in-out infinite;
+}
+
+/* Secondary central node - smaller offset circle */
+.templated-layout.layout-borg .area-main::after {
+    content: '';
+    position: absolute;
+    top: 30%;
+    right: 15%;
+    width: 60px;
+    height: 60px;
+    /* Smaller targeting node */
+    background:
+        radial-gradient(circle, transparent 0%, transparent 35%, rgba(51, 204, 51, 0.4) 36%, transparent 37%),
+        radial-gradient(circle, transparent 0%, transparent 60%, rgba(51, 204, 51, 0.3) 61%, transparent 62%),
+        /* Yellow diagonal crosshairs */
+        linear-gradient(45deg, transparent 45%, rgba(204, 204, 51, 0.3) 49%, transparent 51%),
+        linear-gradient(-45deg, transparent 45%, rgba(204, 204, 51, 0.3) 49%, transparent 51%),
+        radial-gradient(circle, rgba(51, 204, 51, 0.3) 0%, transparent 25%);
+    border: 1px solid rgba(51, 204, 51, 0.3);
+    border-radius: 50%;
+    pointer-events: none;
+    animation: borg-secondary-pulse 5s ease-in-out infinite 1s;
+}
+
+/* Borg footer - status bar with data flow and targeting nodes */
+.templated-layout.layout-borg .area-footer {
+    background:
+        /* Horizontal data stream lines */
+        repeating-linear-gradient(90deg,
+            rgba(51, 204, 51, 0.08) 0px,
+            transparent 2px,
+            transparent 10px),
+        /* Yellow accent band */
+        linear-gradient(90deg,
+            transparent 0%, rgba(204, 204, 51, 0.05) 20%, rgba(204, 204, 51, 0.08) 50%, rgba(204, 204, 51, 0.05) 80%, transparent 100%),
+        linear-gradient(0deg, #001800 0%, #000c00 100%);
+    border-top: 3px solid var(--borg-green);
+    box-shadow:
+        0 0 20px rgba(51, 204, 51, 0.25),
+        0 -3px 15px rgba(51, 204, 51, 0.15),
+        inset 0 8px 20px rgba(51, 204, 51, 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 10;
+}
+
+/* Footer node status indicators - small circular displays */
+.templated-layout.layout-borg .area-footer::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 10%;
+    width: 100px;
+    height: 16px;
+    /* Row of small targeting nodes */
+    background:
+        radial-gradient(circle at 10px 8px, var(--borg-green) 0%, var(--borg-green) 4px, transparent 5px),
+        radial-gradient(circle at 30px 8px, var(--borg-yellow) 0%, var(--borg-yellow) 3px, transparent 4px),
+        radial-gradient(circle at 50px 8px, var(--borg-green) 0%, var(--borg-green) 4px, transparent 5px),
+        radial-gradient(circle at 70px 8px, var(--borg-green) 0%, var(--borg-green) 3px, transparent 4px),
+        radial-gradient(circle at 90px 8px, var(--borg-yellow) 0%, var(--borg-yellow) 4px, transparent 5px);
+    filter: drop-shadow(0 0 5px rgba(51, 204, 51, 0.5));
+}
+
+.templated-layout.layout-borg .area-footer::after {
+    content: '';
+    position: absolute;
+    top: -8px;
+    right: 10%;
+    width: 100px;
+    height: 16px;
+    /* Mirror row of nodes */
+    background:
+        radial-gradient(circle at 10px 8px, var(--borg-yellow) 0%, var(--borg-yellow) 4px, transparent 5px),
+        radial-gradient(circle at 30px 8px, var(--borg-green) 0%, var(--borg-green) 3px, transparent 4px),
+        radial-gradient(circle at 50px 8px, var(--borg-green) 0%, var(--borg-green) 4px, transparent 5px),
+        radial-gradient(circle at 70px 8px, var(--borg-yellow) 0%, var(--borg-yellow) 3px, transparent 4px),
+        radial-gradient(circle at 90px 8px, var(--borg-green) 0%, var(--borg-green) 4px, transparent 5px);
+    filter: drop-shadow(0 0 5px rgba(51, 204, 51, 0.5));
+}
+
+/* Borg hex grid overlay decoration */
+.templated-layout.layout-borg .layout-decoration.hex-grid-overlay {
+    position: absolute;
+    inset: 0;
+    background:
+        repeating-linear-gradient(60deg, rgba(51, 204, 51, 0.015) 0px, transparent 1px, transparent 25px),
+        repeating-linear-gradient(-60deg, rgba(51, 204, 51, 0.015) 0px, transparent 1px, transparent 25px),
+        repeating-linear-gradient(0deg, rgba(51, 204, 51, 0.02) 0px, transparent 1px, transparent 30px),
+        repeating-linear-gradient(90deg, rgba(51, 204, 51, 0.02) 0px, transparent 1px, transparent 30px);
+    pointer-events: none;
+}
+
+/* Data stream animation */
+.templated-layout.layout-borg .layout-decoration.data-streams::before {
+    content: '';
+    position: absolute;
+    bottom: 40px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        var(--borg-green) 20%,
+        var(--borg-green-bright) 50%,
+        var(--borg-green) 80%,
+        transparent 100%);
+    animation: borg-layout-data-flow 3s linear infinite;
+}
+
+/* Additional vertical data streams */
+.templated-layout.layout-borg .layout-decoration.data-streams::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 15%;
+    width: 1px;
+    background: linear-gradient(180deg,
+        transparent 0%,
+        var(--borg-green) 30%,
+        var(--borg-green-bright) 50%,
+        var(--borg-green) 70%,
+        transparent 100%);
+    animation: borg-vertical-flow 5s linear infinite;
+}
+
+@keyframes borg-layout-data-flow {
+    0% { transform: translateX(-100%); opacity: 0.5; }
+    50% { opacity: 1; }
+    100% { transform: translateX(100%); opacity: 0.5; }
+}
+
+@keyframes borg-vertical-flow {
+    0% { transform: translateY(-100%); opacity: 0.3; }
+    50% { opacity: 0.8; }
+    100% { transform: translateY(100%); opacity: 0.3; }
+}
+
+@keyframes borg-pulse {
+    0%, 100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.4;
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.05);
+        opacity: 0.8;
+    }
+}
+
+@keyframes borg-secondary-pulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 0.3;
+    }
+    50% {
+        transform: scale(1.08);
+        opacity: 0.6;
+    }
+}
+
+@keyframes borg-targeting-pulse {
+    0%, 100% {
+        box-shadow:
+            0 0 20px rgba(51, 204, 51, 0.5),
+            0 0 40px rgba(51, 204, 51, 0.2),
+            inset 0 0 15px rgba(51, 204, 51, 0.3);
+    }
+    50% {
+        box-shadow:
+            0 0 30px rgba(51, 204, 51, 0.7),
+            0 0 60px rgba(51, 204, 51, 0.35),
+            inset 0 0 25px rgba(51, 204, 51, 0.5);
+    }
+}
+
+/* Organic vine-like connection pattern overlay */
+.templated-layout.layout-borg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    /* Vine-like curved network lines */
+    background:
+        /* Diagonal organic connections */
+        repeating-linear-gradient(35deg,
+            transparent 0px, transparent 150px,
+            rgba(51, 204, 51, 0.03) 152px, transparent 154px,
+            transparent 300px),
+        repeating-linear-gradient(-35deg,
+            transparent 0px, transparent 180px,
+            rgba(51, 204, 51, 0.03) 182px, transparent 184px,
+            transparent 360px),
+        /* Yellow accent crossing lines */
+        repeating-linear-gradient(70deg,
+            transparent 0px, transparent 200px,
+            rgba(204, 204, 51, 0.015) 202px, transparent 204px,
+            transparent 400px),
+        repeating-linear-gradient(-70deg,
+            transparent 0px, transparent 220px,
+            rgba(204, 204, 51, 0.015) 222px, transparent 224px,
+            transparent 440px);
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Network node connection points scattered across layout */
+.templated-layout.layout-borg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    /* Small glowing node dots at intersections */
+    background:
+        radial-gradient(circle at 15% 25%, var(--borg-green) 0%, var(--borg-green) 3px, transparent 4px),
+        radial-gradient(circle at 85% 30%, var(--borg-green) 0%, var(--borg-green) 3px, transparent 4px),
+        radial-gradient(circle at 20% 70%, var(--borg-yellow) 0%, var(--borg-yellow) 2px, transparent 3px),
+        radial-gradient(circle at 80% 75%, var(--borg-green) 0%, var(--borg-green) 3px, transparent 4px),
+        radial-gradient(circle at 50% 15%, var(--borg-yellow) 0%, var(--borg-yellow) 2px, transparent 3px),
+        radial-gradient(circle at 45% 85%, var(--borg-green) 0%, var(--borg-green) 2px, transparent 3px),
+        /* Connecting line segments (simulated) */
+        linear-gradient(40deg, transparent 14%, rgba(51, 204, 51, 0.08) 15%, transparent 16%),
+        linear-gradient(-35deg, transparent 29%, rgba(51, 204, 51, 0.08) 30%, transparent 31%);
+    pointer-events: none;
+    z-index: 2;
+    animation: borg-network-flicker 8s ease-in-out infinite;
+}
+
+@keyframes borg-network-flicker {
+    0%, 100% { opacity: 0.6; }
+    25% { opacity: 0.8; }
+    50% { opacity: 0.5; }
+    75% { opacity: 0.9; }
+}
+
+/* ==========================================================================
+   BORG UI COMPONENTS - Targeting displays, status nodes, data panels
+   ========================================================================== */
+
+/* Borg panel - main content container with tech-organic border */
+.borg-panel {
+    background:
+        repeating-linear-gradient(0deg, rgba(51, 204, 51, 0.02) 0px, transparent 1px, transparent 20px),
+        repeating-linear-gradient(90deg, rgba(51, 204, 51, 0.02) 0px, transparent 1px, transparent 20px),
+        linear-gradient(180deg, #000c00 0%, #000600 50%, #000c00 100%);
+    border: 2px solid var(--borg-green, #33CC33);
+    position: relative;
+    padding: 1rem;
+}
+
+.borg-panel::before {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: 10px;
+    right: 10px;
+    height: 4px;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        var(--borg-green, #33CC33) 20%,
+        var(--borg-yellow, #CCCC33) 50%,
+        var(--borg-green, #33CC33) 80%,
+        transparent 100%);
+}
+
+/* Borg targeting display - concentric circles with crosshair */
+.borg-targeting-display {
+    width: 100px;
+    height: 100px;
+    position: relative;
+    background:
+        /* Concentric rings */
+        radial-gradient(circle, transparent 0%, transparent 15%, var(--borg-green, #33CC33) 16%, transparent 17%),
+        radial-gradient(circle, transparent 0%, transparent 30%, var(--borg-green, #33CC33) 31%, transparent 32%),
+        radial-gradient(circle, transparent 0%, transparent 45%, rgba(51, 204, 51, 0.7) 46%, transparent 47%),
+        radial-gradient(circle, transparent 0%, transparent 60%, rgba(51, 204, 51, 0.5) 61%, transparent 62%),
+        radial-gradient(circle, transparent 0%, transparent 75%, rgba(51, 204, 51, 0.3) 76%, transparent 77%),
+        /* Yellow crosshair */
+        linear-gradient(0deg, transparent 47%, var(--borg-yellow, #CCCC33) 49%, transparent 51%),
+        linear-gradient(90deg, transparent 47%, var(--borg-yellow, #CCCC33) 49%, transparent 51%),
+        /* Center dot */
+        radial-gradient(circle, #00FF00 0%, #00FF00 5%, transparent 6%);
+    border: 2px solid var(--borg-green, #33CC33);
+    border-radius: 50%;
+    box-shadow:
+        0 0 20px rgba(51, 204, 51, 0.5),
+        0 0 40px rgba(51, 204, 51, 0.2);
+    animation: borg-targeting-pulse 3s ease-in-out infinite;
+}
+
+/* Small targeting node */
+.borg-targeting-display.small {
+    width: 50px;
+    height: 50px;
+}
+
+/* Large targeting node */
+.borg-targeting-display.large {
+    width: 150px;
+    height: 150px;
+}
+
+/* Borg status node - glowing connection point */
+.borg-status-node {
+    width: 24px;
+    height: 24px;
+    background:
+        radial-gradient(circle, transparent 30%, var(--borg-green, #33CC33) 32%, transparent 34%),
+        radial-gradient(circle, transparent 55%, var(--borg-green, #33CC33) 57%, transparent 59%),
+        radial-gradient(circle, #00FF00 0%, #00FF00 20%, transparent 22%);
+    border-radius: 50%;
+    box-shadow: 0 0 15px rgba(51, 204, 51, 0.6);
+    display: inline-block;
+}
+
+.borg-status-node.yellow {
+    background:
+        radial-gradient(circle, transparent 30%, var(--borg-yellow, #CCCC33) 32%, transparent 34%),
+        radial-gradient(circle, transparent 55%, var(--borg-yellow, #CCCC33) 57%, transparent 59%),
+        radial-gradient(circle, #FFFF00 0%, #CCCC33 20%, transparent 22%);
+    box-shadow: 0 0 15px rgba(204, 204, 51, 0.6);
+}
+
+.borg-status-node.active {
+    animation: borg-node-active 1.5s ease-in-out infinite;
+}
+
+@keyframes borg-node-active {
+    0%, 100% { box-shadow: 0 0 15px rgba(51, 204, 51, 0.6); transform: scale(1); }
+    50% { box-shadow: 0 0 25px rgba(51, 204, 51, 0.9), 0 0 40px rgba(51, 204, 51, 0.4); transform: scale(1.1); }
+}
+
+/* Borg data stream bar - horizontal animated data flow */
+.borg-data-stream {
+    height: 4px;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        var(--borg-green, #33CC33) 20%,
+        #00FF00 50%,
+        var(--borg-green, #33CC33) 80%,
+        transparent 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.borg-data-stream::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(255, 255, 0, 0.3) 50%,
+        transparent 100%);
+    animation: borg-data-pulse 2s linear infinite;
+}
+
+@keyframes borg-data-pulse {
+    0% { left: -100%; }
+    100% { left: 200%; }
+}
+
+/* Borg text styles */
+.borg-text {
+    font-family: 'Courier New', 'Consolas', monospace;
+    color: var(--borg-green, #33CC33);
+    text-shadow: 0 0 10px rgba(51, 204, 51, 0.5);
+    letter-spacing: 0.05em;
+}
+
+.borg-text.highlight {
+    color: var(--borg-yellow, #CCCC33);
+    text-shadow: 0 0 10px rgba(204, 204, 51, 0.5);
+}
+
+.borg-text.title {
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+}
+
+/* Borg button style */
+.borg-btn {
+    background:
+        linear-gradient(180deg, rgba(51, 204, 51, 0.2) 0%, rgba(51, 204, 51, 0.05) 100%);
+    border: 2px solid var(--borg-green, #33CC33);
+    color: var(--borg-green, #33CC33);
+    padding: 0.5rem 1.5rem;
+    font-family: 'Courier New', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.borg-btn:hover {
+    background:
+        linear-gradient(180deg, rgba(51, 204, 51, 0.4) 0%, rgba(51, 204, 51, 0.15) 100%);
+    box-shadow: 0 0 20px rgba(51, 204, 51, 0.5);
+    color: #00FF00;
+}
+
+.borg-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 5px;
+    transform: translateY(-50%);
+    width: 8px;
+    height: 8px;
+    background: var(--borg-green, #33CC33);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--borg-green, #33CC33);
+}
+
+/* Borg network connection line (for connecting nodes visually) */
+.borg-connection {
+    height: 2px;
+    background: linear-gradient(90deg,
+        var(--borg-green, #33CC33) 0%,
+        transparent 40%,
+        transparent 60%,
+        var(--borg-green, #33CC33) 100%);
+    position: relative;
+}
+
+.borg-connection::before,
+.borg-connection::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 10px;
+    height: 10px;
+    background: var(--borg-green, #33CC33);
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--borg-green, #33CC33);
+}
+
+.borg-connection::before { left: 0; }
+.borg-connection::after { right: 0; }
+
+/* CARDASSIAN layout styling - TEAL/CYAN + RED/COPPER OVAL MECHANICAL DESIGN */
+.templated-layout.layout-cardassian {
+    /* Cardassian color palette from reference images */
+    --card-teal: #00AAAA;
+    --card-cyan: #00D4D4;
+    --card-cyan-glow: rgba(0, 212, 212, 0.5);
+    --card-red: #AA3333;
+    --card-copper: #AA6633;
+    --card-brown: #664422;
+    --card-magenta: #DD44AA;
+    --card-yellow: #DDAA44;
+    --card-pink: #FF88CC;
+    --card-bg: #0a0808;
+    --card-bg-dark: #050404;
+
+    background: linear-gradient(180deg, var(--card-bg) 0%, var(--card-bg-dark) 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Cardassian arch-shaped header frame */
+.templated-layout.layout-cardassian .area-header {
+    background: linear-gradient(180deg,
+        var(--card-brown) 0%,
+        var(--card-bg-dark) 20%,
+        rgba(0, 170, 170, 0.1) 100%);
+    border-bottom: 3px solid var(--card-copper);
+    position: relative;
+    border-radius: 0 0 50% 50% / 0 0 30px 30px;
+    padding-bottom: 15px;
+}
+
+/* Arch decoration on header */
+.templated-layout.layout-cardassian .area-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 10%;
+    right: 10%;
+    height: 8px;
+    background: linear-gradient(90deg,
+        var(--card-red) 0%,
+        var(--card-copper) 25%,
+        var(--card-teal) 50%,
+        var(--card-copper) 75%,
+        var(--card-red) 100%);
+    border-radius: 0 0 50% 50%;
+}
+
+/* Mechanical wing-like sidebar frames */
+.templated-layout.layout-cardassian .area-sidebar-left,
+.templated-layout.layout-cardassian .area-sidebar-right {
+    background: linear-gradient(180deg,
+        rgba(102, 68, 34, 0.8) 0%,
+        rgba(10, 8, 8, 0.95) 30%,
+        rgba(0, 170, 170, 0.1) 100%);
+    border: 2px solid var(--card-copper);
+    position: relative;
+    clip-path: polygon(
+        0 0, 100% 0, 100% 100%, 0 100%,
+        0 85%, 10% 80%, 10% 20%, 0 15%
+    );
+}
+
+/* Elliptical display frame inside sidebars */
+.templated-layout.layout-cardassian .area-sidebar-left::before,
+.templated-layout.layout-cardassian .area-sidebar-right::before {
+    content: '';
+    position: absolute;
+    top: 20%;
+    left: 15%;
+    right: 15%;
+    bottom: 20%;
+    border: 3px solid var(--card-cyan);
+    border-radius: 50% / 40%;
+    background: radial-gradient(ellipse,
+        rgba(0, 170, 170, 0.15) 0%,
+        transparent 70%);
+    box-shadow:
+        0 0 15px var(--card-cyan-glow),
+        inset 0 0 20px rgba(0, 170, 170, 0.1);
+}
+
+/* Mirror the left sidebar clip-path for right */
+.templated-layout.layout-cardassian .area-sidebar-right {
+    clip-path: polygon(
+        0 0, 100% 0, 100% 15%, 90% 20%, 90% 80%, 100% 85%,
+        100% 100%, 0 100%
+    );
+}
+
+/* Main area with oval central display */
+.templated-layout.layout-cardassian .area-main {
+    position: relative;
+    background: radial-gradient(ellipse 80% 60% at center,
+        rgba(0, 170, 170, 0.08) 0%,
+        transparent 70%);
+}
+
+/* Central oval display frame */
+.templated-layout.layout-cardassian .area-main::before {
+    content: '';
+    position: absolute;
+    top: 10%;
+    left: 15%;
+    right: 15%;
+    bottom: 10%;
+    border: 4px solid var(--card-red);
+    border-radius: 50% / 35%;
+    box-shadow:
+        0 0 20px rgba(170, 51, 51, 0.5),
+        inset 0 0 30px rgba(0, 170, 170, 0.1);
+    pointer-events: none;
+}
+
+/* Footer with hexagonal pattern hint */
+.templated-layout.layout-cardassian .area-footer {
+    background: linear-gradient(0deg,
+        rgba(102, 68, 34, 0.6) 0%,
+        transparent 100%);
+    border-top: 2px solid var(--card-copper);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    position: relative;
+}
+
+/* Hexagonal pattern overlay on footer */
+.templated-layout.layout-cardassian .area-footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image:
+        linear-gradient(60deg, transparent 47%, var(--card-teal) 47%, var(--card-teal) 53%, transparent 53%),
+        linear-gradient(-60deg, transparent 47%, var(--card-teal) 47%, var(--card-teal) 53%, transparent 53%);
+    background-size: 30px 52px;
+    opacity: 0.1;
+    pointer-events: none;
+}
+
+/* Mechanical wing extensions on sides */
+.templated-layout.layout-cardassian::before,
+.templated-layout.layout-cardassian::after {
+    content: '';
+    position: absolute;
+    width: 40px;
+    top: 20%;
+    bottom: 20%;
+    background: linear-gradient(180deg,
+        var(--card-copper) 0%,
+        var(--card-brown) 20%,
+        var(--card-red) 50%,
+        var(--card-brown) 80%,
+        var(--card-copper) 100%);
+    z-index: 5;
+}
+
+.templated-layout.layout-cardassian::before {
+    left: 0;
+    clip-path: polygon(
+        100% 0, 100% 100%, 0 90%, 0 70%, 50% 60%, 50% 40%, 0 30%, 0 10%
+    );
+}
+
+.templated-layout.layout-cardassian::after {
+    right: 0;
+    clip-path: polygon(
+        0 0, 0 100%, 100% 90%, 100% 70%, 50% 60%, 50% 40%, 100% 30%, 100% 10%
+    );
+}
+
+/* Cardassian button styling - angular with colored variants */
+.templated-layout.layout-cardassian .cardassian-btn {
+    background: linear-gradient(180deg, var(--card-brown) 0%, var(--card-bg-dark) 100%);
+    border: 2px solid var(--card-copper);
+    color: var(--card-cyan);
+    padding: 8px 20px;
+    clip-path: polygon(10% 0, 90% 0, 100% 50%, 90% 100%, 10% 100%, 0 50%);
+    transition: all 0.2s ease;
+}
+
+.templated-layout.layout-cardassian .cardassian-btn:hover {
+    background: linear-gradient(180deg, var(--card-copper) 0%, var(--card-brown) 100%);
+    box-shadow: 0 0 15px var(--card-cyan-glow);
+}
+
+/* Cyan variant button */
+.templated-layout.layout-cardassian .cardassian-btn.cyan {
+    background: linear-gradient(180deg, var(--card-teal) 0%, var(--card-cyan) 100%);
+    border-color: var(--card-cyan);
+    color: var(--card-bg-dark);
+}
+
+/* Magenta variant button */
+.templated-layout.layout-cardassian .cardassian-btn.magenta {
+    background: linear-gradient(180deg, var(--card-magenta) 0%, var(--card-pink) 100%);
+    border-color: var(--card-pink);
+    color: var(--card-bg-dark);
+}
+
+/* Yellow variant button */
+.templated-layout.layout-cardassian .cardassian-btn.yellow {
+    background: linear-gradient(180deg, var(--card-yellow) 0%, #FFCC66 100%);
+    border-color: var(--card-yellow);
+    color: var(--card-bg-dark);
+}
+
+/* Cardassian data display panel - oval shaped */
+.templated-layout.layout-cardassian .cardassian-display {
+    background: radial-gradient(ellipse,
+        rgba(0, 170, 170, 0.2) 0%,
+        rgba(10, 8, 8, 0.95) 100%);
+    border: 2px solid var(--card-cyan);
+    border-radius: 50% / 30%;
+    padding: 15px 25px;
+    box-shadow:
+        0 0 10px var(--card-cyan-glow),
+        inset 0 0 15px rgba(0, 170, 170, 0.1);
+}
+
+/* Cardassian surveillance line decoration */
+.templated-layout.layout-cardassian .layout-decoration.surveillance-lines::before {
+    content: '';
+    position: absolute;
+    bottom: 35px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--card-cyan), transparent);
+    background-size: 200% 100%;
+    animation: cardassian-sweep 4s linear infinite;
+}
+
+@keyframes cardassian-sweep {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+/* Corner claw decorations */
+.templated-layout.layout-cardassian .corner-claw-tl,
+.templated-layout.layout-cardassian .corner-claw-tr,
+.templated-layout.layout-cardassian .corner-claw-bl,
+.templated-layout.layout-cardassian .corner-claw-br {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    z-index: 10;
+}
+
+.templated-layout.layout-cardassian .corner-claw-tl {
+    top: 0;
+    left: 0;
+    background: linear-gradient(135deg, var(--card-copper) 0%, transparent 60%);
+    clip-path: polygon(0 0, 100% 0, 70% 30%, 30% 70%, 0 100%);
+}
+
+.templated-layout.layout-cardassian .corner-claw-tr {
+    top: 0;
+    right: 0;
+    background: linear-gradient(-135deg, var(--card-copper) 0%, transparent 60%);
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 70% 70%, 30% 30%);
+}
+
+.templated-layout.layout-cardassian .corner-claw-bl {
+    bottom: 0;
+    left: 0;
+    background: linear-gradient(45deg, var(--card-copper) 0%, transparent 60%);
+    clip-path: polygon(0 0, 30% 30%, 70% 70%, 100% 100%, 0 100%);
+}
+
+.templated-layout.layout-cardassian .corner-claw-br {
+    bottom: 0;
+    right: 0;
+    background: linear-gradient(-45deg, var(--card-copper) 0%, transparent 60%);
+    clip-path: polygon(30% 30%, 100% 0, 100% 100%, 0 100%, 70% 70%);
+}
+
+/* DOMINION layout styling - HIERARCHICAL PURPLE/VIOLET IMPERIAL DESIGN */
+.templated-layout.layout-dominion {
+    /* Dominion color palette from authentic references */
+    --dom-purple: #9966CC;
+    --dom-purple-dark: #663399;
+    --dom-violet: #9933FF;
+    --dom-teal: #33CC99;
+    --dom-green: #339966;
+    --dom-gold: #FFD700;
+    --dom-gold-dim: rgba(255, 215, 0, 0.5);
+    --dom-bg: #050010;
+    --dom-bg-dark: #020005;
+
+    background:
+        /* Subtle imperial pattern */
+        repeating-linear-gradient(0deg,
+            rgba(153, 102, 204, 0.02) 0px,
+            transparent 1px,
+            transparent 40px),
+        repeating-linear-gradient(90deg,
+            rgba(153, 102, 204, 0.02) 0px,
+            transparent 1px,
+            transparent 40px),
+        /* Central Founders' glow */
+        radial-gradient(ellipse 60% 40% at 50% 30%,
+            rgba(153, 102, 204, 0.15) 0%,
+            transparent 60%),
+        linear-gradient(180deg, var(--dom-bg) 0%, var(--dom-bg-dark) 50%, var(--dom-bg) 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Dominion header - Founders' authority */
+.templated-layout.layout-dominion .area-header {
+    background:
+        linear-gradient(180deg,
+            rgba(153, 102, 204, 0.2) 0%,
+            rgba(16, 5, 32, 0.95) 40%,
+            rgba(8, 2, 18, 0.98) 100%);
+    border-bottom: 3px solid var(--dom-purple);
+    box-shadow:
+        0 0 30px rgba(153, 102, 204, 0.3),
+        inset 0 -10px 30px rgba(153, 102, 204, 0.1);
+    position: relative;
+}
+
+/* Golden Founders' emblem indicator */
+.templated-layout.layout-dominion .area-header::before {
+    content: '';
+    position: absolute;
+    bottom: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 24px;
+    height: 24px;
+    background: radial-gradient(circle,
+        var(--dom-gold) 0%,
+        rgba(255, 215, 0, 0.6) 50%,
+        transparent 70%);
+    border-radius: 50%;
+    box-shadow: 0 0 20px var(--dom-gold);
+}
+
+/* Side authority bars */
+.templated-layout.layout-dominion .area-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        var(--dom-gold-dim) 20%,
+        var(--dom-gold) 50%,
+        var(--dom-gold-dim) 80%,
+        transparent 100%);
+}
+
+/* Dominion command bar - Vorta/Jem'Hadar interface */
+.templated-layout.layout-dominion .area-command {
+    background:
+        linear-gradient(180deg,
+            rgba(51, 204, 153, 0.1) 0%,
+            rgba(153, 51, 255, 0.05) 50%,
+            transparent 100%);
+    border-bottom: 1px solid var(--dom-teal);
+    box-shadow: inset 0 0 20px rgba(51, 204, 153, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+    position: relative;
+}
+
+/* Command status indicators */
+.templated-layout.layout-dominion .area-command::before,
+.templated-layout.layout-dominion .area-command::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 8px;
+    height: 8px;
+    background: var(--dom-teal);
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--dom-teal);
+}
+
+.templated-layout.layout-dominion .area-command::before {
+    left: 20px;
+}
+
+.templated-layout.layout-dominion .area-command::after {
+    right: 20px;
+}
+
+/* Dominion main area - strategic display */
+.templated-layout.layout-dominion .area-main {
+    padding: 20px 80px;
+    background:
+        repeating-linear-gradient(0deg,
+            rgba(153, 102, 204, 0.01) 0px,
+            transparent 1px,
+            transparent 50px),
+        repeating-linear-gradient(90deg,
+            rgba(153, 102, 204, 0.01) 0px,
+            transparent 1px,
+            transparent 50px);
+    position: relative;
+}
+
+/* Dominion footer - subject/soldier status */
+.templated-layout.layout-dominion .area-footer {
+    background:
+        linear-gradient(0deg,
+            rgba(51, 204, 153, 0.15) 0%,
+            rgba(153, 51, 255, 0.1) 50%,
+            transparent 100%);
+    border-top: 2px solid var(--dom-purple);
+    box-shadow:
+        0 0 20px rgba(153, 102, 204, 0.2),
+        inset 0 5px 20px rgba(51, 204, 153, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+/* Footer teal accent line */
+.templated-layout.layout-dominion .area-footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 10%;
+    right: 10%;
+    height: 1px;
+    background: linear-gradient(90deg,
+        transparent,
+        var(--dom-teal),
+        transparent);
+}
+
+/* Dominion golden line decoration */
+.templated-layout.layout-dominion .layout-decoration.golden-accents::before {
+    content: '';
+    position: absolute;
+    top: 70px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    height: 1px;
+    background: linear-gradient(90deg,
+        transparent,
+        var(--dom-gold-dim),
+        var(--dom-gold),
+        var(--dom-gold-dim),
+        transparent);
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+}
+
+/* Additional golden accent lines */
+.templated-layout.layout-dominion .layout-decoration.golden-accents::after {
+    content: '';
+    position: absolute;
+    top: 75px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40%;
+    height: 1px;
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(255, 215, 0, 0.3),
+        transparent);
+}
+
+/* Divine shimmer effect */
+.templated-layout.layout-dominion .layout-decoration.divine-shimmer {
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(180deg,
+            rgba(255, 215, 0, 0.03) 0%,
+            transparent 15%,
+            transparent 85%,
+            rgba(153, 51, 255, 0.03) 100%);
+    pointer-events: none;
+    animation: dominion-shimmer 8s ease-in-out infinite;
+}
+
+@keyframes dominion-shimmer {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+}
+
+/* ==========================================================================
+   FERENGI layout styling - CYAN/BLUE + PINK/MAGENTA BUSINESS INTERFACE
+   Based on reference images showing:
+   - Cyan/Blue as primary color
+   - Pink/Magenta as secondary accent
+   - Hexagonal elements (profit-focused design)
+   - White circular frames
+   - Pie chart / wedge displays
+   - Business/data-oriented aesthetic
+   ========================================================================== */
+.templated-layout.layout-ferengi {
+    /* Ferengi color palette from reference images */
+    --fer-cyan: #00CCFF;
+    --fer-cyan-bright: #33DDFF;
+    --fer-cyan-dark: #0088AA;
+    --fer-blue: #0066CC;
+    --fer-pink: #FF66CC;
+    --fer-magenta: #CC33AA;
+    --fer-magenta-bright: #FF44DD;
+    --fer-gold: #FFD700;
+    --fer-gold-dim: rgba(255, 215, 0, 0.5);
+    --fer-white: #FFFFFF;
+    --fer-bg: #0a0812;
+    --fer-bg-dark: #050408;
+
+    background:
+        /* Hexagonal-inspired grid pattern */
+        repeating-linear-gradient(60deg, rgba(0, 204, 255, 0.02) 0px, transparent 1px, transparent 30px),
+        repeating-linear-gradient(-60deg, rgba(0, 204, 255, 0.02) 0px, transparent 1px, transparent 30px),
+        repeating-linear-gradient(0deg, rgba(0, 204, 255, 0.015) 0px, transparent 1px, transparent 40px),
+        repeating-linear-gradient(90deg, rgba(0, 204, 255, 0.015) 0px, transparent 1px, transparent 40px),
+        /* Subtle profit glow at center */
+        radial-gradient(circle at 50% 50%, rgba(255, 215, 0, 0.05) 0%, transparent 30%),
+        linear-gradient(180deg, var(--fer-bg) 0%, var(--fer-bg-dark) 50%, var(--fer-bg) 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Ferengi header - business terminal style with circular accent */
+.templated-layout.layout-ferengi .area-header {
+    background:
+        linear-gradient(180deg,
+            rgba(0, 204, 255, 0.15) 0%,
+            rgba(10, 8, 18, 0.95) 50%,
+            rgba(5, 4, 8, 0.98) 100%);
+    border-bottom: 3px solid var(--fer-cyan);
+    box-shadow:
+        0 0 25px rgba(0, 204, 255, 0.3),
+        inset 0 -10px 30px rgba(0, 204, 255, 0.08);
+    position: relative;
+}
+
+/* Circular profit indicator - white ring frame */
+.templated-layout.layout-ferengi .area-header::before {
+    content: '';
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--fer-white);
+    border-radius: 50%;
+    background:
+        /* Inner rings */
+        radial-gradient(circle, transparent 30%, var(--fer-cyan) 32%, transparent 34%),
+        radial-gradient(circle, transparent 50%, var(--fer-pink) 52%, transparent 54%),
+        /* Center latinum glow */
+        radial-gradient(circle, var(--fer-gold) 0%, rgba(255, 215, 0, 0.5) 20%, transparent 35%);
+    box-shadow:
+        0 0 15px rgba(255, 255, 255, 0.4),
+        0 0 30px rgba(0, 204, 255, 0.3);
+}
+
+/* Side accent bars */
+.templated-layout.layout-ferengi .area-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg,
+        var(--fer-pink) 0%,
+        var(--fer-cyan) 25%,
+        var(--fer-cyan-bright) 50%,
+        var(--fer-cyan) 75%,
+        var(--fer-pink) 100%);
+}
+
+/* Ferengi sidebars - hexagonal data displays */
+.templated-layout.layout-ferengi .area-sidebar-left,
+.templated-layout.layout-ferengi .area-sidebar-right {
+    background:
+        /* Hexagonal overlay pattern */
+        repeating-linear-gradient(60deg, rgba(0, 204, 255, 0.03) 0px, transparent 1px, transparent 15px),
+        repeating-linear-gradient(-60deg, rgba(0, 204, 255, 0.03) 0px, transparent 1px, transparent 15px),
+        linear-gradient(180deg, rgba(0, 136, 170, 0.1) 0%, rgba(10, 8, 18, 0.95) 30%, var(--fer-bg-dark) 100%);
+    border: 2px solid var(--fer-cyan-dark);
+    position: relative;
+    box-shadow:
+        inset 0 0 30px rgba(0, 204, 255, 0.05),
+        0 0 15px rgba(0, 204, 255, 0.1);
+}
+
+/* Circular display frame - white bordered */
+.templated-layout.layout-ferengi .area-sidebar-left::before,
+.templated-layout.layout-ferengi .area-sidebar-right::before {
+    content: '';
+    position: absolute;
+    top: 15%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 70px;
+    height: 70px;
+    border: 3px solid var(--fer-white);
+    border-radius: 50%;
+    background:
+        /* Pie chart wedge effect - cyan and pink segments */
+        conic-gradient(from 0deg,
+            var(--fer-cyan) 0deg,
+            var(--fer-cyan) 90deg,
+            var(--fer-pink) 90deg,
+            var(--fer-pink) 180deg,
+            var(--fer-cyan-dark) 180deg,
+            var(--fer-cyan-dark) 270deg,
+            var(--fer-magenta) 270deg,
+            var(--fer-magenta) 360deg),
+        radial-gradient(circle, var(--fer-bg-dark) 0%, var(--fer-bg-dark) 50%, transparent 51%);
+    background-blend-mode: normal;
+    box-shadow:
+        0 0 20px rgba(255, 255, 255, 0.2),
+        inset 0 0 30px rgba(0, 0, 0, 0.5);
+}
+
+/* Hexagonal status indicator */
+.templated-layout.layout-ferengi .area-sidebar-left::after,
+.templated-layout.layout-ferengi .area-sidebar-right::after {
+    content: '';
+    position: absolute;
+    bottom: 15%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50px;
+    height: 44px;
+    /* Hexagon shape */
+    clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+    background: linear-gradient(180deg,
+        var(--fer-cyan) 0%,
+        var(--fer-blue) 50%,
+        var(--fer-cyan-dark) 100%);
+    box-shadow: 0 0 15px rgba(0, 204, 255, 0.4);
+}
+
+/* Ferengi main area - data terminal display */
+.templated-layout.layout-ferengi .area-main {
+    background:
+        /* Data grid pattern */
+        repeating-linear-gradient(0deg, rgba(0, 204, 255, 0.02) 0px, transparent 1px, transparent 30px),
+        repeating-linear-gradient(90deg, rgba(0, 204, 255, 0.02) 0px, transparent 1px, transparent 30px),
+        /* Central focus glow */
+        radial-gradient(ellipse 50% 40% at center,
+            rgba(0, 204, 255, 0.05) 0%,
+            transparent 70%);
+    position: relative;
+}
+
+/* Large circular frame display in main area */
+.templated-layout.layout-ferengi .area-main::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 25%;
+    transform: translate(-50%, -50%);
+    width: 120px;
+    height: 120px;
+    border: 4px solid var(--fer-white);
+    border-radius: 50%;
+    background:
+        /* Multiple concentric rings */
+        radial-gradient(circle, transparent 20%, var(--fer-white) 21%, transparent 22%),
+        radial-gradient(circle, transparent 40%, rgba(255, 255, 255, 0.5) 41%, transparent 42%),
+        radial-gradient(circle, transparent 60%, rgba(255, 255, 255, 0.3) 61%, transparent 62%),
+        radial-gradient(circle, var(--fer-bg-dark) 0%, transparent 20%);
+    box-shadow:
+        0 0 30px rgba(255, 255, 255, 0.15),
+        inset 0 0 40px rgba(0, 0, 0, 0.6);
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+/* Ferengi footer - transaction/status bar */
+.templated-layout.layout-ferengi .area-footer {
+    background:
+        linear-gradient(0deg,
+            rgba(0, 204, 255, 0.12) 0%,
+            rgba(255, 102, 204, 0.05) 50%,
+            transparent 100%);
+    border-top: 3px solid var(--fer-cyan);
+    box-shadow:
+        0 0 20px rgba(0, 204, 255, 0.2),
+        inset 0 5px 20px rgba(0, 204, 255, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+/* Footer hexagonal status indicators */
+.templated-layout.layout-ferengi .area-footer::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 20%;
+    width: 80px;
+    height: 20px;
+    background:
+        /* Row of small hexagons */
+        radial-gradient(ellipse 10px 10px at 10px 10px, var(--fer-cyan) 40%, transparent 45%),
+        radial-gradient(ellipse 10px 10px at 30px 10px, var(--fer-pink) 40%, transparent 45%),
+        radial-gradient(ellipse 10px 10px at 50px 10px, var(--fer-cyan) 40%, transparent 45%),
+        radial-gradient(ellipse 10px 10px at 70px 10px, var(--fer-pink) 40%, transparent 45%);
+    filter: drop-shadow(0 0 5px rgba(0, 204, 255, 0.5));
+}
+
+.templated-layout.layout-ferengi .area-footer::after {
+    content: '';
+    position: absolute;
+    top: -10px;
+    right: 20%;
+    width: 80px;
+    height: 20px;
+    background:
+        radial-gradient(ellipse 10px 10px at 10px 10px, var(--fer-pink) 40%, transparent 45%),
+        radial-gradient(ellipse 10px 10px at 30px 10px, var(--fer-cyan) 40%, transparent 45%),
+        radial-gradient(ellipse 10px 10px at 50px 10px, var(--fer-pink) 40%, transparent 45%),
+        radial-gradient(ellipse 10px 10px at 70px 10px, var(--fer-cyan) 40%, transparent 45%);
+    filter: drop-shadow(0 0 5px rgba(255, 102, 204, 0.5));
+}
+
+/* Ferengi profit lines overlay */
+.templated-layout.layout-ferengi::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    /* Diagonal crossing lines like X pattern from reference */
+    background:
+        linear-gradient(45deg, transparent 48%, rgba(0, 204, 255, 0.03) 49%, rgba(0, 204, 255, 0.03) 51%, transparent 52%),
+        linear-gradient(-45deg, transparent 48%, rgba(255, 102, 204, 0.03) 49%, rgba(255, 102, 204, 0.03) 51%, transparent 52%);
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* ==========================================================================
+   FERENGI UI COMPONENTS - Hexagons, profit displays, transaction panels
+   ========================================================================== */
+
+/* Ferengi panel - business terminal container */
+.ferengi-panel {
+    background:
+        repeating-linear-gradient(60deg, rgba(0, 204, 255, 0.02) 0px, transparent 1px, transparent 20px),
+        repeating-linear-gradient(-60deg, rgba(0, 204, 255, 0.02) 0px, transparent 1px, transparent 20px),
+        linear-gradient(180deg, rgba(0, 136, 170, 0.08) 0%, rgba(10, 8, 18, 0.95) 100%);
+    border: 2px solid var(--fer-cyan, #00CCFF);
+    position: relative;
+    padding: 1rem;
+}
+
+.ferengi-panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 10px;
+    right: 10px;
+    height: 3px;
+    background: linear-gradient(90deg,
+        var(--fer-pink, #FF66CC) 0%,
+        var(--fer-cyan, #00CCFF) 50%,
+        var(--fer-pink, #FF66CC) 100%);
+}
+
+/* Ferengi hexagon button/display */
+.ferengi-hexagon {
+    width: 60px;
+    height: 52px;
+    clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+    background: linear-gradient(180deg,
+        var(--fer-cyan, #00CCFF) 0%,
+        var(--fer-blue, #0066CC) 50%,
+        var(--fer-cyan-dark, #0088AA) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 600;
+    text-shadow: 0 0 10px rgba(0, 204, 255, 0.5);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.ferengi-hexagon:hover {
+    background: linear-gradient(180deg,
+        var(--fer-cyan-bright, #33DDFF) 0%,
+        var(--fer-cyan, #00CCFF) 50%,
+        var(--fer-blue, #0066CC) 100%);
+    box-shadow: 0 0 20px rgba(0, 204, 255, 0.5);
+}
+
+.ferengi-hexagon.pink {
+    background: linear-gradient(180deg,
+        var(--fer-pink, #FF66CC) 0%,
+        var(--fer-magenta, #CC33AA) 50%,
+        var(--fer-magenta-bright, #FF44DD) 100%);
+}
+
+/* Ferengi circular display - white-framed pie chart */
+.ferengi-pie-display {
+    width: 80px;
+    height: 80px;
+    border: 3px solid white;
+    border-radius: 50%;
+    background:
+        conic-gradient(from 0deg,
+            var(--fer-cyan, #00CCFF) 0deg,
+            var(--fer-cyan, #00CCFF) 90deg,
+            var(--fer-pink, #FF66CC) 90deg,
+            var(--fer-pink, #FF66CC) 180deg,
+            var(--fer-cyan-dark, #0088AA) 180deg,
+            var(--fer-cyan-dark, #0088AA) 270deg,
+            var(--fer-magenta, #CC33AA) 270deg,
+            var(--fer-magenta, #CC33AA) 360deg);
+    position: relative;
+    box-shadow:
+        0 0 20px rgba(255, 255, 255, 0.2),
+        inset 0 0 30px rgba(0, 0, 0, 0.5);
+}
+
+.ferengi-pie-display::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40%;
+    height: 40%;
+    background: var(--fer-bg-dark, #050408);
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Ferengi text styles */
+.ferengi-text {
+    font-family: 'Orbitron', sans-serif;
+    color: var(--fer-cyan, #00CCFF);
+    text-shadow: 0 0 10px rgba(0, 204, 255, 0.5);
+    letter-spacing: 0.05em;
+}
+
+.ferengi-text.pink {
+    color: var(--fer-pink, #FF66CC);
+    text-shadow: 0 0 10px rgba(255, 102, 204, 0.5);
+}
+
+.ferengi-text.gold {
+    color: var(--fer-gold, #FFD700);
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+/* Ferengi profit display */
+.ferengi-profit-display {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: linear-gradient(180deg,
+        rgba(0, 204, 255, 0.15) 0%,
+        rgba(0, 136, 170, 0.05) 100%);
+    border: 1px solid var(--fer-cyan, #00CCFF);
+    border-radius: 4px;
+}
+
+.ferengi-profit-display .value {
+    color: var(--fer-gold, #FFD700);
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    text-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+}
+
+/* Ferengi button */
+.ferengi-btn {
+    background: linear-gradient(180deg,
+        rgba(0, 204, 255, 0.2) 0%,
+        rgba(0, 102, 204, 0.1) 100%);
+    border: 2px solid var(--fer-cyan, #00CCFF);
+    color: var(--fer-cyan, #00CCFF);
+    padding: 8px 20px;
+    font-family: 'Orbitron', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.ferengi-btn:hover {
+    background: linear-gradient(180deg,
+        rgba(0, 204, 255, 0.35) 0%,
+        rgba(0, 102, 204, 0.2) 100%);
+    box-shadow: 0 0 20px rgba(0, 204, 255, 0.4);
+    color: #33DDFF;
+}
+
+.ferengi-btn.pink {
+    border-color: var(--fer-pink, #FF66CC);
+    color: var(--fer-pink, #FF66CC);
+    background: linear-gradient(180deg,
+        rgba(255, 102, 204, 0.2) 0%,
+        rgba(204, 51, 170, 0.1) 100%);
+}
+
+.ferengi-btn.pink:hover {
+    background: linear-gradient(180deg,
+        rgba(255, 102, 204, 0.35) 0%,
+        rgba(204, 51, 170, 0.2) 100%);
+    box-shadow: 0 0 20px rgba(255, 102, 204, 0.4);
+}
+
+/* Layout decoration base */
+.templated-layout .layout-decoration {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* ==========================================================================
+   BAJORAN layout styling - CYAN/TEAL + ORANGE/GOLD SPIRITUAL INTERFACE
+   Based on reference images showing:
+   - Cyan/Teal as primary color (DS9 console style)
+   - Orange/Gold/Amber as spiritual/ancient accents
+   - Circular ring displays (prominent in all panels)
+   - Wing-like decorative shapes (Assault Ship Panel)
+   - Ancient Universe styling with glowing rings
+   - Earthy, warm accent tones
+   ========================================================================== */
+.templated-layout.layout-bajoran {
+    /* Bajoran color palette from reference images */
+    --baj-cyan: #00BBCC;
+    --baj-cyan-bright: #00DDEE;
+    --baj-cyan-dim: #008899;
+    --baj-teal: #006677;
+    --baj-orange: #FF8833;
+    --baj-orange-bright: #FFAA44;
+    --baj-orange-dim: #CC6622;
+    --baj-gold: #DDAA33;
+    --baj-amber: #CC8800;
+    --baj-red: #CC3333;
+    --baj-blue: #3366CC;
+    --baj-white: #EEFFFF;
+    --baj-bg: #040808;
+    --baj-bg-dark: #020505;
+
+    background:
+        /* Subtle circular ring patterns - spiritual aesthetic */
+        radial-gradient(circle at 20% 30%, rgba(0, 187, 204, 0.03) 0%, transparent 25%),
+        radial-gradient(circle at 80% 70%, rgba(255, 136, 51, 0.03) 0%, transparent 25%),
+        /* Ancient glyph-like grid pattern */
+        repeating-linear-gradient(0deg, rgba(0, 187, 204, 0.01) 0px, transparent 1px, transparent 50px),
+        repeating-linear-gradient(90deg, rgba(0, 187, 204, 0.01) 0px, transparent 1px, transparent 50px),
+        /* Base gradient */
+        linear-gradient(180deg, var(--baj-bg) 0%, var(--baj-bg-dark) 50%, var(--baj-bg) 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Bajoran header - temple-inspired with circular emblem */
+.templated-layout.layout-bajoran .area-header {
+    background:
+        linear-gradient(180deg,
+            rgba(0, 187, 204, 0.12) 0%,
+            rgba(4, 8, 8, 0.95) 60%,
+            rgba(2, 5, 5, 0.98) 100%);
+    border-bottom: 3px solid var(--baj-cyan);
+    box-shadow:
+        0 0 25px rgba(0, 187, 204, 0.2),
+        inset 0 -8px 25px rgba(0, 187, 204, 0.05);
+    position: relative;
+}
+
+/* Central circular emblem - Bajoran orb style */
+.templated-layout.layout-bajoran .area-header::before {
+    content: '';
+    position: absolute;
+    bottom: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50px;
+    height: 50px;
+    border: 3px solid var(--baj-orange);
+    border-radius: 50%;
+    background:
+        /* Multiple glowing rings - orb effect */
+        radial-gradient(circle, transparent 25%, var(--baj-orange) 27%, transparent 29%),
+        radial-gradient(circle, transparent 45%, var(--baj-cyan) 47%, transparent 49%),
+        radial-gradient(circle, transparent 65%, rgba(255, 136, 51, 0.5) 67%, transparent 69%),
+        /* Warm center glow */
+        radial-gradient(circle, var(--baj-gold) 0%, rgba(221, 170, 51, 0.6) 15%, transparent 35%);
+    box-shadow:
+        0 0 20px rgba(255, 136, 51, 0.5),
+        0 0 40px rgba(0, 187, 204, 0.3),
+        inset 0 0 15px rgba(255, 136, 51, 0.3);
+    animation: bajoran-orb-pulse 4s ease-in-out infinite;
+}
+
+@keyframes bajoran-orb-pulse {
+    0%, 100% {
+        box-shadow: 0 0 20px rgba(255, 136, 51, 0.5), 0 0 40px rgba(0, 187, 204, 0.3), inset 0 0 15px rgba(255, 136, 51, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 30px rgba(255, 136, 51, 0.7), 0 0 50px rgba(0, 187, 204, 0.5), inset 0 0 25px rgba(255, 136, 51, 0.5);
+    }
+}
+
+/* Wing-like accent bars extending from center */
+.templated-layout.layout-bajoran .area-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg,
+        var(--baj-orange) 0%,
+        var(--baj-cyan) 20%,
+        var(--baj-cyan-bright) 50%,
+        var(--baj-cyan) 80%,
+        var(--baj-orange) 100%);
+}
+
+/* Bajoran sidebars - temple column style with circular displays */
+.templated-layout.layout-bajoran .area-sidebar-left,
+.templated-layout.layout-bajoran .area-sidebar-right {
+    background:
+        /* Subtle arch pattern */
+        radial-gradient(ellipse 80% 40% at 50% 0%, rgba(0, 187, 204, 0.08) 0%, transparent 100%),
+        linear-gradient(180deg, rgba(0, 102, 119, 0.1) 0%, rgba(4, 8, 8, 0.95) 30%, var(--baj-bg-dark) 100%);
+    border: 2px solid var(--baj-cyan-dim);
+    position: relative;
+    box-shadow:
+        inset 0 0 30px rgba(0, 187, 204, 0.03),
+        0 0 15px rgba(0, 187, 204, 0.08);
+}
+
+/* Circular ring display - Ancient Universe style */
+.templated-layout.layout-bajoran .area-sidebar-left::before,
+.templated-layout.layout-bajoran .area-sidebar-right::before {
+    content: '';
+    position: absolute;
+    top: 15%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 70px;
+    height: 70px;
+    border: 3px solid var(--baj-cyan);
+    border-radius: 50%;
+    background:
+        /* Concentric ring targeting display */
+        radial-gradient(circle, transparent 20%, var(--baj-orange) 22%, transparent 24%),
+        radial-gradient(circle, transparent 35%, var(--baj-cyan) 37%, transparent 39%),
+        radial-gradient(circle, transparent 50%, rgba(255, 136, 51, 0.4) 52%, transparent 54%),
+        radial-gradient(circle, transparent 65%, rgba(0, 187, 204, 0.3) 67%, transparent 69%),
+        /* Inner glow */
+        radial-gradient(circle, rgba(221, 170, 51, 0.3) 0%, transparent 30%);
+    box-shadow:
+        0 0 15px rgba(0, 187, 204, 0.3),
+        inset 0 0 20px rgba(0, 0, 0, 0.6);
+}
+
+/* Bottom wing accent - spacecraft panel style */
+.templated-layout.layout-bajoran .area-sidebar-left::after,
+.templated-layout.layout-bajoran .area-sidebar-right::after {
+    content: '';
+    position: absolute;
+    bottom: 12%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 30px;
+    /* Wing/swept shape */
+    clip-path: polygon(50% 0%, 100% 50%, 80% 100%, 20% 100%, 0% 50%);
+    background: linear-gradient(180deg,
+        var(--baj-orange) 0%,
+        var(--baj-amber) 50%,
+        var(--baj-orange-dim) 100%);
+    box-shadow: 0 0 15px rgba(255, 136, 51, 0.4);
+}
+
+/* Bajoran main area - central worship/command space */
+.templated-layout.layout-bajoran .area-main {
+    background:
+        /* Subtle sacred geometry hints */
+        radial-gradient(circle at 50% 50%, rgba(0, 187, 204, 0.03) 0%, transparent 40%),
+        /* Subtle grid for readability */
+        repeating-linear-gradient(0deg, rgba(0, 187, 204, 0.01) 0px, transparent 1px, transparent 40px),
+        repeating-linear-gradient(90deg, rgba(0, 187, 204, 0.01) 0px, transparent 1px, transparent 40px);
+    position: relative;
+}
+
+/* Large circular display frame - bridge scanner style */
+.templated-layout.layout-bajoran .area-main::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 150px;
+    height: 150px;
+    border: 3px solid var(--baj-cyan-dim);
+    border-radius: 50%;
+    background:
+        /* Multiple concentric targeting rings */
+        radial-gradient(circle, transparent 10%, var(--baj-orange) 11%, transparent 12%),
+        radial-gradient(circle, transparent 25%, var(--baj-cyan) 26%, transparent 27%),
+        radial-gradient(circle, transparent 40%, rgba(255, 136, 51, 0.3) 41%, transparent 42%),
+        radial-gradient(circle, transparent 55%, rgba(0, 187, 204, 0.2) 56%, transparent 57%),
+        radial-gradient(circle, transparent 70%, rgba(255, 136, 51, 0.15) 71%, transparent 72%),
+        /* Center dot */
+        radial-gradient(circle, var(--baj-gold) 0%, rgba(221, 170, 51, 0.3) 8%, transparent 15%);
+    box-shadow:
+        0 0 40px rgba(0, 187, 204, 0.1),
+        inset 0 0 50px rgba(0, 0, 0, 0.7);
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+/* Bajoran footer - status/prayer bar style */
+.templated-layout.layout-bajoran .area-footer {
+    background:
+        linear-gradient(0deg,
+            rgba(255, 136, 51, 0.1) 0%,
+            rgba(0, 187, 204, 0.05) 50%,
+            transparent 100%);
+    border-top: 3px solid var(--baj-cyan);
+    box-shadow:
+        0 0 20px rgba(0, 187, 204, 0.15),
+        inset 0 5px 20px rgba(0, 187, 204, 0.03);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+/* Footer circular status indicators */
+.templated-layout.layout-bajoran .area-footer::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 25%;
+    width: 60px;
+    height: 16px;
+    background:
+        radial-gradient(ellipse 8px 8px at 8px 8px, var(--baj-cyan) 50%, transparent 55%),
+        radial-gradient(ellipse 8px 8px at 24px 8px, var(--baj-orange) 50%, transparent 55%),
+        radial-gradient(ellipse 8px 8px at 40px 8px, var(--baj-cyan) 50%, transparent 55%),
+        radial-gradient(ellipse 8px 8px at 56px 8px, var(--baj-orange) 50%, transparent 55%);
+    filter: drop-shadow(0 0 5px rgba(0, 187, 204, 0.5));
+}
+
+.templated-layout.layout-bajoran .area-footer::after {
+    content: '';
+    position: absolute;
+    top: -8px;
+    right: 25%;
+    width: 60px;
+    height: 16px;
+    background:
+        radial-gradient(ellipse 8px 8px at 8px 8px, var(--baj-orange) 50%, transparent 55%),
+        radial-gradient(ellipse 8px 8px at 24px 8px, var(--baj-cyan) 50%, transparent 55%),
+        radial-gradient(ellipse 8px 8px at 40px 8px, var(--baj-orange) 50%, transparent 55%),
+        radial-gradient(ellipse 8px 8px at 56px 8px, var(--baj-cyan) 50%, transparent 55%);
+    filter: drop-shadow(0 0 5px rgba(255, 136, 51, 0.5));
+}
+
+/* Bajoran sacred/spiritual overlay - subtle glow lines */
+.templated-layout.layout-bajoran::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    /* Diagonal crossing lines suggesting light beams */
+    background:
+        linear-gradient(45deg, transparent 49%, rgba(255, 136, 51, 0.015) 49.5%, rgba(255, 136, 51, 0.015) 50.5%, transparent 51%),
+        linear-gradient(-45deg, transparent 49%, rgba(0, 187, 204, 0.015) 49.5%, rgba(0, 187, 204, 0.015) 50.5%, transparent 51%);
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* ==========================================================================
+   BAJORAN UI COMPONENTS - Orb displays, wing panels, spiritual elements
+   ========================================================================== */
+
+/* Bajoran panel - temple/spiritual container */
+.bajoran-panel {
+    background:
+        radial-gradient(ellipse 60% 30% at 50% 0%, rgba(0, 187, 204, 0.06) 0%, transparent 100%),
+        linear-gradient(180deg, rgba(0, 102, 119, 0.08) 0%, rgba(4, 8, 8, 0.95) 100%);
+    border: 2px solid var(--baj-cyan, #00BBCC);
+    border-radius: 4px;
+    position: relative;
+    padding: 1rem;
+}
+
+.bajoran-panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 10px;
+    right: 10px;
+    height: 3px;
+    background: linear-gradient(90deg,
+        var(--baj-orange, #FF8833) 0%,
+        var(--baj-cyan, #00BBCC) 50%,
+        var(--baj-orange, #FF8833) 100%);
+}
+
+/* Bajoran orb display - circular ring element */
+.bajoran-orb-display {
+    width: 80px;
+    height: 80px;
+    border: 3px solid var(--baj-cyan, #00BBCC);
+    border-radius: 50%;
+    background:
+        radial-gradient(circle, transparent 20%, var(--baj-orange, #FF8833) 22%, transparent 24%),
+        radial-gradient(circle, transparent 35%, var(--baj-cyan, #00BBCC) 37%, transparent 39%),
+        radial-gradient(circle, transparent 50%, rgba(255, 136, 51, 0.4) 52%, transparent 54%),
+        radial-gradient(circle, rgba(221, 170, 51, 0.4) 0%, transparent 25%);
+    box-shadow:
+        0 0 20px rgba(0, 187, 204, 0.3),
+        0 0 30px rgba(255, 136, 51, 0.2),
+        inset 0 0 25px rgba(0, 0, 0, 0.6);
+    animation: bajoran-orb-pulse 4s ease-in-out infinite;
+}
+
+/* Bajoran wing display - spacecraft panel style */
+.bajoran-wing-display {
+    width: 100px;
+    height: 50px;
+    clip-path: polygon(50% 0%, 100% 40%, 85% 100%, 15% 100%, 0% 40%);
+    background: linear-gradient(180deg,
+        var(--baj-orange, #FF8833) 0%,
+        var(--baj-amber, #CC8800) 50%,
+        var(--baj-orange-dim, #CC6622) 100%);
+    position: relative;
+    box-shadow: 0 0 20px rgba(255, 136, 51, 0.4);
+}
+
+.bajoran-wing-display::after {
+    content: '';
+    position: absolute;
+    top: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30px;
+    height: 30px;
+    border: 2px solid var(--baj-cyan, #00BBCC);
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--baj-cyan, #00BBCC) 30%, transparent 35%);
+}
+
+/* Bajoran text styles */
+.bajoran-text {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    color: var(--baj-cyan, #00BBCC);
+    text-shadow: 0 0 10px rgba(0, 187, 204, 0.4);
+    letter-spacing: 0.08em;
+}
+
+.bajoran-text.orange {
+    color: var(--baj-orange, #FF8833);
+    text-shadow: 0 0 10px rgba(255, 136, 51, 0.4);
+}
+
+.bajoran-text.gold {
+    color: var(--baj-gold, #DDAA33);
+    text-shadow: 0 0 10px rgba(221, 170, 51, 0.4);
+}
+
+/* Bajoran button */
+.bajoran-btn {
+    background: linear-gradient(180deg,
+        rgba(0, 187, 204, 0.2) 0%,
+        rgba(0, 102, 119, 0.1) 100%);
+    border: 2px solid var(--baj-cyan, #00BBCC);
+    border-radius: 4px;
+    color: var(--baj-cyan, #00BBCC);
+    padding: 8px 20px;
+    font-family: 'Georgia', 'Times New Roman', serif;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.bajoran-btn:hover {
+    background: linear-gradient(180deg,
+        rgba(0, 187, 204, 0.35) 0%,
+        rgba(0, 102, 119, 0.2) 100%);
+    box-shadow: 0 0 20px rgba(0, 187, 204, 0.4);
+    color: #00DDEE;
+}
+
+.bajoran-btn.orange {
+    border-color: var(--baj-orange, #FF8833);
+    color: var(--baj-orange, #FF8833);
+    background: linear-gradient(180deg,
+        rgba(255, 136, 51, 0.2) 0%,
+        rgba(204, 102, 34, 0.1) 100%);
+}
+
+.bajoran-btn.orange:hover {
+    background: linear-gradient(180deg,
+        rgba(255, 136, 51, 0.35) 0%,
+        rgba(204, 102, 34, 0.2) 100%);
+    box-shadow: 0 0 20px rgba(255, 136, 51, 0.4);
+}
+
+/* Bajoran status indicator - small orb */
+.bajoran-status-orb {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: radial-gradient(circle,
+        var(--baj-cyan, #00BBCC) 30%,
+        rgba(0, 187, 204, 0.5) 60%,
+        transparent 70%);
+    box-shadow: 0 0 10px rgba(0, 187, 204, 0.5);
+}
+
+.bajoran-status-orb.active {
+    background: radial-gradient(circle,
+        var(--baj-orange, #FF8833) 30%,
+        rgba(255, 136, 51, 0.5) 60%,
+        transparent 70%);
+    box-shadow: 0 0 10px rgba(255, 136, 51, 0.5);
+}
+
+/* Bajoran data connection line */
+.bajoran-connection {
+    height: 2px;
+    background: linear-gradient(90deg,
+        transparent,
+        var(--baj-cyan, #00BBCC),
+        var(--baj-orange, #FF8833),
+        var(--baj-cyan, #00BBCC),
+        transparent);
+    position: relative;
+}
+
+.bajoran-connection::before,
+.bajoran-connection::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--baj-cyan, #00BBCC);
+    box-shadow: 0 0 8px rgba(0, 187, 204, 0.6);
+}
+
+.bajoran-connection::before { left: 0; }
+.bajoran-connection::after { right: 0; }
+
+
+/* ===========================================
+   GORN HEGEMONY COMPONENTS
+   Bio-organic hive design (SNW Style)
+   "What if Velociraptors survived and formed a civilization?"
+   Orange holographics + Green shields
+   =========================================== */
+
+/* Gorn Button - Organic rounded with bio-glow */
+.gorn-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background: linear-gradient(180deg, #8B6914 0%, #5C4A10 50%, #8B6914 100%);
+    border: 2px solid #FF6622;
+    border-radius: 20px;
+    padding: 10px 24px;
+    cursor: pointer;
+    min-width: 100px;
+    overflow: hidden;
+    transition: all 0.2s ease;
+}
+
+.gorn-btn::before {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: 23px;
+    background: radial-gradient(ellipse at center,
+        rgba(255, 102, 34, 0.4) 0%,
+        transparent 70%);
+    animation: gorn-bio-pulse 2.5s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes gorn-bio-pulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+}
+
+.gorn-btn-inner {
+    color: #FFCC88;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-size: 11px;
+    text-shadow: 0 0 5px rgba(255, 102, 34, 0.5);
+    z-index: 1;
+}
+
+.gorn-btn:hover {
+    border-color: #FFAA33;
+    box-shadow:
+        0 0 20px rgba(255, 102, 34, 0.6),
+        inset 0 0 15px rgba(255, 102, 34, 0.2);
+}
+
+.gorn-btn.active {
+    background: linear-gradient(180deg, #FF6622 0%, #CC4400 100%);
+}
+
+.gorn-btn.active .gorn-btn-inner {
+    color: #0a0f0c;
+}
+
+/* Gorn targeting pip (in button) */
+.gorn-targeting-pip {
+    position: absolute;
+    right: 8px;
+    width: 8px;
+    height: 8px;
+    border: 2px solid #FF6622;
+    border-radius: 50%;
+    animation: gorn-target-scan 2s linear infinite;
+}
+
+@keyframes gorn-target-scan {
+    0% { transform: scale(0.8); opacity: 1; }
+    100% { transform: scale(1.5); opacity: 0; }
+}
+
+/* Gorn Panel - Bio-organic with rib structure */
+.gorn-panel {
+    position: relative;
+    background: linear-gradient(180deg,
+        rgba(10, 15, 12, 0.95) 0%,
+        rgba(5, 8, 7, 0.98) 100%);
+    border: 2px solid #8B6914;
+    border-radius: 12px 12px 8px 8px;
+    overflow: hidden;
+}
+
+/* Rib structure pattern on sides */
+.gorn-panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: repeating-linear-gradient(
+        90deg,
+        transparent 0px,
+        transparent 20px,
+        rgba(139, 105, 20, 0.1) 20px,
+        rgba(139, 105, 20, 0.1) 22px
+    );
+    pointer-events: none;
+}
+
+/* Orange holographic strip at top */
+.gorn-panel::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        #FF6622 20%,
+        #FFAA33 50%,
+        #FF6622 80%,
+        transparent 100%);
+    box-shadow: 0 0 15px rgba(255, 102, 34, 0.5);
+}
+
+.gorn-panel-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: linear-gradient(90deg,
+        rgba(255, 102, 34, 0.15) 0%,
+        transparent 60%);
+    border-bottom: 1px solid rgba(139, 105, 20, 0.4);
+}
+
+.gorn-panel-title {
+    color: #FF6622;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+/* Egg chamber indicator */
+.gorn-egg-indicator {
+    width: 16px;
+    height: 22px;
+    background: radial-gradient(ellipse 100% 80% at 50% 40%,
+        rgba(255, 238, 136, 0.9) 0%,
+        rgba(255, 204, 51, 0.7) 40%,
+        rgba(204, 68, 0, 0.4) 70%,
+        transparent 100%);
+    border-radius: 40% 40% 50% 50% / 50% 50% 40% 40%;
+    box-shadow: 0 0 10px rgba(255, 204, 51, 0.5);
+    animation: gorn-egg-pulse 3s ease-in-out infinite;
+}
+
+@keyframes gorn-egg-pulse {
+    0%, 100% { opacity: 0.7; filter: drop-shadow(0 0 5px #FFCC33); }
+    50% { opacity: 1; filter: drop-shadow(0 0 10px #FFCC33); }
+}
+
+.gorn-panel-body {
+    padding: 16px;
+    color: #DDCCAA;
+}
+
+/* Gorn hive status bar (green for shields/energy) */
+.gorn-hive-bar {
+    height: 3px;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        #44DD44 30%,
+        #44DD44 70%,
+        transparent 100%);
+    box-shadow: 0 0 10px rgba(68, 221, 68, 0.5);
+    margin-top: auto;
+}
+
+/* Gorn Sidebar */
+.gorn-sidebar {
+    background: linear-gradient(180deg,
+        rgba(10, 15, 12, 0.98) 0%,
+        rgba(5, 8, 7, 0.99) 100%);
+    border-right: 3px solid #8B6914;
+    position: relative;
+}
+
+.gorn-sidebar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg,
+        #FF6622 0%,
+        #FFAA33 30%,
+        #FF6622 70%,
+        transparent 100%);
+    box-shadow: 0 0 15px rgba(255, 102, 34, 0.5);
+}
+
+/* Gorn Navigation Item */
+.gorn-nav-hunter {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    margin: 4px 8px;
+    background: rgba(139, 105, 20, 0.1);
+    border: 1px solid transparent;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.gorn-nav-hunter:hover {
+    background: rgba(255, 102, 34, 0.15);
+    border-color: rgba(255, 102, 34, 0.3);
+}
+
+.gorn-nav-hunter.active {
+    background: linear-gradient(90deg,
+        rgba(255, 102, 34, 0.25) 0%,
+        rgba(139, 105, 20, 0.1) 100%);
+    border-color: #FF6622;
+    box-shadow: 0 0 15px rgba(255, 102, 34, 0.3);
+}
+
+.gorn-nav-hunter .nav-icon {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #FF6622;
+    border-radius: 50%;
+    color: #FF6622;
+    font-size: 12px;
+}
+
+.gorn-nav-hunter .nav-label {
+    color: #DDCCAA;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+/* Gorn Header */
+.gorn-header {
+    display: flex;
+    align-items: center;
+    background: linear-gradient(180deg,
+        rgba(10, 15, 12, 0.98) 0%,
+        rgba(5, 8, 7, 0.95) 100%);
+    border-bottom: 3px solid #8B6914;
+    padding: 0 16px;
+    height: 60px;
+    position: relative;
+}
+
+.gorn-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 10%;
+    right: 10%;
+    height: 3px;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        #FF6622 30%,
+        #FFAA33 50%,
+        #FF6622 70%,
+        transparent 100%);
+    box-shadow: 0 0 15px rgba(255, 102, 34, 0.6);
+}
+
+/* Gorn Predator Eye (header icon) */
+.gorn-predator-eye {
+    width: 36px;
+    height: 20px;
+    background: radial-gradient(ellipse 70% 100% at center,
+        #FFEE88 0%,
+        #FF6622 50%,
+        transparent 100%);
+    border-radius: 50%;
+    box-shadow: 0 0 15px rgba(255, 102, 34, 0.6);
+    animation: gorn-eye-scan 4s ease-in-out infinite;
+}
+
+@keyframes gorn-eye-scan {
+    0%, 100% { transform: scaleX(1); }
+    50% { transform: scaleX(0.7); }
+}
+
+/* Gorn Breeding Status */
+.gorn-breeding-status {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    padding: 8px 12px;
+    background: rgba(255, 204, 51, 0.1);
+    border: 1px solid rgba(255, 204, 51, 0.3);
+    border-radius: 8px;
+}
+
+.gorn-breeding-status .egg-count {
+    display: flex;
+    gap: 4px;
+}
+
+.gorn-breeding-status .egg {
+    width: 8px;
+    height: 12px;
+    background: radial-gradient(ellipse 100% 80%,
+        rgba(255, 238, 136, 0.9) 0%,
+        rgba(255, 204, 51, 0.6) 60%,
+        transparent 100%);
+    border-radius: 40% 40% 50% 50%;
+}
+
+/* Gorn Shield Indicator (green) */
+.gorn-shield-indicator {
+    height: 6px;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        #44DD44 20%,
+        #66FF66 50%,
+        #44DD44 80%,
+        transparent 100%);
+    border-radius: 3px;
+    box-shadow: 0 0 10px rgba(68, 221, 68, 0.5);
+}
+
+
+/* ===========================================
+   BREEN CONFEDERACY COMPONENTS
+   Industrial Angular Design (Discovery Style)
+   Gold/Amber light pillars + Cyan accents
+   =========================================== */
+
+/* Breen Button - Angular industrial */
+.breen-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background: linear-gradient(180deg, #CC8800 0%, #885500 50%, #AA6600 100%);
+    border: 2px solid #FFAA33;
+    padding: 10px 20px;
+    cursor: pointer;
+    min-width: 100px;
+    clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+    transition: all 0.15s ease;
+}
+
+.breen-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 100%;
+    background: linear-gradient(180deg,
+        #FFCC55 0%,
+        #FFAA33 50%,
+        #CC8800 100%);
+    box-shadow: 0 0 8px rgba(255, 170, 51, 0.5);
+}
+
+.breen-btn-inner {
+    color: #000;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-size: 11px;
+}
+
+.breen-btn:hover {
+    background: linear-gradient(180deg, #FFAA33 0%, #CC8800 100%);
+    border-color: #FFCC55;
+    box-shadow:
+        0 0 20px rgba(255, 170, 51, 0.5),
+        inset 0 0 15px rgba(255, 204, 85, 0.2);
+}
+
+.breen-btn.active {
+    background: linear-gradient(180deg, #00CCCC 0%, #008888 100%);
+    border-color: #00FFFF;
+}
+
+.breen-btn.active .breen-btn-inner {
+    color: #000;
+}
+
+/* Cyan accent pip */
+.breen-cyan-accent {
+    position: absolute;
+    bottom: 4px;
+    right: 8px;
+    width: 4px;
+    height: 4px;
+    background: #00CCCC;
+    box-shadow: 0 0 6px #00CCCC;
+}
+
+/* Breen Panel - Industrial with light pillars */
+.breen-panel {
+    position: relative;
+    background: linear-gradient(180deg,
+        rgba(21, 21, 21, 0.98) 0%,
+        rgba(10, 10, 10, 0.99) 100%);
+    border: 2px solid #333338;
+    clip-path: polygon(12px 0, calc(100% - 12px) 0, 100% 12px, 100% calc(100% - 12px), calc(100% - 12px) 100%, 12px 100%, 0 calc(100% - 12px), 0 12px);
+    overflow: hidden;
+}
+
+/* Gold light pillar on left */
+.breen-panel::before {
+    content: '';
+    position: absolute;
+    top: 10%;
+    left: 12px;
+    width: 4px;
+    height: 80%;
+    background: linear-gradient(180deg,
+        #FFCC55 0%,
+        #FFAA33 30%,
+        #DD9922 70%,
+        #CC8800 100%);
+    box-shadow:
+        0 0 15px #FFAA33,
+        0 0 30px rgba(255, 170, 51, 0.4);
+    z-index: 1;
+}
+
+/* Cyan floor strip at bottom */
+.breen-panel::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 15%;
+    right: 15%;
+    height: 2px;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        #008888 20%,
+        #00CCCC 50%,
+        #008888 80%,
+        transparent 100%);
+    box-shadow: 0 0 10px #00CCCC;
+}
+
+.breen-panel-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 24px 12px 32px;
+    background: linear-gradient(90deg,
+        rgba(255, 170, 51, 0.15) 0%,
+        transparent 70%);
+    border-bottom: 1px solid #333338;
+}
+
+.breen-panel-title {
+    color: #FFAA33;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.breen-panel-body {
+    padding: 16px 24px 20px 32px;
+    color: #DDCCAA;
+}
+
+/* Breen Sidebar */
+.breen-sidebar {
+    background: linear-gradient(90deg,
+        rgba(10, 10, 10, 0.99) 0%,
+        rgba(15, 15, 15, 0.98) 100%);
+    border-right: 4px solid #333338;
+    position: relative;
+}
+
+/* Gold pillar edge */
+.breen-sidebar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg,
+        #FFCC55 0%,
+        #FFAA33 20%,
+        #DD9922 50%,
+        #FFAA33 80%,
+        #FFCC55 100%);
+    box-shadow:
+        0 0 20px rgba(255, 170, 51, 0.5),
+        0 0 40px rgba(255, 170, 51, 0.25);
+    z-index: 10;
+}
+
+/* Cyan floor strip */
+.breen-sidebar::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg,
+        #00CCCC 0%,
+        #00FFFF 50%,
+        #00CCCC 100%);
+    box-shadow: 0 0 15px #00CCCC;
+}
+
+/* Breen Navigation Item */
+.breen-nav-angular {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    margin: 4px 8px;
+    background: rgba(25, 25, 25, 0.6);
+    border-left: 3px solid transparent;
+    border-bottom: 1px solid rgba(255, 170, 51, 0.1);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.breen-nav-angular:hover {
+    background: rgba(35, 35, 35, 0.8);
+    border-left-color: #CC8800;
+}
+
+.breen-nav-angular.active {
+    background: linear-gradient(90deg,
+        rgba(255, 170, 51, 0.2) 0%,
+        rgba(25, 25, 25, 0.6) 100%);
+    border-left-color: #FFAA33;
+    box-shadow:
+        inset 0 0 30px rgba(255, 170, 51, 0.1),
+        0 0 15px rgba(255, 170, 51, 0.2);
+}
+
+.breen-nav-angular .nav-icon {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 170, 51, 0.1);
+    border: 1px solid #CC8800;
+    color: #FFAA33;
+    font-size: 10px;
+    clip-path: polygon(4px 0, 100% 0, 100% calc(100% - 4px), calc(100% - 4px) 100%, 0 100%, 0 4px);
+}
+
+.breen-nav-angular .nav-label {
+    color: #BBAA88;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.breen-nav-angular.active .nav-label {
+    color: #FFCC55;
+}
+
+/* Gold indicator pip on active */
+.breen-nav-angular.active::after {
+    content: '';
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 6px;
+    height: 6px;
+    background: #FFAA33;
+    box-shadow:
+        0 0 8px #FFAA33,
+        0 0 16px rgba(255, 170, 51, 0.5);
+}
+
+/* Breen Header */
+.breen-header {
+    display: flex;
+    align-items: center;
+    background:
+        repeating-linear-gradient(
+            90deg,
+            transparent 0px,
+            transparent 100px,
+            rgba(255, 170, 51, 0.08) 100px,
+            rgba(255, 170, 51, 0.08) 104px
+        ),
+        linear-gradient(180deg, #0c0c0c 0%, #080808 100%);
+    border-bottom: none;
+    padding: 0 16px;
+    height: 55px;
+    position: relative;
+}
+
+/* Gold light bar with glow */
+.breen-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg,
+        #0a0a0a 0%,
+        #CC8800 15%,
+        #FFAA33 35%,
+        #FFCC55 50%,
+        #FFAA33 65%,
+        #CC8800 85%,
+        #0a0a0a 100%);
+    box-shadow:
+        0 0 25px rgba(255, 170, 51, 0.6),
+        0 0 50px rgba(255, 170, 51, 0.3);
+}
+
+/* Breen Helmet Icon */
+.breen-helmet-icon {
+    width: 30px;
+    height: 30px;
+    background: linear-gradient(180deg, #252525 0%, #151515 100%);
+    border: 2px solid #FFAA33;
+    border-radius: 50% 50% 45% 45% / 60% 60% 40% 40%;
+    position: relative;
+    box-shadow: 0 0 10px rgba(255, 170, 51, 0.3);
+}
+
+/* Visor slit (cyan) */
+.breen-helmet-icon::before {
+    content: '';
+    position: absolute;
+    top: 40%;
+    left: 15%;
+    right: 15%;
+    height: 4px;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        #00CCCC 20%,
+        #00FFFF 50%,
+        #00CCCC 80%,
+        transparent 100%);
+    box-shadow: 0 0 8px #00CCCC;
+}
+
+/* Breen Status Bar */
+.breen-status-bar {
+    height: 6px;
+    background: #0a0a0a;
+    border: 1px solid #252525;
+}
+
+.breen-status-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg,
+        #CC8800 0%,
+        #FFAA33 50%,
+        #FFCC55 100%);
+    box-shadow: 0 0 10px #FFAA33;
+    transition: width 0.3s ease;
+}
+
+/* Breen Visor Indicator */
+.breen-visor-indicator {
+    width: 40px;
+    height: 6px;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        #00CCCC 20%,
+        #00FFFF 50%,
+        #00CCCC 80%,
+        transparent 100%);
+    border-radius: 3px;
+    box-shadow: 0 0 12px #00CCCC;
+}
+
+/* Breen Communication Signal */
+.breen-comm-signal {
+    display: flex;
+    gap: 3px;
+    align-items: flex-end;
+}
+
+.breen-comm-signal-bar {
+    width: 4px;
+    background: #FFAA33;
+    box-shadow: 0 0 5px #FFAA33;
+    animation: breen-comm 1.5s ease-in-out infinite;
+}
+
+.breen-comm-signal-bar:nth-child(1) { height: 8px; animation-delay: 0s; }
+.breen-comm-signal-bar:nth-child(2) { height: 14px; animation-delay: 0.2s; }
+.breen-comm-signal-bar:nth-child(3) { height: 10px; animation-delay: 0.4s; }
+.breen-comm-signal-bar:nth-child(4) { height: 16px; animation-delay: 0.6s; }
+
+@keyframes breen-comm {
+    0%, 20% { opacity: 1; }
+    25%, 45% { opacity: 0.4; }
+    50%, 70% { opacity: 0.9; }
+    75%, 95% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+/* Breen Holographic Display */
+.breen-holo-display {
+    border: 3px solid #FFAA33;
+    border-radius: 50%;
+    background: radial-gradient(circle at center,
+        rgba(255, 170, 51, 0.15) 0%,
+        rgba(255, 170, 51, 0.05) 50%,
+        transparent 70%);
+    box-shadow:
+        inset 0 0 30px rgba(255, 170, 51, 0.2),
+        0 0 20px rgba(255, 170, 51, 0.4);
+    position: relative;
+}
+
+/* Cyan center dot */
+.breen-holo-display::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 16px;
+    height: 16px;
+    background: #00CCCC;
+    border-radius: 50%;
+    box-shadow: 0 0 15px #00CCCC;
+}
+
+/* Breen Industrial Divider */
+.breen-industrial-divider {
+    height: 2px;
+    background: linear-gradient(90deg,
+        #0a0a0a 0%,
+        #252525 30%,
+        #FFAA33 50%,
+        #252525 70%,
+        #0a0a0a 100%);
+    margin: 12px 0;
+}

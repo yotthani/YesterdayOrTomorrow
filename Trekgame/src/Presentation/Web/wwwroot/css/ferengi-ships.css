@@ -29,7 +29,7 @@
    ============================================== */
 
 .ship-card.ferengi.military {
-    background-image: url('/images/ships/ferengi/military_ships.png');
+    background-image: url('/assets/factions/ferengi/ferengi_militaryships_spritesheet.png');
 }
 
 /* Row 1 */
@@ -67,7 +67,7 @@
    ============================================== */
 
 .ship-card.ferengi.civilian {
-    background-image: url('/images/ships/ferengi/civilian_ships.png');
+    background-image: url('/assets/factions/ferengi/ferengi_civilianships_spritesheet.png');
 }
 
 /* Row 1 */

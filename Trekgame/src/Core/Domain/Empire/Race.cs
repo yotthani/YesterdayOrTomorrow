@@ -10,16 +10,16 @@ public class Race : Entity
 {
     private readonly List<RaceTrait> _traits = new();
 
-    public string Name { get; private set; }
-    public string Description { get; private set; }
+    public string Name { get; private set; } = null!;
+    public string Description { get; private set; } = null!;
     public RaceCategory Category { get; private set; }
-    public string HomeWorldName { get; private set; }
+    public string HomeWorldName { get; private set; } = null!;
     public GovernmentType DefaultGovernment { get; private set; }
 
     // UI Theming
-    public string UiThemeId { get; private set; }
-    public string PrimaryColor { get; private set; }
-    public string SecondaryColor { get; private set; }
+    public string UiThemeId { get; private set; } = null!;
+    public string PrimaryColor { get; private set; } = null!;
+    public string SecondaryColor { get; private set; } = null!;
 
     // Gameplay modifiers (percentages, e.g., 1.1 = 10% bonus)
     public decimal ResearchModifier { get; private set; }

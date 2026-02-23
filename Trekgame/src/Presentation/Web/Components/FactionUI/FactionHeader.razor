@@ -1,0 +1,189 @@
+@using StarTrekGame.Web.Services
+@inject ThemeService ThemeService
+
+@* Faction-aware header/topbar with different structure per theme *@
+
+@switch (ThemeService.CurrentTheme)
+{
+    case "federation":
+        <header class="faction-header lcars-header">
+            <div class="lcars-header-elbow">
+                <div class="lcars-elbow-outer"></div>
+                <div class="lcars-elbow-inner"></div>
+            </div>
+            <div class="lcars-header-bars">
+                <div class="lcars-bar orange"></div>
+                <div class="lcars-bar tan"></div>
+                <div class="lcars-bar purple"></div>
+                <div class="lcars-bar blue"></div>
+            </div>
+            <div class="lcars-header-content">
+                <div class="lcars-title-block">
+                    <span class="lcars-title">@Title</span>
+                    @if (!string.IsNullOrEmpty(Subtitle))
+                    {
+                        <span class="lcars-subtitle">@Subtitle</span>
+                    }
+                </div>
+                <div class="lcars-resource-cells">
+                    @ChildContent
+                </div>
+                <div class="lcars-action-area">
+                    @ActionContent
+                </div>
+            </div>
+            <div class="lcars-header-cap"></div>
+        </header>
+        break;
+
+    case "klingon":
+        <header class="faction-header klingon-header">
+            <div class="klingon-header-blade left"></div>
+            <div class="klingon-trefoil-small"></div>
+            <div class="klingon-header-content">
+                <div class="klingon-title-plate">
+                    <span class="klingon-title">@Title</span>
+                    @if (!string.IsNullOrEmpty(Subtitle))
+                    {
+                        <span class="klingon-subtitle">@Subtitle</span>
+                    }
+                </div>
+                <div class="klingon-resources">
+                    @ChildContent
+                </div>
+                <div class="klingon-action-area">
+                    @ActionContent
+                </div>
+            </div>
+            <div class="klingon-header-blade right"></div>
+            <div class="klingon-spike-accent"></div>
+        </header>
+        break;
+
+    case "romulan":
+        <header class="faction-header romulan-header">
+            <div class="romulan-wing-header left"></div>
+            <div class="romulan-header-content">
+                <div class="romulan-title-area">
+                    <span class="romulan-bird-small"></span>
+                    <span class="romulan-title">@Title</span>
+                    @if (!string.IsNullOrEmpty(Subtitle))
+                    {
+                        <span class="romulan-subtitle">@Subtitle</span>
+                    }
+                </div>
+                <div class="romulan-bronze-divider"></div>
+                <div class="romulan-resources">
+                    @ChildContent
+                </div>
+                <div class="romulan-action-area">
+                    @ActionContent
+                </div>
+            </div>
+            <div class="romulan-wing-header right"></div>
+            <div class="romulan-v-accent"></div>
+        </header>
+        break;
+
+    case "borg":
+        <header class="faction-header borg-header">
+            <div class="borg-header-grid"></div>
+            <div class="borg-header-content">
+                <div class="borg-designation-block">
+                    <span class="borg-designation">@Title</span>
+                    <span class="borg-subroutine">@(Subtitle ?? "SPECIES DESIGNATION PENDING")</span>
+                </div>
+                <div class="borg-data-readout">
+                    @ChildContent
+                </div>
+                <div class="borg-action-node">
+                    @ActionContent
+                </div>
+            </div>
+            <div class="borg-status-nodes">
+                <span class="borg-node active"></span>
+                <span class="borg-node active"></span>
+                <span class="borg-node"></span>
+            </div>
+        </header>
+        break;
+
+    case "cardassian":
+        <header class="faction-header cardassian-header">
+            <div class="cardassian-header-frame">
+                <div class="cardassian-status-light"></div>
+                <div class="cardassian-header-content">
+                    <div class="cardassian-title-block">
+                        <span class="cardassian-emblem-small"></span>
+                        <span class="cardassian-title">@Title</span>
+                        @if (!string.IsNullOrEmpty(Subtitle))
+                        {
+                            <span class="cardassian-subtitle">@Subtitle</span>
+                        }
+                    </div>
+                    <div class="cardassian-resources">
+                        @ChildContent
+                    </div>
+                    <div class="cardassian-action-area">
+                        @ActionContent
+                    </div>
+                </div>
+                <div class="cardassian-hierarchy-indicator"></div>
+            </div>
+            <div class="cardassian-surveillance-line"></div>
+        </header>
+        break;
+
+    case "dominion":
+        <header class="faction-header dominion-header">
+            <div class="dominion-header-frame">
+                <div class="dominion-diamond-left"></div>
+                <div class="dominion-header-content">
+                    <div class="dominion-title-block">
+                        <span class="dominion-founder-icon"></span>
+                        <span class="dominion-title">@Title</span>
+                        @if (!string.IsNullOrEmpty(Subtitle))
+                        {
+                            <span class="dominion-subtitle">@Subtitle</span>
+                        }
+                    </div>
+                    <div class="dominion-resources">
+                        @ChildContent
+                    </div>
+                    <div class="dominion-action-area">
+                        @ActionContent
+                    </div>
+                </div>
+                <div class="dominion-diamond-right"></div>
+            </div>
+            <div class="dominion-golden-line"></div>
+        </header>
+        break;
+
+    default:
+        <header class="faction-header default-header">
+            <div class="default-header-content">
+                <div class="default-title-block">
+                    <span class="default-title">@Title</span>
+                    @if (!string.IsNullOrEmpty(Subtitle))
+                    {
+                        <span class="default-subtitle">@Subtitle</span>
+                    }
+                </div>
+                <div class="default-resources">
+                    @ChildContent
+                </div>
+                <div class="default-action-area">
+                    @ActionContent
+                </div>
+            </div>
+        </header>
+        break;
+}
+
+@code {
+    [Parameter] public string Title { get; set; } = "GALACTIC STRATEGY";
+    [Parameter] public string? Subtitle { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }  // For resources
+    [Parameter] public RenderFragment? ActionContent { get; set; }  // For end turn, etc.
+}

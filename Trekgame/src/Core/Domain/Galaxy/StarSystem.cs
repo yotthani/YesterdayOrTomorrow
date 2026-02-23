@@ -11,8 +11,8 @@ public class StarSystem : AggregateRoot
     private readonly List<CelestialBody> _celestialBodies = new();
     private readonly List<Anomaly> _anomalies = new();
 
-    public string Name { get; private set; }
-    public GalacticCoordinates Coordinates { get; private set; }
+    public string Name { get; private set; } = null!;
+    public GalacticCoordinates Coordinates { get; private set; } = null!;
     public StarType StarType { get; private set; }
     public StarClass StarClass { get; private set; }
     public Guid? ControllingEmpireId { get; private set; }

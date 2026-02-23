@@ -4,13 +4,14 @@ using System.Text.Json;
 namespace AssetGenerator.Services;
 
 /// <summary>
-/// Service for loading prompt definitions from JSON files via HTTP.
-/// Works with Blazor WebAssembly by loading from wwwroot/data/prompts/.
+/// Service for loading prompt definitions from JSON files.
+/// Supports both HTTP loading (Blazor WebAssembly) and file system loading (Blazor Server).
 /// </summary>
 public class PromptDataService
 {
-    private readonly HttpClient _httpClient;
+    private readonly HttpClient? _httpClient;
     private readonly string _basePath;
+    private readonly string? _wwwrootPath;
     private Dictionary<string, JsonDocument> _jsonDocs = new();
     private bool _isLoaded = false;
     private List<string> _loadErrors = new();
@@ -24,10 +25,24 @@ public class PromptDataService
         "HouseSymbols", "UIElements", "Vehicles"
     };
 
+    /// <summary>
+    /// Constructor for HTTP-based loading (Blazor WebAssembly)
+    /// </summary>
     public PromptDataService(HttpClient httpClient, string basePath = "data/prompts")
     {
         _httpClient = httpClient;
         _basePath = basePath;
+        _wwwrootPath = null;
+    }
+
+    /// <summary>
+    /// Constructor for file system loading (Blazor Server)
+    /// </summary>
+    public PromptDataService(string wwwrootPath)
+    {
+        _httpClient = null;
+        _basePath = "data/prompts";
+        _wwwrootPath = wwwrootPath;
     }
 
     /// <summary>
@@ -41,7 +56,7 @@ public class PromptDataService
     public IReadOnlyList<string> LoadErrors => _loadErrors;
 
     /// <summary>
-    /// Load all prompt JSON files from wwwroot via HTTP
+    /// Load all prompt JSON files - from file system if wwwrootPath is set, otherwise via HTTP
     /// </summary>
     public async Task LoadAsync()
     {
@@ -50,12 +65,72 @@ public class PromptDataService
         _loadErrors.Clear();
         var loadedCount = 0;
 
+        // Use file system loading if wwwrootPath is set (Blazor Server)
+        if (!string.IsNullOrEmpty(_wwwrootPath))
+        {
+            loadedCount = await LoadFromFileSystemAsync();
+        }
+        else if (_httpClient != null)
+        {
+            loadedCount = await LoadFromHttpAsync();
+        }
+        else
+        {
+            _loadErrors.Add("[PromptData] No loading method available");
+        }
+
+        _isLoaded = loadedCount > 0;
+        Console.WriteLine($"[PromptData] Loaded {loadedCount}/{KnownJsonFiles.Length} files");
+    }
+
+    private async Task<int> LoadFromFileSystemAsync()
+    {
+        var loadedCount = 0;
+        var basePath = Path.Combine(_wwwrootPath!, _basePath);
+
+        Console.WriteLine($"[PromptData] Loading from file system: {basePath}");
+
+        foreach (var fileName in KnownJsonFiles)
+        {
+            var filePath = Path.Combine(basePath, $"{fileName}.json");
+            try
+            {
+                if (File.Exists(filePath))
+                {
+                    var json = await File.ReadAllTextAsync(filePath);
+                    var doc = JsonDocument.Parse(json);
+                    _jsonDocs[fileName.ToLower()] = doc;
+                    loadedCount++;
+                    Console.WriteLine($"[PromptData] Loaded: {fileName}");
+                }
+                else
+                {
+                    var error = $"[PromptData] File not found: {filePath}";
+                    Console.WriteLine(error);
+                    _loadErrors.Add(error);
+                }
+            }
+            catch (Exception ex)
+            {
+                var error = $"[PromptData] Error loading {fileName}: {ex.Message}";
+                Console.WriteLine(error);
+                _loadErrors.Add(error);
+            }
+        }
+
+        return loadedCount;
+    }
+
+    private async Task<int> LoadFromHttpAsync()
+    {
+        var loadedCount = 0;
+
         foreach (var fileName in KnownJsonFiles)
         {
             var url = $"{_basePath}/{fileName}.json";
             try
             {
-                var response = await _httpClient.GetAsync(url);
+                var response = await _httpClient!.GetAsync(url);
                 if (response.IsSuccessStatusCode)
                 {
                     var json = await response.Content.ReadAsStringAsync();
@@ -79,13 +154,7 @@ public class PromptDataService
             }
         }
 
-        _isLoaded = true;
-        Console.WriteLine($"[PromptData] Loaded {loadedCount}/{KnownJsonFiles.Length} prompt files");
-
-        if (loadedCount == 0)
-        {
-            Console.WriteLine("[PromptData] WARNING: No JSON files loaded! Prompt generation will use fallbacks.");
-        }
+        return loadedCount;
     }
 
     /// <summary>

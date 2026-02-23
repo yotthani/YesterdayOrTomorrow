@@ -3,7 +3,7 @@ using StarTrekGame.Domain.Game;
 using StarTrekGame.Domain.Identity;
 using StarTrekGame.Domain.SharedKernel;
 using System.Security.Claims;
-using r = StarTrekGame.Domain.SharedKernel.Result;
+using DomainResult = StarTrekGame.Domain.SharedKernel.Result;
 using TurnResult = StarTrekGame.Domain.Game.TurnResult;
 
 namespace StarTrekGame.Infrastructure.Hubs;

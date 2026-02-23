@@ -1,0 +1,392 @@
+/* ============================================================
+   FEDERATION THEME - MODERN SNW / STARFLEET ACADEMY LCARS
+   Strange New Worlds + Prodigy aesthetic
+   Flat cyan/blue, no gradients, thin borders, data-grid panels
+   ============================================================ */
+
+/* ── CSS Variables ── */
+html[data-theme="federation"] {
+    --fed-cyan:        #00c8e8;
+    --fed-cyan-dim:    #0094aa;
+    --fed-blue:        #1265d4;
+    --fed-blue-dark:   #0848a8;
+    --fed-blue-deep:   #05306a;
+    --fed-green:       #00e070;
+    --fed-amber:       #ff8800;
+    --fed-red:         #ff3030;
+    --fed-bg:          #020814;
+    --fed-panel:       rgba(4, 14, 32, 0.97);
+    --fed-border:      rgba(0, 200, 232, 0.28);
+    --fed-border-lit:  rgba(0, 200, 232, 0.65);
+    --fed-text:        #e0f4ff;
+    --fed-text-sub:    #7ab8d8;
+    --fed-text-dim:    #2a5068;
+
+    /* Map into generic theme vars used by base components */
+    --theme-primary:   var(--fed-cyan);
+    --theme-secondary: var(--fed-blue);
+    --theme-accent:    var(--fed-green);
+    --theme-bg:        var(--fed-bg);
+    --theme-panel-bg:  var(--fed-panel);
+    --theme-text:      var(--fed-text);
+}
+
+/* ── Root / Body ── */
+html[data-theme="federation"],
+html[data-theme="federation"] body {
+    background: var(--fed-bg);
+    color: var(--fed-text);
+}
+
+/* ============================================================
+   FULL LAYOUT WRAPPER
+   ============================================================ */
+html[data-theme="federation"] .templated-layout {
+    background: var(--fed-bg);
+    color: var(--fed-text);
+    font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
+}
+
+/* ============================================================
+   HEADER — thin cyan underline, no color bars
+   ============================================================ */
+html[data-theme="federation"] .area-header,
+html[data-theme="federation"] .templated-header,
+html[data-theme="federation"] .snw-header {
+    background: #010b1e;
+    border-bottom: 1px solid var(--fed-border-lit);
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    position: relative;
+}
+
+/* Title text */
+html[data-theme="federation"] .header-title,
+html[data-theme="federation"] .faction-title {
+    color: var(--fed-cyan);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+}
+
+html[data-theme="federation"] .header-subtitle,
+html[data-theme="federation"] .faction-subtitle {
+    color: var(--fed-text-sub);
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+/* Resource items in header */
+html[data-theme="federation"] .resource-display {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    border: 1px solid var(--fed-border);
+    border-radius: 5px;
+    background: rgba(0, 200, 232, 0.05);
+}
+
+html[data-theme="federation"] .resource-display .value {
+    color: var(--fed-cyan);
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 1px;
+}
+
+/* END TURN button in header */
+html[data-theme="federation"] .end-turn,
+html[data-theme="federation"] .snw-btn.end-turn {
+    background: var(--fed-cyan-dim) !important;
+    color: #fff !important;
+    border: 1px solid var(--fed-cyan) !important;
+    box-shadow: 0 0 14px rgba(0, 200, 232, 0.3) !important;
+    letter-spacing: 2px !important;
+}
+
+html[data-theme="federation"] .end-turn:hover {
+    background: var(--fed-cyan) !important;
+    color: var(--fed-bg) !important;
+    box-shadow: 0 0 22px rgba(0, 200, 232, 0.55) !important;
+}
+
+/* ============================================================
+   SIDEBAR — compact, narrow, icon+label nav pills
+   ============================================================ */
+html[data-theme="federation"] .area-sidebar-left,
+html[data-theme="federation"] .snw-sidebar {
+    background: #010b1e;
+    border-right: 1px solid var(--fed-border);
+    padding: 8px 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    overflow-y: auto;
+}
+
+/* Nav items */
+html[data-theme="federation"] .snw-nav-item,
+html[data-theme="federation"] .nav-item {
+    border-radius: 5px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--fed-text-sub);
+    font-size: 7px;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    padding: 8px 4px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.12s ease;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    width: 100%;
+    overflow: hidden;
+}
+
+html[data-theme="federation"] .snw-nav-item .nav-part.label,
+html[data-theme="federation"] .nav-item .nav-part.label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+}
+
+html[data-theme="federation"] .snw-nav-item:hover,
+html[data-theme="federation"] .nav-item:hover {
+    border-color: var(--fed-border);
+    background: rgba(0, 200, 232, 0.08);
+    color: var(--fed-text);
+}
+
+html[data-theme="federation"] .snw-nav-item.active,
+html[data-theme="federation"] .nav-item.active {
+    background: var(--fed-blue-dark);
+    border-color: var(--fed-cyan);
+    border-left: 2px solid var(--fed-cyan);
+    color: var(--fed-cyan);
+}
+
+/* ============================================================
+   MAIN CONTENT + RIGHT CONTEXT
+   ============================================================ */
+html[data-theme="federation"] .area-main {
+    background: var(--fed-bg);
+    padding: 12px;
+    overflow-y: auto;
+}
+
+html[data-theme="federation"] .area-sidebar-right {
+    background: #010b1e;
+    border-left: 1px solid var(--fed-border);
+    padding: 10px;
+    overflow-y: auto;
+}
+
+/* ============================================================
+   PANELS — flat dark, thin cyan border
+   ============================================================ */
+html[data-theme="federation"] .snw-panel,
+html[data-theme="federation"] .layout-panel,
+html[data-theme="federation"] .content-panel {
+    background: var(--fed-panel);
+    border: 1px solid var(--fed-border);
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 10px;
+}
+
+html[data-theme="federation"] .snw-panel:hover,
+html[data-theme="federation"] .layout-panel:hover {
+    border-color: var(--fed-border-lit);
+}
+
+/* Panel headers */
+html[data-theme="federation"] .panel-header,
+html[data-theme="federation"] .section-title {
+    color: var(--fed-cyan);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--fed-border);
+    padding-bottom: 6px;
+    margin-bottom: 10px;
+}
+
+/* ============================================================
+   BUTTONS — flat rectangles, SNW style
+   ============================================================ */
+html[data-theme="federation"] .snw-btn,
+html[data-theme="federation"] .templated-button {
+    border-radius: 8px !important;
+    background: var(--fed-blue) !important;
+    color: #fff !important;
+    border: 1px solid rgba(18, 101, 212, 0.6) !important;
+    font-weight: 700 !important;
+    letter-spacing: 1px !important;
+    text-transform: uppercase !important;
+    font-size: 11px !important;
+    padding: 8px 20px !important;
+    cursor: pointer !important;
+    transition: all 0.12s ease !important;
+    box-shadow: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+html[data-theme="federation"] .snw-btn:hover,
+html[data-theme="federation"] .templated-button:hover {
+    background: var(--fed-cyan-dim) !important;
+    border-color: var(--fed-cyan) !important;
+    box-shadow: 0 0 10px rgba(0, 200, 232, 0.3) !important;
+}
+
+/* Primary variant — brighter cyan */
+html[data-theme="federation"] .snw-btn.primary,
+html[data-theme="federation"] .templated-button.primary,
+html[data-theme="federation"] .snw-btn[class*="primary"] {
+    background: var(--fed-cyan-dim) !important;
+}
+
+html[data-theme="federation"] .snw-btn.primary:hover {
+    background: var(--fed-cyan) !important;
+    color: var(--fed-bg) !important;
+}
+
+/* Danger variant */
+html[data-theme="federation"] .snw-btn.danger,
+html[data-theme="federation"] .templated-button.danger {
+    background: rgba(255, 48, 48, 0.2) !important;
+    border-color: var(--fed-red) !important;
+    color: var(--fed-red) !important;
+}
+
+/* Status chips */
+html[data-theme="federation"] .status-chip,
+html[data-theme="federation"] .chip {
+    border-radius: 4px;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border: 1px solid currentColor;
+    background: transparent;
+}
+
+/* ============================================================
+   DATA ROWS (fleet roster etc.)
+   ============================================================ */
+html[data-theme="federation"] .data-row,
+html[data-theme="federation"] .list-item {
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--fed-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--fed-text);
+}
+
+html[data-theme="federation"] .data-row:hover,
+html[data-theme="federation"] .list-item:hover {
+    background: rgba(0, 200, 232, 0.06);
+}
+
+/* Stats / key-value pairs */
+html[data-theme="federation"] .stat-label {
+    color: var(--fed-text-sub);
+    font-size: 9px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+html[data-theme="federation"] .stat-value {
+    color: var(--fed-cyan);
+    font-weight: 700;
+    font-size: 13px;
+}
+
+/* ============================================================
+   SNW LCARS DECORATION — thin horizontal cyan line across top
+   ============================================================ */
+html[data-theme="federation"] .layout-decoration.snw-lcars {
+    display: none; /* no large decorative elements in SNW style */
+}
+
+html[data-theme="federation"] .layout-decoration.data-readouts {
+    display: none;
+}
+
+/* ============================================================
+   PROGRESS / STATUS BARS
+   ============================================================ */
+html[data-theme="federation"] .progress-track {
+    background: var(--fed-blue-deep);
+    border-radius: 2px;
+    height: 5px;
+    overflow: hidden;
+}
+
+html[data-theme="federation"] .progress-fill {
+    background: var(--fed-cyan);
+    height: 100%;
+    border-radius: 2px;
+}
+
+html[data-theme="federation"] .progress-fill.ok     { background: var(--fed-green); }
+html[data-theme="federation"] .progress-fill.warn   { background: var(--fed-amber); }
+html[data-theme="federation"] .progress-fill.alert  { background: var(--fed-red);   }
+
+/* ============================================================
+   SCROLLBARS
+   ============================================================ */
+html[data-theme="federation"] ::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+}
+
+html[data-theme="federation"] ::-webkit-scrollbar-track {
+    background: var(--fed-bg);
+}
+
+html[data-theme="federation"] ::-webkit-scrollbar-thumb {
+    background: var(--fed-blue-dark);
+    border-radius: 2px;
+}
+
+html[data-theme="federation"] ::-webkit-scrollbar-thumb:hover {
+    background: var(--fed-cyan-dim);
+}
+
+/* ============================================================
+   TYPOGRAPHY OVERRIDES
+   ============================================================ */
+html[data-theme="federation"] h3,
+html[data-theme="federation"] h4,
+html[data-theme="federation"] h5 {
+    color: var(--fed-cyan);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
+html[data-theme="federation"] p,
+html[data-theme="federation"] span {
+    color: var(--fed-text);
+}
+
+html[data-theme="federation"] .muted,
+html[data-theme="federation"] .dim {
+    color: var(--fed-text-sub);
+}

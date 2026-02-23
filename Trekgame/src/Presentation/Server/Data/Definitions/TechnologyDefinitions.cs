@@ -697,6 +697,719 @@ public static class TechnologyDefinitions
             Effects = new[] { "damage_reduction:+5%/hit", "max_adaptation:50%" },
             Prerequisites = Array.Empty<string>(),
             FactionExclusive = "borg"
+        },
+
+        // ═══════════════════════════════════════════════════════════════════
+        // ADDITIONAL PHYSICS TECHNOLOGIES
+        // ═══════════════════════════════════════════════════════════════════
+
+        ["disruptor_technology"] = new TechDef
+        {
+            Id = "disruptor_technology",
+            Name = "Disruptor Technology",
+            Description = "High-energy particle weapons that disrupt molecular bonds.",
+            Branch = TechBranch.Physics,
+            Category = TechCategory.Weapons,
+            Tier = 1,
+            Cost = 500,
+            Effects = new[] { "unlock_weapon:disruptor", "shield_penetration:+5%" },
+            Prerequisites = Array.Empty<string>(),
+            FactionBonus = new() { ["klingon"] = 0.8, ["romulan"] = 0.85 }
+        },
+
+        ["polaron_weapons"] = new TechDef
+        {
+            Id = "polaron_weapons",
+            Name = "Polaron Beam Technology",
+            Description = "Weapons that pass through conventional shields.",
+            Branch = TechBranch.Physics,
+            Category = TechCategory.Weapons,
+            Tier = 2,
+            Cost = 950,
+            Effects = new[] { "unlock_weapon:polaron", "shield_bypass:30%" },
+            Prerequisites = new[] { "improved_phasers" },
+            FactionExclusive = "dominion"
+        },
+
+        ["tetryon_weapons"] = new TechDef
+        {
+            Id = "tetryon_weapons",
+            Name = "Tetryon Pulse Weapons",
+            Description = "Energy weapons that destabilize enemy shields.",
+            Branch = TechBranch.Physics,
+            Category = TechCategory.Weapons,
+            Tier = 2,
+            Cost = 900,
+            Effects = new[] { "unlock_weapon:tetryon", "shield_damage:+25%" },
+            Prerequisites = new[] { "improved_phasers" }
+        },
+
+        ["antiproton_weapons"] = new TechDef
+        {
+            Id = "antiproton_weapons",
+            Name = "Antiproton Beam Arrays",
+            Description = "Pure antiproton beams with increased critical chance.",
+            Branch = TechBranch.Physics,
+            Category = TechCategory.Weapons,
+            Tier = 3,
+            Cost = 1400,
+            Effects = new[] { "unlock_weapon:antiproton", "crit_chance:+15%" },
+            Prerequisites = new[] { "photon_torpedoes" }
+        },
+
+        ["plasma_torpedoes"] = new TechDef
+        {
+            Id = "plasma_torpedoes",
+            Name = "Plasma Torpedoes",
+            Description = "High-yield plasma warheads that burn through hulls.",
+            Branch = TechBranch.Physics,
+            Category = TechCategory.Weapons,
+            Tier = 2,
+            Cost = 850,
+            Effects = new[] { "unlock_weapon:plasma_torpedo", "dot_damage:+20" },
+            Prerequisites = new[] { "improved_phasers" },
+            FactionBonus = new() { ["romulan"] = 0.75 }
+        },
+
+        ["gravimetric_torpedoes"] = new TechDef
+        {
+            Id = "gravimetric_torpedoes",
+            Name = "Gravimetric Torpedoes",
+            Description = "Create localized gravity wells that damage multiple targets.",
+            Branch = TechBranch.Physics,
+            Category = TechCategory.Weapons,
+            Tier = 4,
+            Cost = 2800,
+            Effects = new[] { "unlock_weapon:gravimetric_torpedo", "aoe_damage:true" },
+            Prerequisites = new[] { "quantum_torpedoes" },
+            IsRare = true
+        },
+
+        ["metaphasic_shields"] = new TechDef
+        {
+            Id = "metaphasic_shields",
+            Name = "Metaphasic Shields",
+            Description = "Shields capable of withstanding stellar corona temperatures.",
+            Branch = TechBranch.Physics,
+            Category = TechCategory.Shields,
+            Tier = 2,
+            Cost = 800,
+            Effects = new[] { "sun_damage_immunity", "heat_resistance:+100%" },
+            Prerequisites = new[] { "improved_shields" }
+        },
+
+        ["covariant_shields"] = new TechDef
+        {
+            Id = "covariant_shields",
+            Name = "Covariant Shield Arrays",
+            Description = "Maximum shield capacity at the cost of regeneration.",
+            Branch = TechBranch.Physics,
+            Category = TechCategory.Shields,
+            Tier = 2,
+            Cost = 750,
+            Effects = new[] { "shield_hp:+40%", "shield_regen:-20%" },
+            Prerequisites = new[] { "improved_shields" }
+        },
+
+        ["resilient_shields"] = new TechDef
+        {
+            Id = "resilient_shields",
+            Name = "Resilient Shield Arrays",
+            Description = "Shields that absorb bleedthrough damage.",
+            Branch = TechBranch.Physics,
+            Category = TechCategory.Shields,
+            Tier = 3,
+            Cost = 1300,
+            Effects = new[] { "bleedthrough_reduction:50%", "shield_hp:+15%" },
+            Prerequisites = new[] { "regenerative_shields" }
+        },
+
+        ["gravimetric_sensors"] = new TechDef
+        {
+            Id = "gravimetric_sensors",
+            Name = "Gravimetric Sensor Array",
+            Description = "Detect mass signatures through subspace distortions.",
+            Branch = TechBranch.Physics,
+            Category = TechCategory.Sensors,
+            Tier = 2,
+            Cost = 750,
+            Effects = new[] { "sensor_range:+2", "detect_mass_signature:true" },
+            Prerequisites = new[] { "long_range_sensors" }
+        },
+
+        ["lateral_sensors"] = new TechDef
+        {
+            Id = "lateral_sensors",
+            Name = "Enhanced Lateral Sensors",
+            Description = "360-degree sensor coverage with no blind spots.",
+            Branch = TechBranch.Physics,
+            Category = TechCategory.Sensors,
+            Tier = 1,
+            Cost = 450,
+            Effects = new[] { "no_sensor_blindspot", "scan_speed:+15%" },
+            Prerequisites = Array.Empty<string>()
+        },
+
+        ["temporal_sensors"] = new TechDef
+        {
+            Id = "temporal_sensors",
+            Name = "Temporal Sensors",
+            Description = "Detect timeline disruptions and temporal anomalies.",
+            Branch = TechBranch.Physics,
+            Category = TechCategory.Sensors,
+            Tier = 4,
+            Cost = 2500,
+            Effects = new[] { "temporal_detection:true", "anomaly_scan_bonus:+50%" },
+            Prerequisites = new[] { "tachyon_detection" },
+            IsRare = true
+        },
+
+        ["warp_core_efficiency"] = new TechDef
+        {
+            Id = "warp_core_efficiency",
+            Name = "Warp Core Efficiency",
+            Description = "Optimize matter/antimatter mix ratios for better fuel economy.",
+            Branch = TechBranch.Physics,
+            Category = TechCategory.Energy,
+            Tier = 2,
+            Cost = 650,
+            Effects = new[] { "fuel_consumption:-20%", "range:+15%" },
+            Prerequisites = new[] { "fusion_reactors" }
+        },
+
+        ["quantum_slipstream"] = new TechDef
+        {
+            Id = "quantum_slipstream",
+            Name = "Quantum Slipstream Drive",
+            Description = "Travel through quantum slipspace for extreme velocities.",
+            Branch = TechBranch.Physics,
+            Category = TechCategory.Energy,
+            Tier = 4,
+            Cost = 3200,
+            Effects = new[] { "unlock_slipstream", "ship_speed:+200%:slipstream" },
+            Prerequisites = new[] { "zero_point_energy" },
+            IsRare = true
+        },
+
+        // ═══════════════════════════════════════════════════════════════════
+        // ADDITIONAL ENGINEERING TECHNOLOGIES
+        // ═══════════════════════════════════════════════════════════════════
+
+        ["modular_construction"] = new TechDef
+        {
+            Id = "modular_construction",
+            Name = "Modular Ship Design",
+            Description = "Ships can be reconfigured for different mission profiles.",
+            Branch = TechBranch.Engineering,
+            Category = TechCategory.Voidcraft,
+            Tier = 2,
+            Cost = 800,
+            Effects = new[] { "refit_cost:-30%", "module_slots:+1" },
+            Prerequisites = new[] { "orbital_shipyards" }
+        },
+
+        ["multi_vector_assault"] = new TechDef
+        {
+            Id = "multi_vector_assault",
+            Name = "Multi-Vector Assault Mode",
+            Description = "Ships can separate into multiple combat-capable sections.",
+            Branch = TechBranch.Engineering,
+            Category = TechCategory.Voidcraft,
+            Tier = 3,
+            Cost = 1700,
+            Effects = new[] { "unlock_mvam", "combat_flexibility:+30%" },
+            Prerequisites = new[] { "starbases" },
+            FactionExclusive = "federation"
+        },
+
+        ["bioneural_gel_packs"] = new TechDef
+        {
+            Id = "bioneural_gel_packs",
+            Name = "Bioneural Gel Packs",
+            Description = "Organic computer circuits for faster processing.",
+            Branch = TechBranch.Engineering,
+            Category = TechCategory.Construction,
+            Tier = 2,
+            Cost = 900,
+            Effects = new[] { "computer_speed:+25%", "sensor_analysis:+20%" },
+            Prerequisites = new[] { "improved_hulls" },
+            FactionBonus = new() { ["federation"] = 0.85 }
+        },
+
+        ["ablative_hull_armor"] = new TechDef
+        {
+            Id = "ablative_hull_armor",
+            Name = "Ablative Hull Armor",
+            Description = "Sacrificial armor layers that absorb weapon impacts.",
+            Branch = TechBranch.Engineering,
+            Category = TechCategory.Construction,
+            Tier = 2,
+            Cost = 850,
+            Effects = new[] { "hull_hp:+25%", "armor:+15" },
+            Prerequisites = new[] { "improved_hulls" }
+        },
+
+        ["neutronium_alloys"] = new TechDef
+        {
+            Id = "neutronium_alloys",
+            Name = "Neutronium Alloys",
+            Description = "Ultra-dense hull materials from neutron star remnants.",
+            Branch = TechBranch.Engineering,
+            Category = TechCategory.Construction,
+            Tier = 4,
+            Cost = 2600,
+            Effects = new[] { "hull_hp:+60%", "armor:+30" },
+            Prerequisites = new[] { "self_repairing_hulls" },
+            IsRare = true
+        },
+
+        ["impulse_upgrades"] = new TechDef
+        {
+            Id = "impulse_upgrades",
+            Name = "Enhanced Impulse Engines",
+            Description = "Better sublight maneuverability and acceleration.",
+            Branch = TechBranch.Engineering,
+            Category = TechCategory.Propulsion,
+            Tier = 1,
+            Cost = 450,
+            Effects = new[] { "impulse_speed:+20%", "turn_rate:+15%" },
+            Prerequisites = Array.Empty<string>()
+        },
+
+        ["emergency_warp"] = new TechDef
+        {
+            Id = "emergency_warp",
+            Name = "Emergency Warp Drive",
+            Description = "Instant warp capability for emergency retreats.",
+            Branch = TechBranch.Engineering,
+            Category = TechCategory.Propulsion,
+            Tier = 2,
+            Cost = 750,
+            Effects = new[] { "unlock_emergency_warp", "retreat_success:+40%" },
+            Prerequisites = new[] { "warp_6" }
+        },
+
+        ["coaxial_warp"] = new TechDef
+        {
+            Id = "coaxial_warp",
+            Name = "Coaxial Warp Drive",
+            Description = "Fold space for instantaneous short-range jumps.",
+            Branch = TechBranch.Engineering,
+            Category = TechCategory.Propulsion,
+            Tier = 3,
+            Cost = 1900,
+            Effects = new[] { "unlock_microjump", "tactical_mobility:+50%" },
+            Prerequisites = new[] { "warp_8" },
+            IsRare = true
+        },
+
+        ["dilithium_synthesis"] = new TechDef
+        {
+            Id = "dilithium_synthesis",
+            Name = "Dilithium Recrystallization",
+            Description = "Recharge dilithium crystals to extend their lifespan.",
+            Branch = TechBranch.Engineering,
+            Category = TechCategory.Mining,
+            Tier = 2,
+            Cost = 850,
+            Effects = new[] { "dilithium_consumption:-25%", "crystal_lifespan:+50%" },
+            Prerequisites = new[] { "efficient_mining" }
+        },
+
+        ["gas_giant_harvesting"] = new TechDef
+        {
+            Id = "gas_giant_harvesting",
+            Name = "Gas Giant Harvesting",
+            Description = "Extract deuterium and hydrogen from gas giant atmospheres.",
+            Branch = TechBranch.Engineering,
+            Category = TechCategory.Mining,
+            Tier = 2,
+            Cost = 700,
+            Effects = new[] { "deuterium_production:+30%", "unlock_orbital:gas_harvester" },
+            Prerequisites = new[] { "efficient_mining" }
+        },
+
+        ["planetary_mining_drones"] = new TechDef
+        {
+            Id = "planetary_mining_drones",
+            Name = "Automated Mining Drones",
+            Description = "Self-directed mining drones increase extraction efficiency.",
+            Branch = TechBranch.Engineering,
+            Category = TechCategory.Mining,
+            Tier = 3,
+            Cost = 1100,
+            Effects = new[] { "mineral_production:+30%", "mining_labor:-50%" },
+            Prerequisites = new[] { "asteroid_mining" }
+        },
+
+        // ═══════════════════════════════════════════════════════════════════
+        // ADDITIONAL SOCIETY TECHNOLOGIES
+        // ═══════════════════════════════════════════════════════════════════
+
+        ["holographic_technology"] = new TechDef
+        {
+            Id = "holographic_technology",
+            Name = "Holographic Technology",
+            Description = "Advanced holographic systems for training and recreation.",
+            Branch = TechBranch.Society,
+            Category = TechCategory.Biology,
+            Tier = 1,
+            Cost = 500,
+            Effects = new[] { "unlock_building:holodeck", "pop_happiness:+10%" },
+            Prerequisites = Array.Empty<string>(),
+            FactionBonus = new() { ["federation"] = 0.8 }
+        },
+
+        ["emergency_medical_hologram"] = new TechDef
+        {
+            Id = "emergency_medical_hologram",
+            Name = "Emergency Medical Hologram",
+            Description = "Holographic doctors provide emergency medical care.",
+            Branch = TechBranch.Society,
+            Category = TechCategory.Biology,
+            Tier = 2,
+            Cost = 750,
+            Effects = new[] { "medical_capacity:+30%", "crew_recovery:+25%" },
+            Prerequisites = new[] { "holographic_technology" },
+            FactionBonus = new() { ["federation"] = 0.85 }
+        },
+
+        ["genetic_engineering"] = new TechDef
+        {
+            Id = "genetic_engineering",
+            Name = "Genetic Engineering",
+            Description = "Modify genetic code to enhance population traits.",
+            Branch = TechBranch.Society,
+            Category = TechCategory.Biology,
+            Tier = 2,
+            Cost = 850,
+            Effects = new[] { "pop_growth:+20%", "worker_output:+10%" },
+            Prerequisites = new[] { "genome_mapping" },
+            FactionBonus = new() { ["dominion"] = 0.7 }
+        },
+
+        ["ketracel_white"] = new TechDef
+        {
+            Id = "ketracel_white",
+            Name = "Ketracel-White Production",
+            Description = "Synthesize the enzyme that controls Jem'Hadar loyalty.",
+            Branch = TechBranch.Society,
+            Category = TechCategory.Biology,
+            Tier = 2,
+            Cost = 700,
+            Effects = new[] { "jemhadar_loyalty:100%", "army_morale:+30%" },
+            Prerequisites = Array.Empty<string>(),
+            FactionExclusive = "dominion"
+        },
+
+        ["cloning_technology"] = new TechDef
+        {
+            Id = "cloning_technology",
+            Name = "Cloning Facilities",
+            Description = "Mass-produce soldiers and workers through cloning.",
+            Branch = TechBranch.Society,
+            Category = TechCategory.Biology,
+            Tier = 3,
+            Cost = 1400,
+            Effects = new[] { "army_recruitment:+50%", "pop_growth:+25%" },
+            Prerequisites = new[] { "genetic_engineering" },
+            FactionBonus = new() { ["dominion"] = 0.6 }
+        },
+
+        ["trade_federation"] = new TechDef
+        {
+            Id = "trade_federation",
+            Name = "Interstellar Trade Consortium",
+            Description = "Establish formal trade networks across the quadrant.",
+            Branch = TechBranch.Society,
+            Category = TechCategory.Statecraft,
+            Tier = 2,
+            Cost = 700,
+            Effects = new[] { "trade_routes:+2", "trade_value:+20%" },
+            Prerequisites = new[] { "colonial_administration" },
+            FactionBonus = new() { ["ferengi"] = 0.6 }
+        },
+
+        ["subspace_comms"] = new TechDef
+        {
+            Id = "subspace_comms",
+            Name = "Subspace Communications Network",
+            Description = "Real-time communication across vast distances.",
+            Branch = TechBranch.Society,
+            Category = TechCategory.Statecraft,
+            Tier = 1,
+            Cost = 400,
+            Effects = new[] { "admin_cap:+10", "diplomacy_range:+50%" },
+            Prerequisites = Array.Empty<string>()
+        },
+
+        ["martial_law"] = new TechDef
+        {
+            Id = "martial_law",
+            Name = "Military Governance",
+            Description = "Efficient but harsh military administration.",
+            Branch = TechBranch.Society,
+            Category = TechCategory.Statecraft,
+            Tier = 2,
+            Cost = 600,
+            Effects = new[] { "stability:+20%:occupied", "crime:-30%", "happiness:-10%" },
+            Prerequisites = new[] { "colonial_administration" },
+            FactionBonus = new() { ["cardassian"] = 0.7 }
+        },
+
+        ["obsidian_order_methods"] = new TechDef
+        {
+            Id = "obsidian_order_methods",
+            Name = "Obsidian Order Methods",
+            Description = "The finest intelligence agency in the quadrant.",
+            Branch = TechBranch.Society,
+            Category = TechCategory.Espionage,
+            Tier = 2,
+            Cost = 900,
+            Effects = new[] { "agent_skill:+30%", "counter_intel:+40%", "interrogation:+50%" },
+            Prerequisites = new[] { "covert_ops" },
+            FactionExclusive = "cardassian"
+        },
+
+        ["section_31"] = new TechDef
+        {
+            Id = "section_31",
+            Name = "Section 31 Operations",
+            Description = "Autonomous covert operations outside normal oversight.",
+            Branch = TechBranch.Society,
+            Category = TechCategory.Espionage,
+            Tier = 3,
+            Cost = 1500,
+            Effects = new[] { "unlock_mission:black_ops", "agent_cap:+3", "deniable_ops:true" },
+            Prerequisites = new[] { "infiltration" },
+            FactionExclusive = "federation",
+            IsRare = true
+        },
+
+        ["tal_shiar_network"] = new TechDef
+        {
+            Id = "tal_shiar_network",
+            Name = "Tal Shiar Network",
+            Description = "The Romulan intelligence apparatus sees all.",
+            Branch = TechBranch.Society,
+            Category = TechCategory.Espionage,
+            Tier = 2,
+            Cost = 950,
+            Effects = new[] { "agent_skill:+25%", "surveillance:+40%", "assassination:+30%" },
+            Prerequisites = new[] { "covert_ops" },
+            FactionExclusive = "romulan"
+        },
+
+        ["orbital_habitats"] = new TechDef
+        {
+            Id = "orbital_habitats",
+            Name = "Orbital Habitats",
+            Description = "Build massive space stations for population overflow.",
+            Branch = TechBranch.Society,
+            Category = TechCategory.Colonization,
+            Tier = 2,
+            Cost = 850,
+            Effects = new[] { "unlock_orbital:habitat", "housing:+10:per_habitat" },
+            Prerequisites = new[] { "terraforming_basics" }
+        },
+
+        ["underwater_colonies"] = new TechDef
+        {
+            Id = "underwater_colonies",
+            Name = "Underwater Colonization",
+            Description = "Settle ocean worlds with pressure-resistant habitats.",
+            Branch = TechBranch.Society,
+            Category = TechCategory.Colonization,
+            Tier = 2,
+            Cost = 750,
+            Effects = new[] { "ocean_habitability:+50%", "unlock_building:underwater_dome" },
+            Prerequisites = new[] { "terraforming_basics" }
+        },
+
+        ["subterranean_colonies"] = new TechDef
+        {
+            Id = "subterranean_colonies",
+            Name = "Subterranean Colonies",
+            Description = "Build underground cities on hostile surface worlds.",
+            Branch = TechBranch.Society,
+            Category = TechCategory.Colonization,
+            Tier = 2,
+            Cost = 700,
+            Effects = new[] { "hostile_habitability:+30%", "unlock_building:underground_complex" },
+            Prerequisites = new[] { "terraforming_basics" }
+        },
+
+        // ═══════════════════════════════════════════════════════════════════
+        // MORE FACTION-SPECIFIC TECHNOLOGIES
+        // ═══════════════════════════════════════════════════════════════════
+
+        ["energy_dampening"] = new TechDef
+        {
+            Id = "energy_dampening",
+            Name = "Energy Dampening Weapons",
+            Description = "Breen weapons that drain enemy ship power.",
+            Branch = TechBranch.Physics,
+            Category = TechCategory.Weapons,
+            Tier = 3,
+            Cost = 1400,
+            Effects = new[] { "unlock_weapon:energy_dampener", "power_drain:30%" },
+            Prerequisites = new[] { "photon_torpedoes" },
+            FactionExclusive = "breen"
+        },
+
+        ["organic_technology"] = new TechDef
+        {
+            Id = "organic_technology",
+            Name = "Organic Ship Technology",
+            Description = "Living ships that grow and self-repair.",
+            Branch = TechBranch.Engineering,
+            Category = TechCategory.Voidcraft,
+            Tier = 3,
+            Cost = 1600,
+            Effects = new[] { "hull_regen:+15/turn", "no_repair_cost" },
+            Prerequisites = new[] { "starbases" },
+            FactionExclusive = "dominion,species_8472"
+        },
+
+        ["web_technology"] = new TechDef
+        {
+            Id = "web_technology",
+            Name = "Tholian Web Technology",
+            Description = "Trap enemy vessels in energy webs.",
+            Branch = TechBranch.Physics,
+            Category = TechCategory.Weapons,
+            Tier = 3,
+            Cost = 1500,
+            Effects = new[] { "unlock_ability:tholian_web", "enemy_immobilize:5_turns" },
+            Prerequisites = new[] { "regenerative_shields" },
+            FactionExclusive = "tholian"
+        },
+
+        ["thermal_adaptation"] = new TechDef
+        {
+            Id = "thermal_adaptation",
+            Name = "Extreme Thermal Adaptation",
+            Description = "Survive in environments from absolute zero to plasma temperatures.",
+            Branch = TechBranch.Society,
+            Category = TechCategory.Colonization,
+            Tier = 2,
+            Cost = 800,
+            Effects = new[] { "temperature_habitability:+100%", "colonize_extreme:true" },
+            Prerequisites = new[] { "terraforming_basics" },
+            FactionBonus = new() { ["tholian"] = 0.5, ["breen"] = 0.6 }
+        },
+
+        ["gorn_regeneration"] = new TechDef
+        {
+            Id = "gorn_regeneration",
+            Name = "Gorn Regenerative Biology",
+            Description = "Rapid cellular regeneration reduces casualties.",
+            Branch = TechBranch.Society,
+            Category = TechCategory.Biology,
+            Tier = 2,
+            Cost = 700,
+            Effects = new[] { "army_recovery:+40%", "ground_damage_reduction:20%" },
+            Prerequisites = Array.Empty<string>(),
+            FactionExclusive = "gorn"
+        },
+
+        ["orion_pheromones"] = new TechDef
+        {
+            Id = "orion_pheromones",
+            Name = "Orion Pheromone Technology",
+            Description = "Synthesize pheromones that influence other species.",
+            Branch = TechBranch.Society,
+            Category = TechCategory.Espionage,
+            Tier = 2,
+            Cost = 750,
+            Effects = new[] { "diplomacy_bonus:+20%", "seduce_chance:+30%" },
+            Prerequisites = new[] { "covert_ops" },
+            FactionExclusive = "orion"
+        },
+
+        ["kazon_raiding"] = new TechDef
+        {
+            Id = "kazon_raiding",
+            Name = "Kazon Raiding Tactics",
+            Description = "Aggressive boarding and salvage operations.",
+            Branch = TechBranch.Society,
+            Category = TechCategory.Statecraft,
+            Tier = 1,
+            Cost = 400,
+            Effects = new[] { "boarding_damage:+30%", "salvage_bonus:+40%" },
+            Prerequisites = Array.Empty<string>(),
+            FactionExclusive = "kazon"
+        },
+
+        ["hirogen_hunting"] = new TechDef
+        {
+            Id = "hirogen_hunting",
+            Name = "The Hunt Protocol",
+            Description = "Track and pursue prey across any terrain.",
+            Branch = TechBranch.Society,
+            Category = TechCategory.Statecraft,
+            Tier = 1,
+            Cost = 450,
+            Effects = new[] { "sensor_tracking:+50%", "pursuit_speed:+30%", "trophy_bonus:true" },
+            Prerequisites = Array.Empty<string>(),
+            FactionExclusive = "hirogen"
+        },
+
+        ["prophets_guidance"] = new TechDef
+        {
+            Id = "prophets_guidance",
+            Name = "Guidance of the Prophets",
+            Description = "The Prophets reveal paths through time and space.",
+            Branch = TechBranch.Society,
+            Category = TechCategory.Statecraft,
+            Tier = 3,
+            Cost = 1200,
+            Effects = new[] { "temporal_insight:true", "orb_experience:+50%", "faith:+30" },
+            Prerequisites = new[] { "cultural_diplomacy" },
+            FactionExclusive = "bajoran",
+            IsRare = true
+        },
+
+        ["vorta_diplomacy"] = new TechDef
+        {
+            Id = "vorta_diplomacy",
+            Name = "Vorta Diplomatic Training",
+            Description = "Genetically-engineered diplomats serve the Founders.",
+            Branch = TechBranch.Society,
+            Category = TechCategory.Statecraft,
+            Tier = 2,
+            Cost = 700,
+            Effects = new[] { "diplomacy_bonus:+30%", "negotiation_skill:+40%" },
+            Prerequisites = Array.Empty<string>(),
+            FactionExclusive = "dominion"
+        },
+
+        ["vulcan_logic"] = new TechDef
+        {
+            Id = "vulcan_logic",
+            Name = "Vulcan Logic Disciplines",
+            Description = "Master emotional control and logical reasoning.",
+            Branch = TechBranch.Society,
+            Category = TechCategory.Biology,
+            Tier = 1,
+            Cost = 450,
+            Effects = new[] { "research_bonus:+15%", "stability:+10" },
+            Prerequisites = Array.Empty<string>(),
+            FactionBonus = new() { ["federation"] = 0.8 }
+        },
+
+        ["mind_meld"] = new TechDef
+        {
+            Id = "mind_meld",
+            Name = "Mind Meld Techniques",
+            Description = "Share thoughts and memories through telepathic contact.",
+            Branch = TechBranch.Society,
+            Category = TechCategory.Biology,
+            Tier = 2,
+            Cost = 800,
+            Effects = new[] { "interrogation:+50%", "diplomacy_insight:+30%" },
+            Prerequisites = new[] { "vulcan_logic" },
+            FactionBonus = new() { ["federation"] = 0.75 }
         }
     };
     

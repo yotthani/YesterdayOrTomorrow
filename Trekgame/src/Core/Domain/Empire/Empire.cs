@@ -12,15 +12,15 @@ public class Empire : AggregateRoot
     private readonly List<DiplomaticRelation> _relations = new();
     private readonly List<Technology> _technologies = new();
 
-    public string Name { get; private set; }
+    public string Name { get; private set; } = null!;
     public Guid RaceId { get; private set; }
     public Guid? PlayerId { get; private set; }  // Null for AI empires
     public bool IsPlayerControlled => PlayerId.HasValue;
     public Guid HomeSystemId { get; private set; }
 
-    public Resources Treasury { get; private set; }
-    public Resources Income { get; private set; }
-    public Resources Expenses { get; private set; }
+    public Resources Treasury { get; private set; } = null!;
+    public Resources Income { get; private set; } = null!;
+    public Resources Expenses { get; private set; } = null!;
 
     // Empire-wide stats
     public int TotalPopulation { get; private set; }

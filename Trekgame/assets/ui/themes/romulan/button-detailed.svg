@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 50" fill="none">
+  <!-- ROMULAN DETAILED BUTTON: Elegant trapezoid with beveled corners -->
+  <defs>
+    <linearGradient id="romulanBtnGreen" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#00FFCC"/>
+      <stop offset="20%" style="stop-color:#00DD99"/>
+      <stop offset="50%" style="stop-color:#008866"/>
+      <stop offset="80%" style="stop-color:#00DD99"/>
+      <stop offset="100%" style="stop-color:#00FFCC"/>
+    </linearGradient>
+
+    <linearGradient id="romulanBtnBronze" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#D4AF37"/>
+      <stop offset="50%" style="stop-color:#8B6914"/>
+      <stop offset="100%" style="stop-color:#D4AF37"/>
+    </linearGradient>
+
+    <linearGradient id="romulanBtnDark" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#1A4A3A"/>
+      <stop offset="50%" style="stop-color:#0D2A1A"/>
+      <stop offset="100%" style="stop-color:#1A4A3A"/>
+    </linearGradient>
+
+    <filter id="romulanBtnGlow" x="-25%" y="-25%" width="150%" height="150%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="4" result="blur"/>
+      <feFlood flood-color="#00FFAA" flood-opacity="0.5"/>
+      <feComposite in2="blur" operator="in"/>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="romulanBtnShadow">
+      <feDropShadow dx="1" dy="2" stdDeviation="2" flood-color="#000" flood-opacity="0.5"/>
+    </filter>
+
+    <!-- Elegant pattern -->
+    <pattern id="btnPattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M 0 10 Q 5 5, 10 10 T 20 10" fill="none" stroke="rgba(0,255,170,0.05)" stroke-width="0.3"/>
+    </pattern>
+  </defs>
+
+  <!-- Button base - trapezoid with beveled corners -->
+  <path d="
+    M 15 2
+    L 185 2
+    L 198 12
+    L 198 38
+    L 185 48
+    L 15 48
+    L 2 38
+    L 2 12
+    Z
+  " fill="url(#romulanBtnDark)" filter="url(#romulanBtnShadow)"/>
+
+  <!-- Pattern overlay -->
+  <path d="
+    M 15 2
+    L 185 2
+    L 198 12
+    L 198 38
+    L 185 48
+    L 15 48
+    L 2 38
+    L 2 12
+    Z
+  " fill="url(#btnPattern)"/>
+
+  <!-- Emerald border glow -->
+  <path d="
+    M 15 4
+    L 183 4
+    L 195 13
+    L 195 37
+    L 183 46
+    L 15 46
+    L 5 37
+    L 5 13
+    Z
+  " fill="none" stroke="url(#romulanBtnGreen)" stroke-width="2" filter="url(#romulanBtnGlow)"/>
+
+  <!-- Inner highlight -->
+  <path d="
+    M 20 8
+    L 180 8
+    L 190 15
+    L 190 25
+  " fill="none" stroke="rgba(0,255,200,0.2)" stroke-width="1"/>
+
+  <!-- Bottom shadow line -->
+  <path d="
+    M 20 42
+    L 180 42
+    L 190 35
+  " fill="none" stroke="rgba(0,0,0,0.3)" stroke-width="1"/>
+
+  <!-- Bronze corner accents -->
+  <path d="M 5 12 L 15 4 L 25 4 L 10 15 Z" fill="url(#romulanBtnBronze)" opacity="0.7"/>
+  <path d="M 195 12 L 185 4 L 175 4 L 190 15 Z" fill="url(#romulanBtnBronze)" opacity="0.7"/>
+  <path d="M 5 38 L 15 46 L 25 46 L 10 35 Z" fill="url(#romulanBtnBronze)" opacity="0.5"/>
+  <path d="M 195 38 L 185 46 L 175 46 L 190 35 Z" fill="url(#romulanBtnBronze)" opacity="0.5"/>
+
+  <!-- V-accent decorations (bird motif) -->
+  <path d="M 25 25 L 35 18 L 45 25 L 40 25 L 35 21 L 30 25 Z" fill="url(#romulanBtnGreen)" opacity="0.6"/>
+  <path d="M 155 25 L 165 18 L 175 25 L 170 25 L 165 21 L 160 25 Z" fill="url(#romulanBtnGreen)" opacity="0.6"/>
+
+  <!-- Center indicator dot -->
+  <circle cx="100" cy="25" r="3" fill="url(#romulanBtnGreen)" filter="url(#romulanBtnGlow)" opacity="0.8"/>
+</svg>

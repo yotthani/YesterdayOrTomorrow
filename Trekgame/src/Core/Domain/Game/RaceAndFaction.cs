@@ -40,22 +40,22 @@ public class Race
     public RaceType Type { get; }
     public string Name { get; }
     public string Description { get; }
-    public string HomeRegion { get; }  // Alpha, Beta, Gamma, Delta quadrant region
-    
+    public string HomeRegion { get; } = default!;  // Alpha, Beta, Gamma, Delta quadrant region
+
     // Inherent traits (biology, culture - always apply)
-    public List<RacialTrait> InherentTraits { get; }
-    
+    public List<RacialTrait> InherentTraits { get; } = default!;
+
     // Canon faction this race is associated with
     public CanonFactionType? CanonFaction { get; }
-    
+
     // Starting position parameters
     public GalacticRegion StartingRegion { get; }
     public int BaseSystemCount { get; }  // How many systems in their region
-    
+
     // Visual/flavor
     public string ShipPrefix { get; }  // USS, IKS, IRW, etc.
-    public string ShipStyle { get; }   // Visual style for ships
-    public string ArchitectureStyle { get; }  // Colony buildings
+    public string ShipStyle { get; } = default!;   // Visual style for ships
+    public string ArchitectureStyle { get; } = default!;  // Colony buildings
 
     public Race(RaceType type, string name, string description, 
         GalacticRegion startingRegion, CanonFactionType? canonFaction,
@@ -161,7 +161,7 @@ public enum TraitCategory
 /// </summary>
 public class Faction : AggregateRoot
 {
-    public string Name { get; private set; }
+    public string Name { get; private set; } = default!;
     public FactionType Type { get; private set; }
     public CanonFactionType? CanonType { get; private set; }  // If canon faction
     
@@ -371,7 +371,8 @@ public enum CanonFactionType
     TholianAssembly,
     GornHegemony,
     BreenConfederacy,
-    OrionSyndicate
+    OrionSyndicate,
+    HirogenClans
 }
 
 public class FactionMember
@@ -651,6 +652,28 @@ public static class CanonFactionTemplates
             {
                 new("Assimilate", "Must assimilate or destroy", RestrictionType.Assimilate),
                 new("Perfection", "Cannot ally with lesser species", RestrictionType.Assimilate)
+            }
+        },
+
+        [CanonFactionType.HirogenClans] = new CanonFactionTemplate
+        {
+            Type = CanonFactionType.HirogenClans,
+            Name = "Hirogen Clans",
+            Government = FactionGovernmentType.Meritocracy,  // Alpha proves dominance through hunting prowess
+            PrimaryRaces = new[] { RaceType.Hirogen },
+            MemberRaces = new RaceType[] { },  // Hirogen hunt alone, no allies
+            HostileRaces = new RaceType[] { },  // Everyone is potential prey, not specifically hostile
+            Bonuses = new List<FactionBonus>
+            {
+                new("The Hunt", "Massive ground and space combat damage bonus", new() { ["combat_damage"] = 0.35, ["army_damage"] = 0.35 }),
+                new("Prey Tracking", "Superior sensor and tracking capabilities", new() { ["sensor_range"] = 0.40, ["detection"] = 0.30 }),
+                new("Nomadic Fleet", "Faster fleet movement and evasion", new() { ["fleet_speed"] = 0.15, ["evasion"] = 0.10 }),
+                new("Trophy Collection", "Morale boost from victories, intimidation of enemies", new() { ["morale_from_kills"] = 0.25, ["enemy_morale_damage"] = 0.20 })
+            },
+            Restrictions = new List<FactionRestriction>
+            {
+                new("The Hunt Above All", "Must pursue worthy prey when encountered", RestrictionType.HonorableCombat),
+                new("Nomadic Culture", "Reduced colony development and diplomacy", RestrictionType.CannotAttack)
             }
         }
     };

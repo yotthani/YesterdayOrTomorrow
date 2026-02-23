@@ -1,87 +1,216 @@
 {
   "category": "UIElements",
-  "description": "User interface elements in faction-specific styles - LCARS for Federation",
+  "description": "User interface elements in faction-specific styles - detailed BOTF-inspired frames",
   "factionStyles": {
     "federation": {
       "name": "LCARS",
-      "style": "Flat 2D, rounded rectangles, colorful",
+      "style": "Classic Star Trek TNG/DS9/VOY LCARS interface - colorful rounded shapes on black",
       "colors": {
         "primary": "Orange (#FF9900)",
-        "secondary": "Purple (#CC99FF)",
-        "accent": "Blue (#9999FF)",
+        "secondary": "Purple/Violet (#CC99FF)",
+        "tertiary": "Tan/Peach (#FFCC99)",
+        "accent": "Blue (#9999FF, #6699CC)",
+        "pink": "Salmon pink (#FF9999, #FFAACC)",
         "alert": "Red (#FF5555)",
-        "background": "Black (#000000)"
+        "background": "Pure black (#000000)"
       },
-      "features": ["Rounded corners", "Pill shapes", "Grid layouts", "Text labels"]
+      "features": [
+        "Distinctive rounded pill shapes",
+        "Thick colored bars with rounded ends",
+        "Characteristic elbow/corner pieces",
+        "Multi-colored segmented displays",
+        "Text in bold sans-serif",
+        "Black content areas surrounded by colored frame"
+      ],
+      "reference": "Star Trek TNG bridge displays, LCARS terminals"
     },
     "klingon": {
-      "name": "Klingon Interface",
-      "style": "Angular, aggressive, red/black",
+      "name": "Klingon Empire Interface",
+      "style": "Aggressive, dark, battle-worn metal with red accents - inspired by BOTF",
       "colors": {
-        "primary": "Red (#CC0000)",
-        "secondary": "Dark red (#660000)",
-        "accent": "Gold (#FFCC00)",
-        "background": "Black"
+        "primary": "Blood red (#CC0000, #FF3333)",
+        "secondary": "Dark gunmetal (#333333, #4A4A4A)",
+        "tertiary": "Bronze/bone (#8B7355, #B8860B)",
+        "accent": "Burning orange (#FF6600)",
+        "glow": "Red glow (#FF0000 with blur)",
+        "background": "Near-black with red nebula tint (#0A0000)"
       },
-      "features": ["Sharp angles", "Trefoil motifs", "Warrior imagery"]
+      "features": [
+        "Heavy angular metal frames",
+        "Aggressive spike/blade cutouts",
+        "Brushed metal textures with scratches",
+        "Battle damage marks and rivets",
+        "Klingon trefoil emblem areas",
+        "Glowing red accent stripes",
+        "Dark fortress/bunker aesthetic"
+      ],
+      "reference": "Birth of the Federation Klingon UI, warship interiors"
     },
     "romulan": {
-      "name": "Romulan Interface",
-      "style": "Elegant, green-based, secretive",
+      "name": "Romulan Star Empire Interface",
+      "style": "Elegant, sophisticated, green/emerald with gold/bronze accents - secretive and refined",
       "colors": {
-        "primary": "Green (#00CC00)",
-        "secondary": "Dark green (#006600)",
-        "accent": "Silver (#CCCCCC)",
-        "background": "Black"
+        "primary": "Emerald green (#00AA44, #00CC55)",
+        "secondary": "Dark green (#003322, #004433)",
+        "tertiary": "Bronze/gold (#D4AF37, #B8860B)",
+        "accent": "Teal (#00FFAA)",
+        "glow": "Green glow (#00FF88 with blur)",
+        "background": "Very dark green-black (#000A05)"
       },
-      "features": ["Sleek curves", "Bird motifs", "Hidden elements"]
+      "features": [
+        "Elegant sweeping curves",
+        "Bird-of-prey wing motifs",
+        "Polished bronze corner accents",
+        "Subtle green nebula backgrounds",
+        "Refined, almost Art Deco styling",
+        "Hidden panel aesthetic",
+        "Romulan bird emblem areas"
+      ],
+      "reference": "Birth of the Federation Romulan UI, Warbird bridge"
     },
     "cardassian": {
-      "name": "Cardassian Interface",
-      "style": "Functional, brown/orange, militaristic",
+      "name": "Cardassian Union Interface",
+      "style": "Military efficiency, orange/brown, surveillance-focused",
       "colors": {
-        "primary": "Orange (#FF6600)",
-        "secondary": "Brown (#996633)",
-        "accent": "Yellow (#FFCC00)",
-        "background": "Dark brown"
+        "primary": "Amber orange (#FF8800, #CC6600)",
+        "secondary": "Dark brown (#4A3520, #332211)",
+        "tertiary": "Yellow (#FFCC00)",
+        "accent": "Cream (#FFEECC)",
+        "background": "Dark brown-black (#0A0500)"
       },
-      "features": ["Geometric shapes", "Status displays", "Surveillance feel"]
+      "features": [
+        "Geometric, efficient shapes",
+        "Status monitoring displays",
+        "Hierarchical layout",
+        "Surveillance/scanning aesthetic",
+        "Military precision styling",
+        "Cardassian neck-ridge motifs"
+      ],
+      "reference": "DS9 Cardassian interfaces, Obsidian Order terminals"
     },
     "borg": {
-      "name": "Borg Interface",
-      "style": "Technological, green on black, hexagonal",
+      "name": "Borg Collective Interface",
+      "style": "Cold technological horror, green on black, hexagonal patterns",
       "colors": {
-        "primary": "Green (#00FF00)",
-        "secondary": "Dark green (#003300)",
-        "accent": "White text",
-        "background": "Black"
+        "primary": "Borg green (#00FF00, #33FF33)",
+        "secondary": "Very dark green (#001100, #002200)",
+        "tertiary": "Gunmetal (#333333)",
+        "accent": "White data (#FFFFFF)",
+        "glow": "Green glow with digital noise",
+        "background": "Pure black with green tint (#000500)"
       },
-      "features": ["Hexagons", "Data streams", "Designation numbers", "No individual elements"]
+      "features": [
+        "Hexagonal honeycomb patterns",
+        "Flowing data streams",
+        "No individuality - uniform design",
+        "Technological implant aesthetic",
+        "Designation numbers instead of names",
+        "Assimilation progress indicators"
+      ],
+      "reference": "Borg cube interiors, assimilation chambers"
     }
   },
   "elementTypes": [
-    { "id": "button", "name": "Button Standard", "use": "Clickable interface button" },
-    { "id": "panel", "name": "Panel Information", "use": "Information display panel" },
-    { "id": "frame", "name": "Frame Border", "use": "Window/dialog border" },
-    { "id": "header", "name": "Header Bar", "use": "Section header" },
-    { "id": "footer", "name": "Footer Bar", "use": "Bottom navigation" },
-    { "id": "icon_set", "name": "Icon Set Common", "use": "Common UI icons" },
-    { "id": "progress", "name": "Progress Bar", "use": "Loading/status indicator" },
-    { "id": "alert", "name": "Alert Box", "use": "Warning/error display" },
-    { "id": "menu", "name": "Menu Panel", "use": "Selection menu" },
-    { "id": "tooltip", "name": "Tooltip Popup", "use": "Hover information" }
+    {
+      "id": "panel_frame_800x600",
+      "name": "Main Panel Frame (800x600)",
+      "use": "Primary game panel background - system info, diplomacy, etc",
+      "dimensions": "800x600 pixels",
+      "prompt_suffix": "game UI panel frame, 800x600 resolution, thick frame on left and top, thin frame on right and bottom, large black content area in center for text/buttons, transparent or faction-colored background visible through gaps"
+    },
+    {
+      "id": "sidebar_300x800",
+      "name": "Sidebar Panel (300x800)",
+      "use": "Left sidebar for navigation buttons",
+      "dimensions": "300x800 pixels",
+      "prompt_suffix": "vertical sidebar navigation panel, thick decorative frame, slots for 6-8 navigation buttons, faction emblem area, 300x800 resolution"
+    },
+    {
+      "id": "button_wide",
+      "name": "Wide Button (200x50)",
+      "use": "Standard action button",
+      "dimensions": "200x50 pixels",
+      "prompt_suffix": "wide clickable button, 200x50 resolution, clear text area, hover state variation"
+    },
+    {
+      "id": "button_pill",
+      "name": "Pill Button (150x40)",
+      "use": "LCARS-style pill button",
+      "dimensions": "150x40 pixels",
+      "prompt_suffix": "rounded pill-shaped button, 150x40 resolution"
+    },
+    {
+      "id": "header_bar",
+      "name": "Header Bar (800x80)",
+      "use": "Top header for panels",
+      "dimensions": "800x80 pixels",
+      "prompt_suffix": "horizontal header bar, title area, decorative elements, 800x80 resolution"
+    },
+    {
+      "id": "corner_accent_tl",
+      "name": "Corner Accent Top-Left",
+      "use": "Decorative corner piece",
+      "dimensions": "100x100 pixels",
+      "prompt_suffix": "decorative corner accent piece for top-left, 100x100 resolution, faction styling"
+    },
+    {
+      "id": "progress_bar",
+      "name": "Progress Bar (400x30)",
+      "use": "Resource/loading indicator",
+      "dimensions": "400x30 pixels",
+      "prompt_suffix": "horizontal progress bar with fill indicator, 400x30 resolution"
+    },
+    {
+      "id": "alert_box",
+      "name": "Alert Box (500x200)",
+      "use": "Warning/confirmation dialog",
+      "dimensions": "500x200 pixels",
+      "prompt_suffix": "alert/warning dialog box, attention-grabbing frame, 500x200 resolution"
+    },
+    {
+      "id": "tooltip",
+      "name": "Tooltip Frame (300x150)",
+      "use": "Hover information popup",
+      "dimensions": "300x150 pixels",
+      "prompt_suffix": "tooltip popup frame, subtle styling, 300x150 resolution"
+    },
+    {
+      "id": "minimap_frame",
+      "name": "Minimap Frame (200x200)",
+      "use": "Frame for galaxy minimap",
+      "dimensions": "200x200 pixels",
+      "prompt_suffix": "square minimap frame with faction decoration, 200x200 resolution"
+    }
   ],
   "styleGuide": {
-    "material": "FLAT 2D graphics - vector style",
-    "quality": "Clean, crisp edges, readable at all sizes",
-    "lighting": "None - flat colors and gradients only",
-    "composition": "UI element isolated on transparent or black",
-    "background": "Transparent or solid black",
+    "material": "High quality digital render - NOT flat 2D - rich textures and depth",
+    "quality": "Professional game UI quality, crisp at target resolution",
+    "lighting": "Subtle ambient lighting, glowing accents for active elements",
+    "composition": "UI element on black or transparent background",
+    "background": "Transparent PNG preferred, or black background",
     "critical": [
-      "MUST be flat 2D - these are UI elements",
-      "Faction color scheme strictly followed",
-      "Readable text areas clearly marked",
-      "Consistent with game UI needs"
+      "BOTF-inspired quality - dramatic, impressive, each faction UNIQUE",
+      "Klingon: Battle-worn metal, scratches, rivets, red glow",
+      "Romulan: Elegant bronze/green, sweeping curves, refined",
+      "Federation/LCARS: Colorful rounded shapes, multi-segment bars",
+      "NOT flat 2D clipart - rich textures and lighting",
+      "Clear content areas for text/buttons",
+      "Consistent sizing for UI assembly"
     ]
+  },
+  "comfyui_settings": {
+    "recommended_model": "sd_xl_base_1.0.safetensors",
+    "steps": 35,
+    "cfg": 7.5,
+    "sampler": "euler_ancestral",
+    "scheduler": "karras",
+    "negative_prompt": "blurry, low quality, distorted, watermark, text, 3D render, photorealistic photo, cartoon, anime, childish, flat colors, clipart, simple vector"
+  },
+  "batch_prompts": {
+    "klingon_panel_frame": "Klingon Empire game UI panel frame, 800x600 resolution, heavy angular gunmetal frame with battle damage scratches and rivets, aggressive spike cutouts along edges, glowing blood-red accent stripes, dark bronze corner spikes, Klingon trefoil emblem in sidebar, red nebula glow visible through frame, black content area center, BOTF style, dramatic lighting, professional game quality",
+    "romulan_panel_frame": "Romulan Star Empire game UI panel frame, 800x600 resolution, elegant sweeping curved bronze-gold frame, emerald green accent lines with soft glow, sophisticated Art Deco styling, Romulan bird-of-prey wing motifs in corners, green nebula visible through frame, polished metal texture, black content area center, BOTF style, refined and secretive aesthetic",
+    "federation_panel_frame": "Federation LCARS game UI panel frame, 800x600 resolution, classic Star Trek TNG style, thick orange and tan rounded bars on left side, purple and blue pill-shaped segments, characteristic elbow corners, multi-colored data displays, pure black content area, crisp clean design, authentic LCARS aesthetic",
+    "cardassian_panel_frame": "Cardassian Union game UI panel frame, 800x600 resolution, military efficiency design, amber-orange and brown color scheme, geometric shapes, surveillance display aesthetic, status monitoring elements, Cardassian geometric patterns, black content area center",
+    "borg_panel_frame": "Borg Collective game UI panel frame, 800x600 resolution, cold technological horror aesthetic, hexagonal honeycomb patterns, green glow on black, data streams, no organic elements, assimilation aesthetic, pure efficiency"
   }
 }

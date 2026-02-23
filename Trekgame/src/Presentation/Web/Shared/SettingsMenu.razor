@@ -2,6 +2,7 @@
 @using StarTrekGame.Web.Services
 @inject ILocalStorageService LocalStorage
 @inject ISoundService Sound
+@inject ThemeService Theme
 @inject IJSRuntime JS
 
 @if (_isOpen)
@@ -75,6 +76,27 @@
 
             <div class="settings-section">
                 <h3>🖥️ Display</h3>
+                <div class="setting-row">
+                    <span class="setting-label">UI Theme</span>
+                    <select @bind="_currentTheme" @bind:after="UpdateTheme">
+                        @foreach (var theme in ThemeService.GetAvailableThemes())
+                        {
+                            <option value="@theme.Id">@theme.Name</option>
+                        }
+                    </select>
+                </div>
+                <div class="theme-preview">
+                    @foreach (var theme in ThemeService.GetAvailableThemes())
+                    {
+                        <button class="theme-btn @(theme.Id == _currentTheme ? "active" : "")"
+                                style="--theme-color: @theme.PrimaryColor"
+                                title="@theme.Description"
+                                @onclick="() => SelectTheme(theme.Id)">
+                            <span class="theme-dot"></span>
+                            <span class="theme-name">@theme.Name</span>
+                        </button>
+                    }
+                </div>
                 <div class="setting-row">
                     <span class="setting-label">UI Scale</span>
                     <select @bind="_uiScale" @bind:after="SaveSettings">
@@ -289,6 +311,47 @@
         color: #fff;
     }
     .save-btn:hover { background: linear-gradient(180deg, #5aaeFF, #3a7edc); }
+
+    .theme-preview {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        padding: 12px 0;
+    }
+    .theme-btn {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(74, 158, 255, 0.3);
+        border-radius: 16px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .theme-btn:hover {
+        background: rgba(74, 158, 255, 0.1);
+        border-color: var(--theme-color);
+    }
+    .theme-btn.active {
+        background: rgba(74, 158, 255, 0.2);
+        border-color: var(--theme-color);
+        box-shadow: 0 0 10px var(--theme-color);
+    }
+    .theme-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--theme-color);
+        box-shadow: 0 0 6px var(--theme-color);
+    }
+    .theme-name {
+        font-size: 11px;
+        color: #c8d4e8;
+    }
+    .theme-btn.active .theme-name {
+        color: var(--theme-color);
+    }
 </style>
 
 @code {
@@ -306,6 +369,7 @@
     private string _animationSpeed = "normal";
     
     // Display settings
+    private string _currentTheme = "default";
     private string _uiScale = "1.0";
     private bool _showGrid = true;
     private bool _showSystemNames = true;
@@ -313,6 +377,7 @@
     protected override async Task OnInitializedAsync()
     {
         await LoadSettings();
+        _currentTheme = Theme.CurrentTheme;
     }
 
     public void Open()
@@ -365,6 +430,17 @@
     {
         await Sound.SetEnabledAsync(_soundEnabled);
         await SaveSettings();
+    }
+
+    private async Task UpdateTheme()
+    {
+        await Theme.SetThemeAsync(_currentTheme);
+    }
+
+    private async Task SelectTheme(string themeId)
+    {
+        _currentTheme = themeId;
+        await UpdateTheme();
     }
 
     private async Task ResetToDefaults()

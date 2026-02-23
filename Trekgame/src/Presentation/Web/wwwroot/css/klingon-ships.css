@@ -29,7 +29,7 @@
    ============================================== */
 
 .ship-card.klingon.military {
-    background-image: url('/images/ships/klingon/military_ships.png');
+    background-image: url('/assets/factions/klingon/klingon_militaryships_spritesheet.png');
 }
 
 /* Row 1 */
@@ -67,7 +67,7 @@
    ============================================== */
 
 .ship-card.klingon.civilian {
-    background-image: url('/images/ships/klingon/civilian_ships.png');
+    background-image: url('/assets/factions/klingon/klingon_civilianships_spritesheet.png');
 }
 
 /* Row 1 */

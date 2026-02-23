@@ -1,15 +1,15 @@
 @page "/game/tutorial"
 @page "/game/help"
+@layout StellarisLayout
 @using MudBlazor
 @inject NavigationManager Navigation
 
 <PageTitle>Tutorial - Galactic Strategy</PageTitle>
 
 <div class="tutorial-wrapper">
-    <header class="lcars-header">
-        <a href="/game/overview" class="back-link">← BACK</a>
+    <div class="tutorial-page-header">
         <h1 class="page-title">📚 COMMANDER'S GUIDE</h1>
-    </header>
+    </div>
 
     <div class="tutorial-content">
         <MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" Class="tutorial-tabs">
@@ -256,12 +256,10 @@
 </div>
 
 <style>
-    .tutorial-wrapper { min-height: 100vh; background: linear-gradient(135deg, #000010 0%, #0a0a20 100%); }
-    
-    .lcars-header { height: 60px; background: linear-gradient(180deg, #1a1a2e 0%, #0a0a18 100%); border-bottom: 3px solid #ff9900; display: flex; align-items: center; padding: 0 24px; gap: 24px; }
-    .back-link { color: #ff9900; text-decoration: none; font-weight: 600; padding: 8px 16px; border: 1px solid #ff9900; border-radius: 6px; }
-    .back-link:hover { background: #ff9900; color: #000; }
-    .page-title { color: #ffcc00; font-size: 20px; font-weight: 700; letter-spacing: 4px; margin: 0; }
+    .tutorial-wrapper { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
+
+    .tutorial-page-header { padding: 12px 24px; background: linear-gradient(180deg, #1a1a2e 0%, #0a0a18 100%); border-bottom: 3px solid #ff9900; display: flex; align-items: center; gap: 24px; }
+    .page-title { color: #ffcc00; font-size: 18px; font-weight: 700; letter-spacing: 4px; margin: 0; }
 
     .tutorial-content { max-width: 1000px; margin: 0 auto; padding: 24px; }
     

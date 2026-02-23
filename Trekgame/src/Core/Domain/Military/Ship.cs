@@ -7,9 +7,9 @@ namespace StarTrekGame.Domain.Military;
 /// </summary>
 public class Ship : Entity
 {
-    public string Name { get; private set; }
+    public string Name { get; private set; } = default!;
     public Guid ShipClassId { get; private set; }
-    public ShipClass Class { get; private set; } = null!;
+    public ShipClass Class { get; private set; } = default!;
     public ShipDesign? Design { get; private set; }
     public Guid FleetId { get; private set; }
 
@@ -85,8 +85,9 @@ public class Ship : Entity
     /// </summary>
     public static Ship Create(Guid designId, Guid empireId)
     {
-        var design = ShipDesignTemplates.GetByName("Constitution");  // Default
-        return new Ship($"New Ship", design, empireId);
+        var design = ShipDesignTemplates.GetByName("Constitution")
+            ?? throw new InvalidOperationException("Default ship design 'Constitution' not found");
+        return new Ship("New Ship", design, empireId);
     }
 
     public void TakeDamage(int damage, DamageType type)
@@ -210,8 +211,8 @@ public enum DamageType
 /// </summary>
 public class ShipClass : Entity
 {
-    public string Name { get; private set; }
-    public string Description { get; private set; }
+    public string Name { get; private set; } = default!;
+    public string Description { get; private set; } = default!;
     public ShipRole Role { get; private set; }
     public ShipSize Size { get; private set; }
     public Guid RaceId { get; private set; }  // Which race designs this
@@ -230,8 +231,8 @@ public class ShipClass : Entity
     public int CarrierCapacity { get; private set; }  // For carriers
 
     // Costs
-    public Resources BuildCost { get; private set; }
-    public Resources MaintenanceCost { get; private set; }
+    public Resources BuildCost { get; private set; } = default!;
+    public Resources MaintenanceCost { get; private set; } = default!;
     public int BuildTime { get; private set; }  // Turns
 
     private ShipClass() { } // EF Core

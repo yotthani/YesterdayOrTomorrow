@@ -1,0 +1,74 @@
+@using StarTrekGame.Web.Services
+@inject MainMenuTemplateService TemplateService
+
+@* Data-driven menu layout that arranges UI areas based on template definition *@
+
+@{
+    var template = TemplateService.GetTemplate(MenuStyle);
+}
+
+<CascadingValue Name="MenuStyle" Value="@MenuStyle">
+    <div class="menu-layout @GetLayoutClass(template) @Class">
+        @* Background layers *@
+        <div class="menu-background">
+            <div class="stars-layer"></div>
+            <div class="nebula-layer"></div>
+            @if (CustomBackground != null)
+            {
+                @CustomBackground
+            }
+        </div>
+
+        @* Main content container *@
+        <div class="menu-content">
+            @* Header area *@
+            @if (HeaderContent != null)
+            {
+                <div class="layout-area area-header">
+                    @HeaderContent
+                </div>
+            }
+
+            @* Main area with optional sidebar *@
+            <div class="layout-area area-main-wrapper">
+                @if (SidebarContent != null && template.Sidebar.Position != "none")
+                {
+                    <div class="layout-area area-sidebar @template.Sidebar.Position">
+                        @SidebarContent
+                    </div>
+                }
+
+                <div class="layout-area area-main">
+                    @MainContent
+                </div>
+            </div>
+
+            @* Footer area *@
+            @if (FooterContent != null)
+            {
+                <div class="layout-area area-footer">
+                    @FooterContent
+                </div>
+            }
+        </div>
+    </div>
+</CascadingValue>
+
+@code {
+    [Parameter] public RenderFragment? HeaderContent { get; set; }
+    [Parameter] public RenderFragment? SidebarContent { get; set; }
+    [Parameter] public RenderFragment? MainContent { get; set; }
+    [Parameter] public RenderFragment? FooterContent { get; set; }
+    [Parameter] public RenderFragment? CustomBackground { get; set; }
+    [Parameter] public string Class { get; set; } = "";
+
+    /// <summary>
+    /// Menu style: lcars, cinematic, minimal, academy
+    /// </summary>
+    [Parameter] public string MenuStyle { get; set; } = "lcars";
+
+    private string GetLayoutClass(MenuTemplate template)
+    {
+        return $"style-{template.Id}";
+    }
+}

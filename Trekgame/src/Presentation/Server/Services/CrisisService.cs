@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using StarTrekGame.Server.Data;
 using StarTrekGame.Server.Data.Entities;
+using StarTrekGame.Server.Data.Definitions;
+using ExtendedCrisisDef = StarTrekGame.Server.Data.Definitions.CrisisDef;
 
 namespace StarTrekGame.Server.Services;
 
@@ -131,7 +133,7 @@ public class CrisisService : ICrisisService
     }
 
     /// <summary>
-    /// Check if a crisis should trigger
+    /// Check if a crisis should trigger - uses both local and CrisisDefinitions
     /// </summary>
     public async Task<bool> CheckCrisisTriggerAsync(Guid gameId)
     {
@@ -141,11 +143,19 @@ public class CrisisService : ICrisisService
         // Check if crisis already active
         if (game.ActiveCrisisType != null) return false;
 
-        // Check each crisis type
+        // Try extended crises from CrisisDefinitions first
+        var extendedCrisis = await TryTriggerExtendedCrisisAsync(game);
+        if (extendedCrisis != null)
+        {
+            await StartExtendedCrisisAsync(game.Id, extendedCrisis);
+            return true;
+        }
+
+        // Fallback to local crisis types
         foreach (var (type, def) in Crises)
         {
             if (game.CurrentTurn < def.MinTurn) continue;
-            
+
             // Chance increases after min turn
             var turnBonus = (game.CurrentTurn - def.MinTurn) * 0.001;
             var chance = def.TriggerChance + turnBonus;
@@ -158,6 +168,262 @@ public class CrisisService : ICrisisService
         }
 
         return false;
+    }
+
+    private async Task<ExtendedCrisisDef?> TryTriggerExtendedCrisisAsync(GameSessionEntity game)
+    {
+        foreach (var extDef in CrisisDefinitions.All.Values)
+        {
+            // Check turn requirement
+            if (game.CurrentTurn < extDef.EarliestTurn) continue;
+
+            // Check trigger conditions
+            if (!await EvaluateCrisisConditionsAsync(game, extDef.TriggerConditions))
+                continue;
+
+            // Chance increases after min turn
+            var turnBonus = (game.CurrentTurn - extDef.EarliestTurn) * 0.001;
+            var chance = extDef.TriggerChance + turnBonus;
+
+            if (_random.NextDouble() < chance)
+            {
+                return extDef;
+            }
+        }
+        return null;
+    }
+
+    private async Task<bool> EvaluateCrisisConditionsAsync(GameSessionEntity game, string[] conditions)
+    {
+        foreach (var condition in conditions ?? Array.Empty<string>())
+        {
+            var result = condition switch
+            {
+                "no_active_crisis" => game.ActiveCrisisType == null,
+                "galaxy_tech_level >= 3" => await HasAdvancedTechAsync(game.Id, 3),
+                "any_empire_discovered_transwarp" => await HasTechAsync(game.Id, "transwarp"),
+                "wormhole_discovered" => await HasWormholeAsync(game.Id),
+                "dominion_exists" => await FactionExistsAsync(game.Id, "dominion"),
+                "borg_faction_exists" => await FactionExistsAsync(game.Id, "borg"),
+                "any_empire_has_borg_contact" => await HasBorgContactAsync(game.Id),
+                "federation_exists" => await FactionExistsAsync(game.Id, "federation"),
+                "klingon_exists" => await FactionExistsAsync(game.Id, "klingon"),
+                "romulan_exists" => await FactionExistsAsync(game.Id, "romulan"),
+                "cardassian_exists" => await FactionExistsAsync(game.Id, "cardassian"),
+                "bajoran_exists" => await FactionExistsAsync(game.Id, "bajoran"),
+                "multiple_major_powers" => await HasMultipleMajorPowersAsync(game.Id, 3),
+                _ => true  // Unknown conditions pass by default
+            };
+
+            if (!result) return false;
+        }
+        return true;
+    }
+
+    private async Task<bool> HasAdvancedTechAsync(Guid gameId, int tier)
+    {
+        return await _db.Technologies
+            .AnyAsync(t => t.Faction.GameId == gameId && t.IsResearched && t.Tier >= tier);
+    }
+
+    private async Task<bool> HasTechAsync(Guid gameId, string techIdPart)
+    {
+        return await _db.Technologies
+            .AnyAsync(t => t.Faction.GameId == gameId && t.IsResearched && t.TechId.Contains(techIdPart));
+    }
+
+    private async Task<bool> HasWormholeAsync(Guid gameId)
+    {
+        return await _db.Systems
+            .AnyAsync(s => s.GameId == gameId && s.SystemFeatures.Contains("wormhole"));
+    }
+
+    private async Task<bool> FactionExistsAsync(Guid gameId, string raceId)
+    {
+        return await _db.Factions
+            .AnyAsync(f => f.GameId == gameId && f.RaceId.ToLower().Contains(raceId.ToLower()) && !f.IsDefeated);
+    }
+
+    private async Task<bool> HasBorgContactAsync(Guid gameId)
+    {
+        return await _db.DiplomaticRelations
+            .AnyAsync(r => r.Faction.GameId == gameId &&
+                         (r.OtherFaction.RaceId.Contains("borg") || r.Faction.RaceId.Contains("borg")));
+    }
+
+    private async Task<bool> HasMultipleMajorPowersAsync(Guid gameId, int count)
+    {
+        var majorFactions = await _db.Factions
+            .Where(f => f.GameId == gameId && !f.IsDefeated && !f.IsCrisisFaction)
+            .CountAsync();
+        return majorFactions >= count;
+    }
+
+    private async Task<CrisisEntity?> StartExtendedCrisisAsync(Guid gameId, ExtendedCrisisDef extDef)
+    {
+        var game = await _db.Games
+            .Include(g => g.Factions)
+            .Include(g => g.StarSystems)
+            .FirstOrDefaultAsync(g => g.Id == gameId);
+
+        if (game == null) return null;
+
+        // Map severity to threat level
+        var threatLevel = extDef.Severity switch
+        {
+            CrisisSeverity.Minor => 1,
+            CrisisSeverity.Moderate => 2,
+            CrisisSeverity.Severe => 3,
+            CrisisSeverity.Catastrophic => 4,
+            CrisisSeverity.Extinction => 5,
+            _ => 1
+        };
+
+        var crisis = new CrisisEntity
+        {
+            Id = Guid.NewGuid(),
+            GameId = gameId,
+            Type = MapExtendedCrisisType(extDef.Id),
+            Name = extDef.Name,
+            Description = extDef.Description,
+            StartTurn = game.CurrentTurn,
+            Phase = 1,
+            ThreatLevel = threatLevel,
+            IsActive = true
+        };
+
+        // Select spawn location based on crisis category
+        var targetSelection = extDef.Category switch
+        {
+            CrisisCategory.ExternalThreat => TargetSelection.BorderWorld,
+            CrisisCategory.Internal => TargetSelection.Random,
+            CrisisCategory.Natural => TargetSelection.Random,
+            CrisisCategory.Temporal => TargetSelection.None,
+            CrisisCategory.Opportunity => TargetSelection.None,
+            _ => TargetSelection.Random
+        };
+
+        var spawnSystem = SelectSpawnSystem(game, targetSelection);
+        if (spawnSystem != null)
+        {
+            crisis.OriginSystemId = spawnSystem.Id;
+        }
+
+        _db.Add(crisis);
+
+        game.ActiveCrisisType = extDef.Id;
+        game.CrisisStartTurn = game.CurrentTurn;
+
+        // Spawn initial fleets based on first stage
+        if (extDef.Stages?.Length > 0 && spawnSystem != null)
+        {
+            var firstStage = extDef.Stages[0];
+            if (firstStage.SpawnFleets?.Length > 0)
+            {
+                await SpawnExtendedCrisisFleetAsync(game, crisis, spawnSystem, firstStage, extDef);
+            }
+        }
+
+        // Apply global effects
+        if (extDef.GlobalEffects != null)
+        {
+            _logger.LogInformation("Crisis {Name} applies global effects: {Effects}",
+                extDef.Name, string.Join(", ", extDef.GlobalEffects.Keys));
+        }
+
+        // Trigger crisis event for all factions
+        foreach (var faction in game.Factions.Where(f => !f.IsDefeated))
+        {
+            await _eventService.TriggerEventAsync(gameId, $"crisis_{extDef.Id}_start",
+                faction.Id, null, null);
+        }
+
+        await _db.SaveChangesAsync();
+
+        _logger.LogWarning("EXTENDED CRISIS STARTED: {Name} (Severity: {Severity}) at turn {Turn}",
+            extDef.Name, extDef.Severity, game.CurrentTurn);
+
+        return crisis;
+    }
+
+    private CrisisType MapExtendedCrisisType(string crisisId)
+    {
+        return crisisId switch
+        {
+            "borg_invasion" => CrisisType.BorgInvasion,
+            "dominion_war" => CrisisType.DominionWar,
+            "temporal_cold_war" or "krenim_temporal_weapon" => CrisisType.TemporalAnomaly,
+            "species_8472_invasion" or "mirror_universe_invasion" => CrisisType.ExtragalacticInvasion,
+            _ => CrisisType.ExtragalacticInvasion  // Default for new crisis types
+        };
+    }
+
+    private async Task SpawnExtendedCrisisFleetAsync(GameSessionEntity game, CrisisEntity crisis,
+        StarSystemEntity system, CrisisStage stage, ExtendedCrisisDef extDef)
+    {
+        // Create crisis faction if not exists
+        var crisisFaction = game.Factions.FirstOrDefault(f => f.RaceId == $"crisis_{crisis.Type}");
+        if (crisisFaction == null)
+        {
+            crisisFaction = new FactionEntity
+            {
+                Id = Guid.NewGuid(),
+                GameId = game.Id,
+                Name = crisis.Name,
+                RaceId = $"crisis_{extDef.Id}",
+                IsCrisisFaction = true,
+                IsAI = true
+            };
+            _db.Factions.Add(crisisFaction);
+        }
+
+        // Use ship classes from CrisisDefinitions stage
+        foreach (var shipDesignId in stage.SpawnFleets ?? Array.Empty<string>())
+        {
+            var shipDef = ShipDefinitions.Get(shipDesignId);
+            var shipCount = stage.SpawnCount > 0 ? stage.SpawnCount : 1;
+
+            var fleet = new FleetEntity
+            {
+                Id = Guid.NewGuid(),
+                FactionId = crisisFaction.Id,
+                Name = $"{crisis.Name} {shipDesignId} Fleet",
+                CurrentSystemId = system.Id,
+                Stance = FleetStance.Aggressive,
+                Role = FleetRole.Combat,
+                Morale = 100,
+                ExperiencePoints = 1000  // Crisis fleets are elite
+            };
+            _db.Fleets.Add(fleet);
+
+            for (int i = 0; i < shipCount; i++)
+            {
+                var ship = new ShipEntity
+                {
+                    Id = Guid.NewGuid(),
+                    FleetId = fleet.Id,
+                    Name = $"{shipDef?.Name ?? shipDesignId} {i + 1}",
+                    DesignId = shipDesignId,
+                    ShipClass = shipDef?.Class ?? ShipClass.Cruiser,
+                    HullPoints = shipDef?.BaseHull ?? 500,
+                    MaxHullPoints = shipDef?.BaseHull ?? 500,
+                    ShieldPoints = shipDef?.BaseShields ?? 250,
+                    MaxShieldPoints = shipDef?.BaseShields ?? 250,
+                    Firepower = shipDef?.BaseFirepower ?? 200,
+                    Speed = shipDef?.BaseSpeed ?? 80
+                };
+                _db.Ships.Add(ship);
+
+                fleet.TotalHull += ship.MaxHullPoints;
+                fleet.TotalShields += ship.MaxShieldPoints;
+                fleet.TotalFirepower += ship.Firepower;
+            }
+        }
+
+        system.ControllingFactionId = crisisFaction.Id;
+
+        _logger.LogInformation("Extended crisis fleet spawned in {System}: {Ships}",
+            system.Name, string.Join(", ", stage.SpawnFleets ?? Array.Empty<string>()));
     }
 
     /// <summary>
@@ -432,7 +698,7 @@ public class CrisisService : ICrisisService
             .CountAsync();
 
         var crisisSystemCount = await _db.Systems
-            .Where(s => s.GameId == gameId && s.ControllingFaction.RaceId == $"crisis_{crisis.Type}")
+            .Where(s => s.GameId == gameId && s.ControllingFaction != null && s.ControllingFaction.RaceId == $"crisis_{crisis.Type}")
             .CountAsync();
 
         return new CrisisReport

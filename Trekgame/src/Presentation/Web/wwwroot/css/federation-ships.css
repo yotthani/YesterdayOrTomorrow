@@ -79,7 +79,7 @@
 
 .ship-card.shuttle,
 .ship-card.civilian {
-    background-image: url('/images/ships/federation/shuttles_civilian.png');
+    background-image: url('/assets/factions/federation/federation_civilianships_spritesheet.png');
 }
 
 /* Row 1: Type 6, Type 7, Type 9, Runabout, Delta Flyer, Argo */
@@ -113,7 +113,7 @@
 
 .ship-card.military,
 .ship-card.starship {
-    background-image: url('/images/ships/federation/military_ships.png');
+    background-image: url('/assets/factions/federation/federation_militaryships_spritesheet.png');
 }
 
 /* Row 1: Enterprise, Reliant, Excelsior, Galaxy, Enterprise-D, Nebula */

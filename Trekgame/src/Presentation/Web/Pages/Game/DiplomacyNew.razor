@@ -10,26 +10,10 @@
 
 @inject ILocalStorageService LocalStorage
 @inject ISnackbar Snackbar
+@inject ThemeService ThemeService
 <PageTitle>Diplomacy - Galactic Strategy</PageTitle>
 
-<div class="stellaris-layout">
-    <header class="st-topbar">
-        <div class="st-empire-badge"><div class="st-empire-flag">🌐</div><div class="st-empire-info"><span class="st-empire-name">Federation Diplomatic Corps</span><span class="st-empire-type">Foreign Relations</span></div></div>
-        <div class="st-resources">
-            <div class="st-resource highlight"><span class="st-resource-icon">👑</span><div class="st-resource-values"><span class="st-resource-current">@_influence</span><span class="st-resource-income positive">+3/turn</span></div></div>
-        </div>
-        <div class="st-game-controls"><button class="st-end-turn-btn">END TURN</button></div>
-    </header>
-
-    <div class="st-main">
-        <aside class="st-sidebar-left">
-            <nav class="st-nav">
-                <a href="/game/galaxy" class="st-nav-btn"><span class="st-nav-icon">🌌</span><span class="st-nav-label">Galaxy</span></a>
-                <a href="/game/contacts" class="st-nav-btn active"><span class="st-nav-icon">👥</span><span class="st-nav-label">Contacts</span></a>
-            </nav>
-        </aside>
-
-        <div class="diplomacy-content">
+<div class="diplomacy-content">
             <div class="diplomacy-header">
                 <h1>GALACTIC RELATIONS</h1>
                 <div class="diplomacy-filters">
@@ -47,6 +31,9 @@
                         <div class="@EmpireCardClass(empire)" @onclick="() => SelectEmpire(empire)">
                             <div class="empire-portrait">
                                 <FactionLeaderPortrait FactionId="@empire.RaceId" Size="medium" />
+                                <div class="emblem-badge">
+                                    <FactionEmblem RaceId="@empire.RaceId" Size="24" Variant="flat" />
+                                </div>
                             </div>
                             <div class="empire-info">
                                 <span class="empire-name">@empire.FactionName</span>
@@ -63,6 +50,9 @@
                         <div class="detail-banner" style="background: linear-gradient(180deg, @_selectedEmpire.Color 0%, transparent 100%);">
                             <div class="banner-portrait">
                                 <FactionLeaderPortrait FactionId="@_selectedEmpire.RaceId" Size="xlarge" />
+                                <div class="emblem-badge large">
+                                    <FactionEmblem RaceId="@_selectedEmpire.RaceId" Size="40" Variant="standard" />
+                                </div>
                             </div>
                             <div class="banner-info"><h2>@_selectedEmpire.FactionName</h2><span>@_selectedEmpire.GovernmentType</span></div>
                             <div class="banner-relation"><span class="relation-label">RELATIONS</span><span class="relation-value @GetRelationClass(_selectedEmpire.Opinion)">@FormatOpinion(_selectedEmpire.Opinion)</span></div>
@@ -83,13 +73,11 @@
                 }
             </div>
         </div>
-    </div>
-</div>
 
 <style>
-.diplomacy-content{flex:1;display:flex;flex-direction:column;background:linear-gradient(180deg,#080c14,#040608)}
-.diplomacy-header{padding:16px 24px;background:rgba(10,15,25,0.9);border-bottom:1px solid var(--st-border-dark);display:flex;align-items:center;gap:24px}
-.diplomacy-header h1{font-family:var(--st-font-display);font-size:18px;color:var(--st-text-white);letter-spacing:2px;margin:0}
+.diplomacy-content{flex:1;display:flex;flex-direction:column;background:var(--st-bg-darkest, linear-gradient(180deg,#080c14,#040608))}
+.diplomacy-header{padding:16px 24px;background:var(--st-gradient-header, rgba(10,15,25,0.9));border-bottom:1px solid var(--st-border-dark);display:flex;align-items:center;gap:24px}
+.diplomacy-header h1{font-family:var(--st-font-display);font-size:18px;color:var(--st-accent-blue, var(--st-text-white));letter-spacing:2px;margin:0}
 .diplomacy-filters{display:flex;gap:8px;margin-left:auto}
 .filter-btn{padding:6px 14px;background:var(--st-gradient-button);border:1px solid var(--st-border-dark);border-radius:4px;color:var(--st-text-muted);font-size:11px;cursor:pointer}
 .filter-btn:hover{background:var(--st-gradient-button-hover)}.filter-btn.active{border-color:var(--st-accent-blue);color:var(--st-accent-blue)}
@@ -97,7 +85,9 @@
 .empires-list{width:350px;overflow-y:auto;display:flex;flex-direction:column;gap:8px}
 .empire-card{display:flex;gap:12px;padding:12px;background:var(--st-gradient-panel);border:1px solid var(--st-border-dark);border-radius:8px;cursor:pointer;align-items:center}
 .empire-card:hover{border-color:var(--st-border-light)}.empire-card.selected{border-color:var(--st-accent-blue)}
-.empire-portrait{width:72px;height:72px;flex-shrink:0}
+.empire-portrait{width:72px;height:72px;flex-shrink:0;position:relative}
+.emblem-badge{position:absolute;bottom:-4px;right:-4px;width:28px;height:28px;border-radius:50%;background:rgba(0,0,0,0.8);border:2px solid var(--st-border-light);display:flex;align-items:center;justify-content:center;box-shadow:0 0 8px rgba(255,153,0,0.3)}
+.emblem-badge.large{width:48px;height:48px;bottom:-8px;right:-8px}
 .empire-info{flex:1}.empire-name{display:block;font-size:14px;font-weight:600;color:var(--st-text-white)}.empire-type{display:block;font-size:10px;color:var(--st-text-dim)}
 .relation-badge{font-size:9px;padding:2px 6px;border-radius:8px;margin-left:8px}
 .relation-badge.friendly{background:rgba(68,221,102,0.2);color:var(--st-accent-green)}
@@ -105,7 +95,7 @@
 .relation-badge.neutral{background:rgba(150,150,150,0.2);color:var(--st-text-muted)}
 .empire-detail-panel{flex:1;background:var(--st-gradient-panel);border:1px solid var(--st-border-dark);border-radius:8px;overflow:hidden}
 .detail-banner{padding:24px;display:flex;align-items:center;gap:20px}
-.banner-portrait{width:128px;height:128px;flex-shrink:0}
+.banner-portrait{width:128px;height:128px;flex-shrink:0;position:relative}
 .banner-info{flex:1}.banner-info h2{font-family:var(--st-font-display);font-size:20px;color:var(--st-text-white);margin:0}
 .banner-relation{text-align:right}.relation-label{display:block;font-size:10px;color:rgba(255,255,255,0.5)}.relation-value{font-family:var(--st-font-display);font-size:28px;font-weight:700}
 .relation-value.friendly{color:var(--st-accent-green)}.relation-value.hostile{color:var(--st-accent-red)}.relation-value.neutral{color:var(--st-text-muted)}
@@ -123,6 +113,7 @@
     private DiplomaticRelationDto? _selectedEmpire;
     private int _influence = 150;
     private Guid? _factionId;
+    private Guid? _gameId;
     private List<DiplomaticRelationDto> _empires = new();
 
     private IEnumerable<DiplomaticRelationDto> FilteredEmpires => _empires.Where(e => 
@@ -134,6 +125,14 @@
     protected override async Task OnInitializedAsync()
     {
         _factionId = await LocalStorage.GetItemAsync<Guid?>("currentFactionId");
+        try
+        {
+            var games = await Api.GetGamesAsync();
+            var game = games.FirstOrDefault();
+            if (game != null) _gameId = game.Id;
+        }
+        catch { }
+
         if (_factionId.HasValue)
         {
             await LoadDiplomacyData();
@@ -258,4 +257,5 @@
             catch (Exception ex) { Snackbar.Add($"Failed: {ex.Message}", Severity.Error); }
         }
     }
+
 }

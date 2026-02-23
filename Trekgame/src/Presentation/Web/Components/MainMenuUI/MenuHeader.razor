@@ -1,0 +1,108 @@
+@using StarTrekGame.Web.Services
+@inject MainMenuTemplateService TemplateService
+
+@* Data-driven menu header that renders based on template definition *@
+
+@{
+    var template = TemplateService.GetTemplate(_currentStyle);
+    var header = template.Header;
+}
+
+<header class="menu-header @header.Style @Class">
+    @if (header.Style == "lcars-bar")
+    {
+        @* LCARS specific layout with bar row + title block *@
+        <div class="lcars-header-row">
+            <div class="header-lcars-cap left">LCARS</div>
+            <div class="header-lcars-bar">
+                <span class="lcars-segment orange"></span>
+                <span class="lcars-segment tan"></span>
+                <span class="lcars-segment peach"></span>
+            </div>
+            <div class="header-lcars-cap right">47</div>
+        </div>
+        <div class="header-title-block @header.LogoStyle">
+            <h1 class="game-title">@Title</h1>
+            @if (!string.IsNullOrEmpty(Subtitle))
+            {
+                <p class="game-subtitle">@Subtitle</p>
+            }
+            @if (!string.IsNullOrEmpty(CommunityTag))
+            {
+                <p class="community-tag">@((MarkupString)CommunityTag)</p>
+            }
+        </div>
+    }
+    else if (header.Style == "cinematic-fade")
+    {
+        @* Cinematic style with glow backdrop *@
+        <div class="header-glow-backdrop"></div>
+        <div class="header-title-block @header.LogoStyle">
+            <h1 class="game-title">@Title</h1>
+            @if (!string.IsNullOrEmpty(Subtitle))
+            {
+                <p class="game-subtitle">@Subtitle</p>
+            }
+            @if (!string.IsNullOrEmpty(CommunityTag))
+            {
+                <p class="community-tag">@((MarkupString)CommunityTag)</p>
+            }
+        </div>
+    }
+    else if (header.Style == "minimal-clean")
+    {
+        @* Minimal style with horizontal layout *@
+        <div class="header-logo left">
+            <span class="logo-text">@Title</span>
+        </div>
+        <nav class="header-nav center">
+            @if (ExtraContent != null)
+            {
+                @ExtraContent
+            }
+        </nav>
+        <div class="header-actions right"></div>
+    }
+    else if (header.Style == "academy-banner")
+    {
+        @* Academy style with crest *@
+        <div class="header-academy-crest">🎓</div>
+        <div class="header-title-block @header.LogoStyle">
+            <h1 class="game-title">@Title</h1>
+            @if (!string.IsNullOrEmpty(Subtitle))
+            {
+                <p class="game-subtitle">@Subtitle</p>
+            }
+        </div>
+        <div class="header-stardate">STARDATE @DateTime.Now.ToString("yyyyMMdd.HHmm")</div>
+    }
+    else
+    {
+        @* Fallback - simple title *@
+        <div class="header-title-block">
+            <h1 class="game-title">@Title</h1>
+            @if (!string.IsNullOrEmpty(Subtitle))
+            {
+                <p class="game-subtitle">@Subtitle</p>
+            }
+        </div>
+    }
+</header>
+
+@code {
+    [Parameter] public string Title { get; set; } = "TrekGame";
+    [Parameter] public string? Subtitle { get; set; }
+    [Parameter] public string? CommunityTag { get; set; }
+    [Parameter] public RenderFragment? ExtraContent { get; set; }
+    [Parameter] public string Class { get; set; } = "";
+
+    /// <summary>
+    /// Override the default menu style
+    /// </summary>
+    [Parameter] public string? Style { get; set; }
+
+    [CascadingParameter(Name = "MenuStyle")]
+    public string? CascadedStyle { get; set; }
+
+    private string _currentStyle => Style ?? CascadedStyle ?? "lcars";
+}

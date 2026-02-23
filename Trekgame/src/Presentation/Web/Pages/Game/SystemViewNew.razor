@@ -5,6 +5,7 @@
 @using StarTrekGame.Web.Services
 @inject IGameApiClient Api
 @inject NavigationManager Nav
+@inject AssetService AssetService
 
 <PageTitle>System View - TrekGame</PageTitle>
 
@@ -32,12 +33,19 @@
         
         <div class="system-content">
             <div class="system-view">
-                <!-- Star -->
-                <div class="star-container">
-                    <div class="star @_starType.ToLower()">
+                <!-- Star (using spritesheet asset) -->
+                <div class="star-container" @onmouseenter="ShowStarTooltip" @onmouseleave="HideTooltip">
+                    <div class="star-sprite" style="@GetStarSpriteStyle()">
                         <div class="star-corona"></div>
                     </div>
                     <span class="star-label">@(_system?.Name ?? "Star") • @_starType Star</span>
+                    <div class="star-tooltip @(_showStarTooltip ? "visible" : "")">
+                        <span class="tt-name">@(_system?.Name ?? "Star") System</span>
+                        <span class="tt-type">@_starType Star</span>
+                        <span class="tt-info">Planets: @_planets.Count</span>
+                        <span class="tt-info">Habitable: @_planets.Count(p => p.Habitability >= 50)</span>
+                        <span class="tt-info">Colonies: @_planets.Count(p => p.HasColony)</span>
+                    </div>
                 </div>
                 
                 <!-- Orbits and Planets -->
@@ -51,15 +59,31 @@
                         var duration = 20 + idx * 10;
                         var startAngle = (idx * 73 + idx * idx * 31) % 360;
                         var delay = -(startAngle / 360.0) * duration;
-                        
+                        var planetSize = GetPlanetDisplaySize(planet);
+                        var spinDuration = GetPlanetSpinDuration(planet);
+
                         <div class="orbit-ring" style="width: @(orbitWidth * 2)px; height: @(orbitHeight * 2)px;">
-                            <div class="planet-orbit-path" style="animation-duration: @(duration)s; animation-delay: @(delay)s;">
-                                <div class="planet @planet.Type.ToLower() @(_selectedPlanet?.Id == planet.Id ? "selected" : "")" 
-                                     @onclick="() => SelectPlanet(idx)">
+                            <div class="planet-orbit-path"
+                                 style="animation-duration: @(duration)s; animation-delay: @(delay)s;
+                                        offset-path: ellipse(@(orbitWidth)px @(orbitHeight)px at center);">
+                                <div class="planet @(_selectedPlanet?.Id == planet.Id ? "selected" : "")"
+                                     style="@GetPlanetStyle(planet, planetSize); --spin-duration: @(spinDuration)s;"
+                                     @onclick="() => SelectPlanet(idx)"
+                                     @onmouseenter="() => ShowPlanetTooltip(planet)"
+                                     @onmouseleave="HideTooltip">
                                     @if (planet.HasColony)
                                     {
                                         <div class="colony-marker">🏠</div>
                                     }
+                                    <div class="planet-tooltip">
+                                        <span class="tt-name">@planet.Name</span>
+                                        <span class="tt-type">@planet.Type • Size @planet.Size</span>
+                                        <span class="tt-hab @GetHabitabilityClass(planet.Habitability)">Habitability: @planet.Habitability%</span>
+                                        @if (planet.HasColony)
+                                        {
+                                            <span class="tt-colony">🏠 Pop: @planet.Population.ToString("N0")</span>
+                                        }
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -70,9 +94,10 @@
                 <div class="fleets-in-system">
                     @foreach (var fleet in _fleets)
                     {
-                        <div class="fleet-marker">
+                        <div class="fleet-marker" title="@fleet.Name — @fleet.Ships ships">
                             <span class="fleet-icon">▲</span>
                             <span class="fleet-name">@fleet.Name</span>
+                            <span class="fleet-ships">@fleet.Ships 🚀</span>
                         </div>
                     }
                 </div>
@@ -90,7 +115,7 @@
                     <div class="planet-detail">
                         <div class="detail-header @_selectedPlanet.Type.ToLower()">
                             <div class="planet-preview">
-                                <div class="planet-sphere @_selectedPlanet.Type.ToLower()"></div>
+                                <div class="planet-sphere" style="@GetPlanetStyle(_selectedPlanet, 60)"></div>
                             </div>
                             <div class="planet-title">
                                 <h3>@_selectedPlanet.Name</h3>
@@ -186,33 +211,43 @@
         z-index: 10;
     }
     
+    .star-sprite {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        position: relative;
+        background-repeat: no-repeat;
+        filter: drop-shadow(0 0 30px rgba(255, 200, 100, 0.6));
+    }
+
+    /* Fallback CSS styles (used if spritesheet fails to load) */
     .star {
         width: 80px;
         height: 80px;
         border-radius: 50%;
         position: relative;
     }
-    
+
     .star.yellow {
         background: radial-gradient(circle, #fff 0%, #ffee88 30%, #ffaa00 70%, #ff6600 100%);
         box-shadow: 0 0 60px #ffaa00, 0 0 120px rgba(255, 170, 0, 0.5);
     }
-    
+
     .star.red {
         background: radial-gradient(circle, #ffcccc 0%, #ff6666 30%, #cc0000 100%);
         box-shadow: 0 0 60px #cc0000;
     }
-    
+
     .star.blue {
         background: radial-gradient(circle, #fff 0%, #aaddff 30%, #4488ff 100%);
         box-shadow: 0 0 60px #4488ff;
     }
-    
+
     .star.orange {
         background: radial-gradient(circle, #fff 0%, #ffcc88 30%, #ff8800 100%);
         box-shadow: 0 0 60px #ff8800;
     }
-    
+
     .star.white {
         background: radial-gradient(circle, #fff 0%, #eeeeff 50%, #aabbcc 100%);
         box-shadow: 0 0 60px #ffffff;
@@ -245,26 +280,31 @@
         border: 1px solid rgba(100, 150, 200, 0.2);
         border-radius: 50%;
         transform: translate(-50%, -50%);
+        pointer-events: none;  /* Let clicks pass through orbit rings */
     }
-    
+
     .planet-orbit-path {
         position: absolute;
         width: 100%;
         height: 100%;
-        animation: orbit linear infinite;
+        animation: orbit-ellipse linear infinite;
+        pointer-events: none;  /* Let clicks pass through orbit path container */
+        offset-rotate: 0deg;  /* Keep planet upright during orbit */
     }
-    
+
     .planet {
         position: absolute;
-        top: -16px;
+        top: 50%;
         left: 50%;
-        transform: translateX(-50%);
+        transform: translate(-50%, -50%);
         width: 32px;
         height: 32px;
         border-radius: 50%;
         cursor: pointer;
-        transition: all 0.2s ease;
+        transition: box-shadow 0.2s ease, transform 0.2s ease;
         box-shadow: 0 0 10px rgba(100, 150, 200, 0.3);
+        pointer-events: auto;  /* Planets catch clicks */
+        z-index: 50;  /* Base z-index for all planets */
     }
     
     .planet:hover {
@@ -278,14 +318,58 @@
         box-shadow: 0 0 25px rgba(255, 200, 100, 0.8);
         z-index: 100;
     }
-    
-    .planet.terran { background: radial-gradient(circle at 30% 30%, #6a9a6a, #3a6a3a, #1a3a1a); }
-    .planet.desert { background: radial-gradient(circle at 30% 30%, #c4a060, #8a6a40, #5a4020); }
-    .planet.arctic { background: radial-gradient(circle at 30% 30%, #e8f0ff, #a0c0e0, #6090c0); }
-    .planet.oceanic { background: radial-gradient(circle at 30% 30%, #4080c0, #2060a0, #104080); }
-    .planet.barren { background: radial-gradient(circle at 30% 30%, #8a8a8a, #5a5a5a, #3a3a3a); }
-    .planet.volcanic { background: radial-gradient(circle at 30% 30%, #c04020, #802010, #400808); }
-    
+
+    /* Planet rotation animation - creates spinning effect */
+    .planet {
+        animation: planet-spin var(--spin-duration, 20s) linear infinite;
+        overflow: hidden;
+        position: relative;
+    }
+
+    /* Inner rotating layer for the planet texture */
+    .planet::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border-radius: 50%;
+        background: inherit;
+        background-size: inherit;
+        background-position: inherit;
+        animation: texture-scroll var(--spin-duration, 20s) linear infinite;
+    }
+
+    @@keyframes texture-scroll {
+        0% { background-position-x: 0; }
+        100% { background-position-x: 100%; }
+    }
+
+    /* Add subtle 3D rotation effect with shadow movement */
+    .planet::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border-radius: 50%;
+        background: linear-gradient(
+            -70deg,
+            transparent 30%,
+            rgba(255, 255, 255, 0.1) 45%,
+            transparent 50%,
+            transparent 70%,
+            rgba(0, 0, 0, 0.3) 85%,
+            rgba(0, 0, 0, 0.5) 100%
+        );
+        pointer-events: none;
+    }
+
+    /* Planet styles are now set dynamically via AssetService.GetPlanetStyle() */
+    /* This mixes generated spritesheet assets with sourced individual assets */
+
     .colony-marker {
         position: absolute;
         top: -10px;
@@ -315,6 +399,40 @@
     
     .fleet-icon { color: #ffcc00; font-size: 14px; }
     .fleet-name { font-size: 12px; color: #fff; }
+    .fleet-ships { font-size: 10px; color: rgba(200, 220, 255, 0.6); margin-left: auto; }
+
+    /* Tooltips */
+    .planet-tooltip, .star-tooltip {
+        position: absolute;
+        bottom: calc(100% + 12px);
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(8, 14, 25, 0.95);
+        border: 1px solid rgba(100, 150, 200, 0.5);
+        border-radius: 6px;
+        padding: 8px 12px;
+        min-width: 160px;
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.2s;
+        z-index: 200;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+    }
+    .planet:hover .planet-tooltip,
+    .star-tooltip.visible {
+        opacity: 1;
+    }
+    .tt-name { font-size: 13px; font-weight: 600; color: #fff; }
+    .tt-type { font-size: 10px; color: rgba(200, 220, 255, 0.6); }
+    .tt-hab { font-size: 11px; }
+    .tt-hab.good { color: #44dd66; }
+    .tt-hab.medium { color: #ffcc00; }
+    .tt-hab.poor { color: #ff6666; }
+    .tt-colony { font-size: 10px; color: #88ccff; margin-top: 2px; }
+    .tt-info { font-size: 10px; color: rgba(200, 220, 255, 0.7); }
     
     /* Detail Panel */
     .planet-detail { }
@@ -332,22 +450,15 @@
     .detail-header.oceanic { background: linear-gradient(180deg, rgba(40, 100, 180, 0.2), transparent); }
     .detail-header.barren { background: linear-gradient(180deg, rgba(100, 100, 100, 0.2), transparent); }
     .detail-header.volcanic { background: linear-gradient(180deg, rgba(180, 60, 30, 0.2), transparent); }
+    .detail-header.gasgiant { background: linear-gradient(180deg, rgba(200, 160, 100, 0.2), transparent); }
     
     .planet-preview { width: 60px; height: 60px; }
-    
+
+    /* Planet sphere styles are now set dynamically via AssetService.GetPlanetStyle() */
     .planet-sphere {
-        width: 100%;
-        height: 100%;
         border-radius: 50%;
     }
-    
-    .planet-sphere.terran { background: radial-gradient(circle at 30% 30%, #6a9a6a, #3a6a3a, #1a3a1a); }
-    .planet-sphere.desert { background: radial-gradient(circle at 30% 30%, #c4a060, #8a6a40, #5a4020); }
-    .planet-sphere.arctic { background: radial-gradient(circle at 30% 30%, #e8f0ff, #a0c0e0, #6090c0); }
-    .planet-sphere.oceanic { background: radial-gradient(circle at 30% 30%, #4080c0, #2060a0, #104080); }
-    .planet-sphere.barren { background: radial-gradient(circle at 30% 30%, #8a8a8a, #5a5a5a, #3a3a3a); }
-    .planet-sphere.volcanic { background: radial-gradient(circle at 30% 30%, #c04020, #802010, #400808); }
-    
+
     .planet-title h3 {
         font-size: 16px;
         color: #fff;
@@ -419,9 +530,16 @@
         color: rgba(200, 220, 255, 0.7);
     }
     
+    /* Fallback rotation animation (for browsers without offset-path support) */
     @@keyframes orbit {
         from { transform: rotate(0deg); }
         to { transform: rotate(360deg); }
+    }
+
+    /* Elliptical orbit using offset-path (modern browsers) */
+    @@keyframes orbit-ellipse {
+        from { offset-distance: 0%; }
+        to { offset-distance: 100%; }
     }
     
     @@keyframes pulse {
@@ -438,9 +556,14 @@
     private List<PlanetData> _planets = new();
     private PlanetData? _selectedPlanet;
     private List<FleetData> _fleets = new();
-    
+    private Dictionary<string, PlanetAsset?> _planetAssets = new();  // Cached planet assets
+    private bool _showStarTooltip = false;
+
     protected override async Task OnInitializedAsync()
     {
+        // Initialize asset service for mixed planet assets
+        await AssetService.InitializeAsync();
+
         try
         {
             var games = await Api.GetGamesAsync();
@@ -449,25 +572,145 @@
             _system = systems.FirstOrDefault(s => s.Id == SystemId) ?? systems.FirstOrDefault();
         }
         catch { }
-        
+
         GenerateSystemData();
+
+        // Cache planet assets for rendering
+        foreach (var planet in _planets)
+        {
+            _planetAssets[planet.Id.ToString()] = AssetService.GetPlanetForIdentifier(planet.Type.ToLower(), planet.Name);
+        }
     }
-    
+
+    private string GetPlanetStyle(PlanetData planet, int size)
+    {
+        var key = planet.Id.ToString();
+        if (_planetAssets.TryGetValue(key, out var asset) && asset != null)
+        {
+            return AssetService.GetPlanetStyle(asset, size);
+        }
+        // Fallback to default spritesheet style
+        return GetFallbackPlanetStyle(planet.Type.ToLower(), size);
+    }
+
+    private string GetFallbackPlanetStyle(string planetType, int size)
+    {
+        var (row, col) = planetType switch
+        {
+            "terran" => (0, 0),
+            "oceanic" => (0, 1),
+            "jungle" => (0, 2),
+            "arctic" => (0, 3),
+            "desert" => (0, 4),
+            "gasgiant" => (1, 0),
+            "barren" => (2, 0),
+            "volcanic" => (2, 2),
+            _ => (0, 0)
+        };
+        var scale = size / 360.0;
+        var bgSize = (int)(2160 * scale);
+        var x = (int)(col * 360 * scale);
+        var y = (int)(row * 360 * scale);
+        return $"background-image: url('/assets/universal/planets_spritesheet.png'); " +
+               $"background-size: {bgSize}px {bgSize}px; " +
+               $"background-position: -{x}px -{y}px; " +
+               $"width: {size}px; height: {size}px; border-radius: 50%;";
+    }
+
+    /// <summary>
+    /// Get display size for a planet based on type and size attribute.
+    /// Mimics real-world size variations:
+    /// - Gas giants: 50-80px (Jupiter/Saturn scale)
+    /// - Terran/Oceanic: 24-36px (Earth-like)
+    /// - Desert/Arctic/Volcanic: 20-32px (Mars-like)
+    /// - Barren: 12-24px (Mercury/Moon scale)
+    /// </summary>
+    private int GetPlanetDisplaySize(PlanetData planet)
+    {
+        // Base size ranges by planet type (min, max)
+        var (minSize, maxSize) = planet.Type.ToLower() switch
+        {
+            "gasgiant" => (50, 80),      // Gas giants are huge (Jupiter = 11x Earth)
+            "terran" => (26, 36),        // Earth-like planets
+            "oceanic" => (24, 34),       // Ocean worlds, similar to terran
+            "jungle" => (24, 34),        // Jungle worlds
+            "desert" => (20, 30),        // Mars-like (Mars = 0.5x Earth)
+            "arctic" => (20, 30),        // Ice worlds
+            "volcanic" => (18, 28),      // Volcanic worlds, often smaller
+            "barren" => (14, 24),        // Mercury/Moon scale (Mercury = 0.38x Earth)
+            _ => (22, 32)                // Default
+        };
+
+        // Use planet's Size attribute (typically 8-25) to interpolate within range
+        // Normalize Size to 0-1 range (assuming Size is 5-30)
+        var normalizedSize = Math.Clamp((planet.Size - 5) / 25.0, 0, 1);
+
+        // Add some variation based on planet name hash for uniqueness
+        var nameHash = planet.Name.GetHashCode();
+        var variation = (Math.Abs(nameHash) % 10) / 10.0 * 0.2 - 0.1; // ±10% variation
+
+        var finalRatio = Math.Clamp(normalizedSize + variation, 0, 1);
+        return (int)(minSize + (maxSize - minSize) * finalRatio);
+    }
+
+    /// <summary>
+    /// Get rotation speed for a planet (in seconds per rotation).
+    /// Gas giants spin faster (Jupiter = 10 hours), rocky planets slower.
+    /// </summary>
+    private int GetPlanetSpinDuration(PlanetData planet)
+    {
+        // Base spin duration by planet type (seconds for visual rotation)
+        var baseDuration = planet.Type.ToLower() switch
+        {
+            "gasgiant" => 8,      // Gas giants spin fast (Jupiter = 10h)
+            "terran" => 20,       // Earth = 24h
+            "oceanic" => 22,      // Similar to Earth
+            "jungle" => 18,       // Slightly faster
+            "desert" => 25,       // Mars-like (Mars = 24.6h)
+            "arctic" => 24,       // Ice worlds
+            "volcanic" => 30,     // Slower rotation
+            "barren" => 40,       // Very slow (Mercury = 59 days!)
+            _ => 20
+        };
+
+        // Add variation based on planet name for uniqueness
+        var nameHash = Math.Abs(planet.Name.GetHashCode());
+        var variation = (nameHash % 10) - 5; // ±5 seconds variation
+
+        return Math.Max(5, baseDuration + variation);
+    }
+
     private void GenerateSystemData()
     {
         var systemName = _system?.Name ?? "Unknown";
+
+        // Check for canonical Star Trek systems first
+        if (TryGenerateCanonicalSystem(systemName))
+        {
+            return;
+        }
+
         var hash = systemName.GetHashCode();
         var random = new Random(hash);
-        
-        // Star type
+
+        // Star type - use system's star type if available, otherwise generate from name hash
         var starTypes = new[] { "Yellow", "Red", "Blue", "Orange", "White" };
-        _starType = starTypes[Math.Abs(hash) % starTypes.Length];
-        
+        var systemStarType = _system?.StarType;
+        if (string.IsNullOrEmpty(systemStarType) || systemStarType.Equals("Unknown", StringComparison.OrdinalIgnoreCase))
+        {
+            // Generate consistent random star type from system name
+            _starType = starTypes[Math.Abs(hash) % starTypes.Length];
+        }
+        else
+        {
+            _starType = systemStarType;
+        }
+
         // Generate planets
         var planetTypes = new[] { "Terran", "Desert", "Arctic", "Oceanic", "Barren", "Volcanic" };
         var climates = new[] { "Temperate", "Arid", "Frozen", "Tropical", "Barren", "Molten" };
         var planetCount = random.Next(3, 7);
-        
+
         _planets = new List<PlanetData>();
         for (int i = 0; i < planetCount; i++)
         {
@@ -476,7 +719,7 @@
                                planetTypes[typeIdx] == "Oceanic" ? random.Next(50, 80) :
                                planetTypes[typeIdx] == "Desert" ? random.Next(30, 60) :
                                random.Next(5, 40);
-            
+
             _planets.Add(new PlanetData
             {
                 Id = Guid.NewGuid(),
@@ -496,15 +739,279 @@
                 }
             });
         }
-        
+
         // Sample fleets
         _fleets = new List<FleetData>
         {
             new() { Name = "1st Exploration Fleet", Ships = 5 },
             new() { Name = "Defense Squadron", Ships = 3 }
         };
-        
+
         _selectedPlanet = _planets.FirstOrDefault();
+    }
+
+    private bool TryGenerateCanonicalSystem(string systemName)
+    {
+        var normalizedName = systemName.ToLower().Trim();
+
+        switch (normalizedName)
+        {
+            case "sol":
+            case "earth":
+            case "terra":
+                GenerateSolSystemData();
+                return true;
+            case "vulcan":
+            case "40 eridani":
+                GenerateVulcanSystemData();
+                return true;
+            case "qo'nos":
+            case "kronos":
+            case "klingon":
+                GenerateQonosSystemData();
+                return true;
+            case "romulus":
+            case "romulan":
+                GenerateRomulusSystemData();
+                return true;
+            case "cardassia":
+            case "cardassian":
+                GenerateCardassiaSystemData();
+                return true;
+            case "bajor":
+            case "bajoran":
+                GenerateBajorSystemData();
+                return true;
+            case "ferenginar":
+            case "ferengi":
+                GenerateFerengiSystemData();
+                return true;
+            case "andoria":
+            case "andorian":
+                GenerateAndoriaSystemData();
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private void GenerateVulcanSystemData()
+    {
+        _starType = "Orange";
+        _planets = new List<PlanetData>
+        {
+            new() { Id = Guid.NewGuid(), Name = "Vulcan", Type = "Desert", Size = 14, Climate = "Arid",
+                    Habitability = 65, HasColony = true, Population = 6_000_000_000, Buildings = 10,
+                    Resources = new() { new() { Icon = "🔬", Value = 12 }, new() { Icon = "⚙️", Value = 6 } } },
+            new() { Id = Guid.NewGuid(), Name = "T'Khut", Type = "Volcanic", Size = 12, Climate = "Inferno",
+                    Habitability = 0, Resources = new() { new() { Icon = "💎", Value = 5 } } },
+            new() { Id = Guid.NewGuid(), Name = "Delta Vega", Type = "Arctic", Size = 10, Climate = "Frozen",
+                    Habitability = 15, Resources = new() { new() { Icon = "💎", Value = 4 }, new() { Icon = "⚡", Value = 3 } } }
+        };
+        _fleets = new() { new() { Name = "Vulcan Science Academy Fleet", Ships = 6 } };
+        _selectedPlanet = _planets.FirstOrDefault(p => p.Name == "Vulcan");
+    }
+
+    private void GenerateQonosSystemData()
+    {
+        _starType = "Orange";
+        _planets = new List<PlanetData>
+        {
+            new() { Id = Guid.NewGuid(), Name = "Qo'noS", Type = "Terran", Size = 15, Climate = "Harsh",
+                    Habitability = 70, HasColony = true, Population = 8_000_000_000, Buildings = 14,
+                    Resources = new() { new() { Icon = "⚙️", Value = 14 }, new() { Icon = "💎", Value = 8 } } },
+            new() { Id = Guid.NewGuid(), Name = "Praxis", Type = "Barren", Size = 8, Climate = "Dead",
+                    Habitability = 0, Resources = new() { new() { Icon = "💎", Value = 10 } } },
+            new() { Id = Guid.NewGuid(), Name = "Boreth", Type = "Arctic", Size = 11, Climate = "Frozen",
+                    Habitability = 30, HasColony = true, Population = 50_000, Buildings = 2,
+                    Resources = new() { new() { Icon = "🔬", Value = 5 } } }
+        };
+        _fleets = new() { new() { Name = "Klingon Defense Force", Ships = 24 }, new() { Name = "House Fleet", Ships = 12 } };
+        _selectedPlanet = _planets.FirstOrDefault(p => p.Name == "Qo'noS");
+    }
+
+    private void GenerateRomulusSystemData()
+    {
+        _starType = "Orange";
+        _planets = new List<PlanetData>
+        {
+            new() { Id = Guid.NewGuid(), Name = "Romulus", Type = "Terran", Size = 14, Climate = "Temperate",
+                    Habitability = 80, HasColony = true, Population = 10_000_000_000, Buildings = 15,
+                    Resources = new() { new() { Icon = "🔬", Value = 10 }, new() { Icon = "⚙️", Value = 12 } } },
+            new() { Id = Guid.NewGuid(), Name = "Remus", Type = "Barren", Size = 12, Climate = "Tidally Locked",
+                    Habitability = 20, HasColony = true, Population = 2_000_000_000, Buildings = 8,
+                    Resources = new() { new() { Icon = "💎", Value = 15 }, new() { Icon = "⚙️", Value = 10 } } }
+        };
+        _fleets = new() { new() { Name = "Romulan Star Navy", Ships = 30 }, new() { Name = "Tal Shiar Fleet", Ships = 8 } };
+        _selectedPlanet = _planets.FirstOrDefault(p => p.Name == "Romulus");
+    }
+
+    private void GenerateCardassiaSystemData()
+    {
+        _starType = "Yellow";
+        _planets = new List<PlanetData>
+        {
+            new() { Id = Guid.NewGuid(), Name = "Cardassia Prime", Type = "Desert", Size = 14, Climate = "Arid",
+                    Habitability = 60, HasColony = true, Population = 7_000_000_000, Buildings = 12,
+                    Resources = new() { new() { Icon = "⚙️", Value = 12 }, new() { Icon = "💎", Value = 6 } } },
+            new() { Id = Guid.NewGuid(), Name = "Cardassia II", Type = "Barren", Size = 9, Climate = "Harsh",
+                    Habitability = 15, Resources = new() { new() { Icon = "💎", Value = 8 } } },
+            new() { Id = Guid.NewGuid(), Name = "Cardassia III", Type = "GasGiant", Size = 20, Climate = "Gas Giant",
+                    Habitability = 0, Resources = new() { new() { Icon = "⚡", Value = 8 } } }
+        };
+        _fleets = new() { new() { Name = "Cardassian Central Command", Ships = 20 } };
+        _selectedPlanet = _planets.FirstOrDefault(p => p.Name == "Cardassia Prime");
+    }
+
+    private void GenerateBajorSystemData()
+    {
+        _starType = "Yellow";
+        _planets = new List<PlanetData>
+        {
+            new() { Id = Guid.NewGuid(), Name = "Bajor", Type = "Terran", Size = 13, Climate = "Temperate",
+                    Habitability = 85, HasColony = true, Population = 4_000_000_000, Buildings = 8,
+                    Resources = new() { new() { Icon = "🌾", Value = 10 }, new() { Icon = "🔬", Value = 6 } } },
+            new() { Id = Guid.NewGuid(), Name = "Derna", Type = "Barren", Size = 6, Climate = "Airless",
+                    Habitability = 0, Resources = new() { new() { Icon = "💎", Value = 3 } } },
+            new() { Id = Guid.NewGuid(), Name = "Bajor VII", Type = "Arctic", Size = 10, Climate = "Frozen",
+                    Habitability = 10, Resources = new() { new() { Icon = "💎", Value = 4 } } }
+        };
+        _fleets = new() { new() { Name = "Bajoran Militia", Ships = 8 }, new() { Name = "Deep Space Nine", Ships = 4 } };
+        _selectedPlanet = _planets.FirstOrDefault(p => p.Name == "Bajor");
+    }
+
+    private void GenerateFerengiSystemData()
+    {
+        _starType = "Yellow";
+        _planets = new List<PlanetData>
+        {
+            new() { Id = Guid.NewGuid(), Name = "Ferenginar", Type = "Oceanic", Size = 12, Climate = "Rainy",
+                    Habitability = 70, HasColony = true, Population = 5_000_000_000, Buildings = 20,
+                    Resources = new() { new() { Icon = "💰", Value = 15 }, new() { Icon = "⚙️", Value = 8 } } },
+            new() { Id = Guid.NewGuid(), Name = "Ferenginar II", Type = "GasGiant", Size = 18, Climate = "Gas Giant",
+                    Habitability = 0, Resources = new() { new() { Icon = "⚡", Value = 6 } } }
+        };
+        _fleets = new() { new() { Name = "Ferengi Commerce Fleet", Ships = 15 } };
+        _selectedPlanet = _planets.FirstOrDefault(p => p.Name == "Ferenginar");
+    }
+
+    private void GenerateAndoriaSystemData()
+    {
+        _starType = "Blue";
+        _planets = new List<PlanetData>
+        {
+            new() { Id = Guid.NewGuid(), Name = "Andoria", Type = "Arctic", Size = 13, Climate = "Frozen",
+                    Habitability = 60, HasColony = true, Population = 3_000_000_000, Buildings = 9,
+                    Resources = new() { new() { Icon = "💎", Value = 8 }, new() { Icon = "⚙️", Value = 7 } } },
+            new() { Id = Guid.NewGuid(), Name = "Weytahn", Type = "Barren", Size = 7, Climate = "Harsh",
+                    Habitability = 15, HasColony = true, Population = 500_000, Buildings = 2,
+                    Resources = new() { new() { Icon = "💎", Value = 5 } } }
+        };
+        _fleets = new() { new() { Name = "Andorian Imperial Guard", Ships = 10 } };
+        _selectedPlanet = _planets.FirstOrDefault(p => p.Name == "Andoria");
+    }
+
+    private void GenerateSolSystemData()
+    {
+        _starType = "Yellow";  // G-type main sequence (Sol)
+
+        _planets = new List<PlanetData>
+        {
+            // Mercury - closest to sun, small rocky
+            new PlanetData
+            {
+                Id = Guid.NewGuid(), Name = "Mercury", Type = "Barren", Size = 8,
+                Climate = "Extreme", Habitability = 5, HasColony = false,
+                Resources = new List<ResourceInfo>
+                {
+                    new() { Icon = "💎", Value = 4 }, new() { Icon = "⚙️", Value = 2 }
+                }
+            },
+            // Venus - volcanic hellscape
+            new PlanetData
+            {
+                Id = Guid.NewGuid(), Name = "Venus", Type = "Volcanic", Size = 12,
+                Climate = "Inferno", Habitability = 0, HasColony = false,
+                Resources = new List<ResourceInfo>
+                {
+                    new() { Icon = "⚙️", Value = 3 }, new() { Icon = "🔬", Value = 2 }
+                }
+            },
+            // Earth - humanity's homeworld
+            new PlanetData
+            {
+                Id = Guid.NewGuid(), Name = "Earth", Type = "Terran", Size = 13,
+                Climate = "Temperate", Habitability = 95, HasColony = true,
+                Population = 11_000_000_000, Buildings = 12,
+                Resources = new List<ResourceInfo>
+                {
+                    new() { Icon = "⚙️", Value = 10 }, new() { Icon = "🔬", Value = 8 },
+                    new() { Icon = "💎", Value = 5 }, new() { Icon = "🌾", Value = 9 }
+                }
+            },
+            // Mars - terraforming candidate
+            new PlanetData
+            {
+                Id = Guid.NewGuid(), Name = "Mars", Type = "Desert", Size = 10,
+                Climate = "Arid", Habitability = 35, HasColony = true,
+                Population = 2_500_000_000, Buildings = 6,
+                Resources = new List<ResourceInfo>
+                {
+                    new() { Icon = "⚙️", Value = 5 }, new() { Icon = "💎", Value = 4 },
+                    new() { Icon = "🔬", Value = 3 }
+                }
+            },
+            // Jupiter - gas giant
+            new PlanetData
+            {
+                Id = Guid.NewGuid(), Name = "Jupiter", Type = "GasGiant", Size = 25,
+                Climate = "Gas Giant", Habitability = 0, HasColony = false,
+                Resources = new List<ResourceInfo>
+                {
+                    new() { Icon = "⚡", Value = 12 }  // Deuterium harvesting
+                }
+            },
+            // Saturn - ringed gas giant
+            new PlanetData
+            {
+                Id = Guid.NewGuid(), Name = "Saturn", Type = "GasGiant", Size = 22,
+                Climate = "Gas Giant", Habitability = 0, HasColony = false,
+                Resources = new List<ResourceInfo>
+                {
+                    new() { Icon = "⚡", Value = 10 }
+                }
+            },
+            // Uranus - ice giant
+            new PlanetData
+            {
+                Id = Guid.NewGuid(), Name = "Uranus", Type = "Arctic", Size = 18,
+                Climate = "Frozen", Habitability = 0, HasColony = false,
+                Resources = new List<ResourceInfo>
+                {
+                    new() { Icon = "⚡", Value = 6 }, new() { Icon = "💎", Value = 2 }
+                }
+            },
+            // Neptune - ice giant
+            new PlanetData
+            {
+                Id = Guid.NewGuid(), Name = "Neptune", Type = "Arctic", Size = 17,
+                Climate = "Frozen", Habitability = 0, HasColony = false,
+                Resources = new List<ResourceInfo>
+                {
+                    new() { Icon = "⚡", Value = 5 }, new() { Icon = "🔬", Value = 3 }
+                }
+            }
+        };
+
+        // Sol system fleets
+        _fleets = new List<FleetData>
+        {
+            new() { Name = "Sol Defense Fleet", Ships = 12 },
+            new() { Name = "Starfleet Academy Squadron", Ships = 8 },
+            new() { Name = "Jupiter Station Patrol", Ships = 4 }
+        };
+
+        _selectedPlanet = _planets.FirstOrDefault(p => p.Name == "Earth") ?? _planets.FirstOrDefault();
     }
     
     private void SelectPlanet(int index)
@@ -522,6 +1029,24 @@
             Nav.NavigateTo("/game/colonies");
         }
     }
+
+    private void ShowPlanetTooltip(PlanetData planet)
+    {
+        _showStarTooltip = false;
+        StateHasChanged();
+    }
+
+    private void ShowStarTooltip()
+    {
+        _showStarTooltip = true;
+        StateHasChanged();
+    }
+
+    private void HideTooltip()
+    {
+        _showStarTooltip = false;
+        StateHasChanged();
+    }
     
     private string GetHabitabilityClass(int hab) => hab >= 70 ? "good" : hab >= 40 ? "medium" : "poor";
     
@@ -530,6 +1055,39 @@
         1 => "I", 2 => "II", 3 => "III", 4 => "IV", 5 => "V",
         6 => "VI", 7 => "VII", 8 => "VIII", 9 => "IX", 10 => "X",
         _ => num.ToString()
+    };
+
+    // Star spritesheet rendering
+    // Spritesheet is 1440x1440px with 4x4 grid of 360px cells
+    // Display size 100px = scale factor 100/360 = 0.278
+    // background-size = 1440 * 0.278 = 400px
+    // position offset = col * 360 * 0.278 = col * 100
+    private string GetStarSpriteStyle()
+    {
+        var (row, col) = GetStarGridPosition(_starType);
+        var displaySize = 100;
+        var scaleFactor = displaySize / 360.0;
+        var bgSize = (int)(1440 * scaleFactor);  // 400px
+        var x = (int)(col * 360 * scaleFactor);  // col * 100
+        var y = (int)(row * 360 * scaleFactor);  // row * 100
+
+        return $"width: {displaySize}px; height: {displaySize}px; " +
+               $"background-image: url('/assets/universal/stars_spritesheet.png'); " +
+               $"background-position: -{x}px -{y}px; " +
+               $"background-size: {bgSize}px {bgSize}px; " +
+               $"border-radius: 50%;";
+    }
+
+    private (int row, int col) GetStarGridPosition(string starType) => starType?.ToLower() switch
+    {
+        "yellow" => (0, 0),   // Star Yellow Dwarf
+        "orange" => (0, 1),   // Star Orange Dwarf
+        "red" => (0, 2),      // Star Red Dwarf
+        "blue" => (0, 3),     // Star Blue Giant
+        "white" => (1, 2),    // Star White Giant
+        "neutron" => (2, 0),  // Star Neutron Pulsar
+        "blackhole" => (2, 1), // Star Black Hole
+        _ => (0, 0)           // Default to Yellow Dwarf
     };
     
     private class PlanetData

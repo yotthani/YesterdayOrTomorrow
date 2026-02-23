@@ -179,7 +179,7 @@
                         else if (building != null)
                         {
                             <div class="slot-building @building.Category">
-                                <div class="building-sprite" style="background-position: @(-building.SpriteCol * 333)px @(-building.SpriteRow * 155)px;"></div>
+                                <div class="building-sprite" style="background-position: @(-building.SpriteCol * 80)px @(-building.SpriteRow * 80)px;"></div>
                                 <span class="building-name">@building.ShortName</span>
                                 <span class="building-level">Lvl @building.Level</span>
                                 @if (!building.IsActive)
@@ -384,7 +384,7 @@
                             {
                                 <div class="avail-building @avail.Category @(_selectedBuilding?.Type == avail.Type ? "selected" : "") @(!avail.CanBuild ? "locked" : "")"
                                      @onclick="() => SelectBuilding(avail)">
-                                    <div class="avail-sprite" style="background-position: @(-avail.SpriteCol * 333)px @(-avail.SpriteRow * 155)px;"></div>
+                                    <div class="avail-sprite" style="background-position: @(-avail.SpriteCol * 48)px @(-avail.SpriteRow * 48)px;"></div>
                                     <div class="avail-info">
                                         <span class="avail-name">@avail.Name</span>
                                         <span class="avail-desc">@avail.ShortDesc</span>
@@ -861,23 +861,31 @@
 .slot-building.military { border-left: 3px solid #ef4444; }
 .slot-building.civic { border-left: 3px solid #3b82f6; }
 
+/* Building sprites: 8x6 grid, 360px cells, 2880x2160px total */
+/* Display 80x80 = scale 80/360 = 0.222 */
+/* background-size = 2880 * 0.222 = 640px, 2160 * 0.222 = 480px */
 .building-sprite {
-    width: 100px;
-    height: 100px;
-    background-image: url('/images/buildings/federation_buildings.png');
-    background-size: 2000px 1090px;
+    width: 80px;
+    height: 80px;
+    background-image: url('/assets/factions/federation/federation_buildings_spritesheet.png');
+    background-size: 640px 480px;
     background-repeat: no-repeat;
     border-radius: 4px;
+    background-position: 0 0; /* Default to first building */
 }
 
+/* Smaller version for available buildings list */
+/* Display 48x48 = scale 48/360 = 0.133 */
+/* background-size = 2880 * 0.133 = 384px, 2160 * 0.133 = 288px */
 .avail-sprite {
-    width: 60px;
-    height: 60px;
-    background-image: url('/images/buildings/federation_buildings.png');
-    background-size: 2000px 1090px;
+    width: 48px;
+    height: 48px;
+    background-image: url('/assets/factions/federation/federation_buildings_spritesheet.png');
+    background-size: 384px 288px;
     background-repeat: no-repeat;
     border-radius: 4px;
     flex-shrink: 0;
+    background-position: 0 0;
 }
 
 .building-icon { font-size: 24px; display: none; }

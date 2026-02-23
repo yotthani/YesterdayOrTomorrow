@@ -16,157 +16,16 @@
 @inject INotificationService NotificationSvc
 @inject ILocalStorageService LocalStorage
 @inject IJSRuntime JS
+@inject ThemeService ThemeService
 
 <PageTitle>Galaxy - Galactic Strategy</PageTitle>
 
-<div class="stellaris-galaxy-ui @_currentRace" data-theme="@_currentRace">
-    @* ═══════════════════════════════════════════════════════════════════════
-       TOP BAR - Empire Info, Resources, Game Speed
-       ═══════════════════════════════════════════════════════════════════════ *@
-    <header class="top-bar">
-        <div class="empire-section">
-            <div class="empire-flag @_currentRace">
-                <img src="/images/emblems/@(_currentRace).svg" alt="@_currentRace" onerror="this.style.display='none'" />
-            </div>
-            <div class="empire-info">
-                <span class="empire-name">@(_currentFaction?.Name ?? "United Federation")</span>
-                <span class="government-type">Democratic Republic</span>
-            </div>
-        </div>
-        
-        <div class="resources-section">
-            <div class="resource" data-tooltip="resource-credits" title="Energy Credits">
-                
-                <span class="icon-fallback">⚡</span>
-                <div class="resource-values">
-                    <span class="current">@_resources.Energy.ToString("N0")</span>
-                    <span class="income @(_resources.EnergyIncome >= 0 ? "positive" : "negative")">
-                        @(_resources.EnergyIncome >= 0 ? "+" : "")@_resources.EnergyIncome
-                    </span>
-                </div>
-            </div>
-            <div class="resource" data-tooltip="resource-dilithium" title="Minerals">
-                <span class="icon-fallback">💎</span>
-                <div class="resource-values">
-                    <span class="current">@_resources.Minerals.ToString("N0")</span>
-                    <span class="income @(_resources.MineralsIncome >= 0 ? "positive" : "negative")">
-                        @(_resources.MineralsIncome >= 0 ? "+" : "")@_resources.MineralsIncome
-                    </span>
-                </div>
-            </div>
-            <div class="resource" title="Food">
-                <span class="icon-fallback">🌾</span>
-                <div class="resource-values">
-                    <span class="current">@_resources.Food.ToString("N0")</span>
-                </div>
-            </div>
-            <div class="resource" data-tooltip="resource-duranium" title="Alloys">
-                <span class="icon-fallback">🔩</span>
-                <div class="resource-values">
-                    <span class="current">@_resources.Alloys.ToString("N0")</span>
-                </div>
-            </div>
-            <div class="resource" data-tooltip="resource-research" title="Research">
-                <span class="icon-fallback">🔬</span>
-                <div class="resource-values">
-                    <span class="current">@_resources.Research.ToString("N0")</span>
-                </div>
-            </div>
-            <div class="resource" title="Influence">
-                <span class="icon-fallback">👑</span>
-                <div class="resource-values">
-                    <span class="current">@_resources.Influence.ToString("N0")</span>
-                </div>
-            </div>
-        </div>
-        
-        <div class="game-section">
-            <div class="turn-display">
-                <span class="label">STARDATE</span>
-                <span class="value">@GetStardate()</span>
-            </div>
-            <div class="notification-area">
-                <NotificationPanel />
-            </div>
-            <button class="help-btn" @onclick="ShowHelp" title="Help & Tutorial">❓</button>
-            <button class="settings-btn" @onclick="OpenSettings" title="Settings">⚙️</button>
-            <button class="end-turn-btn @(_hasSubmittedOrders ? "submitted" : "")" data-tooltip="action-end-turn" @onclick="EndTurn" disabled="@_processingTurn">
-                @if (_processingTurn)
-                {
-                    <span class="spinner"></span>
-                }
-                else if (_hasSubmittedOrders)
-                {
-                    <span>✓ ORDERS SENT</span>
-                }
-                else
-                {
-                    <span>END TURN</span>
-                }
-            </button>
-        </div>
-    </header>
+<div class="stellaris-galaxy-ui @_currentRace">
 
     @* ═══════════════════════════════════════════════════════════════════════
        MAIN CONTENT
        ═══════════════════════════════════════════════════════════════════════ *@
     <div class="main-content">
-        @* LEFT SIDEBAR - Navigation *@
-        <aside class="left-sidebar">
-            <nav class="nav-buttons">
-                <a href="/game/galaxy" class="nav-btn active">
-                    <span class="icon">🌌</span>
-                    <span class="label">Galaxy</span>
-                </a>
-                <a href="/game/contacts" class="nav-btn">
-                    <span class="icon">👥</span>
-                    <span class="label">Contacts</span>
-                </a>
-                <a href="/game/situation" class="nav-btn">
-                    <span class="icon">📋</span>
-                    <span class="label">Situation</span>
-                </a>
-                <a href="/game/research" class="nav-btn">
-                    <span class="icon">🔬</span>
-                    <span class="label">Research</span>
-                </a>
-                <a href="/game/ship-designer" class="nav-btn">
-                    <span class="icon">🛠</span>
-                    <span class="label">Ships</span>
-                </a>
-                <a href="/game/fleets" class="nav-btn">
-                    <span class="icon">🚀</span>
-                    <span class="label">Fleets</span>
-                </a>
-                <a href="/game/colonies" class="nav-btn">
-                    <span class="icon">🏠</span>
-                    <span class="label">Planets</span>
-                </a>
-                <a href="/game/policies" class="nav-btn">
-                    <span class="icon">⚖</span>
-                    <span class="label">Policies</span>
-                </a>
-            </nav>
-            
-            <div class="sidebar-stats">
-                <div class="stat">
-                    <span class="label">Systems</span>
-                    <span class="value">@_ownedSystems / @_totalSystems</span>
-                </div>
-                <div class="stat">
-                    <span class="label">Colonies</span>
-                    <span class="value">@_colonies.Count</span>
-                </div>
-                <div class="stat">
-                    <span class="label">Fleets</span>
-                    <span class="value">@_fleets.Count</span>
-                </div>
-                <div class="stat">
-                    <span class="label">Ships</span>
-                    <span class="value">@_totalShips / @_fleetCap</span>
-                </div>
-            </div>
-        </aside>
 
         @* GALAXY MAP CANVAS *@
         <div class="galaxy-viewport">
@@ -336,6 +195,7 @@
 <style>
     /* Root variables */
     :root {
+        --ui-bg-darkest: #000008;
         --ui-bg-dark: rgba(8, 12, 20, 0.95);
         --ui-bg-medium: rgba(15, 22, 35, 0.9);
         --ui-bg-light: rgba(25, 35, 50, 0.85);
@@ -351,51 +211,390 @@
     }
     
     /* Federation Theme - LCARS Orange/Blue */
-    .stellaris-galaxy-ui.federation {
+    .stellaris-galaxy-ui.federation,
+    html[data-theme="federation"] .stellaris-galaxy-ui {
         --ui-accent: #ff9900;
         --ui-accent-gold: #ffcc00;
-        --ui-border-bright: rgba(255, 153, 0, 0.5);
+        --ui-border: rgba(255, 153, 0, 0.4);
+        --ui-border-bright: rgba(255, 153, 0, 0.7);
+        --ui-bg-darkest: #000010;
+        --ui-bg-dark: rgba(10, 10, 30, 0.95);
+        --ui-bg-medium: rgba(20, 20, 50, 0.9);
+        --ui-bg-light: rgba(35, 35, 70, 0.85);
+        --ui-text: #d8e0ff;
+        --ui-text-dim: #8090cc;
     }
-    
+
+    /* Federation specific overrides for stronger visual impact */
+    .stellaris-galaxy-ui.federation .top-bar,
+    html[data-theme="federation"] .stellaris-galaxy-ui .top-bar {
+        background: linear-gradient(180deg, rgba(20, 20, 50, 0.98) 0%, rgba(10, 10, 30, 0.98) 100%);
+        border-bottom: 2px solid #ff9900;
+    }
+
+    .stellaris-galaxy-ui.federation .left-sidebar,
+    html[data-theme="federation"] .stellaris-galaxy-ui .left-sidebar {
+        background: linear-gradient(180deg, rgba(15, 15, 40, 0.98) 0%, rgba(10, 10, 25, 0.98) 100%);
+        border-right: 2px solid rgba(255, 153, 0, 0.5);
+    }
+
+    .stellaris-galaxy-ui.federation .nav-btn.active,
+    html[data-theme="federation"] .stellaris-galaxy-ui .nav-btn.active {
+        background: rgba(255, 153, 0, 0.2);
+        border-left-color: #ff9900;
+        color: #ffcc00;
+    }
+
+    .stellaris-galaxy-ui.federation .end-turn-btn,
+    html[data-theme="federation"] .stellaris-galaxy-ui .end-turn-btn {
+        background: linear-gradient(180deg, #ff9900 0%, #cc7700 100%);
+        border-color: #ffcc00;
+    }
+
+    .stellaris-galaxy-ui.federation .end-turn-btn:hover,
+    html[data-theme="federation"] .stellaris-galaxy-ui .end-turn-btn:hover {
+        background: linear-gradient(180deg, #ffaa22 0%, #ff9900 100%);
+    }
+
     /* Klingon Theme - Red/Black */
-    .stellaris-galaxy-ui.klingon {
+    .stellaris-galaxy-ui.klingon,
+    html[data-theme="klingon"] .stellaris-galaxy-ui {
         --ui-accent: #cc0000;
         --ui-accent-gold: #ff4444;
-        --ui-border-bright: rgba(204, 0, 0, 0.5);
-        --ui-bg-dark: rgba(20, 8, 8, 0.95);
-        --ui-bg-medium: rgba(35, 15, 15, 0.9);
+        --ui-border: rgba(204, 0, 0, 0.4);
+        --ui-border-bright: rgba(204, 0, 0, 0.7);
+        --ui-bg-darkest: #0a0000;
+        --ui-bg-dark: rgba(25, 8, 8, 0.95);
+        --ui-bg-medium: rgba(45, 15, 15, 0.9);
+        --ui-bg-light: rgba(60, 22, 22, 0.85);
+        --ui-text: #ffd8d8;
+        --ui-text-dim: #cc8080;
     }
-    
+
+    .stellaris-galaxy-ui.klingon .top-bar,
+    html[data-theme="klingon"] .stellaris-galaxy-ui .top-bar {
+        background: linear-gradient(180deg, rgba(40, 10, 10, 0.98) 0%, rgba(20, 5, 5, 0.98) 100%);
+        border-bottom: 2px solid #cc0000;
+    }
+
+    .stellaris-galaxy-ui.klingon .left-sidebar,
+    html[data-theme="klingon"] .stellaris-galaxy-ui .left-sidebar {
+        background: linear-gradient(180deg, rgba(35, 10, 10, 0.98) 0%, rgba(20, 5, 5, 0.98) 100%);
+        border-right: 2px solid rgba(204, 0, 0, 0.5);
+    }
+
+    .stellaris-galaxy-ui.klingon .end-turn-btn,
+    html[data-theme="klingon"] .stellaris-galaxy-ui .end-turn-btn {
+        background: linear-gradient(180deg, #cc0000 0%, #880000 100%);
+        border-color: #ff4444;
+    }
+
     /* Romulan Theme - Green */
-    .stellaris-galaxy-ui.romulan {
+    .stellaris-galaxy-ui.romulan,
+    html[data-theme="romulan"] .stellaris-galaxy-ui {
         --ui-accent: #00aa44;
         --ui-accent-gold: #44ff88;
-        --ui-border-bright: rgba(0, 170, 68, 0.5);
-        --ui-bg-dark: rgba(5, 15, 10, 0.95);
+        --ui-border: rgba(0, 170, 68, 0.4);
+        --ui-border-bright: rgba(0, 170, 68, 0.7);
+        --ui-bg-darkest: #000a04;
+        --ui-bg-dark: rgba(5, 20, 12, 0.95);
+        --ui-bg-medium: rgba(10, 35, 22, 0.9);
+        --ui-bg-light: rgba(18, 50, 32, 0.85);
+        --ui-text: #d8ffe8;
+        --ui-text-dim: #80cc98;
     }
-    
+
+    .stellaris-galaxy-ui.romulan .top-bar,
+    html[data-theme="romulan"] .stellaris-galaxy-ui .top-bar {
+        background: linear-gradient(180deg, rgba(8, 30, 18, 0.98) 0%, rgba(4, 15, 10, 0.98) 100%);
+        border-bottom: 2px solid #00aa44;
+    }
+
+    .stellaris-galaxy-ui.romulan .left-sidebar,
+    html[data-theme="romulan"] .stellaris-galaxy-ui .left-sidebar {
+        background: linear-gradient(180deg, rgba(6, 25, 15, 0.98) 0%, rgba(3, 12, 8, 0.98) 100%);
+        border-right: 2px solid rgba(0, 170, 68, 0.5);
+    }
+
+    .stellaris-galaxy-ui.romulan .end-turn-btn,
+    html[data-theme="romulan"] .stellaris-galaxy-ui .end-turn-btn {
+        background: linear-gradient(180deg, #00aa44 0%, #007730 100%);
+        border-color: #44ff88;
+    }
+
     /* Cardassian Theme - Tan/Brown */
-    .stellaris-galaxy-ui.cardassian {
+    .stellaris-galaxy-ui.cardassian,
+    html[data-theme="cardassian"] .stellaris-galaxy-ui {
         --ui-accent: #aa8844;
         --ui-accent-gold: #ddaa66;
-        --ui-border-bright: rgba(170, 136, 68, 0.5);
+        --ui-border: rgba(170, 136, 68, 0.4);
+        --ui-border-bright: rgba(170, 136, 68, 0.7);
+        --ui-bg-darkest: #080604;
         --ui-bg-dark: rgba(20, 15, 10, 0.95);
+        --ui-bg-medium: rgba(35, 28, 18, 0.9);
+        --ui-bg-light: rgba(50, 40, 28, 0.85);
     }
-    
+
     /* Ferengi Theme - Gold */
-    .stellaris-galaxy-ui.ferengi {
+    .stellaris-galaxy-ui.ferengi,
+    html[data-theme="ferengi"] .stellaris-galaxy-ui {
         --ui-accent: #ddaa00;
         --ui-accent-gold: #ffcc00;
-        --ui-border-bright: rgba(221, 170, 0, 0.5);
+        --ui-border: rgba(221, 170, 0, 0.4);
+        --ui-border-bright: rgba(221, 170, 0, 0.7);
+        --ui-bg-darkest: #080800;
         --ui-bg-dark: rgba(20, 18, 8, 0.95);
+        --ui-bg-medium: rgba(35, 32, 15, 0.9);
+        --ui-bg-light: rgba(50, 45, 22, 0.85);
     }
-    
+
     /* Borg Theme - Cyber Green */
-    .stellaris-galaxy-ui.borg {
+    .stellaris-galaxy-ui.borg,
+    html[data-theme="borg"] .stellaris-galaxy-ui {
         --ui-accent: #00ffaa;
         --ui-accent-gold: #44ffcc;
-        --ui-border-bright: rgba(0, 255, 170, 0.5);
-        --ui-bg-dark: rgba(5, 15, 12, 0.95);
+        --ui-border: rgba(0, 255, 170, 0.4);
+        --ui-border-bright: rgba(0, 255, 170, 0.7);
+        --ui-bg-darkest: #000a06;
+        --ui-bg-dark: rgba(5, 18, 14, 0.95);
+        --ui-bg-medium: rgba(10, 30, 24, 0.9);
+        --ui-bg-light: rgba(18, 45, 36, 0.85);
+        --ui-text: #d0ffee;
+        --ui-text-dim: #70cc99;
+    }
+
+    .stellaris-galaxy-ui.borg .top-bar,
+    html[data-theme="borg"] .stellaris-galaxy-ui .top-bar {
+        background: linear-gradient(180deg, rgba(5, 25, 20, 0.98) 0%, rgba(2, 12, 10, 0.98) 100%);
+        border-bottom: 2px solid #00ffaa;
+    }
+
+    .stellaris-galaxy-ui.borg .left-sidebar,
+    html[data-theme="borg"] .stellaris-galaxy-ui .left-sidebar {
+        background: linear-gradient(180deg, rgba(4, 22, 18, 0.98) 0%, rgba(2, 10, 8, 0.98) 100%);
+        border-right: 2px solid rgba(0, 255, 170, 0.5);
+    }
+
+    .stellaris-galaxy-ui.borg .end-turn-btn,
+    html[data-theme="borg"] .stellaris-galaxy-ui .end-turn-btn {
+        background: linear-gradient(180deg, #00cc88 0%, #008855 100%);
+        border-color: #00ffaa;
+    }
+
+    /* Dominion Theme - Purple/Gold */
+    .stellaris-galaxy-ui.dominion,
+    html[data-theme="dominion"] .stellaris-galaxy-ui {
+        --ui-accent: #9933ff;
+        --ui-accent-gold: #ffd700;
+        --ui-border: rgba(153, 51, 255, 0.4);
+        --ui-border-bright: rgba(153, 51, 255, 0.7);
+        --ui-bg-darkest: #050010;
+        --ui-bg-dark: rgba(15, 8, 30, 0.95);
+        --ui-bg-medium: rgba(25, 15, 50, 0.9);
+        --ui-bg-light: rgba(40, 25, 65, 0.85);
+        --ui-text: #eeddff;
+        --ui-text-dim: #9980cc;
+    }
+
+    .stellaris-galaxy-ui.dominion .top-bar,
+    html[data-theme="dominion"] .stellaris-galaxy-ui .top-bar {
+        background: linear-gradient(180deg, rgba(20, 10, 40, 0.98) 0%, rgba(10, 5, 25, 0.98) 100%);
+        border-bottom: 2px solid #9933ff;
+    }
+
+    .stellaris-galaxy-ui.dominion .end-turn-btn,
+    html[data-theme="dominion"] .stellaris-galaxy-ui .end-turn-btn {
+        background: linear-gradient(180deg, #7722cc 0%, #551199 100%);
+        border-color: #9933ff;
+    }
+
+    /* Bajoran Theme - Teal/Orange */
+    .stellaris-galaxy-ui.bajoran,
+    html[data-theme="bajoran"] .stellaris-galaxy-ui {
+        --ui-accent: #00bbcc;
+        --ui-accent-gold: #ff8833;
+        --ui-border: rgba(0, 187, 204, 0.4);
+        --ui-border-bright: rgba(0, 187, 204, 0.7);
+        --ui-bg-darkest: #040808;
+        --ui-bg-dark: rgba(8, 18, 18, 0.95);
+        --ui-bg-medium: rgba(12, 28, 28, 0.9);
+        --ui-bg-light: rgba(20, 40, 40, 0.85);
+        --ui-text: #cceeee;
+        --ui-text-dim: #80aaaa;
+    }
+
+    .stellaris-galaxy-ui.bajoran .top-bar,
+    html[data-theme="bajoran"] .stellaris-galaxy-ui .top-bar {
+        background: linear-gradient(180deg, rgba(8, 22, 22, 0.98) 0%, rgba(4, 12, 12, 0.98) 100%);
+        border-bottom: 2px solid #00bbcc;
+    }
+
+    .stellaris-galaxy-ui.bajoran .end-turn-btn,
+    html[data-theme="bajoran"] .stellaris-galaxy-ui .end-turn-btn {
+        background: linear-gradient(180deg, #009999 0%, #006666 100%);
+        border-color: #00bbcc;
+    }
+
+    /* Tholian Theme - Orange/Amber */
+    .stellaris-galaxy-ui.tholian,
+    html[data-theme="tholian"] .stellaris-galaxy-ui {
+        --ui-accent: #ff8800;
+        --ui-accent-gold: #ffdd00;
+        --ui-border: rgba(255, 136, 0, 0.4);
+        --ui-border-bright: rgba(255, 136, 0, 0.7);
+        --ui-bg-darkest: #0a0500;
+        --ui-bg-dark: rgba(20, 12, 5, 0.95);
+        --ui-bg-medium: rgba(35, 22, 10, 0.9);
+        --ui-bg-light: rgba(50, 32, 15, 0.85);
+        --ui-text: #ffddaa;
+        --ui-text-dim: #cc9955;
+    }
+
+    .stellaris-galaxy-ui.tholian .top-bar,
+    html[data-theme="tholian"] .stellaris-galaxy-ui .top-bar {
+        background: linear-gradient(180deg, rgba(25, 15, 5, 0.98) 0%, rgba(15, 8, 2, 0.98) 100%);
+        border-bottom: 2px solid #ff8800;
+    }
+
+    .stellaris-galaxy-ui.tholian .end-turn-btn,
+    html[data-theme="tholian"] .stellaris-galaxy-ui .end-turn-btn {
+        background: linear-gradient(180deg, #cc6600 0%, #994400 100%);
+        border-color: #ff8800;
+    }
+
+    /* Gorn Theme - Orange-Green Bio */
+    .stellaris-galaxy-ui.gorn,
+    html[data-theme="gorn"] .stellaris-galaxy-ui {
+        --ui-accent: #ff6622;
+        --ui-accent-gold: #44dd44;
+        --ui-border: rgba(255, 102, 34, 0.4);
+        --ui-border-bright: rgba(255, 102, 34, 0.7);
+        --ui-bg-darkest: #050807;
+        --ui-bg-dark: rgba(12, 18, 14, 0.95);
+        --ui-bg-medium: rgba(20, 30, 24, 0.9);
+        --ui-bg-light: rgba(30, 42, 35, 0.85);
+        --ui-text: #ddccaa;
+        --ui-text-dim: #aa8866;
+    }
+
+    .stellaris-galaxy-ui.gorn .top-bar,
+    html[data-theme="gorn"] .stellaris-galaxy-ui .top-bar {
+        background: linear-gradient(180deg, rgba(15, 22, 18, 0.98) 0%, rgba(8, 12, 10, 0.98) 100%);
+        border-bottom: 2px solid #ff6622;
+    }
+
+    .stellaris-galaxy-ui.gorn .end-turn-btn,
+    html[data-theme="gorn"] .stellaris-galaxy-ui .end-turn-btn {
+        background: linear-gradient(180deg, #cc4400 0%, #993300 100%);
+        border-color: #ff6622;
+    }
+
+    /* Breen Theme - Gold/Cyan */
+    .stellaris-galaxy-ui.breen,
+    html[data-theme="breen"] .stellaris-galaxy-ui {
+        --ui-accent: #ffaa33;
+        --ui-accent-gold: #00cccc;
+        --ui-border: rgba(255, 170, 51, 0.4);
+        --ui-border-bright: rgba(255, 170, 51, 0.7);
+        --ui-bg-darkest: #08080a;
+        --ui-bg-dark: rgba(15, 15, 18, 0.95);
+        --ui-bg-medium: rgba(25, 25, 30, 0.9);
+        --ui-bg-light: rgba(38, 38, 42, 0.85);
+        --ui-text: #ffeedd;
+        --ui-text-dim: #bb9977;
+    }
+
+    .stellaris-galaxy-ui.breen .top-bar,
+    html[data-theme="breen"] .stellaris-galaxy-ui .top-bar {
+        background: linear-gradient(180deg, rgba(18, 18, 22, 0.98) 0%, rgba(10, 10, 14, 0.98) 100%);
+        border-bottom: 2px solid #ffaa33;
+    }
+
+    .stellaris-galaxy-ui.breen .end-turn-btn,
+    html[data-theme="breen"] .stellaris-galaxy-ui .end-turn-btn {
+        background: linear-gradient(180deg, #cc8822 0%, #996611 100%);
+        border-color: #ffaa33;
+    }
+
+    /* Orion Theme - Green/Gold */
+    .stellaris-galaxy-ui.orion,
+    html[data-theme="orion"] .stellaris-galaxy-ui {
+        --ui-accent: #33aa66;
+        --ui-accent-gold: #ffd700;
+        --ui-border: rgba(51, 170, 102, 0.4);
+        --ui-border-bright: rgba(51, 170, 102, 0.7);
+        --ui-bg-darkest: #050a08;
+        --ui-bg-dark: rgba(10, 18, 14, 0.95);
+        --ui-bg-medium: rgba(18, 30, 24, 0.9);
+        --ui-bg-light: rgba(28, 42, 35, 0.85);
+        --ui-text: #ccffdd;
+        --ui-text-dim: #80bb99;
+    }
+
+    .stellaris-galaxy-ui.orion .top-bar,
+    html[data-theme="orion"] .stellaris-galaxy-ui .top-bar {
+        background: linear-gradient(180deg, rgba(10, 22, 16, 0.98) 0%, rgba(5, 12, 8, 0.98) 100%);
+        border-bottom: 2px solid #33aa66;
+    }
+
+    .stellaris-galaxy-ui.orion .end-turn-btn,
+    html[data-theme="orion"] .stellaris-galaxy-ui .end-turn-btn {
+        background: linear-gradient(180deg, #228844 0%, #116633 100%);
+        border-color: #33aa66;
+    }
+
+    /* Kazon Theme - Orange/Brown */
+    .stellaris-galaxy-ui.kazon,
+    html[data-theme="kazon"] .stellaris-galaxy-ui {
+        --ui-accent: #cc6633;
+        --ui-accent-gold: #ffaa55;
+        --ui-border: rgba(204, 102, 51, 0.4);
+        --ui-border-bright: rgba(204, 102, 51, 0.7);
+        --ui-bg-darkest: #0a0505;
+        --ui-bg-dark: rgba(20, 12, 10, 0.95);
+        --ui-bg-medium: rgba(35, 22, 18, 0.9);
+        --ui-bg-light: rgba(50, 32, 28, 0.85);
+        --ui-text: #ffddcc;
+        --ui-text-dim: #cc8866;
+    }
+
+    .stellaris-galaxy-ui.kazon .top-bar,
+    html[data-theme="kazon"] .stellaris-galaxy-ui .top-bar {
+        background: linear-gradient(180deg, rgba(25, 15, 12, 0.98) 0%, rgba(15, 8, 6, 0.98) 100%);
+        border-bottom: 2px solid #cc6633;
+    }
+
+    .stellaris-galaxy-ui.kazon .end-turn-btn,
+    html[data-theme="kazon"] .stellaris-galaxy-ui .end-turn-btn {
+        background: linear-gradient(180deg, #aa4422 0%, #882211 100%);
+        border-color: #cc6633;
+    }
+
+    /* Hirogen Theme - Olive/Green */
+    .stellaris-galaxy-ui.hirogen,
+    html[data-theme="hirogen"] .stellaris-galaxy-ui {
+        --ui-accent: #557744;
+        --ui-accent-gold: #aacc88;
+        --ui-border: rgba(85, 119, 68, 0.4);
+        --ui-border-bright: rgba(85, 119, 68, 0.7);
+        --ui-bg-darkest: #030503;
+        --ui-bg-dark: rgba(8, 14, 8, 0.95);
+        --ui-bg-medium: rgba(14, 24, 14, 0.9);
+        --ui-bg-light: rgba(22, 36, 22, 0.85);
+        --ui-text: #bbddaa;
+        --ui-text-dim: #88aa77;
+    }
+
+    .stellaris-galaxy-ui.hirogen .top-bar,
+    html[data-theme="hirogen"] .stellaris-galaxy-ui .top-bar {
+        background: linear-gradient(180deg, rgba(10, 18, 10, 0.98) 0%, rgba(5, 10, 5, 0.98) 100%);
+        border-bottom: 2px solid #557744;
+    }
+
+    .stellaris-galaxy-ui.hirogen .end-turn-btn,
+    html[data-theme="hirogen"] .stellaris-galaxy-ui .end-turn-btn {
+        background: linear-gradient(180deg, #446633 0%, #334422 100%);
+        border-color: #557744;
     }
 
     .stellaris-galaxy-ui {
@@ -403,7 +602,7 @@
         top: 0; left: 0;
         width: 100vw;
         height: 100vh;
-        background: #000008;
+        background: var(--ui-bg-darkest, #000008);
         display: flex;
         flex-direction: column;
         font-family: 'Roboto', 'Segoe UI', sans-serif;
@@ -471,9 +670,41 @@
         background-color: #5c4a0a;
         border-color: #ddaa22; 
     }
-    .empire-flag.borg { 
+    .empire-flag.borg {
         background-color: #0a3c0a;
-        border-color: #22cc44; 
+        border-color: #22cc44;
+    }
+    .empire-flag.dominion {
+        background-color: #2a1050;
+        border-color: #9933ff;
+    }
+    .empire-flag.bajoran {
+        background-color: #0a3030;
+        border-color: #00bbcc;
+    }
+    .empire-flag.tholian {
+        background-color: #3c2800;
+        border-color: #ff8800;
+    }
+    .empire-flag.gorn {
+        background-color: #2a1800;
+        border-color: #ff6622;
+    }
+    .empire-flag.breen {
+        background-color: #2a2200;
+        border-color: #ffaa33;
+    }
+    .empire-flag.orion {
+        background-color: #0a2a18;
+        border-color: #33aa66;
+    }
+    .empire-flag.kazon {
+        background-color: #2a1510;
+        border-color: #cc6633;
+    }
+    .empire-flag.hirogen {
+        background-color: #1a2a1a;
+        border-color: #557744;
     }
 
     .empire-info {
@@ -494,15 +725,28 @@
 
     .resources-section {
         display: flex;
-        gap: 16px;
+        gap: 8px;
         flex: 1;
+        align-items: center;
+    }
+
+    .resource-group {
+        display: flex;
+        gap: 6px;
+    }
+
+    .resource-divider {
+        width: 1px;
+        height: 28px;
+        background: var(--ui-border);
+        margin: 0 4px;
     }
 
     .resource {
         display: flex;
         align-items: center;
-        gap: 6px;
-        padding: 4px 10px;
+        gap: 5px;
+        padding: 3px 8px;
         background: var(--ui-bg-light);
         border-radius: 4px;
         border: 1px solid transparent;
@@ -513,29 +757,54 @@
         border-color: var(--ui-border-bright);
     }
 
+    /* Strategic resources have a subtle highlight */
+    .resource.strategic {
+        background: linear-gradient(135deg, var(--ui-bg-light), rgba(100, 150, 255, 0.1));
+        border-color: rgba(100, 150, 255, 0.2);
+    }
+
+    /* Luxury resources (Latinum) have gold highlight */
+    .resource.luxury {
+        background: linear-gradient(135deg, var(--ui-bg-light), rgba(255, 200, 50, 0.15));
+        border-color: rgba(255, 200, 50, 0.3);
+    }
+
     .resource img {
-        width: 18px;
-        height: 18px;
+        width: 16px;
+        height: 16px;
     }
 
     .icon-fallback {
-        font-size: 16px;
+        font-size: 14px;
     }
+
+    /* Resource-specific icon colors */
+    .icon-fallback.credits { color: #ffcc00; }
+    .icon-fallback.energy { color: #66ccff; }
+    .icon-fallback.minerals { color: #cc9966; }
+    .icon-fallback.food { color: #66cc66; }
+    .icon-fallback.dilithium { color: #cc66ff; }
+    .icon-fallback.deuterium { color: #66ffcc; }
+    .icon-fallback.alloys { color: #aaaacc; }
+    .icon-fallback.consumer { color: #ff9966; }
+    .icon-fallback.research { color: #6699ff; }
+    .icon-fallback.influence { color: #ffcc66; }
+    .icon-fallback.latinum { color: #ffd700; }
 
     .resource-values {
         display: flex;
         flex-direction: column;
-        line-height: 1.2;
+        line-height: 1.1;
     }
 
     .resource-values .current {
         font-weight: 600;
-        font-size: 13px;
+        font-size: 12px;
         color: var(--ui-text-bright);
     }
 
     .resource-values .income {
-        font-size: 10px;
+        font-size: 9px;
     }
 
     .resource-values .income.positive { color: var(--ui-positive); }
@@ -580,6 +849,10 @@
         margin-right: 8px;
     }
     .help-btn:hover {
+        background: rgba(74, 158, 255, 0.2);
+        border-color: rgba(74, 158, 255, 0.5);
+        color: #4a9eff;
+    }
     .settings-btn {
         width: 36px;
         height: 36px;
@@ -596,10 +869,6 @@
         background: rgba(255, 153, 0, 0.2);
         border-color: rgba(255, 153, 0, 0.5);
         color: #ff9900;
-    }
-        background: rgba(74, 158, 255, 0.2);
-        border-color: rgba(74, 158, 255, 0.5);
-        color: #4a9eff;
     }
     .end-turn-btn {
         padding: 8px 20px;
@@ -1111,6 +1380,28 @@
         position: relative;
         margin-right: 12px;
     }
+
+    /* Admin force turn button */
+    .admin-force-btn {
+        padding: 6px 12px;
+        background: linear-gradient(180deg, #cc6600 0%, #993300 100%);
+        border: 1px solid #ff8800;
+        border-radius: 4px;
+        color: #ffcc00;
+        font-weight: 700;
+        font-size: 10px;
+        cursor: pointer;
+        transition: all 0.15s;
+        letter-spacing: 1px;
+    }
+    .admin-force-btn:hover {
+        background: linear-gradient(180deg, #ff8800 0%, #cc6600 100%);
+        box-shadow: 0 0 12px rgba(255, 136, 0, 0.4);
+    }
+    .admin-force-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
 </style>
 
 @* Tutorial and Tooltip overlays *@
@@ -1134,11 +1425,14 @@
     private List<FleetDetailDto> _fleets = new();
     private List<ColonyDetailDto> _colonies = new();
     private List<FactionSummaryDto> _knownFactions = new();
+    private List<AsteroidFieldData> _asteroidFields = new();
     
     // Selection
     private StarSystemDto? _selectedSystem;
     private ColonyDetailDto? _selectedSystemColony;
+    #pragma warning disable CS0169
     private StarSystemDto? _hoveredSystem;
+    #pragma warning restore CS0169
     private FleetDetailDto? _selectedFleet;
     private bool _isMovingFleet = false;
     
@@ -1154,8 +1448,7 @@
     private string _currentRace = "federation";
     private int _currentTurn = 1;
     // Game speed removed - turn-based only
-    private bool _hasSubmittedOrders = false;
-    private bool _processingTurn = false;
+    private bool _isAdmin = false;
     
     // Stats
     private int _ownedSystems = 0;
@@ -1250,13 +1543,23 @@
             isMoving = f.IsMoving
         }).ToList();
         
-        Console.WriteLine($"Sending to JS: {systemsData.Count} systems, {hyperlanesData.Count} hyperlanes");
-        
+        // Convert asteroid fields to JS format
+        var asteroidFieldsData = _asteroidFields.Select(a => new {
+            id = a.Id,
+            x = a.X,
+            y = a.Y,
+            radius = a.Radius,
+            density = a.Density
+        }).ToList();
+
+        Console.WriteLine($"Sending to JS: {systemsData.Count} systems, {hyperlanesData.Count} hyperlanes, {asteroidFieldsData.Count} asteroid fields");
+
         try
         {
             await JS.InvokeVoidAsync("setGalaxySystems", JsonSerializer.Serialize(systemsData));
             await JS.InvokeVoidAsync("setGalaxyHyperlanes", JsonSerializer.Serialize(hyperlanesData));
             await JS.InvokeVoidAsync("setGalaxyFleets", JsonSerializer.Serialize(fleetsData));
+            await JS.InvokeVoidAsync("setGalaxyAsteroidFields", JsonSerializer.Serialize(asteroidFieldsData));
             Console.WriteLine("Data sent to JS successfully");
         }
         catch (Exception ex)
@@ -1289,7 +1592,8 @@
             var storedRace = await LocalStorage.GetItemAsync<string>("currentRaceId");
             
             // Validate stored race is a valid theme
-            var validRaces = new[] { "federation", "klingon", "romulan", "cardassian", "ferengi", "borg" };
+            var validRaces = new[] { "federation", "klingon", "romulan", "cardassian", "ferengi", "borg",
+                "dominion", "bajoran", "tholian", "gorn", "breen", "orion", "kazon", "hirogen" };
             _currentRace = validRaces.Contains(storedRace?.ToLower()) ? storedRace!.ToLower() : "federation";
             
             // Check if stored faction exists in current game
@@ -1307,13 +1611,24 @@
                 Console.WriteLine($"Using faction {playerFaction.Name} ({_currentFactionId})");
             }
             
+            // Determine admin status - first human player or stored admin flag
+            _isAdmin = await LocalStorage.GetItemAsync<bool>("isAdmin");
+            // If no explicit admin flag, first human player in the game is admin
+            if (!_isAdmin && _knownFactions.Any())
+            {
+                var firstHuman = _knownFactions.FirstOrDefault(f => !string.IsNullOrEmpty(f.PlayerName));
+                _isAdmin = firstHuman != null && firstHuman.Id == _currentFactionId;
+            }
+
             // Load my faction data
             if (_currentFactionId.HasValue)
             {
                 try
                 {
                     _currentFaction = await Api.GetMyFactionAsync(_currentGame!.Id, _currentFactionId.Value);
-                    // Update race from faction with validation
+                    // Update race from faction with validation (for CSS class on container)
+                    // NOTE: We do NOT change the user's theme preference here!
+                    // Theme is only set when starting a NEW game (in IndexNew.razor)
                     if (_currentFaction != null && !string.IsNullOrEmpty(_currentFaction.RaceId))
                     {
                         var raceId = _currentFaction.RaceId.ToLower();
@@ -1356,15 +1671,23 @@
             _ownedSystems = _systems.Count(s => s.ControllingFactionId == _currentFactionId);
             _totalShips = _fleets.Sum(f => f.ShipCount);
             
-            // Mock resources
+            // Mock resources - all Star Trek resource types
             _resources = new ResourceData
             {
+                // Primary
+                Credits = 15000, CreditsIncome = 250,
                 Energy = 1250, EnergyIncome = 45,
                 Minerals = 890, MineralsIncome = 32,
-                Food = 120,
-                Alloys = 340,
+                Food = 120, FoodIncome = 8,
+                // Strategic (Star Trek)
+                Dilithium = 340, DilithiumIncome = 12,
+                Deuterium = 580, DeuteriumIncome = 25,
+                Alloys = 340, AlloysIncome = 15,
+                // Other
+                ConsumerGoods = 200, ConsumerGoodsIncome = 10,
                 Research = 85,
-                Influence = 150
+                Influence = 150,
+                Latinum = 0 // Only visible if > 0 (Ferengi trading)
             };
             
             // Initial notifications
@@ -1430,9 +1753,36 @@
         _maxX = _systems.Max(s => s.X) + 50;
         _minY = _systems.Min(s => s.Y) - 50;
         _maxY = _systems.Max(s => s.Y) + 50;
-        
-        // Mock resources
-        _resources = new ResourceData { Energy = 1250, Minerals = 890, Alloys = 340, Research = 85, Influence = 150 };
+
+        // Generate asteroid fields scattered across the galaxy
+        _asteroidFields = new List<AsteroidFieldData>();
+        for (int i = 0; i < 8; i++)
+        {
+            _asteroidFields.Add(new AsteroidFieldData
+            {
+                Id = Guid.NewGuid().ToString(),
+                X = random.Next((int)_minX + 30, (int)_maxX - 30),
+                Y = random.Next((int)_minY + 30, (int)_maxY - 30),
+                Radius = random.Next(25, 50),
+                Density = 0.4 + random.NextDouble() * 0.5
+            });
+        }
+
+        // Mock resources - all Star Trek resource types
+        _resources = new ResourceData
+        {
+            Credits = 15000, CreditsIncome = 250,
+            Energy = 1250, EnergyIncome = 45,
+            Minerals = 890, MineralsIncome = 32,
+            Food = 120, FoodIncome = 8,
+            Dilithium = 340, DilithiumIncome = 12,
+            Deuterium = 580, DeuteriumIncome = 25,
+            Alloys = 340, AlloysIncome = 15,
+            ConsumerGoods = 200,
+            Research = 85,
+            Influence = 150,
+            Latinum = 0
+        };
         _totalSystems = _systems.Count;
         _ownedSystems = 5;
         _totalShips = 24;
@@ -1547,8 +1897,7 @@
         switch (action)
         {
             case "endTurn":
-                if (!_processingTurn && !_hasSubmittedOrders)
-                    await EndTurn();
+                await EndTurn();
                 break;
             case "navigateGalaxy":
                 // Already here
@@ -1577,27 +1926,17 @@
     
     private async Task EndTurn()
     {
-        if (_processingTurn) return;
-        _processingTurn = true;
-        StateHasChanged();
-        
-        try
+        if (_currentFactionId.HasValue && _currentGame != null)
         {
-            if (_currentFactionId.HasValue && _currentGame != null)
+            try
             {
-                await Api.SubmitOrdersAsync(_currentGame.Id, _currentFactionId.Value, _currentGame.Turn, new List<FleetOrderDto>(), new List<ColonyOrderDto>());
-                _hasSubmittedOrders = true;
+                await Api.EndTurnAsync(_currentGame.Id, _currentFactionId.Value);
                 _notifications.Add(new NotificationData { Type = "success", Message = "Orders submitted successfully!" });
             }
-        }
-        catch (Exception ex)
-        {
-            Snackbar.Add($"Error: {ex.Message}", Severity.Error);
-        }
-        finally
-        {
-            _processingTurn = false;
-            StateHasChanged();
+            catch (Exception ex)
+            {
+                Snackbar.Add($"Error: {ex.Message}", Severity.Error);
+            }
         }
     }
 
@@ -1697,7 +2036,15 @@
         if (name.Contains("cardassian")) return "#cc8800";
         if (name.Contains("ferengi")) return "#ddaa00";
         if (name.Contains("borg")) return "#00cc44";
-        
+        if (name.Contains("dominion")) return "#9933ff";
+        if (name.Contains("bajoran")) return "#00bbcc";
+        if (name.Contains("tholian")) return "#ff8800";
+        if (name.Contains("gorn")) return "#ff6622";
+        if (name.Contains("breen")) return "#ffaa33";
+        if (name.Contains("orion")) return "#33aa66";
+        if (name.Contains("kazon")) return "#cc6633";
+        if (name.Contains("hirogen")) return "#557744";
+
         return "#888888";
     }
 
@@ -1731,19 +2078,45 @@
     // Data classes
     private class ResourceData
     {
+        // Basic Resources (Stellaris-style)
         public int Energy { get; set; }
         public int EnergyIncome { get; set; }
         public int Minerals { get; set; }
         public int MineralsIncome { get; set; }
         public int Food { get; set; }
+        public int FoodIncome { get; set; }
         public int Alloys { get; set; }
+        public int AlloysIncome { get; set; }
         public int Research { get; set; }
         public int Influence { get; set; }
+
+        // Star Trek Strategic Resources
+        public int Dilithium { get; set; }          // Warp fuel, strategic
+        public int DilithiumIncome { get; set; }
+        public int Deuterium { get; set; }          // Fuel and energy
+        public int DeuteriumIncome { get; set; }
+        public int Latinum { get; set; }            // Luxury currency (Ferengi)
+        public int LatinumIncome { get; set; }
+        public int ConsumerGoods { get; set; }      // Pop happiness
+        public int ConsumerGoodsIncome { get; set; }
+
+        // Credits (currency)
+        public int Credits { get; set; }
+        public int CreditsIncome { get; set; }
     }
 
     private class NotificationData
     {
         public string Type { get; set; } = "info";
         public string Message { get; set; } = "";
+    }
+
+    private class AsteroidFieldData
+    {
+        public string Id { get; set; } = "";
+        public double X { get; set; }
+        public double Y { get; set; }
+        public double Radius { get; set; }
+        public double Density { get; set; }
     }
 }

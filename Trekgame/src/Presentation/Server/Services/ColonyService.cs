@@ -15,6 +15,8 @@ public interface IColonyService
     Task<List<string>> GetAvailableBuildingsAsync(Guid colonyId);
     Task<ColonyDetailReport> GetColonyDetailAsync(Guid colonyId);
     Task ProcessColonyBuildQueuesAsync(Guid gameId);
+    Task<bool> AssignPopToJobAsync(Guid popId, Guid buildingId, string jobId);
+    Task<List<JobSlotInfo>> GetAvailableJobsAsync(Guid colonyId);
 }
 
 public class ColonyService : IColonyService
@@ -528,6 +530,194 @@ public class ColonyService : IColonyService
 
         return report;
     }
+
+    /// <summary>
+    /// Assign a pop to work a specific job
+    /// </summary>
+    public async Task<bool> AssignPopToJobAsync(Guid popId, Guid buildingId, string jobId)
+    {
+        var pop = await _db.Pops
+            .Include(p => p.Colony)
+                .ThenInclude(c => c.House)
+                    .ThenInclude(h => h.Faction)
+            .FirstOrDefaultAsync(p => p.Id == popId);
+
+        var building = await _db.Buildings.FindAsync(buildingId);
+
+        if (pop == null || building == null)
+            return false;
+
+        // Get job definition
+        var jobDef = JobDefinitions.Get(jobId);
+        if (jobDef == null)
+        {
+            _logger.LogWarning("Unknown job type: {Job}", jobId);
+            return false;
+        }
+
+        // Check faction exclusivity
+        var factionRace = pop.Colony?.House?.Faction?.RaceId?.ToLower() ?? "";
+        if (!string.IsNullOrEmpty(jobDef.FactionExclusive) &&
+            !jobDef.FactionExclusive.ToLower().Contains(factionRace))
+        {
+            _logger.LogWarning("Job {Job} not available for faction {Faction}", jobId, factionRace);
+            return false;
+        }
+
+        // Check pop stratum matches job stratum (compare underlying int values)
+        if ((int)pop.Stratum < (int)jobDef.Stratum)
+        {
+            _logger.LogWarning("Pop stratum {PopStratum} too low for job requiring {JobStratum}",
+                pop.Stratum, jobDef.Stratum);
+            return false;
+        }
+
+        // Check if building has available slots for this job
+        var buildingDef = BuildingDefinitions.Get(building.BuildingTypeId);
+        if (buildingDef == null) return false;
+
+        var jobSlot = buildingDef.Jobs.FirstOrDefault(j => j.JobId == jobId);
+        if (jobSlot.JobId == null)
+        {
+            _logger.LogWarning("Building {Building} doesn't provide job {Job}",
+                building.BuildingTypeId, jobId);
+            return false;
+        }
+
+        // Assign pop to job
+        pop.JobId = buildingId;
+        pop.CurrentJob = MapJobIdToJobType(jobId);
+        building.JobsFilled++;
+
+        await _db.SaveChangesAsync();
+
+        _logger.LogInformation("Pop assigned to job {Job} at {Building}", jobId, building.BuildingTypeId);
+        return true;
+    }
+
+    /// <summary>
+    /// Get all available job slots in a colony
+    /// </summary>
+    public async Task<List<JobSlotInfo>> GetAvailableJobsAsync(Guid colonyId)
+    {
+        var colony = await _db.Colonies
+            .Include(c => c.Buildings)
+            .Include(c => c.Pops)
+            .Include(c => c.House)
+                .ThenInclude(h => h.Faction)
+            .FirstOrDefaultAsync(c => c.Id == colonyId);
+
+        if (colony == null)
+            return new List<JobSlotInfo>();
+
+        var factionRace = colony.House?.Faction?.RaceId?.ToLower() ?? "";
+        var availableJobs = new List<JobSlotInfo>();
+
+        foreach (var building in colony.Buildings.Where(b => b.IsActive && !b.IsRuined))
+        {
+            var buildingDef = BuildingDefinitions.Get(building.BuildingTypeId);
+            if (buildingDef == null) continue;
+
+            foreach (var jobSlot in buildingDef.Jobs)
+            {
+                var jobDef = JobDefinitions.Get(jobSlot.JobId);
+                if (jobDef == null) continue;
+
+                // Check faction exclusivity
+                if (!string.IsNullOrEmpty(jobDef.FactionExclusive) &&
+                    !jobDef.FactionExclusive.ToLower().Contains(factionRace))
+                    continue;
+
+                // Count how many pops are already in this job at this building
+                var filledCount = colony.Pops.Count(p => p.JobId == building.Id &&
+                    MapJobIdToJobType(jobSlot.JobId) == p.CurrentJob);
+
+                var openSlots = jobSlot.Count - filledCount;
+
+                if (openSlots > 0)
+                {
+                    availableJobs.Add(new JobSlotInfo
+                    {
+                        BuildingId = building.Id,
+                        BuildingName = buildingDef.Name,
+                        JobId = jobSlot.JobId,
+                        JobName = jobDef.Name,
+                        RequiredStratum = MapJobStratumToPopStratum(jobDef.Stratum),
+                        OpenSlots = openSlots,
+                        TotalSlots = jobSlot.Count,
+
+                        // Job outputs from definition
+                        CreditsOutput = jobDef.BaseProduction.Credits,
+                        EnergyOutput = jobDef.BaseProduction.Energy,
+                        MineralsOutput = jobDef.BaseProduction.Minerals,
+                        FoodOutput = jobDef.BaseProduction.Food,
+                        ConsumerGoodsOutput = jobDef.BaseProduction.ConsumerGoods,
+                        ResearchOutput = jobDef.BaseProduction.Physics + jobDef.BaseProduction.Engineering + jobDef.BaseProduction.Society,
+
+                        // Special bonuses
+                        NavalCapBonus = jobDef.NavalCapBonus,
+                        FleetCommandBonus = jobDef.FleetCommandBonus
+                    });
+                }
+            }
+        }
+
+        return availableJobs;
+    }
+
+    private PopStratum MapJobStratumToPopStratum(JobStratum stratum)
+    {
+        return (PopStratum)(int)stratum;
+    }
+
+    private JobType? MapJobIdToJobType(string jobId)
+    {
+        return jobId switch
+        {
+            "farmer" => JobType.Farmer,
+            "miner" => JobType.Miner,
+            "technician" => JobType.Technician,
+            "clerk" => JobType.Clerk,
+            "researcher" or "xenobiologist" or "warp_theorist" => JobType.Researcher,
+            "engineer" or "shipwright" => JobType.Engineer,
+            "metallurgist" => JobType.Metallurgist,
+            "chemist" => JobType.ChemistSpecialist,
+            "bureaucrat" => JobType.Bureaucrat,
+            "manager" => JobType.Manager,
+            "entertainer" or "dabo_girl" => JobType.Entertainer,
+            "medical_officer" => JobType.Medic,
+            "enforcer" or "security_officer" => JobType.Enforcer,
+            "soldier" or "warrior" or "jem_hadar_soldier" => JobType.Soldier,
+            "executive" or "administrator" => JobType.Executive,
+            "high_priest" => JobType.HighPriest,
+            "noble" or "dahar_master" => JobType.Noble,
+            "merchant" or "trader" or "nagus" => JobType.Merchant,
+            _ => null
+        };
+    }
+}
+
+public class JobSlotInfo
+{
+    public Guid BuildingId { get; set; }
+    public string BuildingName { get; set; } = "";
+    public string JobId { get; set; } = "";
+    public string JobName { get; set; } = "";
+    public PopStratum RequiredStratum { get; set; }
+    public int OpenSlots { get; set; }
+    public int TotalSlots { get; set; }
+
+    // Production outputs
+    public int CreditsOutput { get; set; }
+    public int EnergyOutput { get; set; }
+    public int MineralsOutput { get; set; }
+    public int FoodOutput { get; set; }
+    public int ConsumerGoodsOutput { get; set; }
+    public int ResearchOutput { get; set; }
+
+    // Special bonuses
+    public int NavalCapBonus { get; set; }
+    public int FleetCommandBonus { get; set; }
 }
 
 // Report classes

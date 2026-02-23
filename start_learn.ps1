@@ -1,0 +1,22 @@
+cd "D:\AI\kohya_ss"
+& ".\venv\Scripts\accelerate.exe" launch --mixed_precision=fp16 --num_cpu_threads_per_process=8  ".\sd-scripts\sdxl_train_network.py" `
+  --pretrained_model_name_or_path="D:\AI\ComfyUI\models\checkpoints\juggernautXL_v9Rundiffusion.safetensors" `
+  --train_data_dir="C:\Work\Sources\github\YesterdayOrTomorrow\Trekgame\tools\lora_training\dataset" `
+  --output_dir="C:\Work\Sources\github\YesterdayOrTomorrow\Trekgame\tools\lora_training\output" `
+  --output_name="trekgame_claymation_style" `
+  --save_model_as=safetensors `
+  --network_module=networks.lora `
+  --network_dim=32 `
+  --network_alpha=16 `
+  --resolution=1024 `
+  --train_batch_size=1 `
+  --learning_rate=1e-4 `
+  --max_train_epochs=3 `
+  --save_every_n_epochs=1 `
+  --optimizer_type=AdamW8bit `
+  --cache_latents `
+  --cache_latents_to_disk `
+  --gradient_checkpointing `
+  --mixed_precision=fp16 `
+  --save_precision=fp16 `
+  --sdpa

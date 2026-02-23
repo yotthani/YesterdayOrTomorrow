@@ -1,0 +1,317 @@
+/* ===========================================
+   HIROGEN THEME - HUNTER TRACKING INTERFACE
+
+   Design Philosophy: Pure function. No decoration.
+   The Hirogen are apex predators - their technology
+   exists solely to track, hunt, and display trophies.
+   Everything is utilitarian and efficiency-focused.
+
+   Visual Language:
+   - Muted olive/dark green (camouflage)
+   - Minimal, functional design
+   - Sensor/tracking displays
+   - Target acquisition markers
+   - Trophy counting systems
+   - No unnecessary ornamentation
+   =========================================== */
+
+/* ===== HIROGEN THEME VARIABLES ===== */
+html[data-theme="hirogen"],
+html[data-theme="hirogen"] .stellaris-layout,
+html[data-theme="hirogen"] .stellaris-app {
+    --theme-primary: #557744;
+    --theme-secondary: #779966;
+    --theme-accent: #AACC88;
+    --theme-text: #BBDDAA;
+    --theme-text-dim: #668855;
+    --theme-bg: #030503;
+    --theme-panel-bg: rgba(5, 8, 5, 0.98);
+    --theme-border-radius: 2px;
+    --theme-btn-radius: 2px;
+    --theme-border-width: 1px;
+    --theme-corner-style: minimal;
+
+    --hirogen-olive: #556644;
+    --hirogen-moss: #445533;
+    --hirogen-dark: #223322;
+    --hirogen-sensor: #88AA77;
+    --hirogen-target: #CCDD99;
+    --hirogen-kill: #AA6644;
+
+    --st-bg-darkest: #020302;
+    --st-bg-darker: #030503;
+    --st-bg-dark: #050805;
+    --st-bg-medium: #080c08;
+    --st-bg-light: #0a100a;
+    --st-bg-lighter: #0c140c;
+
+    --st-border-dark: rgba(85, 119, 68, 0.25);
+    --st-border-medium: rgba(85, 119, 68, 0.4);
+    --st-border-light: rgba(119, 153, 102, 0.5);
+    --st-border-bright: rgba(170, 204, 136, 0.6);
+
+    --st-text-dim: #445533;
+    --st-text-muted: #668855;
+    --st-text-normal: #88AA77;
+    --st-text-bright: #BBDDAA;
+
+    --st-gradient-header: linear-gradient(180deg, #050805 0%, #030503 100%);
+    --st-gradient-panel: linear-gradient(180deg, rgba(5, 8, 5, 0.95) 0%, rgba(3, 5, 3, 0.98) 100%);
+    --st-gradient-button: linear-gradient(180deg, #557744 0%, #334422 100%);
+    --st-gradient-button-hover: linear-gradient(180deg, #668855 0%, #445533 100%);
+}
+
+/* ===== HIROGEN PANEL STYLE ===== */
+/* Minimal, functional panels */
+html[data-theme="hirogen"] .mud-paper,
+html[data-theme="hirogen"] .mud-card {
+    background: var(--st-gradient-panel) !important;
+    border: 1px solid var(--hirogen-moss) !important;
+    border-radius: 2px !important;
+    position: relative;
+}
+
+/* Simple top indicator line */
+html[data-theme="hirogen"] .mud-paper::before,
+html[data-theme="hirogen"] .mud-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 40px;
+    height: 2px;
+    background: var(--hirogen-sensor);
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* ===== HIROGEN BUTTONS ===== */
+/* Minimal, flat buttons */
+html[data-theme="hirogen"] .mud-button-root {
+    border-radius: 2px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    font-weight: 500 !important;
+    font-size: 11px !important;
+    transition: all 0.1s ease !important;
+}
+
+html[data-theme="hirogen"] .mud-button-filled {
+    background: var(--hirogen-olive) !important;
+    color: var(--hirogen-target) !important;
+    border: 1px solid var(--hirogen-moss) !important;
+    box-shadow: none !important;
+}
+
+html[data-theme="hirogen"] .mud-button-filled:hover {
+    background: var(--hirogen-moss) !important;
+    border-color: var(--hirogen-sensor) !important;
+}
+
+html[data-theme="hirogen"] .mud-button-outlined {
+    border: 1px solid var(--hirogen-moss) !important;
+    color: var(--hirogen-sensor) !important;
+    background: transparent !important;
+}
+
+/* ===== HIROGEN APP BAR ===== */
+html[data-theme="hirogen"] .mud-appbar {
+    background: var(--st-gradient-header) !important;
+    border-bottom: 1px solid var(--hirogen-dark) !important;
+    position: relative;
+}
+
+/* Minimal sensor line */
+html[data-theme="hirogen"] .mud-appbar::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg,
+        var(--hirogen-dark) 0%,
+        var(--hirogen-moss) 30%,
+        var(--hirogen-sensor) 50%,
+        var(--hirogen-moss) 70%,
+        var(--hirogen-dark) 100%
+    );
+}
+
+/* ===== HIROGEN DRAWER ===== */
+html[data-theme="hirogen"] .mud-drawer {
+    background: linear-gradient(90deg, #030503 0%, #050805 100%) !important;
+    border-right: 1px solid var(--hirogen-dark) !important;
+    position: relative;
+}
+
+html[data-theme="hirogen"] .mud-drawer::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 1px;
+    height: 100%;
+    background: linear-gradient(180deg,
+        transparent 0%,
+        var(--hirogen-moss) 20%,
+        var(--hirogen-sensor) 50%,
+        var(--hirogen-moss) 80%,
+        transparent 100%
+    );
+}
+
+/* ===== HIROGEN NAVIGATION ===== */
+html[data-theme="hirogen"] .mud-nav-link {
+    border-radius: 2px !important;
+    margin: 2px 6px !important;
+    padding: 8px 12px !important;
+    background: transparent !important;
+    border-left: 2px solid transparent !important;
+    transition: all 0.1s ease !important;
+    font-size: 11px !important;
+}
+
+html[data-theme="hirogen"] .mud-nav-link:hover {
+    background: rgba(85, 119, 68, 0.1) !important;
+    border-left-color: var(--hirogen-moss) !important;
+}
+
+html[data-theme="hirogen"] .mud-nav-link.active {
+    background: rgba(85, 119, 68, 0.15) !important;
+    color: var(--hirogen-target) !important;
+    border-left-color: var(--hirogen-sensor) !important;
+}
+
+/* ===== HIROGEN SPECIFIC DECORATIONS ===== */
+
+/* Tracking reticle */
+html[data-theme="hirogen"] .tracking-reticle {
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--hirogen-sensor);
+    border-radius: 50%;
+    position: relative;
+}
+
+html[data-theme="hirogen"] .tracking-reticle::before,
+html[data-theme="hirogen"] .tracking-reticle::after {
+    content: '';
+    position: absolute;
+    background: var(--hirogen-sensor);
+}
+
+html[data-theme="hirogen"] .tracking-reticle::before {
+    width: 1px;
+    height: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+html[data-theme="hirogen"] .tracking-reticle::after {
+    width: 100%;
+    height: 1px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* Trophy count display */
+html[data-theme="hirogen"] .trophy-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    background: var(--hirogen-dark);
+    border: 1px solid var(--hirogen-moss);
+    border-radius: 2px;
+    font-family: monospace;
+    font-size: 12px;
+    color: var(--hirogen-target);
+}
+
+/* Sensor sweep animation */
+@keyframes hirogen-sweep {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+html[data-theme="hirogen"] .sensor-sweep {
+    width: 60px;
+    height: 60px;
+    border: 1px solid var(--hirogen-moss);
+    border-radius: 50%;
+    position: relative;
+    overflow: hidden;
+}
+
+html[data-theme="hirogen"] .sensor-sweep::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 50%;
+    height: 2px;
+    background: linear-gradient(90deg, var(--hirogen-sensor), transparent);
+    transform-origin: left center;
+    animation: hirogen-sweep 4s linear infinite;
+}
+
+/* Hunt status indicator */
+html[data-theme="hirogen"] .hunt-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--hirogen-sensor);
+}
+
+html[data-theme="hirogen"] .hunt-status::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    background: var(--hirogen-sensor);
+    border-radius: 50%;
+}
+
+html[data-theme="hirogen"] .hunt-status.active::before {
+    background: var(--hirogen-kill);
+    box-shadow: 0 0 5px var(--hirogen-kill);
+    animation: hirogen-pulse 1s ease-in-out infinite;
+}
+
+@keyframes hirogen-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Target locked indicator */
+html[data-theme="hirogen"] .target-locked {
+    padding: 4px 10px;
+    background: transparent;
+    border: 1px solid var(--hirogen-kill);
+    color: var(--hirogen-kill);
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* Data readout - monospace functional */
+html[data-theme="hirogen"] .data-readout {
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    color: var(--hirogen-sensor);
+    background: var(--st-bg-dark);
+    padding: 8px;
+    border: 1px solid var(--hirogen-dark);
+    border-radius: 2px;
+}
+
+/* Grid overlay for tracking displays */
+html[data-theme="hirogen"] .tracking-grid {
+    background:
+        repeating-linear-gradient(0deg, rgba(85, 119, 68, 0.05) 0px, transparent 1px, transparent 20px),
+        repeating-linear-gradient(90deg, rgba(85, 119, 68, 0.05) 0px, transparent 1px, transparent 20px);
+}

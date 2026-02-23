@@ -17,15 +17,15 @@ namespace StarTrekGame.Domain.Game;
 public class GameSession : AggregateRoot
 {
     // Identity
-    public string Name { get; private set; }
-    public string JoinCode { get; private set; }  // e.g., "KHAN-7294"
-    
+    public string Name { get; private set; } = null!;
+    public string JoinCode { get; private set; } = null!;  // e.g., "KHAN-7294"
+
     // State
     public GameSessionState State { get; private set; }
-    public GameSettings Settings { get; private set; }
-    
+    public GameSettings Settings { get; private set; } = null!;
+
     // Time
-    public GameClock Clock { get; private set; }
+    public GameClock Clock { get; private set; } = null!;
     public int CurrentTurn => Clock?.CurrentTurn ?? 0;
     
     // Players & Factions

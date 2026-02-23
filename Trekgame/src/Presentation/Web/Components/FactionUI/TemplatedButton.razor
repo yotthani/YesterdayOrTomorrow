@@ -1,0 +1,115 @@
+@using StarTrekGame.Web.Services
+@inject FactionTemplateService TemplateService
+@inject ThemeService ThemeService
+
+@* Data-driven button that renders based on template definition *@
+
+@{
+    var template = TemplateService.GetTemplate(ThemeService.CurrentTheme);
+    var btn = template.Button;
+    var style = BuildStyle(btn);
+}
+
+<button class="templated-btn @btn.CssClass @Class" style="@style" @onclick="OnClick" disabled="@Disabled">
+    @foreach (var part in btn.Structure)
+    {
+        @RenderStructurePart(part, template)
+    }
+</button>
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public string Class { get; set; } = "";
+    [Parameter] public bool Disabled { get; set; } = false;
+    [Parameter] public EventCallback<MouseEventArgs> OnClick { get; set; }
+
+    private string BuildStyle(ButtonTemplate btn)
+    {
+        var styles = new List<string>();
+        if (!string.IsNullOrEmpty(btn.BorderRadius))
+            styles.Add($"border-radius: {btn.BorderRadius}");
+        if (!string.IsNullOrEmpty(btn.ClipPath))
+            styles.Add($"clip-path: {btn.ClipPath}");
+        return string.Join("; ", styles);
+    }
+
+    private RenderFragment RenderStructurePart(string part, FactionTemplate template) => builder =>
+    {
+        switch (part)
+        {
+            case "content":
+                builder.OpenElement(0, "span");
+                builder.AddAttribute(1, "class", "btn-content");
+                builder.AddContent(2, ChildContent);
+                builder.CloseElement();
+                break;
+
+            case "pill-end-left":
+                builder.OpenElement(0, "span");
+                builder.AddAttribute(1, "class", "btn-pill-end left");
+                builder.CloseElement();
+                break;
+
+            case "pill-end-right":
+                builder.OpenElement(0, "span");
+                builder.AddAttribute(1, "class", "btn-pill-end right");
+                builder.CloseElement();
+                break;
+
+            case "corner-accent-tl":
+                builder.OpenElement(0, "span");
+                builder.AddAttribute(1, "class", "btn-corner-accent tl");
+                builder.CloseElement();
+                break;
+
+            case "corner-accent-br":
+                builder.OpenElement(0, "span");
+                builder.AddAttribute(1, "class", "btn-corner-accent br");
+                builder.CloseElement();
+                break;
+
+            case "wing-left":
+                builder.OpenElement(0, "span");
+                builder.AddAttribute(1, "class", "btn-wing left");
+                builder.CloseElement();
+                break;
+
+            case "wing-right":
+                builder.OpenElement(0, "span");
+                builder.AddAttribute(1, "class", "btn-wing right");
+                builder.CloseElement();
+                break;
+
+            case "hex-frame":
+                builder.OpenElement(0, "span");
+                builder.AddAttribute(1, "class", "btn-hex-frame");
+                builder.CloseElement();
+                break;
+
+            case "notch-tl":
+                builder.OpenElement(0, "span");
+                builder.AddAttribute(1, "class", "btn-notch tl");
+                builder.CloseElement();
+                break;
+
+            case "notch-br":
+                builder.OpenElement(0, "span");
+                builder.AddAttribute(1, "class", "btn-notch br");
+                builder.CloseElement();
+                break;
+
+            case "diamond-accent":
+                builder.OpenElement(0, "span");
+                builder.AddAttribute(1, "class", "btn-diamond");
+                builder.CloseElement();
+                break;
+
+            default:
+                // Unknown part - render as empty span with class
+                builder.OpenElement(0, "span");
+                builder.AddAttribute(1, "class", $"btn-part-{part}");
+                builder.CloseElement();
+                break;
+        }
+    };
+}

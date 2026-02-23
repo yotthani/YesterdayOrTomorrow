@@ -148,6 +148,49 @@ public class ColoniesController : ControllerBase
             return BadRequest("Failed to create commuter route");
         return Ok();
     }
+
+    /// <summary>
+    /// Queue ship production at a colony
+    /// </summary>
+    [HttpPost("{colonyId}/produce")]
+    public async Task<ActionResult> ProduceShip(Guid colonyId, [FromBody] ProduceShipRequest request)
+    {
+        var colony = await _db.Colonies.FindAsync(colonyId);
+        if (colony == null) return NotFound("Colony not found");
+
+        // Add to build queue
+        for (int i = 0; i < request.Quantity; i++)
+        {
+            var queueItem = new BuildQueueItemEntity
+            {
+                Id = Guid.NewGuid(),
+                ColonyId = colonyId,
+                ItemType = "ship",
+                ItemId = request.ShipClass,
+                Progress = 0,
+                TotalCost = GetShipProductionCost(request.ShipClass),
+                Position = await _db.BuildQueues.CountAsync(q => q.ColonyId == colonyId) + i
+            };
+            _db.BuildQueues.Add(queueItem);
+        }
+
+        await _db.SaveChangesAsync();
+        return Ok(new { Message = $"Queued {request.Quantity}x {request.ShipClass} for production at {colony.Name}" });
+    }
+
+    private static int GetShipProductionCost(string shipClass) => shipClass.ToLower() switch
+    {
+        "corvette" or "frigate" => 100,
+        "destroyer" => 200,
+        "cruiser" => 400,
+        "battleship" => 800,
+        "carrier" => 600,
+        "titan" => 1500,
+        "science vessel" or "sciencevessel" => 150,
+        "colony ship" or "colonyship" => 300,
+        "constructor" or "constructionship" => 200,
+        _ => 200
+    };
 }
 
 // Request models
@@ -186,6 +229,12 @@ public class CommuterRequest
     public Guid SourceColonyId { get; set; }
     public Guid TargetColonyId { get; set; }
     public int PopCount { get; set; }
+}
+
+public class ProduceShipRequest
+{
+    public string ShipClass { get; set; } = "";
+    public int Quantity { get; set; } = 1;
 }
 
 public record ColonyDto(

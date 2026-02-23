@@ -29,7 +29,7 @@
    ============================================== */
 
 .ship-card.borg.military {
-    background-image: url('/images/ships/borg/military_ships.png');
+    background-image: url('/assets/factions/borg/borg_militaryships_spritesheet.png');
 }
 
 /* Row 1 - Capital Ships */
@@ -67,7 +67,7 @@
    ============================================== */
 
 .ship-card.borg.civilian {
-    background-image: url('/images/ships/borg/civilian_ships.png');
+    background-image: url('/assets/factions/borg/borg_civilianships_spritesheet.png');
 }
 
 /* Row 1 */

@@ -1,0 +1,250 @@
+/* ===========================================
+   KAZON THEME - TRIBAL WARLORD INTERFACE
+
+   Design Philosophy: Aggressive, tribal, territorial.
+   The Kazon are divided into warring sects, each
+   fighting for resources and dominance. Their
+   technology is scavenged, rough, and brutal.
+
+   Visual Language:
+   - Orange/brown desert colors
+   - Spike/thorn motifs
+   - Rough, unpolished edges
+   - Tribal markings and patterns
+   - Territory/sect indicators
+   - Resource scarcity displays
+   =========================================== */
+
+/* ===== KAZON THEME VARIABLES ===== */
+html[data-theme="kazon"],
+html[data-theme="kazon"] .stellaris-layout,
+html[data-theme="kazon"] .stellaris-app {
+    --theme-primary: #CC6633;
+    --theme-secondary: #DD8844;
+    --theme-accent: #FFAA55;
+    --theme-text: #FFDDCC;
+    --theme-text-dim: #AA8866;
+    --theme-bg: #0a0505;
+    --theme-panel-bg: rgba(15, 8, 8, 0.98);
+    --theme-border-radius: 0;
+    --theme-btn-radius: 0;
+    --theme-border-width: 3px;
+    --theme-corner-style: spiked;
+
+    --kazon-rust: #994422;
+    --kazon-copper: #CC6633;
+    --kazon-sand: #DD9955;
+    --kazon-bone: #DDCCAA;
+    --kazon-blood: #882222;
+    --kazon-dark: #331a0a;
+
+    --st-bg-darkest: #050302;
+    --st-bg-darker: #0a0505;
+    --st-bg-dark: #150a08;
+    --st-bg-medium: #201008;
+    --st-bg-light: #2a1510;
+    --st-bg-lighter: #351a15;
+
+    --st-border-dark: rgba(204, 102, 51, 0.4);
+    --st-border-medium: rgba(204, 102, 51, 0.6);
+    --st-border-light: rgba(221, 136, 68, 0.7);
+    --st-border-bright: rgba(255, 170, 85, 0.8);
+
+    --st-gradient-header: linear-gradient(180deg, #150a08 0%, #0a0505 100%);
+    --st-gradient-panel: linear-gradient(180deg, rgba(15, 10, 8, 0.95) 0%, rgba(8, 5, 5, 0.98) 100%);
+    --st-gradient-button: linear-gradient(180deg, #CC6633 0%, #994422 100%);
+    --st-gradient-button-hover: linear-gradient(180deg, #DD8844 0%, #CC6633 100%);
+
+    --st-shadow-glow-orange: 0 0 20px rgba(204, 102, 51, 0.4);
+}
+
+/* ===== KAZON PANEL STYLE ===== */
+html[data-theme="kazon"] .mud-paper,
+html[data-theme="kazon"] .mud-card {
+    background:
+        /* Rough texture pattern */
+        repeating-linear-gradient(
+            135deg,
+            rgba(51, 26, 10, 0.3) 0px,
+            transparent 2px,
+            transparent 10px
+        ),
+        var(--st-gradient-panel) !important;
+    border: 3px solid var(--kazon-rust) !important;
+    border-radius: 0 !important;
+    position: relative;
+    /* Spiked clip path */
+    clip-path: polygon(
+        8px 0, calc(100% - 8px) 0,
+        100% 8px, 100% calc(100% - 8px),
+        calc(100% - 8px) 100%, 8px 100%,
+        0 calc(100% - 8px), 0 8px
+    );
+}
+
+/* Spike accents */
+html[data-theme="kazon"] .mud-paper::before,
+html[data-theme="kazon"] .mud-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: repeating-linear-gradient(90deg,
+        var(--kazon-copper) 0px,
+        var(--kazon-copper) 15px,
+        var(--kazon-rust) 15px,
+        var(--kazon-rust) 20px,
+        var(--kazon-sand) 20px,
+        var(--kazon-sand) 25px
+    );
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* ===== KAZON BUTTONS ===== */
+html[data-theme="kazon"] .mud-button-root {
+    clip-path: polygon(5px 0, calc(100% - 5px) 0, 100% 50%, calc(100% - 5px) 100%, 5px 100%, 0 50%);
+    text-transform: uppercase !important;
+    letter-spacing: 2px !important;
+    font-weight: 800 !important;
+    transition: all 0.15s ease !important;
+}
+
+html[data-theme="kazon"] .mud-button-filled {
+    background: linear-gradient(180deg, #CC6633 0%, #882211 100%) !important;
+    color: var(--kazon-bone) !important;
+    border: none !important;
+    box-shadow: inset 0 2px 0 rgba(255, 170, 85, 0.2) !important;
+}
+
+html[data-theme="kazon"] .mud-button-filled:hover {
+    background: linear-gradient(180deg, #DD8844 0%, #AA4422 100%) !important;
+    box-shadow:
+        inset 0 2px 0 rgba(255, 170, 85, 0.3),
+        0 0 15px rgba(204, 102, 51, 0.4) !important;
+}
+
+/* ===== KAZON APP BAR ===== */
+html[data-theme="kazon"] .mud-appbar {
+    background:
+        /* Territory glow */
+        radial-gradient(circle at 30% 50%, rgba(136, 34, 34, 0.15) 0%, transparent 40%),
+        linear-gradient(180deg, #150a08 0%, #0a0505 100%) !important;
+    border-bottom: none !important;
+    position: relative;
+}
+
+html[data-theme="kazon"] .mud-appbar::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: repeating-linear-gradient(90deg,
+        transparent 0px,
+        transparent 10px,
+        var(--kazon-rust) 10px,
+        var(--kazon-rust) 15px,
+        var(--kazon-copper) 15px,
+        var(--kazon-copper) 25px,
+        var(--kazon-rust) 25px,
+        var(--kazon-rust) 30px,
+        transparent 30px,
+        transparent 40px
+    );
+}
+
+/* ===== KAZON DRAWER ===== */
+html[data-theme="kazon"] .mud-drawer {
+    background:
+        repeating-linear-gradient(
+            180deg,
+            rgba(51, 26, 10, 0.2) 0px,
+            transparent 3px,
+            transparent 20px
+        ),
+        linear-gradient(90deg, #0a0505 0%, #150a08 100%) !important;
+    border-right: none !important;
+    position: relative;
+}
+
+html[data-theme="kazon"] .mud-drawer::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 4px;
+    height: 100%;
+    background: repeating-linear-gradient(180deg,
+        transparent 0px,
+        transparent 15px,
+        var(--kazon-rust) 15px,
+        var(--kazon-rust) 20px,
+        var(--kazon-copper) 20px,
+        var(--kazon-copper) 30px,
+        var(--kazon-rust) 30px,
+        var(--kazon-rust) 35px,
+        transparent 35px,
+        transparent 50px
+    );
+}
+
+/* ===== KAZON NAVIGATION ===== */
+html[data-theme="kazon"] .mud-nav-link {
+    clip-path: polygon(3px 0, calc(100% - 3px) 0, 100% 50%, calc(100% - 3px) 100%, 3px 100%, 0 50%);
+    margin: 5px 8px !important;
+    padding: 12px 14px !important;
+    background: rgba(204, 102, 51, 0.1) !important;
+    transition: all 0.15s ease !important;
+}
+
+html[data-theme="kazon"] .mud-nav-link:hover {
+    background: rgba(204, 102, 51, 0.25) !important;
+}
+
+html[data-theme="kazon"] .mud-nav-link.active {
+    background: linear-gradient(90deg, rgba(136, 34, 34, 0.3) 0%, rgba(204, 102, 51, 0.2) 100%) !important;
+    color: var(--kazon-sand) !important;
+    box-shadow: inset 0 0 10px rgba(136, 34, 34, 0.2) !important;
+}
+
+/* ===== KAZON SPECIFIC DECORATIONS ===== */
+
+/* Sect badge */
+html[data-theme="kazon"] .sect-badge {
+    padding: 3px 10px;
+    background: linear-gradient(180deg, var(--kazon-copper) 0%, var(--kazon-rust) 100%);
+    clip-path: polygon(5px 0, calc(100% - 5px) 0, 100% 50%, calc(100% - 5px) 100%, 5px 100%, 0 50%);
+    color: #000;
+    font-weight: 800;
+    font-size: 10px;
+    letter-spacing: 2px;
+}
+
+/* Territory marker */
+html[data-theme="kazon"] .territory-marker {
+    width: 20px;
+    height: 20px;
+    background: var(--kazon-blood);
+    clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+    box-shadow: 0 0 10px rgba(136, 34, 34, 0.5);
+}
+
+/* Resource scarcity bar */
+html[data-theme="kazon"] .scarcity-bar {
+    height: 6px;
+    background: var(--st-bg-dark);
+    border: 1px solid var(--kazon-rust);
+}
+
+html[data-theme="kazon"] .scarcity-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg,
+        var(--kazon-blood) 0%,
+        var(--kazon-rust) 50%,
+        var(--kazon-copper) 100%
+    );
+}

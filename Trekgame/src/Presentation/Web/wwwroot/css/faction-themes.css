@@ -1,162 +1,478 @@
 /* ===========================================
    GALACTIC STRATEGY - FACTION THEME SYSTEM
-   Each faction has FUNDAMENTALLY different UI styles
-   Inspired by BOTF race-specific interfaces
+
+   BOTF-INSPIRED: Each faction has a COMPLETELY UNIQUE UI
+   - Different shapes, decorations, borders, corner styles
+   - Unique panel structures with faction-specific frames
+   - Decorative elements via pseudo-elements (NO layout shift)
+   - Same functional structure, completely different visuals
+
+   Default = Neutral Stellaris blue
+   Themes = Full visual transformation like Birth of the Federation
    =========================================== */
 
 /* ===== BASE THEME VARIABLES ===== */
+/* Default/neutral values - stellaris blue style, NO faction specifics */
 :root {
-    --theme-primary: #ff9900;
-    --theme-secondary: #cc99ff;
-    --theme-accent: #ffcc00;
-    --theme-text: #ffffff;
-    --theme-text-dim: #aaaacc;
-    --theme-bg: #0a0a18;
-    --theme-panel-bg: rgba(10, 10, 25, 0.95);
-    --theme-border-radius: 20px;
-    --theme-btn-radius: 12px;
-    --theme-border-width: 2px;
+    /* Core colors - neutral blue stellaris style */
+    --theme-primary: #4a9eff;
+    --theme-secondary: #00d4ff;
+    --theme-accent: #ffc844;
+    --theme-text: #d0e4f8;
+    --theme-text-dim: #8098b8;
+    --theme-bg: #040608;
+    --theme-panel-bg: rgba(20, 30, 45, 0.95);
+
+    /* Shape properties */
+    --theme-border-radius: 6px;
+    --theme-btn-radius: 6px;
+    --theme-border-width: 1px;
+
+    /* Stellaris default CSS custom properties */
+    --st-accent-blue: #4a9eff;
+    --st-accent-cyan: #00d4ff;
+    --st-accent-gold: #ffc844;
+    --st-accent-orange: #ff8844;
+    --st-accent-green: #44ff88;
+    --st-accent-red: #ff4444;
+    --st-accent-purple: #aa66ff;
+
+    --st-bg-darkest: #020304;
+    --st-bg-darker: #040608;
+    --st-bg-dark: #080c10;
+    --st-bg-medium: #101820;
+    --st-bg-light: #182028;
+    --st-bg-lighter: #202830;
+
+    --st-border-dark: rgba(74, 158, 255, 0.2);
+    --st-border-medium: rgba(74, 158, 255, 0.4);
+    --st-border-light: rgba(74, 158, 255, 0.6);
+    --st-border-bright: rgba(74, 158, 255, 0.8);
+
+    --st-text-dim: #506878;
+    --st-text-muted: #708898;
+    --st-text-normal: #90a8b8;
+    --st-text-bright: #d0e4f8;
+
+    --st-gradient-header: linear-gradient(180deg, #101820 0%, #080c10 100%);
+    --st-gradient-panel: linear-gradient(180deg, rgba(20, 30, 45, 0.95) 0%, rgba(10, 15, 25, 0.98) 100%);
+    --st-gradient-button: linear-gradient(180deg, #4a9eff 0%, #2a6ecc 100%);
+    --st-gradient-button-hover: linear-gradient(180deg, #5ab0ff 0%, #4a9eff 100%);
+
+    --st-shadow-glow-blue: 0 0 20px rgba(74, 158, 255, 0.3);
+    --st-shadow-glow-gold: 0 0 20px rgba(255, 200, 68, 0.3);
 }
 
 /* ===========================================
-   FEDERATION THEME - LCARS STYLE
-   Rounded, colorful, characteristic pill shapes
+   FEDERATION THEME - MODERN LCARS (SNW / Starfleet Academy)
+   Reference: Strange New Worlds + Prodigy holographic panels
+   Flat cyan/blue palette, no gradients, rounded rects, data-grid layout
    =========================================== */
-[data-theme="federation"] {
-    --theme-primary: #ff9900;
-    --theme-secondary: #cc99ff;
-    --theme-accent: #ffcc00;
-    --theme-text: #ffffff;
-    --theme-text-dim: #aaddff;
-    --theme-bg: #000010;
-    --theme-panel-bg: rgba(5, 5, 20, 0.95);
-    --theme-border-radius: 20px;
-    --theme-btn-radius: 25px;
-    --theme-border-width: 3px;
+html[data-theme="federation"],
+html[data-theme="federation"] .stellaris-layout,
+html[data-theme="federation"] .stellaris-app {
+    /* LCARS Modern color palette */
+    --lcars-cyan:        #00c8e8;
+    --lcars-cyan-dim:    #0094aa;
+    --lcars-blue:        #1265d4;
+    --lcars-blue-dark:   #0848a8;
+    --lcars-blue-deep:   #05306a;
+    --lcars-green:       #00e070;
+    --lcars-amber:       #ff8800;
+    --lcars-red:         #ff3030;
+    --lcars-text:        #e0f4ff;
+    --lcars-text-sub:    #7ab8d8;
+    --lcars-text-dim:    #3a6888;
+    --lcars-bg:          #020814;
+    --lcars-panel:       rgba(4, 14, 32, 0.96);
+    --lcars-border:      rgba(0, 200, 232, 0.35);
+    --lcars-border-lit:  rgba(0, 200, 232, 0.70);
+
+    /* Map into theme variables */
+    --theme-primary:       var(--lcars-cyan);
+    --theme-secondary:     var(--lcars-blue);
+    --theme-accent:        var(--lcars-green);
+    --theme-text:          var(--lcars-text);
+    --theme-text-dim:      var(--lcars-text-sub);
+    --theme-bg:            var(--lcars-bg);
+    --theme-panel-bg:      var(--lcars-panel);
+    --theme-border-radius: 8px;
+    --theme-btn-radius:    8px;
+    --theme-border-width:  1px;
+
+    /* Override stellaris accent variables */
+    --st-accent-blue:   var(--lcars-cyan);
+    --st-accent-cyan:   var(--lcars-cyan);
+    --st-accent-gold:   var(--lcars-amber);
+    --st-accent-orange: var(--lcars-amber);
+    --st-accent-green:  var(--lcars-green);
+    --st-accent-red:    var(--lcars-red);
+    --st-accent-purple: #8866cc;
+
+    --st-bg-darkest: #010610;
+    --st-bg-darker:  #020814;
+    --st-bg-dark:    #030e1e;
+    --st-bg-medium:  #061428;
+    --st-bg-light:   #0a1c38;
+    --st-bg-lighter: #0e2448;
+
+    --st-border-dark:   rgba(0, 200, 232, 0.15);
+    --st-border-medium: rgba(0, 200, 232, 0.35);
+    --st-border-light:  rgba(0, 200, 232, 0.60);
+    --st-border-bright: rgba(0, 200, 232, 0.90);
+
+    --st-text-dim:    #2a5068;
+    --st-text-muted:  #4a7890;
+    --st-text-normal: #7ab8d8;
+    --st-text-bright: #e0f4ff;
+
+    /* Flat colors only - no decorative gradients */
+    --st-gradient-header:       var(--lcars-bg);
+    --st-gradient-panel:        var(--lcars-panel);
+    --st-gradient-button:       var(--lcars-blue);
+    --st-gradient-button-hover: var(--lcars-blue-dark);
+
+    --st-shadow-glow-blue: 0 0 12px rgba(0, 200, 232, 0.35);
+    --st-shadow-glow-gold: 0 0 12px rgba(255, 136, 0, 0.35);
 }
 
-/* Federation LCARS Panel Style */
-[data-theme="federation"] .mud-paper,
-[data-theme="federation"] .mud-card {
-    background: linear-gradient(180deg, rgba(10, 10, 30, 0.98) 0%, rgba(5, 5, 20, 0.98) 100%) !important;
-    border: none !important;
-    border-radius: 0 !important;
-    position: relative;
-    overflow: visible !important;
+/* ===========================================
+   FEDERATION LCARS - Modern SNW Visual Transformation
+   Pure CSS approach, no external PNG assets
+   =========================================== */
+
+/* ── Core app background ── */
+html[data-theme="federation"] .stellaris-app,
+html[data-theme="federation"] body {
+    background-color: var(--lcars-bg) !important;
 }
 
-[data-theme="federation"] .mud-paper::before,
-[data-theme="federation"] .mud-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0;
-    width: 60px; height: 100%;
-    background: linear-gradient(180deg, #ff9900, #cc6600);
-    border-radius: 30px 0 0 30px;
+/* ── Sidebar left - LCARS nav panel ── */
+html[data-theme="federation"] .st-sidebar-left {
+    background-color: var(--st-bg-dark) !important;
+    border-right: 1px solid var(--lcars-border) !important;
 }
 
-[data-theme="federation"] .mud-paper::after,
-[data-theme="federation"] .mud-card::after {
-    content: '';
-    position: absolute;
-    top: 0; right: 0;
-    width: 20px; height: 100%;
-    background: #cc99ff;
-    border-radius: 0 10px 10px 0;
-}
-
-/* Federation Buttons - Pill shaped */
-[data-theme="federation"] .mud-button-root {
-    border-radius: 25px !important;
+/* ── Nav items - flat cyan pills ── */
+html[data-theme="federation"] .st-nav-btn {
+    border-radius: 6px !important;
+    border: 1px solid var(--lcars-border) !important;
+    background: transparent !important;
+    color: var(--lcars-text-sub) !important;
+    font-weight: 600 !important;
+    letter-spacing: 1px !important;
     text-transform: uppercase !important;
-    letter-spacing: 2px !important;
+    font-size: 9px !important;
+    padding: 8px 6px !important;
+    margin: 2px 4px !important;
+    transition: all 0.15s ease !important;
+}
+
+html[data-theme="federation"] .st-nav-btn:hover {
+    background: rgba(0, 200, 232, 0.12) !important;
+    border-color: var(--lcars-border-lit) !important;
+    color: var(--lcars-cyan) !important;
+}
+
+html[data-theme="federation"] .st-nav-btn.active {
+    background: var(--lcars-blue-dark) !important;
+    border-color: var(--lcars-cyan) !important;
+    border-left: 3px solid var(--lcars-cyan) !important;
+    color: var(--lcars-cyan) !important;
+}
+
+/* ── Top bar - LCARS data header ── */
+html[data-theme="federation"] .st-topbar {
+    background-color: var(--st-bg-darker) !important;
+    border-bottom: 1px solid var(--lcars-border) !important;
+    box-shadow: 0 1px 0 rgba(0, 200, 232, 0.20) !important;
+}
+
+/* Topbar text in LCARS subdued palette */
+html[data-theme="federation"] .st-empire-name,
+html[data-theme="federation"] .st-date-value {
+    color: var(--lcars-cyan) !important;
     font-weight: 700 !important;
-    transition: all 0.2s ease !important;
+    letter-spacing: 1px !important;
+    text-shadow: 0 0 8px rgba(0, 200, 232, 0.4) !important;
 }
 
-[data-theme="federation"] .mud-button-filled {
-    background: linear-gradient(180deg, #ff9900 0%, #cc6600 100%) !important;
-    color: #000 !important;
-    box-shadow: 0 4px 15px rgba(255, 153, 0, 0.4) !important;
+html[data-theme="federation"] .st-resource-current {
+    color: var(--lcars-text) !important;
 }
 
-[data-theme="federation"] .mud-button-filled:hover {
-    background: linear-gradient(180deg, #ffaa22 0%, #ff9900 100%) !important;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(255, 153, 0, 0.6) !important;
+html[data-theme="federation"] .st-empire-type,
+html[data-theme="federation"] .st-date-label {
+    color: var(--lcars-text-sub) !important;
+    font-size: 9px !important;
+    letter-spacing: 1px !important;
+    text-transform: uppercase !important;
 }
 
-[data-theme="federation"] .mud-button-outlined {
-    border: 3px solid #ff9900 !important;
-    color: #ff9900 !important;
+/* Resource icons / labels - small data cells */
+html[data-theme="federation"] .st-resource-item {
+    border: 1px solid var(--lcars-border) !important;
+    border-radius: 6px !important;
+    background: rgba(0, 200, 232, 0.06) !important;
+    padding: 2px 6px !important;
+}
+
+/* ── Bottom bar ── */
+html[data-theme="federation"] .st-bottombar {
+    background-color: var(--st-bg-darker) !important;
+    border-top: 1px solid var(--lcars-border) !important;
+}
+
+/* ── Main panels ── */
+html[data-theme="federation"] .stellaris-panel {
+    background-color: var(--lcars-panel) !important;
+    border: 1px solid var(--lcars-border) !important;
+    border-radius: 8px !important;
+}
+
+/* ── Panel section headers - cyan underline ── */
+html[data-theme="federation"] .st-section-header,
+html[data-theme="federation"] .panel-title,
+html[data-theme="federation"] h4,
+html[data-theme="federation"] h5 {
+    color: var(--lcars-cyan) !important;
+    border-bottom: 1px solid var(--lcars-border) !important;
+    padding-bottom: 4px !important;
+    letter-spacing: 2px !important;
+    text-transform: uppercase !important;
+    font-size: 10px !important;
+    font-weight: 700 !important;
+}
+
+/* ── MudBlazor overrides ── */
+html[data-theme="federation"] .mud-paper,
+html[data-theme="federation"] .mud-card {
+    background-color: var(--lcars-panel) !important;
+    border: 1px solid var(--lcars-border) !important;
+    border-radius: 8px !important;
+    box-shadow: none !important;
+}
+
+html[data-theme="federation"] .mud-paper:hover,
+html[data-theme="federation"] .mud-card:hover {
+    border-color: var(--lcars-border-lit) !important;
+}
+
+/* Buttons - flat LCARS style */
+html[data-theme="federation"] .mud-button-root {
+    border-radius: 8px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    font-weight: 700 !important;
+    font-size: 11px !important;
+    padding: 6px 18px !important;
+    transition: all 0.15s ease !important;
+}
+
+html[data-theme="federation"] .mud-button-filled {
+    background-color: var(--lcars-blue) !important;
+    color: #ffffff !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+html[data-theme="federation"] .mud-button-filled:hover {
+    background-color: var(--lcars-cyan-dim) !important;
+    box-shadow: 0 0 12px rgba(0, 200, 232, 0.40) !important;
+}
+
+html[data-theme="federation"] .mud-button-filled.mud-button-primary {
+    background-color: var(--lcars-cyan-dim) !important;
+    color: #ffffff !important;
+}
+
+html[data-theme="federation"] .mud-button-filled.mud-button-primary:hover {
+    background-color: var(--lcars-cyan) !important;
+    color: #020814 !important;
+}
+
+html[data-theme="federation"] .mud-button-outlined {
+    border: 1px solid var(--lcars-cyan-dim) !important;
+    color: var(--lcars-cyan) !important;
     background: transparent !important;
 }
 
-[data-theme="federation"] .mud-button-outlined:hover {
-    background: rgba(255, 153, 0, 0.15) !important;
+html[data-theme="federation"] .mud-button-outlined:hover {
+    background: rgba(0, 200, 232, 0.12) !important;
+    border-color: var(--lcars-cyan) !important;
 }
 
-/* Federation AppBar */
-[data-theme="federation"] .mud-appbar {
-    background: linear-gradient(180deg, #1a1a30 0%, #0a0a18 100%) !important;
-    border-bottom: 4px solid #ff9900 !important;
+/* App bar */
+html[data-theme="federation"] .mud-appbar {
+    background-color: var(--st-bg-darker) !important;
+    border-bottom: 1px solid var(--lcars-border) !important;
+    box-shadow: none !important;
 }
 
-[data-theme="federation"] .mud-appbar::after {
-    content: '';
-    position: absolute;
-    bottom: -4px; left: 0;
-    width: 100%; height: 4px;
-    background: linear-gradient(90deg, #ff9900, #cc99ff, #99ccff, #ff9900);
+/* Drawer / sidebar */
+html[data-theme="federation"] .mud-drawer {
+    background-color: var(--st-bg-dark) !important;
+    border-right: 1px solid var(--lcars-border) !important;
+    box-shadow: none !important;
 }
 
-/* Federation Drawer */
-[data-theme="federation"] .mud-drawer {
-    background: linear-gradient(180deg, #0a0a1a 0%, #050510 100%) !important;
-    border-right: none !important;
+/* Nav links in drawer */
+html[data-theme="federation"] .mud-nav-link {
+    border-radius: 6px !important;
+    margin: 2px 6px !important;
+    padding: 8px 14px !important;
+    background: transparent !important;
+    border: 1px solid transparent !important;
+    color: var(--lcars-text-sub) !important;
+    transition: all 0.15s ease !important;
 }
 
-[data-theme="federation"] .mud-drawer::before {
-    content: '';
-    position: absolute;
-    top: 0; right: 0;
-    width: 8px; height: 100%;
-    background: linear-gradient(180deg, #ff9900, #cc99ff, #99ccff);
+html[data-theme="federation"] .mud-nav-link:hover {
+    background: rgba(0, 200, 232, 0.08) !important;
+    border-color: var(--lcars-border) !important;
+    color: var(--lcars-text) !important;
 }
 
-/* Federation Nav Links */
-[data-theme="federation"] .mud-nav-link {
-    border-radius: 0 25px 25px 0 !important;
-    margin: 4px 8px 4px 0 !important;
-    padding-left: 20px !important;
+html[data-theme="federation"] .mud-nav-link.active {
+    background: var(--lcars-blue-dark) !important;
+    border-color: var(--lcars-cyan) !important;
+    border-left: 3px solid var(--lcars-cyan) !important;
+    color: var(--lcars-cyan) !important;
+    font-weight: 700 !important;
 }
 
-[data-theme="federation"] .mud-nav-link:hover {
-    background: rgba(255, 153, 0, 0.2) !important;
+/* ── Table / list rows ── */
+html[data-theme="federation"] .mud-table-cell,
+html[data-theme="federation"] .mud-table-row {
+    border-color: var(--lcars-border) !important;
+    color: var(--lcars-text) !important;
 }
 
-[data-theme="federation"] .mud-nav-link.active {
-    background: linear-gradient(90deg, #ff9900, #ffcc00) !important;
-    color: #000 !important;
+html[data-theme="federation"] .mud-table-row:hover {
+    background: rgba(0, 200, 232, 0.06) !important;
 }
 
-/* Federation Inputs */
-[data-theme="federation"] .mud-input-outlined .mud-input-outlined-border {
-    border-radius: 25px !important;
-    border-width: 3px !important;
-    border-color: #334 !important;
+/* ── Chips / badges ── */
+html[data-theme="federation"] .mud-chip {
+    border-radius: 4px !important;
+    background-color: var(--lcars-blue-deep) !important;
+    border: 1px solid var(--lcars-border) !important;
+    color: var(--lcars-text) !important;
+    font-size: 10px !important;
+    letter-spacing: 1px !important;
+    text-transform: uppercase !important;
 }
 
-[data-theme="federation"] .mud-input-outlined:hover .mud-input-outlined-border,
-[data-theme="federation"] .mud-input-outlined.mud-input-focused .mud-input-outlined-border {
-    border-color: #ff9900 !important;
+/* ── Progress bars ── */
+html[data-theme="federation"] .mud-progress-linear-bar {
+    background-color: var(--lcars-blue-dark) !important;
+    border-radius: 2px !important;
+}
+
+html[data-theme="federation"] .mud-progress-linear-bar-1 {
+    background-color: var(--lcars-cyan) !important;
+}
+
+/* ── Dividers ── */
+html[data-theme="federation"] .mud-divider {
+    border-color: var(--lcars-border) !important;
+}
+
+/* ── Text inputs ── */
+html[data-theme="federation"] .mud-input-root {
+    border-radius: 6px !important;
+    background: rgba(0, 200, 232, 0.05) !important;
+}
+
+html[data-theme="federation"] .mud-input-outlined-border {
+    border-color: var(--lcars-border) !important;
+}
+
+html[data-theme="federation"] .mud-input-root:focus-within .mud-input-outlined-border {
+    border-color: var(--lcars-cyan) !important;
+}
+
+/* ── Status indicator dots (LCARS style) ── */
+html[data-theme="federation"] .status-ok,
+html[data-theme="federation"] .st-status-ok {
+    color: var(--lcars-green) !important;
+}
+
+html[data-theme="federation"] .status-warn,
+html[data-theme="federation"] .st-status-warn {
+    color: var(--lcars-amber) !important;
+}
+
+html[data-theme="federation"] .status-alert,
+html[data-theme="federation"] .st-status-alert {
+    color: var(--lcars-red) !important;
+}
+
+/* ── Two-tone data label pattern (SNW style) ──
+   Usage: <div class="lcars-readout"><span class="lcars-label">SHIELDS</span><span class="lcars-value">100%</span></div>
+*/
+html[data-theme="federation"] .lcars-readout {
+    display: flex;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid var(--lcars-border);
+    height: 28px;
+}
+
+html[data-theme="federation"] .lcars-label {
+    background-color: var(--lcars-blue-deep);
+    color: var(--lcars-text-sub);
+    padding: 0 8px;
+    display: flex;
+    align-items: center;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+html[data-theme="federation"] .lcars-value {
+    background-color: var(--lcars-blue-dark);
+    color: var(--lcars-cyan);
+    padding: 0 10px;
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    flex: 1;
+}
+
+html[data-theme="federation"] .lcars-value.ok     { color: var(--lcars-green) !important; }
+html[data-theme="federation"] .lcars-value.warn   { color: var(--lcars-amber) !important; }
+html[data-theme="federation"] .lcars-value.alert  { color: var(--lcars-red)   !important; }
+
+/* ── Scrollbar styling ── */
+html[data-theme="federation"] ::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+}
+
+html[data-theme="federation"] ::-webkit-scrollbar-track {
+    background: var(--lcars-bg);
+}
+
+html[data-theme="federation"] ::-webkit-scrollbar-thumb {
+    background: var(--lcars-blue-dark);
+    border-radius: 2px;
+}
+
+html[data-theme="federation"] ::-webkit-scrollbar-thumb:hover {
+    background: var(--lcars-cyan-dim);
 }
 
 /* ===========================================
    KLINGON THEME - AGGRESSIVE ANGULAR
-   Sharp edges, metallic, red/black warrior style
    =========================================== */
-[data-theme="klingon"] {
+html[data-theme="klingon"],
+html[data-theme="klingon"] .stellaris-layout,
+html[data-theme="klingon"] .stellaris-app {
     --theme-primary: #cc0000;
     --theme-secondary: #ff4444;
     --theme-accent: #ffaa00;
@@ -167,29 +483,99 @@
     --theme-border-radius: 0;
     --theme-btn-radius: 0;
     --theme-border-width: 2px;
+
+    --st-accent-blue: #cc0000;
+    --st-accent-cyan: #ff4444;
+    --st-accent-gold: #ffaa00;
+    --st-accent-orange: #ff6600;
+    --st-accent-green: #88aa00;
+    --st-accent-red: #ff0000;
+    --st-accent-purple: #aa4444;
+
+    --st-bg-darkest: #080202;
+    --st-bg-darker: #100404;
+    --st-bg-dark: #180808;
+    --st-bg-medium: #201010;
+    --st-bg-light: #281818;
+    --st-bg-lighter: #302020;
+
+    --st-border-dark: rgba(200, 0, 0, 0.4);
+    --st-border-medium: rgba(200, 0, 0, 0.6);
+    --st-border-light: rgba(255, 68, 68, 0.7);
+    --st-border-bright: rgba(255, 68, 68, 0.9);
+
+    --st-text-dim: #885555;
+    --st-text-muted: #aa7777;
+    --st-text-normal: #cc9999;
+    --st-text-bright: #ffcccc;
+
+    --st-gradient-header: linear-gradient(180deg, #1a0808 0%, #0a0202 100%);
+    --st-gradient-panel: linear-gradient(180deg, rgba(30, 10, 10, 0.95) 0%, rgba(15, 5, 5, 0.98) 100%);
+    --st-gradient-button: linear-gradient(180deg, #cc0000 0%, #880000 100%);
+    --st-gradient-button-hover: linear-gradient(180deg, #ff0000 0%, #cc0000 100%);
+
+    --st-shadow-glow-blue: 0 0 20px rgba(200, 0, 0, 0.5);
+    --st-shadow-glow-gold: 0 0 20px rgba(255, 170, 0, 0.4);
 }
 
-/* Klingon Panel - Angular with metallic border */
-[data-theme="klingon"] .mud-paper,
-[data-theme="klingon"] .mud-card {
-    background: linear-gradient(135deg, rgba(40, 15, 15, 0.98) 0%, rgba(15, 5, 5, 0.98) 100%) !important;
-    border: 2px solid #660000 !important;
+/* ===========================================
+   KLINGON - Aggressive Angular Warrior UI
+   Sharp metal edges, triangular accents, blood red
+   =========================================== */
+
+/* Klingon MudBlazor overrides */
+html[data-theme="klingon"] .mud-paper,
+html[data-theme="klingon"] .mud-card {
+    background:
+        linear-gradient(135deg, rgba(80, 0, 0, 0.1) 0%, transparent 50%),
+        linear-gradient(315deg, rgba(80, 0, 0, 0.1) 0%, transparent 50%),
+        var(--st-gradient-panel) !important;
+    border: 2px solid #880000 !important;
     border-radius: 0 !important;
-    clip-path: polygon(0 8px, 8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%) !important;
+    clip-path: polygon(0 12px, 12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%) !important;
     position: relative;
 }
 
-[data-theme="klingon"] .mud-paper::before,
-[data-theme="klingon"] .mud-card::before {
+/* Klingon triangular corner accents */
+html[data-theme="klingon"] .mud-paper::before,
+html[data-theme="klingon"] .mud-card::before {
     content: '';
     position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, transparent, #cc0000, #ff4444, #cc0000, transparent);
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 30px 30px 0 0;
+    border-color: #cc0000 transparent transparent transparent;
+    pointer-events: none;
+    z-index: 2;
 }
 
-/* Klingon Buttons - Sharp, aggressive */
-[data-theme="klingon"] .mud-button-root {
+html[data-theme="klingon"] .mud-paper::after,
+html[data-theme="klingon"] .mud-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 0 30px 30px;
+    border-color: transparent transparent #cc0000 transparent;
+    pointer-events: none;
+    z-index: 2;
+}
+
+/* Klingon metallic ridge effect on panels */
+html[data-theme="klingon"] .mud-paper {
+    box-shadow:
+        inset 2px 2px 0 rgba(255, 100, 100, 0.3),
+        inset -2px -2px 0 rgba(0, 0, 0, 0.5),
+        0 0 20px rgba(200, 0, 0, 0.3) !important;
+}
+
+html[data-theme="klingon"] .mud-button-root {
     border-radius: 0 !important;
     text-transform: uppercase !important;
     letter-spacing: 3px !important;
@@ -197,76 +583,113 @@
     clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px) !important;
 }
 
-[data-theme="klingon"] .mud-button-filled {
-    background: linear-gradient(180deg, #cc0000 0%, #880000 100%) !important;
+html[data-theme="klingon"] .mud-button-filled {
+    background: linear-gradient(180deg, #cc0000 0%, #660000 50%, #880000 100%) !important;
     color: #fff !important;
     border: 1px solid #ff4444 !important;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 4px 15px rgba(200, 0, 0, 0.5) !important;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 150, 150, 0.4),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.5),
+        0 0 15px rgba(200, 0, 0, 0.5) !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8) !important;
 }
 
-[data-theme="klingon"] .mud-button-filled:hover {
-    background: linear-gradient(180deg, #ff0000 0%, #cc0000 100%) !important;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), 0 6px 25px rgba(255, 0, 0, 0.6) !important;
+html[data-theme="klingon"] .mud-button-filled:hover {
+    background: linear-gradient(180deg, #ff0000 0%, #880000 50%, #aa0000 100%) !important;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 150, 150, 0.5),
+        0 0 25px rgba(255, 0, 0, 0.7) !important;
 }
 
-[data-theme="klingon"] .mud-button-outlined {
+html[data-theme="klingon"] .mud-button-outlined {
     border: 2px solid #cc0000 !important;
     color: #ff4444 !important;
-    background: rgba(100, 0, 0, 0.2) !important;
+    background: linear-gradient(180deg, rgba(100, 0, 0, 0.3) 0%, rgba(50, 0, 0, 0.4) 100%) !important;
 }
 
-/* Klingon AppBar - Dark metallic */
-[data-theme="klingon"] .mud-appbar {
-    background: linear-gradient(180deg, #1a0808 0%, #0a0202 100%) !important;
-    border-bottom: 3px solid #880000 !important;
+/* Klingon App Bar - Aggressive metal header */
+html[data-theme="klingon"] .mud-appbar {
+    background: linear-gradient(180deg, #200808 0%, #100202 100%) !important;
+    border-bottom: none !important;
+    position: relative;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8) !important;
 }
 
-[data-theme="klingon"] .mud-appbar::before {
+/* Metallic ridge along bottom of appbar */
+html[data-theme="klingon"] .mud-appbar::before {
     content: '';
     position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, #cc0000, #ff4444, #cc0000, transparent);
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(180deg, #ff4444 0%, #880000 50%, #440000 100%);
+    pointer-events: none;
 }
 
-/* Klingon Drawer */
-[data-theme="klingon"] .mud-drawer {
-    background: linear-gradient(180deg, #150505 0%, #080202 100%) !important;
-    border-right: 2px solid #550000 !important;
+/* Angular accent marks */
+html[data-theme="klingon"] .mud-appbar::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 12px 40px 0 40px;
+    border-color: #cc0000 transparent transparent transparent;
+    pointer-events: none;
 }
 
-/* Klingon Nav Links - Angular */
-[data-theme="klingon"] .mud-nav-link {
+/* Klingon Drawer - War room sidebar */
+html[data-theme="klingon"] .mud-drawer {
+    background: linear-gradient(90deg, #100404 0%, #180808 100%) !important;
+    border-right: none !important;
+    position: relative;
+}
+
+/* Aggressive edge on drawer */
+html[data-theme="klingon"] .mud-drawer::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, #ff4444 0%, #880000 30%, #440000 70%, #880000 100%);
+    pointer-events: none;
+}
+
+/* Angular nav links */
+html[data-theme="klingon"] .mud-nav-link {
     border-radius: 0 !important;
-    margin: 2px 4px !important;
-    clip-path: polygon(4px 0, 100% 0, 100% calc(100% - 4px), calc(100% - 4px) 100%, 0 100%, 0 4px) !important;
+    margin: 4px 8px !important;
+    padding: 10px 16px !important;
+    clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px) !important;
+    background: linear-gradient(90deg, rgba(100, 0, 0, 0.2) 0%, transparent 100%) !important;
+    border-left: 3px solid transparent !important;
+    transition: all 0.15s ease !important;
 }
 
-[data-theme="klingon"] .mud-nav-link:hover {
-    background: rgba(200, 0, 0, 0.3) !important;
+html[data-theme="klingon"] .mud-nav-link:hover {
+    background: linear-gradient(90deg, rgba(200, 0, 0, 0.4) 0%, rgba(100, 0, 0, 0.2) 100%) !important;
+    border-left-color: #ff4444 !important;
 }
 
-[data-theme="klingon"] .mud-nav-link.active {
-    background: linear-gradient(90deg, #880000, #cc0000) !important;
+html[data-theme="klingon"] .mud-nav-link.active {
+    background: linear-gradient(90deg, #880000 0%, #440000 100%) !important;
     color: #fff !important;
-}
-
-/* Klingon Inputs */
-[data-theme="klingon"] .mud-input-outlined .mud-input-outlined-border {
-    border-radius: 0 !important;
-    border-color: #440000 !important;
-}
-
-[data-theme="klingon"] .mud-input-outlined:hover .mud-input-outlined-border,
-[data-theme="klingon"] .mud-input-outlined.mud-input-focused .mud-input-outlined-border {
-    border-color: #cc0000 !important;
+    border-left-color: #ffaa00 !important;
+    box-shadow: inset 0 0 10px rgba(255, 0, 0, 0.3) !important;
 }
 
 /* ===========================================
    ROMULAN THEME - SLEEK MILITARY
-   Sharp, elegant, green on dark
    =========================================== */
-[data-theme="romulan"] {
+html[data-theme="romulan"],
+html[data-theme="romulan"] .stellaris-layout,
+html[data-theme="romulan"] .stellaris-app {
     --theme-primary: #00aa44;
     --theme-secondary: #44ff88;
     --theme-accent: #88ffaa;
@@ -274,98 +697,220 @@
     --theme-text-dim: #88aa99;
     --theme-bg: #020a05;
     --theme-panel-bg: rgba(5, 20, 12, 0.98);
-    --theme-border-radius: 0;
+    --theme-border-radius: 2px;
     --theme-btn-radius: 4px;
     --theme-border-width: 1px;
+
+    --st-accent-blue: #00aa44;
+    --st-accent-cyan: #44ff88;
+    --st-accent-gold: #88ffaa;
+    --st-accent-orange: #66cc66;
+    --st-accent-green: #00ff66;
+    --st-accent-red: #ff4444;
+    --st-accent-purple: #44aa88;
+
+    --st-bg-darkest: #020804;
+    --st-bg-darker: #041008;
+    --st-bg-dark: #06180c;
+    --st-bg-medium: #0a2014;
+    --st-bg-light: #0e281c;
+    --st-bg-lighter: #123024;
+
+    --st-border-dark: rgba(0, 170, 68, 0.3);
+    --st-border-medium: rgba(0, 170, 68, 0.5);
+    --st-border-light: rgba(68, 255, 136, 0.6);
+    --st-border-bright: rgba(68, 255, 136, 0.8);
+
+    --st-text-dim: #558866;
+    --st-text-muted: #77aa88;
+    --st-text-normal: #99ccaa;
+    --st-text-bright: #ccffdd;
+
+    --st-gradient-header: linear-gradient(180deg, #081810 0%, #040a06 100%);
+    --st-gradient-panel: linear-gradient(180deg, rgba(10, 30, 20, 0.95) 0%, rgba(5, 15, 10, 0.98) 100%);
+    --st-gradient-button: linear-gradient(180deg, #00aa44 0%, #006622 100%);
+    --st-gradient-button-hover: linear-gradient(180deg, #00cc55 0%, #00aa44 100%);
+
+    --st-shadow-glow-blue: 0 0 20px rgba(0, 170, 68, 0.4);
+    --st-shadow-glow-gold: 0 0 20px rgba(136, 255, 170, 0.3);
 }
 
-/* Romulan Panel - Sleek with accent line */
-[data-theme="romulan"] .mud-paper,
-[data-theme="romulan"] .mud-card {
-    background: linear-gradient(180deg, rgba(10, 30, 20, 0.98) 0%, rgba(5, 15, 10, 0.98) 100%) !important;
-    border: 1px solid rgba(0, 170, 68, 0.4) !important;
-    border-radius: 2px !important;
+/* ===========================================
+   ROMULAN - Sleek Military Intelligence Console
+   Sharp V-shapes, hidden power, subtle menace
+   =========================================== */
+
+/* Romulan MudBlazor overrides */
+html[data-theme="romulan"] .mud-paper,
+html[data-theme="romulan"] .mud-card {
+    background:
+        linear-gradient(135deg, rgba(0, 80, 40, 0.15) 0%, transparent 30%),
+        var(--st-gradient-panel) !important;
+    border: 1px solid rgba(0, 170, 68, 0.5) !important;
+    border-radius: 0 !important;
     position: relative;
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0 calc(100% - 10px)) !important;
 }
 
-[data-theme="romulan"] .mud-paper::before,
-[data-theme="romulan"] .mud-card::before {
+/* Romulan Bird-of-Prey inspired wing accent */
+html[data-theme="romulan"] .mud-paper::before,
+html[data-theme="romulan"] .mud-card::before {
     content: '';
     position: absolute;
-    top: 0; left: 20px; right: 20px;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, #00aa44, #44ff88, #00aa44, transparent);
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        #00aa44 10%,
+        #44ff88 30%,
+        #00aa44 50%,
+        #44ff88 70%,
+        #00aa44 90%,
+        transparent 100%
+    );
+    pointer-events: none;
+    z-index: 2;
 }
 
-/* Romulan Buttons - Sleek, sharp */
-[data-theme="romulan"] .mud-button-root {
-    border-radius: 2px !important;
+/* Romulan V-shaped accent at bottom */
+html[data-theme="romulan"] .mud-paper::after,
+html[data-theme="romulan"] .mud-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 20px 8px 20px;
+    border-color: transparent transparent #00aa44 transparent;
+    pointer-events: none;
+    z-index: 2;
+}
+
+html[data-theme="romulan"] .mud-button-root {
+    border-radius: 0 !important;
     text-transform: uppercase !important;
     letter-spacing: 2px !important;
     font-weight: 500 !important;
-    position: relative;
+    clip-path: polygon(4px 0, 100% 0, calc(100% - 4px) 100%, 0 100%) !important;
 }
 
-[data-theme="romulan"] .mud-button-filled {
+html[data-theme="romulan"] .mud-button-filled {
     background: linear-gradient(180deg, #00aa44 0%, #006622 100%) !important;
     color: #fff !important;
     border: 1px solid #44ff88 !important;
+    box-shadow: 0 0 15px rgba(0, 170, 68, 0.4) !important;
 }
 
-[data-theme="romulan"] .mud-button-filled:hover {
+html[data-theme="romulan"] .mud-button-filled:hover {
     background: linear-gradient(180deg, #00cc55 0%, #00aa44 100%) !important;
-    box-shadow: 0 0 20px rgba(0, 170, 68, 0.5) !important;
+    box-shadow: 0 0 25px rgba(68, 255, 136, 0.6) !important;
 }
 
-[data-theme="romulan"] .mud-button-outlined {
+html[data-theme="romulan"] .mud-button-outlined {
     border: 1px solid #00aa44 !important;
     color: #44ff88 !important;
-    background: rgba(0, 50, 25, 0.3) !important;
+    background: linear-gradient(180deg, rgba(0, 80, 40, 0.3) 0%, rgba(0, 40, 20, 0.4) 100%) !important;
 }
 
-/* Romulan AppBar */
-[data-theme="romulan"] .mud-appbar {
+/* Romulan App Bar - Warbird bridge */
+html[data-theme="romulan"] .mud-appbar {
     background: linear-gradient(180deg, #081810 0%, #040a06 100%) !important;
-    border-bottom: 1px solid #004422 !important;
+    border-bottom: none !important;
+    position: relative;
 }
 
-[data-theme="romulan"] .mud-appbar::after {
+/* Romulan Eagle wing pattern */
+html[data-theme="romulan"] .mud-appbar::before {
     content: '';
     position: absolute;
-    bottom: 0; left: 0; right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, #00aa44, transparent);
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg,
+        #003318 0%,
+        #00aa44 20%,
+        #44ff88 35%,
+        #00aa44 50%,
+        #44ff88 65%,
+        #00aa44 80%,
+        #003318 100%
+    );
+    pointer-events: none;
+}
+
+/* Central V accent */
+html[data-theme="romulan"] .mud-appbar::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 30px 10px 30px;
+    border-color: transparent transparent rgba(0, 170, 68, 0.8) transparent;
+    pointer-events: none;
 }
 
 /* Romulan Drawer */
-[data-theme="romulan"] .mud-drawer {
-    background: linear-gradient(180deg, #061008 0%, #030804 100%) !important;
-    border-right: 1px solid #003318 !important;
+html[data-theme="romulan"] .mud-drawer {
+    background: linear-gradient(90deg, #041008 0%, #061810 100%) !important;
+    border-right: none !important;
+    position: relative;
 }
 
-/* Romulan Nav Links */
-[data-theme="romulan"] .mud-nav-link {
+html[data-theme="romulan"] .mud-drawer::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 2px;
+    height: 100%;
+    background: linear-gradient(180deg,
+        #003318 0%,
+        #00aa44 20%,
+        #44ff88 50%,
+        #00aa44 80%,
+        #003318 100%
+    );
+    pointer-events: none;
+}
+
+/* Romulan nav links - sleek military */
+html[data-theme="romulan"] .mud-nav-link {
     border-radius: 0 !important;
-    border-left: 2px solid transparent !important;
-    margin: 1px 0 !important;
+    margin: 2px 8px !important;
+    padding: 10px 16px !important;
+    border-left: 3px solid transparent !important;
+    background: transparent !important;
+    clip-path: polygon(4px 0, 100% 0, calc(100% - 4px) 100%, 0 100%) !important;
+    transition: all 0.2s ease !important;
 }
 
-[data-theme="romulan"] .mud-nav-link:hover {
-    background: rgba(0, 170, 68, 0.15) !important;
+html[data-theme="romulan"] .mud-nav-link:hover {
+    background: rgba(0, 170, 68, 0.2) !important;
     border-left-color: #00aa44 !important;
 }
 
-[data-theme="romulan"] .mud-nav-link.active {
-    background: rgba(0, 170, 68, 0.25) !important;
+html[data-theme="romulan"] .mud-nav-link.active {
+    background: linear-gradient(90deg, rgba(0, 170, 68, 0.4) 0%, rgba(0, 100, 50, 0.2) 100%) !important;
     border-left-color: #44ff88 !important;
     color: #44ff88 !important;
 }
 
 /* ===========================================
    BORG THEME - CYBER GRID
-   Cold, technological, green grid on black
    =========================================== */
-[data-theme="borg"] {
+html[data-theme="borg"],
+html[data-theme="borg"] .stellaris-layout,
+html[data-theme="borg"] .stellaris-app {
     --theme-primary: #00ffaa;
     --theme-secondary: #44ffcc;
     --theme-accent: #88ffdd;
@@ -376,97 +921,222 @@
     --theme-border-radius: 0;
     --theme-btn-radius: 0;
     --theme-border-width: 1px;
+
+    --st-accent-blue: #00ffaa;
+    --st-accent-cyan: #44ffcc;
+    --st-accent-gold: #88ffdd;
+    --st-accent-orange: #44ddaa;
+    --st-accent-green: #00ff88;
+    --st-accent-red: #ff4444;
+    --st-accent-purple: #44aaaa;
+
+    --st-bg-darkest: #000404;
+    --st-bg-darker: #020808;
+    --st-bg-dark: #040c0c;
+    --st-bg-medium: #081410;
+    --st-bg-light: #0c1c18;
+    --st-bg-lighter: #102420;
+
+    --st-border-dark: rgba(0, 255, 170, 0.2);
+    --st-border-medium: rgba(0, 255, 170, 0.4);
+    --st-border-light: rgba(0, 255, 170, 0.6);
+    --st-border-bright: rgba(68, 255, 204, 0.8);
+
+    --st-text-dim: #446666;
+    --st-text-muted: #668888;
+    --st-text-normal: #88aaaa;
+    --st-text-bright: #aaffdd;
+
+    --st-gradient-header: linear-gradient(180deg, #0a1510 0%, #050a08 100%);
+    --st-gradient-panel: linear-gradient(180deg, rgba(8, 20, 15, 0.95) 0%, rgba(3, 10, 8, 0.98) 100%);
+    --st-gradient-button: linear-gradient(180deg, rgba(0, 255, 170, 0.2) 0%, rgba(0, 200, 130, 0.15) 100%);
+    --st-gradient-button-hover: linear-gradient(180deg, rgba(0, 255, 170, 0.35) 0%, rgba(0, 200, 130, 0.25) 100%);
+
+    --st-shadow-glow-blue: 0 0 25px rgba(0, 255, 170, 0.4);
+    --st-shadow-glow-gold: 0 0 25px rgba(136, 255, 221, 0.3);
 }
 
-/* Borg Panel - Grid background */
-[data-theme="borg"] .mud-paper,
-[data-theme="borg"] .mud-card {
-    background: 
-        linear-gradient(90deg, rgba(0, 255, 170, 0.03) 1px, transparent 1px),
-        linear-gradient(rgba(0, 255, 170, 0.03) 1px, transparent 1px),
-        linear-gradient(180deg, rgba(8, 20, 15, 0.98) 0%, rgba(3, 10, 8, 0.98) 100%) !important;
-    background-size: 20px 20px, 20px 20px, 100% 100% !important;
-    border: 1px solid rgba(0, 255, 170, 0.3) !important;
+/* ===========================================
+   BORG - Collective Hive Interface
+   Hexagonal grid, cold cybernetic efficiency
+   No curves, only precision. Resistance is futile.
+   =========================================== */
+
+/* Borg MudBlazor overrides */
+html[data-theme="borg"] .mud-paper,
+html[data-theme="borg"] .mud-card {
+    background:
+        /* Hexagon pattern overlay */
+        repeating-linear-gradient(60deg, rgba(0, 255, 170, 0.03) 0px, transparent 1px, transparent 10px),
+        repeating-linear-gradient(-60deg, rgba(0, 255, 170, 0.03) 0px, transparent 1px, transparent 10px),
+        repeating-linear-gradient(0deg, rgba(0, 255, 170, 0.02) 0px, transparent 1px, transparent 20px),
+        /* Grid lines */
+        linear-gradient(90deg, rgba(0, 255, 170, 0.04) 1px, transparent 1px),
+        linear-gradient(rgba(0, 255, 170, 0.04) 1px, transparent 1px),
+        var(--st-gradient-panel) !important;
+    background-size: 20px 20px, 20px 20px, 20px 20px, 20px 20px, 20px 20px, 100% 100% !important;
+    border: 1px solid rgba(0, 255, 170, 0.4) !important;
     border-radius: 0 !important;
+    position: relative;
 }
 
-[data-theme="borg"] .mud-paper::before,
-[data-theme="borg"] .mud-card::before {
+/* Borg scanning line animation */
+html[data-theme="borg"] .mud-paper::before,
+html[data-theme="borg"] .mud-card::before {
     content: '';
     position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: linear-gradient(180deg, rgba(0, 255, 170, 0.05) 0%, transparent 50%);
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent 0%, #00ffaa 50%, transparent 100%);
+    animation: borg-scan 3s linear infinite;
     pointer-events: none;
+    z-index: 10;
 }
 
-/* Borg Buttons - Technical, cold */
-[data-theme="borg"] .mud-button-root {
+@keyframes borg-scan {
+    0% { transform: translateY(0); opacity: 0.8; }
+    100% { transform: translateY(200px); opacity: 0; }
+}
+
+/* Borg connection node corners */
+html[data-theme="borg"] .mud-paper::after,
+html[data-theme="borg"] .mud-card::after {
+    content: '';
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: 12px;
+    height: 12px;
+    border: 2px solid #00ffaa;
+    background: rgba(0, 255, 170, 0.2);
+    pointer-events: none;
+    z-index: 2;
+}
+
+html[data-theme="borg"] .mud-button-root {
     border-radius: 0 !important;
     text-transform: uppercase !important;
     letter-spacing: 4px !important;
     font-weight: 400 !important;
     font-family: 'Roboto Mono', monospace !important;
+    clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 50%, calc(100% - 8px) 100%, 8px 100%, 0 50%) !important;
 }
 
-[data-theme="borg"] .mud-button-filled {
-    background: rgba(0, 255, 170, 0.15) !important;
+html[data-theme="borg"] .mud-button-filled {
+    background: linear-gradient(180deg, rgba(0, 255, 170, 0.2) 0%, rgba(0, 150, 100, 0.3) 100%) !important;
     color: #00ffaa !important;
     border: 1px solid #00ffaa !important;
+    text-shadow: 0 0 10px rgba(0, 255, 170, 0.8) !important;
 }
 
-[data-theme="borg"] .mud-button-filled:hover {
-    background: rgba(0, 255, 170, 0.3) !important;
-    box-shadow: 0 0 30px rgba(0, 255, 170, 0.4) !important;
+html[data-theme="borg"] .mud-button-filled:hover {
+    background: linear-gradient(180deg, rgba(0, 255, 170, 0.4) 0%, rgba(0, 200, 130, 0.4) 100%) !important;
+    box-shadow: 0 0 30px rgba(0, 255, 170, 0.6), inset 0 0 20px rgba(0, 255, 170, 0.2) !important;
 }
 
-[data-theme="borg"] .mud-button-outlined {
-    border: 1px solid rgba(0, 255, 170, 0.5) !important;
+html[data-theme="borg"] .mud-button-outlined {
+    border: 1px solid rgba(0, 255, 170, 0.6) !important;
     color: #00ffaa !important;
+    background: rgba(0, 50, 30, 0.3) !important;
 }
 
-/* Borg AppBar - Grid */
-[data-theme="borg"] .mud-appbar {
-    background: 
-        linear-gradient(90deg, rgba(0, 255, 170, 0.02) 1px, transparent 1px),
-        linear-gradient(rgba(0, 255, 170, 0.02) 1px, transparent 1px),
+/* Borg App Bar - Cube interface header */
+html[data-theme="borg"] .mud-appbar {
+    background:
+        /* Grid overlay */
+        linear-gradient(90deg, rgba(0, 255, 170, 0.03) 1px, transparent 1px),
+        linear-gradient(rgba(0, 255, 170, 0.03) 1px, transparent 1px),
         linear-gradient(180deg, #0a1510 0%, #050a08 100%) !important;
     background-size: 20px 20px, 20px 20px, 100% 100% !important;
-    border-bottom: 1px solid rgba(0, 255, 170, 0.3) !important;
+    border-bottom: 1px solid rgba(0, 255, 170, 0.4) !important;
+    position: relative;
 }
 
-/* Borg Drawer - Grid */
-[data-theme="borg"] .mud-drawer {
-    background: 
+/* Borg data stream indicator */
+html[data-theme="borg"] .mud-appbar::before {
+    content: 'COLLECTIVE INTERFACE ACTIVE';
+    position: absolute;
+    bottom: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Roboto Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: rgba(0, 255, 170, 0.6);
+    pointer-events: none;
+}
+
+/* Borg Drawer - Alcove navigation */
+html[data-theme="borg"] .mud-drawer {
+    background:
         linear-gradient(90deg, rgba(0, 255, 170, 0.02) 1px, transparent 1px),
         linear-gradient(rgba(0, 255, 170, 0.02) 1px, transparent 1px),
-        linear-gradient(180deg, #081210 0%, #030806 100%) !important;
+        linear-gradient(90deg, #040a08 0%, #081410 100%) !important;
     background-size: 20px 20px, 20px 20px, 100% 100% !important;
-    border-right: 1px solid rgba(0, 255, 170, 0.2) !important;
+    border-right: 1px solid rgba(0, 255, 170, 0.3) !important;
+    position: relative;
 }
 
-/* Borg Nav Links */
-[data-theme="borg"] .mud-nav-link {
+/* Vertical data conduit */
+html[data-theme="borg"] .mud-drawer::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 4px;
+    height: 100%;
+    background: repeating-linear-gradient(
+        180deg,
+        #00ffaa 0px,
+        #00ffaa 2px,
+        transparent 2px,
+        transparent 8px
+    );
+    opacity: 0.5;
+    animation: borg-conduit 2s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes borg-conduit {
+    0% { background-position: 0 0; }
+    100% { background-position: 0 20px; }
+}
+
+/* Borg nav links - Alcove slots */
+html[data-theme="borg"] .mud-nav-link {
     border-radius: 0 !important;
+    margin: 1px 0 !important;
+    padding: 12px 16px !important;
     font-family: 'Roboto Mono', monospace !important;
-    letter-spacing: 1px !important;
+    font-size: 12px !important;
+    letter-spacing: 2px !important;
+    border-left: 3px solid transparent !important;
+    background: rgba(0, 50, 30, 0.2) !important;
+    transition: all 0.15s ease !important;
 }
 
-[data-theme="borg"] .mud-nav-link:hover {
-    background: rgba(0, 255, 170, 0.1) !important;
+html[data-theme="borg"] .mud-nav-link:hover {
+    background: rgba(0, 255, 170, 0.15) !important;
+    border-left-color: rgba(0, 255, 170, 0.5) !important;
+    text-shadow: 0 0 10px rgba(0, 255, 170, 0.5) !important;
 }
 
-[data-theme="borg"] .mud-nav-link.active {
-    background: rgba(0, 255, 170, 0.2) !important;
+html[data-theme="borg"] .mud-nav-link.active {
+    background: rgba(0, 255, 170, 0.25) !important;
     color: #00ffaa !important;
-    border-left: 2px solid #00ffaa !important;
+    border-left-color: #00ffaa !important;
+    text-shadow: 0 0 15px rgba(0, 255, 170, 0.8) !important;
+    box-shadow: inset 0 0 20px rgba(0, 255, 170, 0.1) !important;
 }
 
 /* ===========================================
    CARDASSIAN THEME - GEOMETRIC
-   Double borders, tan/brown, ornate patterns
    =========================================== */
-[data-theme="cardassian"] {
+html[data-theme="cardassian"],
+html[data-theme="cardassian"] .stellaris-layout,
+html[data-theme="cardassian"] .stellaris-app {
     --theme-primary: #aa8844;
     --theme-secondary: #ddaa66;
     --theme-accent: #ffcc88;
@@ -477,82 +1147,195 @@
     --theme-border-radius: 8px;
     --theme-btn-radius: 4px;
     --theme-border-width: 3px;
+
+    --st-accent-blue: #aa8844;
+    --st-accent-cyan: #ddaa66;
+    --st-accent-gold: #ffcc88;
+    --st-accent-orange: #cc8844;
+    --st-accent-green: #88aa66;
+    --st-accent-red: #cc6644;
+    --st-accent-purple: #aa8866;
+
+    --st-bg-darkest: #060402;
+    --st-bg-darker: #0c0806;
+    --st-bg-dark: #140e0a;
+    --st-bg-medium: #1c1610;
+    --st-bg-light: #241e18;
+    --st-bg-lighter: #2c2620;
+
+    --st-border-dark: rgba(170, 136, 68, 0.4);
+    --st-border-medium: rgba(170, 136, 68, 0.6);
+    --st-border-light: rgba(221, 170, 102, 0.7);
+    --st-border-bright: rgba(255, 204, 136, 0.9);
+
+    --st-text-dim: #887766;
+    --st-text-muted: #aa9988;
+    --st-text-normal: #ccbbaa;
+    --st-text-bright: #eeddcc;
+
+    --st-gradient-header: linear-gradient(180deg, #1a1208 0%, #0a0804 100%);
+    --st-gradient-panel: linear-gradient(180deg, rgba(30, 22, 15, 0.95) 0%, rgba(15, 10, 5, 0.98) 100%);
+    --st-gradient-button: linear-gradient(180deg, #aa8844 0%, #775522 100%);
+    --st-gradient-button-hover: linear-gradient(180deg, #ccaa55 0%, #aa8844 100%);
+
+    --st-shadow-glow-blue: 0 0 20px rgba(170, 136, 68, 0.4);
+    --st-shadow-glow-gold: 0 0 20px rgba(255, 204, 136, 0.3);
 }
 
-/* Cardassian Panel - Double border */
-[data-theme="cardassian"] .mud-paper,
-[data-theme="cardassian"] .mud-card {
-    background: linear-gradient(180deg, rgba(30, 22, 15, 0.98) 0%, rgba(15, 10, 5, 0.98) 100%) !important;
-    border: 3px double #886633 !important;
-    border-radius: 8px !important;
+/* ===========================================
+   CARDASSIAN - Obsidian Order Console
+   Geometric patterns, double borders, military efficiency
+   Brown/tan desert tones, authoritarian architecture
+   =========================================== */
+
+/* Cardassian MudBlazor overrides */
+html[data-theme="cardassian"] .mud-paper,
+html[data-theme="cardassian"] .mud-card {
+    background:
+        /* Geometric pattern overlay */
+        repeating-linear-gradient(45deg, rgba(170, 136, 68, 0.02) 0px, transparent 1px, transparent 15px),
+        repeating-linear-gradient(-45deg, rgba(170, 136, 68, 0.02) 0px, transparent 1px, transparent 15px),
+        var(--st-gradient-panel) !important;
+    border: 3px double #aa8844 !important;
+    border-radius: 0 !important;
+    position: relative;
+    clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0 calc(100% - 10px), 0 10px) !important;
+}
+
+/* Cardassian spoon-head inspired frame accents */
+html[data-theme="cardassian"] .mud-paper::before,
+html[data-theme="cardassian"] .mud-card::before {
+    content: '';
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    right: 8px;
+    height: 3px;
+    background: linear-gradient(90deg,
+        #664422 0%,
+        #aa8844 20%,
+        #ddaa66 50%,
+        #aa8844 80%,
+        #664422 100%
+    );
+    pointer-events: none;
+    z-index: 2;
+}
+
+/* Bottom accent bar */
+html[data-theme="cardassian"] .mud-paper::after,
+html[data-theme="cardassian"] .mud-card::after {
+    content: '';
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    right: 8px;
+    height: 3px;
+    background: linear-gradient(90deg,
+        #664422 0%,
+        #aa8844 20%,
+        #ddaa66 50%,
+        #aa8844 80%,
+        #664422 100%
+    );
+    pointer-events: none;
+    z-index: 2;
+}
+
+html[data-theme="cardassian"] .mud-button-root {
+    border-radius: 0 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    clip-path: polygon(6px 0, calc(100% - 6px) 0, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 0 calc(100% - 6px), 0 6px) !important;
+}
+
+html[data-theme="cardassian"] .mud-button-filled {
+    background: linear-gradient(180deg, #aa8844 0%, #664422 100%) !important;
+    color: #fff !important;
+    border: 2px solid #ddaa66 !important;
+    box-shadow: inset 0 1px 0 rgba(255, 220, 150, 0.3), 0 2px 8px rgba(0, 0, 0, 0.4) !important;
+}
+
+html[data-theme="cardassian"] .mud-button-filled:hover {
+    background: linear-gradient(180deg, #ccaa55 0%, #886633 100%) !important;
+    box-shadow: inset 0 1px 0 rgba(255, 220, 150, 0.4), 0 0 15px rgba(170, 136, 68, 0.5) !important;
+}
+
+html[data-theme="cardassian"] .mud-button-outlined {
+    border: 2px double #aa8844 !important;
+    color: #ddaa66 !important;
+    background: rgba(60, 40, 20, 0.4) !important;
+}
+
+/* Cardassian App Bar - Central Command header */
+html[data-theme="cardassian"] .mud-appbar {
+    background: linear-gradient(180deg, #1a1208 0%, #0c0804 100%) !important;
+    border-bottom: none !important;
     position: relative;
 }
 
-[data-theme="cardassian"] .mud-paper::before,
-[data-theme="cardassian"] .mud-card::before {
+/* Geometric frame on appbar */
+html[data-theme="cardassian"] .mud-appbar::before {
     content: '';
     position: absolute;
-    top: 4px; left: 4px; right: 4px; bottom: 4px;
-    border: 1px solid rgba(170, 136, 68, 0.3);
-    border-radius: 4px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background:
+        linear-gradient(180deg, #aa8844 0%, #664422 100%);
+    clip-path: polygon(0 0, 5% 100%, 10% 0, 15% 100%, 20% 0, 25% 100%, 30% 0, 35% 100%, 40% 0, 45% 100%, 50% 0, 55% 100%, 60% 0, 65% 100%, 70% 0, 75% 100%, 80% 0, 85% 100%, 90% 0, 95% 100%, 100% 0);
     pointer-events: none;
 }
 
-/* Cardassian Buttons */
-[data-theme="cardassian"] .mud-button-root {
-    border-radius: 4px !important;
-    text-transform: uppercase !important;
-    letter-spacing: 1px !important;
-}
-
-[data-theme="cardassian"] .mud-button-filled {
-    background: linear-gradient(180deg, #aa8844 0%, #775522 100%) !important;
-    color: #fff !important;
-    border: 2px solid #ddaa66 !important;
-}
-
-[data-theme="cardassian"] .mud-button-filled:hover {
-    background: linear-gradient(180deg, #ccaa55 0%, #aa8844 100%) !important;
-}
-
-[data-theme="cardassian"] .mud-button-outlined {
-    border: 2px double #aa8844 !important;
-    color: #ddaa66 !important;
-}
-
-/* Cardassian AppBar */
-[data-theme="cardassian"] .mud-appbar {
-    background: linear-gradient(180deg, #1a1208 0%, #0a0804 100%) !important;
-    border-bottom: 3px double #664422 !important;
-}
-
 /* Cardassian Drawer */
-[data-theme="cardassian"] .mud-drawer {
-    background: linear-gradient(180deg, #120c06 0%, #080502 100%) !important;
-    border-right: 3px double #553311 !important;
+html[data-theme="cardassian"] .mud-drawer {
+    background: linear-gradient(90deg, #0c0806 0%, #140e0a 100%) !important;
+    border-right: none !important;
+    position: relative;
 }
 
-/* Cardassian Nav Links */
-[data-theme="cardassian"] .mud-nav-link {
-    border-radius: 4px !important;
-    margin: 2px 6px !important;
+html[data-theme="cardassian"] .mud-drawer::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 6px;
+    height: 100%;
+    background:
+        linear-gradient(90deg, #664422 0%, #aa8844 100%);
+    clip-path: polygon(0 0, 100% 3%, 0 6%, 100% 9%, 0 12%, 100% 15%, 0 18%, 100% 21%, 0 24%, 100% 27%, 0 30%, 100% 33%, 0 36%, 100% 39%, 0 42%, 100% 45%, 0 48%, 100% 51%, 0 54%, 100% 57%, 0 60%, 100% 63%, 0 66%, 100% 69%, 0 72%, 100% 75%, 0 78%, 100% 81%, 0 84%, 100% 87%, 0 90%, 100% 93%, 0 96%, 100% 100%);
+    pointer-events: none;
 }
 
-[data-theme="cardassian"] .mud-nav-link:hover {
-    background: rgba(170, 136, 68, 0.2) !important;
+/* Cardassian nav links - Obsidian Order style */
+html[data-theme="cardassian"] .mud-nav-link {
+    border-radius: 0 !important;
+    margin: 3px 8px !important;
+    padding: 10px 16px !important;
+    border: 1px solid transparent !important;
+    background: rgba(60, 40, 20, 0.3) !important;
+    clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px) !important;
+    transition: all 0.2s ease !important;
 }
 
-[data-theme="cardassian"] .mud-nav-link.active {
-    background: linear-gradient(90deg, rgba(170, 136, 68, 0.4), rgba(170, 136, 68, 0.2)) !important;
-    border: 1px solid #aa8844 !important;
+html[data-theme="cardassian"] .mud-nav-link:hover {
+    background: rgba(170, 136, 68, 0.25) !important;
+    border-color: rgba(170, 136, 68, 0.5) !important;
+}
+
+html[data-theme="cardassian"] .mud-nav-link.active {
+    background: linear-gradient(90deg, rgba(170, 136, 68, 0.5) 0%, rgba(100, 70, 30, 0.4) 100%) !important;
+    border-color: #aa8844 !important;
     color: #ffcc88 !important;
 }
 
 /* ===========================================
    FERENGI THEME - ORNATE GOLD
-   Luxurious, curved, gold/bronze
    =========================================== */
-[data-theme="ferengi"] {
+html[data-theme="ferengi"],
+html[data-theme="ferengi"] .stellaris-layout,
+html[data-theme="ferengi"] .stellaris-app {
     --theme-primary: #ddaa00;
     --theme-secondary: #ffcc00;
     --theme-accent: #ffee44;
@@ -563,189 +1346,1838 @@
     --theme-border-radius: 16px;
     --theme-btn-radius: 20px;
     --theme-border-width: 2px;
-}
 
-/* Ferengi Panel - Gold trim */
-[data-theme="ferengi"] .mud-paper,
-[data-theme="ferengi"] .mud-card {
-    background: linear-gradient(180deg, rgba(35, 28, 12, 0.98) 0%, rgba(18, 14, 5, 0.98) 100%) !important;
-    border: 2px solid #aa8800 !important;
-    border-radius: 16px !important;
-    box-shadow: 
-        inset 0 1px 0 rgba(255, 220, 100, 0.2),
-        0 4px 20px rgba(0, 0, 0, 0.5) !important;
-}
+    --st-accent-blue: #ddaa00;
+    --st-accent-cyan: #ffcc00;
+    --st-accent-gold: #ffee44;
+    --st-accent-orange: #ffaa00;
+    --st-accent-green: #aacc00;
+    --st-accent-red: #ff6644;
+    --st-accent-purple: #ccaa44;
 
-/* Ferengi Buttons - Gold luxury */
-[data-theme="ferengi"] .mud-button-root {
-    border-radius: 20px !important;
-    text-transform: uppercase !important;
-    letter-spacing: 1px !important;
-    font-weight: 600 !important;
-}
+    --st-bg-darkest: #080602;
+    --st-bg-darker: #100c04;
+    --st-bg-dark: #181208;
+    --st-bg-medium: #20180c;
+    --st-bg-light: #281e12;
+    --st-bg-lighter: #302418;
 
-[data-theme="ferengi"] .mud-button-filled {
-    background: linear-gradient(180deg, #ffcc00 0%, #aa8800 100%) !important;
-    color: #000 !important;
-    border: 1px solid #ffee44 !important;
-    box-shadow: 0 4px 15px rgba(221, 170, 0, 0.4) !important;
-}
+    --st-border-dark: rgba(221, 170, 0, 0.3);
+    --st-border-medium: rgba(221, 170, 0, 0.5);
+    --st-border-light: rgba(255, 204, 0, 0.7);
+    --st-border-bright: rgba(255, 238, 68, 0.9);
 
-[data-theme="ferengi"] .mud-button-filled:hover {
-    background: linear-gradient(180deg, #ffdd44 0%, #ddaa00 100%) !important;
-    box-shadow: 0 6px 25px rgba(255, 204, 0, 0.5) !important;
-}
+    --st-text-dim: #887744;
+    --st-text-muted: #aa9966;
+    --st-text-normal: #ccbb88;
+    --st-text-bright: #ffeecc;
 
-[data-theme="ferengi"] .mud-button-outlined {
-    border: 2px solid #ddaa00 !important;
-    color: #ffcc00 !important;
-    background: rgba(100, 80, 0, 0.2) !important;
-}
+    --st-gradient-header: linear-gradient(180deg, #1a1508 0%, #0a0804 100%);
+    --st-gradient-panel: linear-gradient(180deg, rgba(35, 28, 12, 0.95) 0%, rgba(18, 14, 5, 0.98) 100%);
+    --st-gradient-button: linear-gradient(180deg, #ffcc00 0%, #aa8800 100%);
+    --st-gradient-button-hover: linear-gradient(180deg, #ffdd44 0%, #ddaa00 100%);
 
-/* Ferengi AppBar */
-[data-theme="ferengi"] .mud-appbar {
-    background: linear-gradient(180deg, #1a1508 0%, #0a0804 100%) !important;
-    border-bottom: 2px solid #886600 !important;
-}
-
-[data-theme="ferengi"] .mud-appbar::after {
-    content: '';
-    position: absolute;
-    bottom: -2px; left: 0; right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, #ffcc00, #ddaa00, #ffcc00, transparent);
-}
-
-/* Ferengi Drawer */
-[data-theme="ferengi"] .mud-drawer {
-    background: linear-gradient(180deg, #141006 0%, #080602 100%) !important;
-    border-right: 2px solid #664400 !important;
-}
-
-/* Ferengi Nav Links */
-[data-theme="ferengi"] .mud-nav-link {
-    border-radius: 12px !important;
-    margin: 3px 8px !important;
-}
-
-[data-theme="ferengi"] .mud-nav-link:hover {
-    background: rgba(221, 170, 0, 0.15) !important;
-}
-
-[data-theme="ferengi"] .mud-nav-link.active {
-    background: linear-gradient(90deg, rgba(221, 170, 0, 0.4), rgba(221, 170, 0, 0.15)) !important;
-    color: #ffcc00 !important;
+    --st-shadow-glow-blue: 0 0 20px rgba(221, 170, 0, 0.5);
+    --st-shadow-glow-gold: 0 0 25px rgba(255, 204, 0, 0.4);
 }
 
 /* ===========================================
-   COMMON OVERRIDES FOR ALL THEMES
+   FERENGI - Grand Nagus Trading Console
+   Ornate gold, curved luxury, latinum-inspired
+   Commerce and profit above all
+   =========================================== */
+
+/* Ferengi MudBlazor overrides */
+html[data-theme="ferengi"] .mud-paper,
+html[data-theme="ferengi"] .mud-card {
+    background:
+        /* Subtle latinum shimmer */
+        linear-gradient(135deg, rgba(255, 220, 100, 0.05) 0%, transparent 50%, rgba(255, 220, 100, 0.03) 100%),
+        var(--st-gradient-panel) !important;
+    border: 3px solid #ddaa00 !important;
+    border-radius: 16px !important;
+    position: relative;
+    box-shadow:
+        inset 0 2px 0 rgba(255, 238, 100, 0.3),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.3),
+        0 4px 20px rgba(0, 0, 0, 0.5),
+        0 0 30px rgba(221, 170, 0, 0.2) !important;
+}
+
+/* Ferengi ornate corner decorations */
+html[data-theme="ferengi"] .mud-paper::before,
+html[data-theme="ferengi"] .mud-card::before {
+    content: '₾';  /* Latinum-like symbol */
+    position: absolute;
+    top: 8px;
+    left: 12px;
+    font-size: 16px;
+    color: #ffcc00;
+    text-shadow: 0 0 10px rgba(255, 204, 0, 0.8);
+    pointer-events: none;
+    z-index: 2;
+}
+
+html[data-theme="ferengi"] .mud-paper::after,
+html[data-theme="ferengi"] .mud-card::after {
+    content: '₾';
+    position: absolute;
+    bottom: 8px;
+    right: 12px;
+    font-size: 16px;
+    color: #ffcc00;
+    text-shadow: 0 0 10px rgba(255, 204, 0, 0.8);
+    pointer-events: none;
+    z-index: 2;
+}
+
+html[data-theme="ferengi"] .mud-button-root {
+    border-radius: 25px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    font-weight: 700 !important;
+    padding: 8px 24px !important;
+}
+
+html[data-theme="ferengi"] .mud-button-filled {
+    background: linear-gradient(180deg, #ffdd44 0%, #ddaa00 50%, #aa8800 100%) !important;
+    color: #000 !important;
+    border: 2px solid #ffee66 !important;
+    box-shadow:
+        inset 0 2px 0 rgba(255, 255, 200, 0.5),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.2),
+        0 0 20px rgba(255, 204, 0, 0.5) !important;
+    text-shadow: 0 1px 0 rgba(255, 255, 200, 0.5) !important;
+}
+
+html[data-theme="ferengi"] .mud-button-filled:hover {
+    background: linear-gradient(180deg, #ffee66 0%, #ffcc00 50%, #ddaa00 100%) !important;
+    box-shadow:
+        inset 0 2px 0 rgba(255, 255, 200, 0.6),
+        0 0 35px rgba(255, 204, 0, 0.8) !important;
+}
+
+html[data-theme="ferengi"] .mud-button-outlined {
+    border: 2px solid #ddaa00 !important;
+    color: #ffcc00 !important;
+    background: rgba(100, 80, 0, 0.3) !important;
+    border-radius: 25px !important;
+}
+
+html[data-theme="ferengi"] .mud-button-outlined:hover {
+    background: rgba(221, 170, 0, 0.3) !important;
+    box-shadow: 0 0 15px rgba(255, 204, 0, 0.4) !important;
+}
+
+/* Ferengi App Bar - Tower of Commerce */
+html[data-theme="ferengi"] .mud-appbar {
+    background: linear-gradient(180deg, #1a1508 0%, #0c0804 100%) !important;
+    border-bottom: none !important;
+    position: relative;
+}
+
+/* Ornate gold border */
+html[data-theme="ferengi"] .mud-appbar::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg,
+        #664400 0%,
+        #aa8800 10%,
+        #ffcc00 20%,
+        #ffee44 30%,
+        #ffcc00 40%,
+        #aa8800 50%,
+        #ffcc00 60%,
+        #ffee44 70%,
+        #ffcc00 80%,
+        #aa8800 90%,
+        #664400 100%
+    );
+    pointer-events: none;
+}
+
+/* Profit indicator */
+html[data-theme="ferengi"] .mud-appbar::after {
+    content: 'PROFIT MARGIN: OPTIMAL';
+    position: absolute;
+    bottom: 8px;
+    right: 20px;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: rgba(255, 204, 0, 0.7);
+    pointer-events: none;
+}
+
+/* Ferengi Drawer - Vault entrance */
+html[data-theme="ferengi"] .mud-drawer {
+    background: linear-gradient(90deg, #100c04 0%, #181208 100%) !important;
+    border-right: none !important;
+    position: relative;
+}
+
+html[data-theme="ferengi"] .mud-drawer::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg,
+        #664400 0%,
+        #aa8800 15%,
+        #ffcc00 30%,
+        #aa8800 50%,
+        #ffcc00 70%,
+        #aa8800 85%,
+        #664400 100%
+    );
+    pointer-events: none;
+}
+
+/* Ferengi nav links - luxurious pills */
+html[data-theme="ferengi"] .mud-nav-link {
+    border-radius: 20px !important;
+    margin: 4px 10px !important;
+    padding: 10px 18px !important;
+    background: rgba(100, 80, 0, 0.2) !important;
+    border: 1px solid transparent !important;
+    transition: all 0.2s ease !important;
+}
+
+html[data-theme="ferengi"] .mud-nav-link:hover {
+    background: rgba(221, 170, 0, 0.2) !important;
+    border-color: rgba(221, 170, 0, 0.5) !important;
+    box-shadow: 0 0 10px rgba(255, 204, 0, 0.2) !important;
+}
+
+html[data-theme="ferengi"] .mud-nav-link.active {
+    background: linear-gradient(90deg, rgba(221, 170, 0, 0.5) 0%, rgba(170, 136, 0, 0.4) 100%) !important;
+    border-color: #ffcc00 !important;
+    color: #ffee44 !important;
+    box-shadow: 0 0 15px rgba(255, 204, 0, 0.4) !important;
+}
+
+/* ===========================================
+   DOMINION THEME - IMPERIAL PURPLE
+   =========================================== */
+html[data-theme="dominion"],
+html[data-theme="dominion"] .stellaris-layout,
+html[data-theme="dominion"] .stellaris-app {
+    --theme-primary: #8844cc;
+    --theme-secondary: #aa66ff;
+    --theme-accent: #cc88ff;
+    --theme-text: #ddccff;
+    --theme-text-dim: #9988aa;
+    --theme-bg: #040206;
+    --theme-panel-bg: rgba(15, 10, 25, 0.98);
+    --theme-border-radius: 4px;
+    --theme-btn-radius: 4px;
+    --theme-border-width: 2px;
+
+    --st-accent-blue: #8844cc;
+    --st-accent-cyan: #aa66ff;
+    --st-accent-gold: #cc88ff;
+    --st-accent-orange: #aa66cc;
+    --st-accent-green: #8888cc;
+    --st-accent-red: #cc4488;
+    --st-accent-purple: #aa44ff;
+
+    --st-bg-darkest: #040206;
+    --st-bg-darker: #08040c;
+    --st-bg-dark: #0c0612;
+    --st-bg-medium: #140a1c;
+    --st-bg-light: #1c1028;
+    --st-bg-lighter: #241634;
+
+    --st-border-dark: rgba(136, 68, 204, 0.3);
+    --st-border-medium: rgba(136, 68, 204, 0.5);
+    --st-border-light: rgba(170, 102, 255, 0.7);
+    --st-border-bright: rgba(204, 136, 255, 0.9);
+
+    --st-text-dim: #776688;
+    --st-text-muted: #9988aa;
+    --st-text-normal: #bbaacc;
+    --st-text-bright: #ddccff;
+
+    --st-gradient-header: linear-gradient(180deg, #180820 0%, #0a0410 100%);
+    --st-gradient-panel: linear-gradient(180deg, rgba(25, 15, 35, 0.95) 0%, rgba(12, 8, 18, 0.98) 100%);
+    --st-gradient-button: linear-gradient(180deg, #8844cc 0%, #553388 100%);
+    --st-gradient-button-hover: linear-gradient(180deg, #aa66dd 0%, #8844cc 100%);
+
+    --st-shadow-glow-blue: 0 0 20px rgba(136, 68, 204, 0.4);
+    --st-shadow-glow-gold: 0 0 20px rgba(204, 136, 255, 0.3);
+}
+
+/* ===========================================
+   DOMINION - Founders' Imperial Interface
+   Regal purple, absolute authority, liquid metal accents
+   Order through obedience. The Founders are gods.
+   =========================================== */
+
+/* Dominion MudBlazor overrides */
+html[data-theme="dominion"] .mud-paper,
+html[data-theme="dominion"] .mud-card {
+    background:
+        /* Changeling liquid shimmer effect */
+        radial-gradient(ellipse at 30% 20%, rgba(170, 102, 255, 0.1) 0%, transparent 50%),
+        radial-gradient(ellipse at 70% 80%, rgba(136, 68, 204, 0.08) 0%, transparent 50%),
+        var(--st-gradient-panel) !important;
+    border: 2px solid #8844cc !important;
+    border-radius: 0 !important;
+    position: relative;
+    clip-path: polygon(0 8px, 8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px)) !important;
+}
+
+/* Dominion imperial crown accent at top */
+html[data-theme="dominion"] .mud-paper::before,
+html[data-theme="dominion"] .mud-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 4px;
+    background: linear-gradient(90deg, transparent 0%, #aa66ff 20%, #cc88ff 50%, #aa66ff 80%, transparent 100%);
+    pointer-events: none;
+    z-index: 2;
+}
+
+/* Vertical authority lines on sides */
+html[data-theme="dominion"] .mud-paper::after,
+html[data-theme="dominion"] .mud-card::after {
+    content: '';
+    position: absolute;
+    top: 15px;
+    left: 3px;
+    width: 2px;
+    height: calc(100% - 30px);
+    background: linear-gradient(180deg,
+        transparent 0%,
+        #8844cc 10%,
+        #aa66ff 50%,
+        #8844cc 90%,
+        transparent 100%
+    );
+    pointer-events: none;
+    z-index: 2;
+}
+
+html[data-theme="dominion"] .mud-button-root {
+    border-radius: 0 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 3px !important;
+    font-weight: 600 !important;
+    clip-path: polygon(6px 0, calc(100% - 6px) 0, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 0 calc(100% - 6px), 0 6px) !important;
+}
+
+html[data-theme="dominion"] .mud-button-filled {
+    background: linear-gradient(180deg, #aa66dd 0%, #8844cc 50%, #663399 100%) !important;
+    color: #fff !important;
+    border: 1px solid #cc88ff !important;
+    box-shadow:
+        inset 0 1px 0 rgba(200, 150, 255, 0.4),
+        0 0 20px rgba(136, 68, 204, 0.4) !important;
+}
+
+html[data-theme="dominion"] .mud-button-filled:hover {
+    background: linear-gradient(180deg, #bb77ee 0%, #aa66dd 50%, #8844cc 100%) !important;
+    box-shadow:
+        inset 0 1px 0 rgba(220, 180, 255, 0.5),
+        0 0 30px rgba(170, 102, 255, 0.6) !important;
+}
+
+html[data-theme="dominion"] .mud-button-outlined {
+    border: 2px solid #8844cc !important;
+    color: #aa66ff !important;
+    background: rgba(60, 30, 80, 0.4) !important;
+}
+
+/* Dominion App Bar - Great Link chamber */
+html[data-theme="dominion"] .mud-appbar {
+    background: linear-gradient(180deg, #180820 0%, #0c0410 100%) !important;
+    border-bottom: none !important;
+    position: relative;
+}
+
+/* Imperial authority bar */
+html[data-theme="dominion"] .mud-appbar::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg,
+        #442266 0%,
+        #8844cc 15%,
+        #aa66ff 30%,
+        #cc88ff 50%,
+        #aa66ff 70%,
+        #8844cc 85%,
+        #442266 100%
+    );
+    pointer-events: none;
+}
+
+/* Founders' emblem hint */
+html[data-theme="dominion"] .mud-appbar::after {
+    content: 'ORDER THROUGH OBEDIENCE';
+    position: absolute;
+    bottom: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 8px;
+    letter-spacing: 4px;
+    color: rgba(170, 102, 255, 0.5);
+    pointer-events: none;
+}
+
+/* Dominion Drawer - Vorta administration panel */
+html[data-theme="dominion"] .mud-drawer {
+    background: linear-gradient(90deg, #08040c 0%, #140a1c 100%) !important;
+    border-right: none !important;
+    position: relative;
+}
+
+html[data-theme="dominion"] .mud-drawer::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 3px;
+    height: 100%;
+    background: linear-gradient(180deg,
+        #331155 0%,
+        #8844cc 20%,
+        #aa66ff 50%,
+        #8844cc 80%,
+        #331155 100%
+    );
+    pointer-events: none;
+}
+
+/* Dominion nav links - Hierarchy levels */
+html[data-theme="dominion"] .mud-nav-link {
+    border-radius: 0 !important;
+    margin: 2px 8px !important;
+    padding: 10px 16px !important;
+    border: 1px solid transparent !important;
+    background: rgba(60, 30, 80, 0.2) !important;
+    clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px) !important;
+    transition: all 0.2s ease !important;
+}
+
+html[data-theme="dominion"] .mud-nav-link:hover {
+    background: rgba(136, 68, 204, 0.25) !important;
+    border-color: rgba(136, 68, 204, 0.5) !important;
+}
+
+html[data-theme="dominion"] .mud-nav-link.active {
+    background: linear-gradient(90deg, rgba(136, 68, 204, 0.5) 0%, rgba(100, 50, 150, 0.4) 100%) !important;
+    border-color: #aa66ff !important;
+    color: #cc88ff !important;
+    box-shadow: inset 0 0 15px rgba(136, 68, 204, 0.3) !important;
+}
+
+/* ===========================================
+   COMMON OVERRIDES FOR ALL FACTION THEMES
+   Only applies when a faction theme is active
    =========================================== */
 
 /* Table styling */
-[data-theme] .mud-table {
+html[data-theme]:not([data-theme="default"]) .mud-table {
     background: var(--theme-panel-bg) !important;
 }
 
-[data-theme] .mud-table-head {
+html[data-theme]:not([data-theme="default"]) .mud-table-head {
     background: rgba(0, 0, 0, 0.3) !important;
 }
 
-[data-theme] .mud-table-cell {
+html[data-theme]:not([data-theme="default"]) .mud-table-cell {
     border-color: rgba(255, 255, 255, 0.1) !important;
     color: var(--theme-text) !important;
 }
 
-[data-theme] .mud-table-row:hover {
+html[data-theme]:not([data-theme="default"]) .mud-table-row:hover {
     background: rgba(255, 255, 255, 0.05) !important;
 }
 
 /* Dialog styling */
-[data-theme] .mud-dialog {
+html[data-theme]:not([data-theme="default"]) .mud-dialog {
     background: var(--theme-panel-bg) !important;
     border: var(--theme-border-width) solid var(--theme-primary) !important;
     border-radius: var(--theme-border-radius) !important;
 }
 
 /* Progress bars */
-[data-theme] .mud-progress-linear {
+html[data-theme]:not([data-theme="default"]) .mud-progress-linear {
     background: rgba(0, 0, 0, 0.3) !important;
     border-radius: var(--theme-btn-radius) !important;
 }
 
-[data-theme] .mud-progress-linear-bar {
+html[data-theme]:not([data-theme="default"]) .mud-progress-linear-bar {
     background: var(--theme-primary) !important;
 }
 
 /* Tabs */
-[data-theme] .mud-tabs-header {
+html[data-theme]:not([data-theme="default"]) .mud-tabs-header {
     background: rgba(0, 0, 0, 0.2) !important;
 }
 
-[data-theme] .mud-tab {
+html[data-theme]:not([data-theme="default"]) .mud-tab {
     color: var(--theme-text-dim) !important;
 }
 
-[data-theme] .mud-tab.mud-tab-active {
+html[data-theme]:not([data-theme="default"]) .mud-tab.mud-tab-active {
     color: var(--theme-primary) !important;
 }
 
-[data-theme] .mud-tab-slider {
+html[data-theme]:not([data-theme="default"]) .mud-tab-slider {
     background: var(--theme-primary) !important;
 }
 
 /* Chips */
-[data-theme] .mud-chip {
+html[data-theme]:not([data-theme="default"]) .mud-chip {
     background: rgba(255, 255, 255, 0.1) !important;
     color: var(--theme-text) !important;
     border-radius: var(--theme-btn-radius) !important;
 }
 
 /* Snackbar */
-[data-theme] .mud-snackbar {
+html[data-theme]:not([data-theme="default"]) .mud-snackbar {
     background: var(--theme-panel-bg) !important;
     border: 1px solid var(--theme-primary) !important;
 }
 
 /* Menu/Popover */
-[data-theme] .mud-popover {
+html[data-theme]:not([data-theme="default"]) .mud-popover {
     background: var(--theme-panel-bg) !important;
     border: 1px solid rgba(255, 255, 255, 0.2) !important;
 }
 
-[data-theme] .mud-list-item:hover {
+html[data-theme]:not([data-theme="default"]) .mud-list-item:hover {
     background: rgba(255, 255, 255, 0.1) !important;
 }
 
 /* Icons */
-[data-theme] .mud-icon-button {
+html[data-theme]:not([data-theme="default"]) .mud-icon-button {
     color: var(--theme-text) !important;
 }
 
-[data-theme] .mud-icon-button:hover {
+html[data-theme]:not([data-theme="default"]) .mud-icon-button:hover {
     background: rgba(255, 255, 255, 0.1) !important;
 }
 
 /* Text colors */
-[data-theme] .mud-typography-h6,
-[data-theme] .mud-typography-subtitle1 {
+html[data-theme]:not([data-theme="default"]) .mud-typography-h6,
+html[data-theme]:not([data-theme="default"]) .mud-typography-subtitle1 {
     color: var(--theme-accent) !important;
 }
 
-/* Scrollbars - Theme specific */
-[data-theme]::-webkit-scrollbar {
+/* Scrollbars */
+html[data-theme]:not([data-theme="default"]) ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
 }
 
-[data-theme]::-webkit-scrollbar-track {
+html[data-theme]:not([data-theme="default"]) ::-webkit-scrollbar-track {
     background: rgba(0, 0, 0, 0.3);
 }
 
-[data-theme]::-webkit-scrollbar-thumb {
+html[data-theme]:not([data-theme="default"]) ::-webkit-scrollbar-thumb {
     background: var(--theme-primary);
     border-radius: var(--theme-btn-radius);
 }
 
-[data-theme]::-webkit-scrollbar-thumb:hover {
+html[data-theme]:not([data-theme="default"]) ::-webkit-scrollbar-thumb:hover {
     background: var(--theme-secondary);
+}
+
+/* ===========================================
+   STELLARIS GAME UI THEME INTEGRATION
+   Apply theme variables to game-specific elements
+   =========================================== */
+
+/* Game panels and cards */
+html[data-theme]:not([data-theme="default"]) .panel,
+html[data-theme]:not([data-theme="default"]) .game-panel,
+html[data-theme]:not([data-theme="default"]) .system-panel,
+html[data-theme]:not([data-theme="default"]) .info-panel {
+    background: var(--st-gradient-panel);
+    border-color: var(--theme-primary);
+    border-radius: var(--theme-border-radius);
+}
+
+html[data-theme]:not([data-theme="default"]) .empire-card,
+html[data-theme]:not([data-theme="default"]) .slot-building,
+html[data-theme]:not([data-theme="default"]) .fleet-card,
+html[data-theme]:not([data-theme="default"]) .ship-card-wrapper {
+    border-color: var(--theme-primary);
+    border-radius: var(--theme-border-radius);
+}
+
+html[data-theme]:not([data-theme="default"]) .empire-card:hover,
+html[data-theme]:not([data-theme="default"]) .slot-building:hover,
+html[data-theme]:not([data-theme="default"]) .fleet-card:hover {
+    border-color: var(--theme-secondary);
+    box-shadow: var(--st-shadow-glow-blue);
+}
+
+/* Buttons */
+html[data-theme]:not([data-theme="default"]) .btn-primary,
+html[data-theme]:not([data-theme="default"]) .action-btn {
+    background: var(--st-gradient-button);
+    border-radius: var(--theme-btn-radius);
+}
+
+html[data-theme]:not([data-theme="default"]) .btn-primary:hover,
+html[data-theme]:not([data-theme="default"]) .action-btn:hover {
+    background: var(--st-gradient-button-hover);
+}
+
+/* Headers */
+html[data-theme]:not([data-theme="default"]) .section-header,
+html[data-theme]:not([data-theme="default"]) .panel-header {
+    color: var(--theme-primary);
+    border-bottom-color: var(--theme-primary);
+}
+
+/* Top bar */
+html[data-theme]:not([data-theme="default"]) .st-topbar {
+    background: var(--st-gradient-header);
+    border-bottom-color: var(--theme-primary);
+}
+
+/* Navigation buttons */
+html[data-theme]:not([data-theme="default"]) .st-nav-btn.active {
+    background: var(--st-gradient-button);
+    color: var(--theme-bg);
+}
+
+html[data-theme]:not([data-theme="default"]) .st-nav-btn:hover {
+    background: rgba(var(--theme-primary), 0.2);
+    border-color: var(--theme-primary);
+}
+
+/* Buttons */
+html[data-theme]:not([data-theme="default"]) .st-btn {
+    background: var(--st-gradient-button);
+    border-radius: var(--theme-btn-radius);
+}
+
+html[data-theme]:not([data-theme="default"]) .st-end-turn-btn {
+    background: linear-gradient(180deg, var(--theme-accent), color-mix(in srgb, var(--theme-accent) 70%, black));
+    color: var(--theme-bg);
+}
+
+/* Cards and panels */
+html[data-theme]:not([data-theme="default"]) .fleet-row.selected,
+html[data-theme]:not([data-theme="default"]) .ship-card.selected,
+html[data-theme]:not([data-theme="default"]) .empire-row.selected {
+    border-left-color: var(--theme-primary);
+    background: color-mix(in srgb, var(--theme-primary) 15%, transparent);
+}
+
+/* Progress bars */
+html[data-theme]:not([data-theme="default"]) .st-progress-fill,
+html[data-theme]:not([data-theme="default"]) .capacity-fill {
+    background: linear-gradient(90deg, var(--theme-primary), var(--theme-secondary));
+}
+
+/* Accents */
+html[data-theme]:not([data-theme="default"]) .fleet-emblem,
+html[data-theme]:not([data-theme="default"]) .system-icon,
+html[data-theme]:not([data-theme="default"]) .planet-selection {
+    border-color: var(--theme-primary);
+}
+
+/* Text highlights */
+html[data-theme]:not([data-theme="default"]) .power-value,
+html[data-theme]:not([data-theme="default"]) .stat-value.highlight {
+    color: var(--theme-secondary);
+}
+
+/* ===========================================
+   FACTION-SPECIFIC GAME UI TRANSFORMATIONS
+   Complete visual overhaul for each faction
+   =========================================== */
+
+/* ===== FEDERATION LCARS GAME UI - Modern SNW ===== */
+html[data-theme="federation"] .st-btn {
+    border-radius: 8px !important;
+    background: var(--lcars-blue) !important;
+    color: #ffffff !important;
+    border: 1px solid var(--lcars-border) !important;
+    font-weight: 700 !important;
+    letter-spacing: 1px !important;
+    text-transform: uppercase !important;
+    padding: 6px 18px !important;
+    transition: all 0.15s ease !important;
+}
+
+html[data-theme="federation"] .st-btn:hover {
+    background: var(--lcars-cyan-dim) !important;
+    border-color: var(--lcars-cyan) !important;
+    box-shadow: 0 0 12px rgba(0, 200, 232, 0.35) !important;
+}
+
+html[data-theme="federation"] .st-btn.primary,
+html[data-theme="federation"] .st-btn-primary {
+    background: var(--lcars-cyan-dim) !important;
+}
+
+html[data-theme="federation"] .st-btn.primary:hover,
+html[data-theme="federation"] .st-btn-primary:hover {
+    background: var(--lcars-cyan) !important;
+    color: #020814 !important;
+}
+
+html[data-theme="federation"] .fleet-row,
+html[data-theme="federation"] .ship-card,
+html[data-theme="federation"] .empire-card,
+html[data-theme="federation"] .slot-building {
+    border-radius: 6px !important;
+    border: 1px solid var(--lcars-border) !important;
+    border-left: 3px solid var(--lcars-cyan-dim) !important;
+    background: rgba(8, 72, 168, 0.15) !important;
+}
+
+html[data-theme="federation"] .fleet-row:hover,
+html[data-theme="federation"] .ship-card:hover,
+html[data-theme="federation"] .empire-card:hover {
+    border-color: var(--lcars-border-lit) !important;
+    border-left-color: var(--lcars-cyan) !important;
+    background: rgba(0, 200, 232, 0.08) !important;
+}
+
+html[data-theme="federation"] .st-end-turn-btn {
+    border-radius: 8px !important;
+    background: var(--lcars-cyan-dim) !important;
+    color: #ffffff !important;
+    border: 1px solid var(--lcars-cyan) !important;
+    font-weight: 700 !important;
+    letter-spacing: 2px !important;
+    text-transform: uppercase !important;
+    box-shadow: 0 0 14px rgba(0, 200, 232, 0.30) !important;
+}
+
+html[data-theme="federation"] .st-end-turn-btn:hover {
+    background: var(--lcars-cyan) !important;
+    color: #020814 !important;
+    box-shadow: 0 0 22px rgba(0, 200, 232, 0.55) !important;
+}
+
+/* ===== KLINGON AGGRESSIVE GAME UI ===== */
+html[data-theme="klingon"] .st-btn {
+    border-radius: 0 !important;
+    clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px) !important;
+    background: linear-gradient(180deg, #cc0000 0%, #660000 100%) !important;
+    border: 1px solid #ff4444 !important;
+    text-shadow: 0 1px 2px #000 !important;
+}
+
+html[data-theme="klingon"] .st-btn:hover {
+    background: linear-gradient(180deg, #ff0000 0%, #880000 100%) !important;
+    box-shadow: 0 0 20px rgba(255, 0, 0, 0.5) !important;
+}
+
+html[data-theme="klingon"] .fleet-row,
+html[data-theme="klingon"] .ship-card,
+html[data-theme="klingon"] .empire-card,
+html[data-theme="klingon"] .slot-building {
+    border-radius: 0 !important;
+    clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px) !important;
+    border: 1px solid #880000 !important;
+    background: linear-gradient(135deg, rgba(100, 0, 0, 0.2) 0%, rgba(50, 0, 0, 0.3) 100%) !important;
+}
+
+html[data-theme="klingon"] .fleet-row:hover,
+html[data-theme="klingon"] .ship-card:hover,
+html[data-theme="klingon"] .empire-card:hover {
+    border-color: #ff4444 !important;
+    box-shadow: inset 0 0 20px rgba(200, 0, 0, 0.3), 0 0 15px rgba(200, 0, 0, 0.4) !important;
+}
+
+html[data-theme="klingon"] .st-topbar {
+    background: linear-gradient(180deg, #200808 0%, #100404 100%) !important;
+    border-bottom: 4px solid #880000 !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8), inset 0 -2px 0 #ff4444 !important;
+}
+
+html[data-theme="klingon"] .st-end-turn-btn {
+    clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0 calc(100% - 10px), 0 10px) !important;
+    background: linear-gradient(180deg, #ffaa00 0%, #cc6600 100%) !important;
+}
+
+/* ===== ROMULAN SLEEK GAME UI ===== */
+html[data-theme="romulan"] .st-btn {
+    border-radius: 0 !important;
+    clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%) !important;
+    background: linear-gradient(180deg, #00aa44 0%, #006622 100%) !important;
+    border: 1px solid #44ff88 !important;
+}
+
+html[data-theme="romulan"] .st-btn:hover {
+    box-shadow: 0 0 20px rgba(0, 170, 68, 0.5) !important;
+}
+
+html[data-theme="romulan"] .fleet-row,
+html[data-theme="romulan"] .ship-card,
+html[data-theme="romulan"] .empire-card,
+html[data-theme="romulan"] .slot-building {
+    border-radius: 0 !important;
+    border-left: 3px solid #00aa44 !important;
+    background: linear-gradient(90deg, rgba(0, 100, 50, 0.2) 0%, transparent 100%) !important;
+}
+
+html[data-theme="romulan"] .fleet-row:hover,
+html[data-theme="romulan"] .ship-card:hover,
+html[data-theme="romulan"] .empire-card:hover {
+    border-left-color: #44ff88 !important;
+    box-shadow: 0 0 15px rgba(0, 170, 68, 0.3) !important;
+}
+
+html[data-theme="romulan"] .st-topbar {
+    background: linear-gradient(180deg, #081810 0%, #040a06 100%) !important;
+    border-bottom: 2px solid #00aa44 !important;
+}
+
+html[data-theme="romulan"] .st-end-turn-btn {
+    clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 50%, calc(100% - 8px) 100%, 8px 100%, 0 50%) !important;
+    background: linear-gradient(180deg, #00cc55 0%, #00aa44 100%) !important;
+}
+
+/* ===== BORG COLLECTIVE GAME UI ===== */
+html[data-theme="borg"] .st-btn {
+    clip-path: polygon(12% 0%, 88% 0%, 100% 50%, 88% 100%, 12% 100%, 0% 50%) !important;
+    background: rgba(0, 255, 170, 0.15) !important;
+    border: 1px solid #00ffaa !important;
+    color: #00ffaa !important;
+    font-family: 'Roboto Mono', monospace !important;
+    letter-spacing: 3px !important;
+    text-shadow: 0 0 10px rgba(0, 255, 170, 0.8) !important;
+}
+
+html[data-theme="borg"] .st-btn:hover {
+    background: rgba(0, 255, 170, 0.3) !important;
+    box-shadow: 0 0 30px rgba(0, 255, 170, 0.5) !important;
+}
+
+html[data-theme="borg"] .fleet-row,
+html[data-theme="borg"] .ship-card,
+html[data-theme="borg"] .empire-card,
+html[data-theme="borg"] .slot-building {
+    border-radius: 0 !important;
+    border: 1px solid rgba(0, 255, 170, 0.4) !important;
+    background:
+        linear-gradient(90deg, rgba(0, 255, 170, 0.03) 1px, transparent 1px),
+        linear-gradient(rgba(0, 255, 170, 0.03) 1px, transparent 1px),
+        rgba(0, 30, 20, 0.5) !important;
+    background-size: 15px 15px, 15px 15px, 100% 100% !important;
+}
+
+html[data-theme="borg"] .fleet-row:hover,
+html[data-theme="borg"] .ship-card:hover,
+html[data-theme="borg"] .empire-card:hover {
+    border-color: #00ffaa !important;
+    box-shadow: 0 0 20px rgba(0, 255, 170, 0.3) !important;
+}
+
+html[data-theme="borg"] .st-topbar {
+    background:
+        linear-gradient(90deg, rgba(0, 255, 170, 0.02) 1px, transparent 1px),
+        linear-gradient(rgba(0, 255, 170, 0.02) 1px, transparent 1px),
+        linear-gradient(180deg, #0a1510 0%, #050a08 100%) !important;
+    background-size: 20px 20px, 20px 20px, 100% 100% !important;
+    border-bottom: 1px solid rgba(0, 255, 170, 0.5) !important;
+}
+
+html[data-theme="borg"] .st-end-turn-btn {
+    clip-path: polygon(15% 0%, 85% 0%, 100% 50%, 85% 100%, 15% 100%, 0% 50%) !important;
+    background: rgba(0, 255, 170, 0.25) !important;
+    border: 2px solid #00ffaa !important;
+}
+
+/* ===== CARDASSIAN GEOMETRIC GAME UI ===== */
+html[data-theme="cardassian"] .st-btn {
+    border-radius: 0 !important;
+    clip-path: polygon(6px 0, calc(100% - 6px) 0, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 0 calc(100% - 6px), 0 6px) !important;
+    background: linear-gradient(180deg, #aa8844 0%, #664422 100%) !important;
+    border: 2px double #ddaa66 !important;
+}
+
+html[data-theme="cardassian"] .st-btn:hover {
+    background: linear-gradient(180deg, #ccaa55 0%, #886633 100%) !important;
+}
+
+html[data-theme="cardassian"] .fleet-row,
+html[data-theme="cardassian"] .ship-card,
+html[data-theme="cardassian"] .empire-card,
+html[data-theme="cardassian"] .slot-building {
+    border-radius: 0 !important;
+    border: 2px double #886644 !important;
+    background: linear-gradient(135deg, rgba(100, 70, 40, 0.2) 0%, rgba(60, 40, 20, 0.3) 100%) !important;
+}
+
+html[data-theme="cardassian"] .fleet-row:hover,
+html[data-theme="cardassian"] .ship-card:hover,
+html[data-theme="cardassian"] .empire-card:hover {
+    border-color: #ddaa66 !important;
+}
+
+html[data-theme="cardassian"] .st-topbar {
+    background: linear-gradient(180deg, #1a1208 0%, #0c0804 100%) !important;
+    border-bottom: 4px double #aa8844 !important;
+}
+
+html[data-theme="cardassian"] .st-end-turn-btn {
+    clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px), 0 8px) !important;
+    background: linear-gradient(180deg, #ddaa66 0%, #aa8844 100%) !important;
+}
+
+/* ===== FERENGI LUXURY GAME UI ===== */
+html[data-theme="ferengi"] .st-btn {
+    border-radius: 25px !important;
+    background: linear-gradient(180deg, #ffdd44 0%, #ddaa00 100%) !important;
+    color: #000 !important;
+    font-weight: 700 !important;
+    box-shadow: 0 0 15px rgba(255, 204, 0, 0.4), inset 0 2px 0 rgba(255, 255, 200, 0.5) !important;
+}
+
+html[data-theme="ferengi"] .st-btn:hover {
+    box-shadow: 0 0 30px rgba(255, 204, 0, 0.7), inset 0 2px 0 rgba(255, 255, 200, 0.6) !important;
+}
+
+html[data-theme="ferengi"] .fleet-row,
+html[data-theme="ferengi"] .ship-card,
+html[data-theme="ferengi"] .empire-card,
+html[data-theme="ferengi"] .slot-building {
+    border-radius: 12px !important;
+    border: 2px solid #ddaa00 !important;
+    background: linear-gradient(135deg, rgba(150, 120, 0, 0.15) 0%, rgba(80, 60, 0, 0.2) 100%) !important;
+    box-shadow: inset 0 1px 0 rgba(255, 220, 100, 0.2) !important;
+}
+
+html[data-theme="ferengi"] .fleet-row:hover,
+html[data-theme="ferengi"] .ship-card:hover,
+html[data-theme="ferengi"] .empire-card:hover {
+    border-color: #ffcc00 !important;
+    box-shadow: 0 0 15px rgba(255, 204, 0, 0.3), inset 0 1px 0 rgba(255, 220, 100, 0.3) !important;
+}
+
+html[data-theme="ferengi"] .st-topbar {
+    background: linear-gradient(180deg, #1a1508 0%, #0c0804 100%) !important;
+    border-bottom: 4px solid transparent !important;
+    border-image: linear-gradient(90deg, #664400, #ffcc00, #ffee44, #ffcc00, #664400) 1 !important;
+}
+
+html[data-theme="ferengi"] .st-end-turn-btn {
+    border-radius: 30px !important;
+    background: linear-gradient(180deg, #ffee44 0%, #ffcc00 50%, #ddaa00 100%) !important;
+    box-shadow: 0 0 30px rgba(255, 204, 0, 0.6) !important;
+}
+
+/* ===== DOMINION IMPERIAL GAME UI ===== */
+html[data-theme="dominion"] .st-btn {
+    border-radius: 0 !important;
+    clip-path: polygon(6px 0, calc(100% - 6px) 0, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 0 calc(100% - 6px), 0 6px) !important;
+    background: linear-gradient(180deg, #aa66dd 0%, #663399 100%) !important;
+    border: 1px solid #cc88ff !important;
+}
+
+html[data-theme="dominion"] .st-btn:hover {
+    box-shadow: 0 0 20px rgba(136, 68, 204, 0.5) !important;
+}
+
+html[data-theme="dominion"] .fleet-row,
+html[data-theme="dominion"] .ship-card,
+html[data-theme="dominion"] .empire-card,
+html[data-theme="dominion"] .slot-building {
+    border-radius: 0 !important;
+    border: 1px solid #8844cc !important;
+    background: linear-gradient(135deg, rgba(100, 50, 150, 0.15) 0%, rgba(60, 30, 90, 0.2) 100%) !important;
+}
+
+html[data-theme="dominion"] .fleet-row:hover,
+html[data-theme="dominion"] .ship-card:hover,
+html[data-theme="dominion"] .empire-card:hover {
+    border-color: #aa66ff !important;
+    box-shadow: 0 0 15px rgba(136, 68, 204, 0.3) !important;
+}
+
+html[data-theme="dominion"] .st-topbar {
+    background: linear-gradient(180deg, #180820 0%, #0c0410 100%) !important;
+    border-bottom: 3px solid #8844cc !important;
+}
+
+html[data-theme="dominion"] .st-end-turn-btn {
+    clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0 calc(100% - 10px), 0 10px) !important;
+    background: linear-gradient(180deg, #cc88ff 0%, #aa66dd 100%) !important;
+}
+
+/* ===========================================
+   PAGE-SPECIFIC OVERRIDES
+   These target the inline styles in Razor components
+   with high specificity to override <style> blocks
+   =========================================== */
+
+/* ===== DIPLOMACY PAGE - FEDERATION ===== */
+html[data-theme="federation"] .diplomacy-content {
+    background: linear-gradient(180deg, #0a0a20 0%, #050510 100%) !important;
+}
+
+html[data-theme="federation"] .diplomacy-header {
+    background: rgba(10, 10, 30, 0.95) !important;
+    border-bottom-color: #ff9900 !important;
+}
+
+html[data-theme="federation"] .filter-btn {
+    background: linear-gradient(180deg, #2a2a50 0%, #1a1a38 100%) !important;
+    border-color: rgba(255, 153, 0, 0.3) !important;
+    border-radius: 20px !important;
+    color: #aaccff !important;
+}
+
+html[data-theme="federation"] .filter-btn:hover {
+    background: linear-gradient(180deg, #3a3a60 0%, #2a2a48 100%) !important;
+}
+
+html[data-theme="federation"] .filter-btn.active {
+    background: linear-gradient(90deg, #ff9900 0%, #ffcc00 100%) !important;
+    color: #000 !important;
+    border-color: #ffcc00 !important;
+}
+
+html[data-theme="federation"] .empire-card {
+    background: linear-gradient(180deg, rgba(20, 20, 50, 0.95) 0%, rgba(10, 10, 30, 0.98) 100%) !important;
+    border: 3px solid #ff9900 !important;
+    border-radius: 0 20px 20px 0 !important;
+    border-left: 6px solid #cc99ff !important;
+}
+
+html[data-theme="federation"] .empire-card:hover,
+html[data-theme="federation"] .empire-card.selected {
+    border-color: #ffcc00 !important;
+    border-left-color: #ff9900 !important;
+}
+
+html[data-theme="federation"] .empire-detail-panel {
+    background: linear-gradient(180deg, rgba(20, 20, 50, 0.95) 0%, rgba(10, 10, 30, 0.98) 100%) !important;
+    border: 3px solid #ff9900 !important;
+    border-radius: 20px !important;
+}
+
+html[data-theme="federation"] .action-btn {
+    background: linear-gradient(180deg, #2a2a50 0%, #1a1a38 100%) !important;
+    border: 2px solid #ff9900 !important;
+    border-radius: 20px !important;
+}
+
+html[data-theme="federation"] .action-btn:hover {
+    background: linear-gradient(180deg, #ff9900 0%, #cc6600 100%) !important;
+    color: #000 !important;
+}
+
+html[data-theme="federation"] .action-btn.danger {
+    border-color: #ff6666 !important;
+}
+
+html[data-theme="federation"] .action-btn.danger:hover {
+    background: linear-gradient(180deg, #ff6666 0%, #cc4444 100%) !important;
+}
+
+/* ===== DIPLOMACY PAGE - KLINGON ===== */
+html[data-theme="klingon"] .diplomacy-content {
+    background: linear-gradient(180deg, #100404 0%, #080202 100%) !important;
+}
+
+html[data-theme="klingon"] .diplomacy-header {
+    background: rgba(20, 8, 8, 0.95) !important;
+    border-bottom-color: #880000 !important;
+}
+
+html[data-theme="klingon"] .filter-btn {
+    background: linear-gradient(180deg, #301010 0%, #200808 100%) !important;
+    border-color: rgba(200, 0, 0, 0.4) !important;
+    border-radius: 0 !important;
+    clip-path: polygon(4px 0, 100% 0, 100% calc(100% - 4px), calc(100% - 4px) 100%, 0 100%, 0 4px) !important;
+    color: #ffcccc !important;
+}
+
+html[data-theme="klingon"] .filter-btn:hover {
+    background: linear-gradient(180deg, #401818 0%, #301010 100%) !important;
+}
+
+html[data-theme="klingon"] .filter-btn.active {
+    background: linear-gradient(180deg, #cc0000 0%, #880000 100%) !important;
+    color: #fff !important;
+    border-color: #ff4444 !important;
+}
+
+html[data-theme="klingon"] .empire-card {
+    background: linear-gradient(135deg, rgba(40, 10, 10, 0.95) 0%, rgba(20, 5, 5, 0.98) 100%) !important;
+    border: 2px solid #880000 !important;
+    border-radius: 0 !important;
+    clip-path: polygon(0 8px, 8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%) !important;
+}
+
+html[data-theme="klingon"] .empire-card:hover,
+html[data-theme="klingon"] .empire-card.selected {
+    border-color: #ff4444 !important;
+    box-shadow: 0 0 20px rgba(200, 0, 0, 0.4) !important;
+}
+
+html[data-theme="klingon"] .empire-detail-panel {
+    background: linear-gradient(180deg, rgba(30, 10, 10, 0.95) 0%, rgba(15, 5, 5, 0.98) 100%) !important;
+    border: 2px solid #880000 !important;
+    border-radius: 0 !important;
+    clip-path: polygon(0 12px, 12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%) !important;
+}
+
+html[data-theme="klingon"] .action-btn {
+    background: linear-gradient(180deg, #401818 0%, #200808 100%) !important;
+    border: 2px solid #880000 !important;
+    border-radius: 0 !important;
+    clip-path: polygon(4px 0, 100% 0, 100% calc(100% - 4px), calc(100% - 4px) 100%, 0 100%, 0 4px) !important;
+}
+
+html[data-theme="klingon"] .action-btn:hover {
+    background: linear-gradient(180deg, #cc0000 0%, #880000 100%) !important;
+    color: #fff !important;
+}
+
+html[data-theme="klingon"] .action-btn.danger {
+    border-color: #ff4444 !important;
+    background: linear-gradient(180deg, #660000 0%, #440000 100%) !important;
+}
+
+html[data-theme="klingon"] .action-btn.danger:hover {
+    background: linear-gradient(180deg, #ff0000 0%, #cc0000 100%) !important;
+}
+
+/* ===== DIPLOMACY PAGE - ROMULAN ===== */
+html[data-theme="romulan"] .diplomacy-content {
+    background: linear-gradient(180deg, #041008 0%, #020804 100%) !important;
+}
+
+html[data-theme="romulan"] .filter-btn {
+    background: linear-gradient(180deg, #0a2014 0%, #06180c 100%) !important;
+    border-color: rgba(0, 170, 68, 0.4) !important;
+    border-radius: 0 !important;
+    clip-path: polygon(4px 0, 100% 0, calc(100% - 4px) 100%, 0 100%) !important;
+    color: #ccffdd !important;
+}
+
+html[data-theme="romulan"] .filter-btn.active {
+    background: linear-gradient(180deg, #00aa44 0%, #006622 100%) !important;
+    color: #fff !important;
+}
+
+html[data-theme="romulan"] .empire-card {
+    background: linear-gradient(90deg, rgba(0, 100, 50, 0.2) 0%, rgba(5, 20, 12, 0.95) 100%) !important;
+    border: 1px solid rgba(0, 170, 68, 0.5) !important;
+    border-left: 3px solid #00aa44 !important;
+    border-radius: 0 !important;
+}
+
+html[data-theme="romulan"] .empire-card:hover,
+html[data-theme="romulan"] .empire-card.selected {
+    border-color: #44ff88 !important;
+    border-left-color: #44ff88 !important;
+}
+
+html[data-theme="romulan"] .empire-detail-panel {
+    background: linear-gradient(180deg, rgba(10, 30, 20, 0.95) 0%, rgba(5, 15, 10, 0.98) 100%) !important;
+    border: 1px solid rgba(0, 170, 68, 0.5) !important;
+    border-radius: 0 !important;
+}
+
+html[data-theme="romulan"] .action-btn {
+    background: linear-gradient(180deg, rgba(0, 80, 40, 0.4) 0%, rgba(0, 40, 20, 0.5) 100%) !important;
+    border: 1px solid #00aa44 !important;
+    border-radius: 0 !important;
+    clip-path: polygon(4px 0, 100% 0, calc(100% - 4px) 100%, 0 100%) !important;
+}
+
+html[data-theme="romulan"] .action-btn:hover {
+    background: linear-gradient(180deg, #00aa44 0%, #006622 100%) !important;
+    color: #fff !important;
+}
+
+/* ===== DIPLOMACY PAGE - BORG ===== */
+html[data-theme="borg"] .diplomacy-content {
+    background:
+        linear-gradient(90deg, rgba(0, 255, 170, 0.02) 1px, transparent 1px),
+        linear-gradient(rgba(0, 255, 170, 0.02) 1px, transparent 1px),
+        linear-gradient(180deg, #040a08 0%, #020604 100%) !important;
+    background-size: 20px 20px, 20px 20px, 100% 100% !important;
+}
+
+html[data-theme="borg"] .filter-btn {
+    background: rgba(0, 255, 170, 0.1) !important;
+    border: 1px solid rgba(0, 255, 170, 0.4) !important;
+    border-radius: 0 !important;
+    color: #00ffaa !important;
+    font-family: 'Roboto Mono', monospace !important;
+    letter-spacing: 2px !important;
+}
+
+html[data-theme="borg"] .filter-btn.active {
+    background: rgba(0, 255, 170, 0.3) !important;
+    border-color: #00ffaa !important;
+    text-shadow: 0 0 10px rgba(0, 255, 170, 0.8) !important;
+}
+
+html[data-theme="borg"] .empire-card {
+    background:
+        linear-gradient(90deg, rgba(0, 255, 170, 0.03) 1px, transparent 1px),
+        linear-gradient(rgba(0, 255, 170, 0.03) 1px, transparent 1px),
+        rgba(5, 15, 12, 0.95) !important;
+    background-size: 15px 15px, 15px 15px, 100% 100% !important;
+    border: 1px solid rgba(0, 255, 170, 0.4) !important;
+    border-radius: 0 !important;
+}
+
+html[data-theme="borg"] .empire-card:hover,
+html[data-theme="borg"] .empire-card.selected {
+    border-color: #00ffaa !important;
+    box-shadow: 0 0 20px rgba(0, 255, 170, 0.3) !important;
+}
+
+html[data-theme="borg"] .empire-detail-panel {
+    background:
+        linear-gradient(90deg, rgba(0, 255, 170, 0.02) 1px, transparent 1px),
+        linear-gradient(rgba(0, 255, 170, 0.02) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(8, 20, 15, 0.95) 0%, rgba(3, 10, 8, 0.98) 100%) !important;
+    background-size: 20px 20px, 20px 20px, 100% 100% !important;
+    border: 1px solid rgba(0, 255, 170, 0.4) !important;
+    border-radius: 0 !important;
+}
+
+html[data-theme="borg"] .action-btn {
+    background: rgba(0, 255, 170, 0.1) !important;
+    border: 1px solid rgba(0, 255, 170, 0.5) !important;
+    border-radius: 0 !important;
+    color: #00ffaa !important;
+    font-family: 'Roboto Mono', monospace !important;
+    clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 50%, calc(100% - 8px) 100%, 8px 100%, 0 50%) !important;
+}
+
+html[data-theme="borg"] .action-btn:hover {
+    background: rgba(0, 255, 170, 0.3) !important;
+    box-shadow: 0 0 20px rgba(0, 255, 170, 0.5) !important;
+}
+
+/* ===== DIPLOMACY PAGE - CARDASSIAN ===== */
+html[data-theme="cardassian"] .diplomacy-content {
+    background: linear-gradient(180deg, #0c0806 0%, #060402 100%) !important;
+}
+
+html[data-theme="cardassian"] .filter-btn {
+    background: linear-gradient(180deg, #1c1610 0%, #140e0a 100%) !important;
+    border: 2px double #886644 !important;
+    border-radius: 0 !important;
+    color: #eeddcc !important;
+    clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px) !important;
+}
+
+html[data-theme="cardassian"] .filter-btn.active {
+    background: linear-gradient(180deg, #aa8844 0%, #664422 100%) !important;
+    color: #fff !important;
+    border-color: #ddaa66 !important;
+}
+
+html[data-theme="cardassian"] .empire-card {
+    background: linear-gradient(180deg, rgba(30, 22, 15, 0.95) 0%, rgba(15, 10, 5, 0.98) 100%) !important;
+    border: 3px double #886644 !important;
+    border-radius: 0 !important;
+}
+
+html[data-theme="cardassian"] .empire-detail-panel {
+    background: linear-gradient(180deg, rgba(30, 22, 15, 0.95) 0%, rgba(15, 10, 5, 0.98) 100%) !important;
+    border: 3px double #aa8844 !important;
+    border-radius: 0 !important;
+}
+
+html[data-theme="cardassian"] .action-btn {
+    background: linear-gradient(180deg, #241e18 0%, #1c1610 100%) !important;
+    border: 2px double #886644 !important;
+    border-radius: 0 !important;
+    clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px) !important;
+}
+
+html[data-theme="cardassian"] .action-btn:hover {
+    background: linear-gradient(180deg, #aa8844 0%, #664422 100%) !important;
+    color: #fff !important;
+}
+
+/* ===== DIPLOMACY PAGE - FERENGI ===== */
+html[data-theme="ferengi"] .diplomacy-content {
+    background: linear-gradient(180deg, #100c04 0%, #080602 100%) !important;
+}
+
+html[data-theme="ferengi"] .filter-btn {
+    background: linear-gradient(180deg, #201808 0%, #181004 100%) !important;
+    border: 2px solid #886600 !important;
+    border-radius: 20px !important;
+    color: #ffeecc !important;
+}
+
+html[data-theme="ferengi"] .filter-btn.active {
+    background: linear-gradient(180deg, #ffcc00 0%, #ddaa00 100%) !important;
+    color: #000 !important;
+    border-color: #ffee44 !important;
+    box-shadow: 0 0 15px rgba(255, 204, 0, 0.5) !important;
+}
+
+html[data-theme="ferengi"] .empire-card {
+    background: linear-gradient(180deg, rgba(35, 28, 12, 0.95) 0%, rgba(18, 14, 5, 0.98) 100%) !important;
+    border: 2px solid #ddaa00 !important;
+    border-radius: 16px !important;
+    box-shadow: inset 0 1px 0 rgba(255, 220, 100, 0.2) !important;
+}
+
+html[data-theme="ferengi"] .empire-card:hover,
+html[data-theme="ferengi"] .empire-card.selected {
+    border-color: #ffcc00 !important;
+    box-shadow: 0 0 20px rgba(255, 204, 0, 0.3) !important;
+}
+
+html[data-theme="ferengi"] .empire-detail-panel {
+    background: linear-gradient(180deg, rgba(35, 28, 12, 0.95) 0%, rgba(18, 14, 5, 0.98) 100%) !important;
+    border: 3px solid #ddaa00 !important;
+    border-radius: 16px !important;
+}
+
+html[data-theme="ferengi"] .action-btn {
+    background: linear-gradient(180deg, #302418 0%, #201808 100%) !important;
+    border: 2px solid #886600 !important;
+    border-radius: 20px !important;
+}
+
+html[data-theme="ferengi"] .action-btn:hover {
+    background: linear-gradient(180deg, #ffcc00 0%, #ddaa00 100%) !important;
+    color: #000 !important;
+    box-shadow: 0 0 15px rgba(255, 204, 0, 0.5) !important;
+}
+
+/* ===== DIPLOMACY PAGE - DOMINION ===== */
+html[data-theme="dominion"] .diplomacy-content {
+    background: linear-gradient(180deg, #08040c 0%, #040206 100%) !important;
+}
+
+html[data-theme="dominion"] .filter-btn {
+    background: linear-gradient(180deg, #1c1028 0%, #140a1c 100%) !important;
+    border: 1px solid rgba(136, 68, 204, 0.5) !important;
+    border-radius: 0 !important;
+    color: #ddccff !important;
+    clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px) !important;
+}
+
+html[data-theme="dominion"] .filter-btn.active {
+    background: linear-gradient(180deg, #8844cc 0%, #553388 100%) !important;
+    color: #fff !important;
+    border-color: #aa66ff !important;
+}
+
+html[data-theme="dominion"] .empire-card {
+    background:
+        radial-gradient(ellipse at 30% 20%, rgba(170, 102, 255, 0.08) 0%, transparent 50%),
+        linear-gradient(180deg, rgba(25, 15, 35, 0.95) 0%, rgba(12, 8, 18, 0.98) 100%) !important;
+    border: 2px solid #8844cc !important;
+    border-radius: 0 !important;
+    clip-path: polygon(0 6px, 6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%) !important;
+}
+
+html[data-theme="dominion"] .empire-card:hover,
+html[data-theme="dominion"] .empire-card.selected {
+    border-color: #aa66ff !important;
+    box-shadow: 0 0 20px rgba(136, 68, 204, 0.3) !important;
+}
+
+html[data-theme="dominion"] .empire-detail-panel {
+    background:
+        radial-gradient(ellipse at 30% 20%, rgba(170, 102, 255, 0.1) 0%, transparent 50%),
+        linear-gradient(180deg, rgba(25, 15, 35, 0.95) 0%, rgba(12, 8, 18, 0.98) 100%) !important;
+    border: 2px solid #8844cc !important;
+    border-radius: 0 !important;
+    clip-path: polygon(0 8px, 8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px)) !important;
+}
+
+html[data-theme="dominion"] .action-btn {
+    background: linear-gradient(180deg, rgba(60, 30, 80, 0.5) 0%, rgba(40, 20, 60, 0.6) 100%) !important;
+    border: 1px solid #8844cc !important;
+    border-radius: 0 !important;
+    clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px) !important;
+}
+
+html[data-theme="dominion"] .action-btn:hover {
+    background: linear-gradient(180deg, #8844cc 0%, #553388 100%) !important;
+    color: #fff !important;
+}
+
+/* ===========================================
+   SIDEBAR & NAVIGATION OVERRIDES
+   =========================================== */
+
+/* ===== FEDERATION SIDEBAR ===== */
+html[data-theme="federation"] .st-sidebar-left {
+    background: linear-gradient(180deg, #0a0a20 0%, #050510 100%) !important;
+    border-right: none !important;
+    position: relative;
+}
+
+html[data-theme="federation"] .st-sidebar-left::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 8px;
+    height: 100%;
+    background: linear-gradient(180deg, #ff9900 0%, #cc6600 30%, #cc99ff 70%, #9966cc 100%);
+    pointer-events: none;
+}
+
+html[data-theme="federation"] .st-nav-btn {
+    border-radius: 0 20px 20px 0 !important;
+    margin: 4px 8px 4px 0 !important;
+    border-left: 4px solid #cc99ff !important;
+}
+
+html[data-theme="federation"] .st-nav-btn:hover {
+    background: rgba(255, 153, 0, 0.2) !important;
+}
+
+html[data-theme="federation"] .st-nav-btn.active {
+    background: linear-gradient(90deg, #ff9900 0%, #ffcc00 100%) !important;
+    color: #000 !important;
+}
+
+/* ===== KLINGON SIDEBAR ===== */
+html[data-theme="klingon"] .st-sidebar-left {
+    background: linear-gradient(180deg, #100404 0%, #080202 100%) !important;
+    border-right: none !important;
+}
+
+html[data-theme="klingon"] .st-sidebar-left::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, #ff4444 0%, #880000 30%, #440000 70%, #880000 100%);
+    pointer-events: none;
+}
+
+html[data-theme="klingon"] .st-nav-btn {
+    border-radius: 0 !important;
+    clip-path: polygon(4px 0, 100% 0, 100% calc(100% - 4px), calc(100% - 4px) 100%, 0 100%, 0 4px) !important;
+    margin: 3px 6px !important;
+}
+
+html[data-theme="klingon"] .st-nav-btn:hover {
+    background: rgba(200, 0, 0, 0.3) !important;
+}
+
+html[data-theme="klingon"] .st-nav-btn.active {
+    background: linear-gradient(90deg, #880000 0%, #cc0000 100%) !important;
+    color: #fff !important;
+}
+
+/* ===== ROMULAN SIDEBAR ===== */
+html[data-theme="romulan"] .st-sidebar-left {
+    background: linear-gradient(180deg, #041008 0%, #020804 100%) !important;
+    border-right: none !important;
+}
+
+html[data-theme="romulan"] .st-sidebar-left::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 2px;
+    height: 100%;
+    background: linear-gradient(180deg, #003318 0%, #00aa44 20%, #44ff88 50%, #00aa44 80%, #003318 100%);
+    pointer-events: none;
+}
+
+html[data-theme="romulan"] .st-nav-btn {
+    border-radius: 0 !important;
+    border-left: 3px solid transparent !important;
+    margin: 2px 6px !important;
+}
+
+html[data-theme="romulan"] .st-nav-btn:hover {
+    background: rgba(0, 170, 68, 0.2) !important;
+    border-left-color: #00aa44 !important;
+}
+
+html[data-theme="romulan"] .st-nav-btn.active {
+    background: linear-gradient(90deg, rgba(0, 170, 68, 0.4) 0%, transparent 100%) !important;
+    border-left-color: #44ff88 !important;
+    color: #44ff88 !important;
+}
+
+/* ===== BORG SIDEBAR ===== */
+html[data-theme="borg"] .st-sidebar-left {
+    background:
+        linear-gradient(90deg, rgba(0, 255, 170, 0.02) 1px, transparent 1px),
+        linear-gradient(rgba(0, 255, 170, 0.02) 1px, transparent 1px),
+        linear-gradient(180deg, #040a08 0%, #020604 100%) !important;
+    background-size: 20px 20px, 20px 20px, 100% 100% !important;
+    border-right: 1px solid rgba(0, 255, 170, 0.3) !important;
+}
+
+html[data-theme="borg"] .st-nav-btn {
+    border-radius: 0 !important;
+    font-family: 'Roboto Mono', monospace !important;
+    font-size: 9px !important;
+    letter-spacing: 1px !important;
+}
+
+html[data-theme="borg"] .st-nav-btn:hover {
+    background: rgba(0, 255, 170, 0.15) !important;
+    text-shadow: 0 0 10px rgba(0, 255, 170, 0.5) !important;
+}
+
+html[data-theme="borg"] .st-nav-btn.active {
+    background: rgba(0, 255, 170, 0.25) !important;
+    color: #00ffaa !important;
+    border-left: 2px solid #00ffaa !important;
+}
+
+/* ===== CARDASSIAN SIDEBAR ===== */
+html[data-theme="cardassian"] .st-sidebar-left {
+    background: linear-gradient(180deg, #0c0806 0%, #060402 100%) !important;
+    border-right: none !important;
+}
+
+html[data-theme="cardassian"] .st-sidebar-left::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, #664422 0%, #aa8844 15%, #664422 50%, #aa8844 85%, #664422 100%);
+    pointer-events: none;
+}
+
+html[data-theme="cardassian"] .st-nav-btn {
+    border-radius: 0 !important;
+    border: 1px solid transparent !important;
+    margin: 2px 6px !important;
+}
+
+html[data-theme="cardassian"] .st-nav-btn:hover {
+    background: rgba(170, 136, 68, 0.2) !important;
+    border-color: rgba(170, 136, 68, 0.4) !important;
+}
+
+html[data-theme="cardassian"] .st-nav-btn.active {
+    background: linear-gradient(90deg, rgba(170, 136, 68, 0.5) 0%, rgba(100, 70, 30, 0.3) 100%) !important;
+    border-color: #aa8844 !important;
+    color: #ffcc88 !important;
+}
+
+/* ===== FERENGI SIDEBAR ===== */
+html[data-theme="ferengi"] .st-sidebar-left {
+    background: linear-gradient(180deg, #100c04 0%, #080602 100%) !important;
+    border-right: none !important;
+}
+
+html[data-theme="ferengi"] .st-sidebar-left::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, #664400 0%, #aa8800 15%, #ffcc00 30%, #aa8800 50%, #ffcc00 70%, #aa8800 85%, #664400 100%);
+    pointer-events: none;
+}
+
+html[data-theme="ferengi"] .st-nav-btn {
+    border-radius: 16px !important;
+    margin: 3px 8px !important;
+}
+
+html[data-theme="ferengi"] .st-nav-btn:hover {
+    background: rgba(221, 170, 0, 0.15) !important;
+}
+
+html[data-theme="ferengi"] .st-nav-btn.active {
+    background: linear-gradient(90deg, rgba(221, 170, 0, 0.5) 0%, rgba(170, 136, 0, 0.3) 100%) !important;
+    color: #ffee44 !important;
+    box-shadow: 0 0 10px rgba(255, 204, 0, 0.3) !important;
+}
+
+/* ===== DOMINION SIDEBAR ===== */
+html[data-theme="dominion"] .st-sidebar-left {
+    background: linear-gradient(180deg, #08040c 0%, #040206 100%) !important;
+    border-right: none !important;
+}
+
+html[data-theme="dominion"] .st-sidebar-left::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 3px;
+    height: 100%;
+    background: linear-gradient(180deg, #331155 0%, #8844cc 20%, #aa66ff 50%, #8844cc 80%, #331155 100%);
+    pointer-events: none;
+}
+
+html[data-theme="dominion"] .st-nav-btn {
+    border-radius: 0 !important;
+    border: 1px solid transparent !important;
+    margin: 2px 6px !important;
+    clip-path: polygon(3px 0, calc(100% - 3px) 0, 100% 3px, 100% calc(100% - 3px), calc(100% - 3px) 100%, 3px 100%, 0 calc(100% - 3px), 0 3px) !important;
+}
+
+html[data-theme="dominion"] .st-nav-btn:hover {
+    background: rgba(136, 68, 204, 0.2) !important;
+    border-color: rgba(136, 68, 204, 0.4) !important;
+}
+
+html[data-theme="dominion"] .st-nav-btn.active {
+    background: linear-gradient(90deg, rgba(136, 68, 204, 0.5) 0%, rgba(100, 50, 150, 0.3) 100%) !important;
+    border-color: #aa66ff !important;
+    color: #cc88ff !important;
+}
+
+/* ===========================================
+   GALAXY MAP & DIPLOMACY PAGE THEMING
+   These pages use custom CSS classes that need
+   explicit theme overrides
+   =========================================== */
+
+/* ===== FEDERATION - Galaxy Map ===== */
+html[data-theme="federation"] .stellaris-galaxy-ui .top-bar,
+html[data-theme="federation"] .diplomacy-content,
+.stellaris-galaxy-ui[data-theme="federation"] .top-bar,
+.stellaris-galaxy-ui.federation .top-bar {
+    background: linear-gradient(180deg, #0a0a20 0%, #050510 100%) !important;
+}
+
+html[data-theme="federation"] .stellaris-galaxy-ui .top-bar {
+    border-bottom: 4px solid #ff9900 !important;
+    box-shadow: 0 4px 20px rgba(255, 153, 0, 0.3) !important;
+}
+
+html[data-theme="federation"] .stellaris-galaxy-ui .empire-section .empire-flag {
+    border: 3px solid #ff9900 !important;
+    border-radius: 50% !important;
+    background: linear-gradient(135deg, #ff9900 0%, #cc6600 100%) !important;
+}
+
+html[data-theme="federation"] .stellaris-galaxy-ui .resource {
+    background: rgba(255, 153, 0, 0.1) !important;
+    border: 1px solid rgba(255, 153, 0, 0.3) !important;
+    border-radius: 20px !important;
+}
+
+html[data-theme="federation"] .stellaris-galaxy-ui .end-turn-btn {
+    background: linear-gradient(180deg, #ff9900 0%, #cc6600 100%) !important;
+    color: #000 !important;
+    border-radius: 25px !important;
+    font-weight: bold !important;
+    box-shadow: 0 0 15px rgba(255, 153, 0, 0.5) !important;
+}
+
+html[data-theme="federation"] .stellaris-galaxy-ui .sidebar-left {
+    background: linear-gradient(180deg, #0a0a20 0%, #050510 100%) !important;
+    border-right: 4px solid #cc99ff !important;
+}
+
+html[data-theme="federation"] .stellaris-galaxy-ui .sidebar-left .nav-btn {
+    border-radius: 0 25px 25px 0 !important;
+    margin-right: 8px !important;
+    background: rgba(255, 153, 0, 0.1) !important;
+    border-left: 4px solid #cc99ff !important;
+}
+
+html[data-theme="federation"] .stellaris-galaxy-ui .sidebar-left .nav-btn:hover {
+    background: rgba(255, 153, 0, 0.25) !important;
+}
+
+html[data-theme="federation"] .stellaris-galaxy-ui .sidebar-left .nav-btn.active {
+    background: linear-gradient(90deg, #ff9900 0%, #ffcc00 100%) !important;
+    color: #000 !important;
+}
+
+html[data-theme="federation"] .stellaris-galaxy-ui .sidebar-right {
+    background: linear-gradient(180deg, #0a0a20 0%, #050510 100%) !important;
+    border-left: 4px solid #ff9900 !important;
+}
+
+html[data-theme="federation"] .stellaris-galaxy-ui .panel {
+    background: rgba(10, 10, 30, 0.95) !important;
+    border: 3px solid #ff9900 !important;
+    border-radius: 20px !important;
+}
+
+/* ===== FEDERATION - Diplomacy Page ===== */
+html[data-theme="federation"] .diplomacy-header {
+    background: linear-gradient(180deg, #1a1a30 0%, #0a0a18 100%) !important;
+    border-bottom: 4px solid #ff9900 !important;
+}
+
+html[data-theme="federation"] .diplomacy-header h1 {
+    color: #ff9900 !important;
+    text-shadow: 0 0 10px rgba(255, 153, 0, 0.5) !important;
+}
+
+html[data-theme="federation"] .filter-btn {
+    background: rgba(255, 153, 0, 0.1) !important;
+    border: 2px solid rgba(255, 153, 0, 0.3) !important;
+    border-radius: 25px !important;
+    color: #ffcc00 !important;
+}
+
+html[data-theme="federation"] .filter-btn:hover,
+html[data-theme="federation"] .filter-btn.active {
+    background: linear-gradient(180deg, #ff9900 0%, #cc6600 100%) !important;
+    color: #000 !important;
+}
+
+html[data-theme="federation"] .empire-card {
+    background: rgba(10, 10, 30, 0.9) !important;
+    border: 2px solid rgba(255, 153, 0, 0.3) !important;
+    border-radius: 15px !important;
+}
+
+html[data-theme="federation"] .empire-card:hover,
+html[data-theme="federation"] .empire-card.selected {
+    border-color: #ff9900 !important;
+    box-shadow: 0 0 20px rgba(255, 153, 0, 0.3) !important;
+}
+
+html[data-theme="federation"] .empire-detail-panel {
+    background: rgba(10, 10, 30, 0.95) !important;
+    border-left: 4px solid #ff9900 !important;
+}
+
+html[data-theme="federation"] .action-btn {
+    background: rgba(255, 153, 0, 0.1) !important;
+    border: 2px solid rgba(255, 153, 0, 0.3) !important;
+    border-radius: 20px !important;
+    color: #ffcc00 !important;
+}
+
+html[data-theme="federation"] .action-btn:hover {
+    background: linear-gradient(180deg, #ff9900 0%, #cc6600 100%) !important;
+    color: #000 !important;
+}
+
+html[data-theme="federation"] .action-btn.danger {
+    border-color: rgba(255, 100, 100, 0.5) !important;
+    color: #ff6666 !important;
+}
+
+html[data-theme="federation"] .action-btn.danger:hover {
+    background: linear-gradient(180deg, #ff4444 0%, #cc0000 100%) !important;
+    color: #fff !important;
+}
+
+/* ===== KLINGON - Galaxy Map ===== */
+html[data-theme="klingon"] .stellaris-galaxy-ui .top-bar {
+    background: linear-gradient(180deg, #1a0808 0%, #0a0202 100%) !important;
+    border-bottom: 3px solid #cc0000 !important;
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 8px), calc(100% - 20px) 100%, 20px 100%, 0 calc(100% - 8px)) !important;
+}
+
+html[data-theme="klingon"] .stellaris-galaxy-ui .end-turn-btn {
+    background: linear-gradient(180deg, #cc0000 0%, #880000 100%) !important;
+    clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px), 0 8px) !important;
+    color: #ffcccc !important;
+    font-weight: bold !important;
+}
+
+html[data-theme="klingon"] .stellaris-galaxy-ui .sidebar-left {
+    background: linear-gradient(180deg, #100404 0%, #080202 100%) !important;
+    border-right: 3px solid #880000 !important;
+}
+
+/* ===== KLINGON - Diplomacy Page ===== */
+html[data-theme="klingon"] .diplomacy-header {
+    background: linear-gradient(180deg, #1a0808 0%, #0a0202 100%) !important;
+    border-bottom: 3px solid #cc0000 !important;
+}
+
+html[data-theme="klingon"] .diplomacy-header h1 {
+    color: #ff4444 !important;
+}
+
+html[data-theme="klingon"] .empire-card {
+    background: rgba(20, 8, 8, 0.9) !important;
+    border: 2px solid rgba(200, 0, 0, 0.3) !important;
+    clip-path: polygon(0 8px, 8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%) !important;
+}
+
+html[data-theme="klingon"] .action-btn {
+    background: rgba(200, 0, 0, 0.1) !important;
+    border: 2px solid rgba(200, 0, 0, 0.3) !important;
+    clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px) !important;
+    color: #ff4444 !important;
+}
+
+/* ===== ROMULAN - Galaxy Map ===== */
+html[data-theme="romulan"] .stellaris-galaxy-ui .top-bar {
+    background: linear-gradient(180deg, #081808 0%, #040a04 100%) !important;
+    border-bottom: 2px solid #228822 !important;
+}
+
+html[data-theme="romulan"] .stellaris-galaxy-ui .end-turn-btn {
+    background: linear-gradient(180deg, rgba(34, 136, 34, 0.6) 0%, rgba(17, 68, 17, 0.4) 100%) !important;
+    border: 1px solid #44aa44 !important;
+    color: #88ff88 !important;
+}
+
+/* ===== ROMULAN - Diplomacy Page ===== */
+html[data-theme="romulan"] .diplomacy-header {
+    background: linear-gradient(180deg, #081808 0%, #040a04 100%) !important;
+    border-bottom: 2px solid #228822 !important;
+}
+
+html[data-theme="romulan"] .empire-card {
+    background: rgba(8, 24, 8, 0.9) !important;
+    border: 1px solid rgba(34, 136, 34, 0.3) !important;
+}
+
+/* ===== BORG - Galaxy Map ===== */
+html[data-theme="borg"] .stellaris-galaxy-ui .top-bar {
+    background:
+        repeating-linear-gradient(90deg, rgba(0, 255, 170, 0.02) 0px, transparent 1px, transparent 20px),
+        linear-gradient(180deg, #040c0c 0%, #020606 100%) !important;
+    border-bottom: 1px solid rgba(0, 255, 170, 0.4) !important;
+}
+
+html[data-theme="borg"] .stellaris-galaxy-ui .end-turn-btn {
+    background: rgba(0, 255, 170, 0.1) !important;
+    border: 1px solid rgba(0, 255, 170, 0.5) !important;
+    color: #00ffaa !important;
+    font-family: monospace !important;
+    letter-spacing: 2px !important;
+}
+
+/* ===== BORG - Diplomacy Page ===== */
+html[data-theme="borg"] .diplomacy-header h1 {
+    color: #00ffaa !important;
+    font-family: monospace !important;
+    letter-spacing: 3px !important;
+}
+
+html[data-theme="borg"] .empire-card {
+    background:
+        repeating-linear-gradient(60deg, rgba(0, 255, 170, 0.02) 0px, transparent 1px, transparent 10px),
+        rgba(5, 15, 12, 0.95) !important;
+    border: 1px solid rgba(0, 255, 170, 0.3) !important;
 }

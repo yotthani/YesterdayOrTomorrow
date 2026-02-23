@@ -1,63 +1,53 @@
 @page "/game/policies"
 @layout StellarisLayout
 @using StarTrekGame.Web.Services
+@using Blazored.LocalStorage
+@using MudBlazor
+@inject IGameApiClient Api
+@inject ILocalStorageService LocalStorage
 @inject NavigationManager Navigation
+@inject ISnackbar Snackbar
 
 <PageTitle>Policies - Galactic Strategy</PageTitle>
 
-<div class="stellaris-layout">
-    <header class="st-topbar">
-        <div class="st-empire-badge"><div class="st-empire-flag">🌐</div><div class="st-empire-info"><span class="st-empire-name">Empire Policies</span></div></div>
-        <div class="st-game-controls"><button class="st-end-turn-btn" @onclick="GoBack">← BACK</button></div>
-    </header>
-    <div class="st-main">
-        <aside class="st-sidebar-left">
-            <nav class="st-nav">
-                <a href="/game/galaxy" class="st-nav-btn"><span class="st-nav-icon">🌌</span><span class="st-nav-label">Galaxy</span></a>
-                <a href="/game/policies" class="st-nav-btn active"><span class="st-nav-icon">📜</span><span class="st-nav-label">Policies</span></a>
-            </nav>
-        </aside>
-        <div class="policy-content">
+<div class="policy-content">
             <h1>EMPIRE POLICIES</h1>
             <p>Configure your empire's policies and edicts.</p>
             
             <div class="policy-grid">
                 <div class="policy-card">
                     <h3>Economic Policy</h3>
-                    <select class="policy-select">
-                        <option>Free Market</option>
-                        <option>Planned Economy</option>
-                        <option>Mixed Economy</option>
+                    <p class="policy-desc">Determines resource generation priorities and trade modifiers.</p>
+                    <select class="policy-select" @onchange='(e) => SetPolicy("economic", e.Value?.ToString() ?? "")'>
+                        @foreach (var opt in new[]{"Free Market","Planned Economy","Mixed Economy"}){<option selected="@(_policies["economic"]==opt)">@opt</option>}
                     </select>
+                    <div class="policy-effect">@GetPolicyEffect("economic")</div>
                 </div>
                 <div class="policy-card">
                     <h3>Military Doctrine</h3>
-                    <select class="policy-select">
-                        <option>Defensive</option>
-                        <option>Balanced</option>
-                        <option>Aggressive</option>
+                    <p class="policy-desc">Affects fleet combat bonuses and naval capacity.</p>
+                    <select class="policy-select" @onchange='(e) => SetPolicy("military", e.Value?.ToString() ?? "")'>
+                        @foreach (var opt in new[]{"Defensive","Balanced","Aggressive"}){<option selected="@(_policies["military"]==opt)">@opt</option>}
                     </select>
+                    <div class="policy-effect">@GetPolicyEffect("military")</div>
                 </div>
                 <div class="policy-card">
                     <h3>Diplomatic Stance</h3>
-                    <select class="policy-select">
-                        <option>Peaceful</option>
-                        <option>Neutral</option>
-                        <option>Belligerent</option>
+                    <p class="policy-desc">Influences opinion modifiers with other factions.</p>
+                    <select class="policy-select" @onchange='(e) => SetPolicy("diplomatic", e.Value?.ToString() ?? "")'>
+                        @foreach (var opt in new[]{"Peaceful","Neutral","Belligerent"}){<option selected="@(_policies["diplomatic"]==opt)">@opt</option>}
                     </select>
+                    <div class="policy-effect">@GetPolicyEffect("diplomatic")</div>
                 </div>
                 <div class="policy-card">
                     <h3>Research Focus</h3>
-                    <select class="policy-select">
-                        <option>Balanced</option>
-                        <option>Military Tech</option>
-                        <option>Economic Tech</option>
-                        <option>Exploration</option>
+                    <p class="policy-desc">Provides a bonus to the selected research category.</p>
+                    <select class="policy-select" @onchange='(e) => SetPolicy("research", e.Value?.ToString() ?? "")'>
+                        @foreach (var opt in new[]{"Balanced","Military Tech","Economic Tech","Exploration"}){<option selected="@(_policies["research"]==opt)">@opt</option>}
                     </select>
+                    <div class="policy-effect">@GetPolicyEffect("research")</div>
                 </div>
             </div>
-        </div>
-    </div>
 </div>
 
 <style>
@@ -68,8 +58,71 @@
 .policy-card { background: rgba(20, 30, 45, 0.9); border: 1px solid rgba(60, 90, 130, 0.5); border-radius: 8px; padding: 20px; }
 .policy-card h3 { font-family: var(--st-font-display); font-size: 14px; color: #c8d4e8; margin-bottom: 12px; }
 .policy-select { width: 100%; padding: 10px; background: rgba(10, 15, 25, 0.8); border: 1px solid rgba(60, 90, 130, 0.5); border-radius: 4px; color: #c8d4e8; font-size: 13px; }
+.policy-desc { font-size: 11px; color: var(--st-text-dim, #667788); margin-bottom: 12px; }
+.policy-effect { margin-top: 8px; padding: 8px; background: rgba(74, 158, 255, 0.08); border-left: 2px solid var(--st-accent-blue, #4a9eff); font-size: 11px; color: var(--st-accent-cyan, #66ccff); border-radius: 0 4px 4px 0; }
 </style>
 
 @code {
-    private void GoBack() => Navigation.NavigateTo("/game/galaxy");
+    private Guid? _factionId;
+    private Dictionary<string, string> _policies = new()
+    {
+        { "economic", "Mixed Economy" },
+        { "military", "Balanced" },
+        { "diplomatic", "Neutral" },
+        { "research", "Balanced" }
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        _factionId = await LocalStorage.GetItemAsync<Guid?>("currentFactionId");
+        if (_factionId.HasValue)
+        {
+            try
+            {
+                var apiPolicies = await Api.GetPoliciesAsync(_factionId.Value);
+                if (apiPolicies.Any())
+                    _policies = apiPolicies;
+            }
+            catch { /* use defaults */ }
+        }
+    }
+
+    private async Task SetPolicy(string category, string value)
+    {
+        _policies[category] = value;
+        if (_factionId.HasValue)
+        {
+            try
+            {
+                await Api.SetPolicyAsync(_factionId.Value, category, value);
+                Snackbar.Add($"{category} policy changed to: {value}", MudBlazor.Severity.Success);
+            }
+            catch (Exception ex)
+            {
+                Snackbar.Add($"Failed to set policy: {ex.Message}", MudBlazor.Severity.Error);
+            }
+        }
+        else
+        {
+            Snackbar.Add($"{category} policy changed to: {value}", MudBlazor.Severity.Success);
+        }
+    }
+
+    private string GetPolicyEffect(string category) => (category, _policies[category]) switch
+    {
+        ("economic", "Free Market") => "+15% Credits, -5% Minerals production",
+        ("economic", "Planned Economy") => "+10% All resources, -10% Credits",
+        ("economic", "Mixed Economy") => "No modifiers (balanced)",
+        ("military", "Defensive") => "+20% Station defense, -10% Fleet damage",
+        ("military", "Balanced") => "No modifiers (balanced)",
+        ("military", "Aggressive") => "+15% Fleet damage, -10% Station defense",
+        ("diplomatic", "Peaceful") => "+20 Opinion with all factions, -15% Fleet damage",
+        ("diplomatic", "Neutral") => "No modifiers (balanced)",
+        ("diplomatic", "Belligerent") => "-10 Opinion, +10% Fleet damage, +Claims",
+        ("research", "Balanced") => "No modifiers (balanced)",
+        ("research", "Military Tech") => "+25% Military research, -10% Other research",
+        ("research", "Economic Tech") => "+25% Engineering research, -10% Other research",
+        ("research", "Exploration") => "+25% Science research, -10% Other research",
+        _ => "No modifiers"
+    };
 }

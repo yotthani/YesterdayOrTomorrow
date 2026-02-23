@@ -1,0 +1,419 @@
+@page "/menu-test"
+@layout EmptyLayout
+@using StarTrekGame.Web.Services
+@using StarTrekGame.Web.Components.MainMenuUI
+@inject MainMenuTemplateService TemplateService
+
+<PageTitle>Menu Style Test - @_currentStyle.ToUpper()</PageTitle>
+
+@* Style Selector - Fixed at top *@
+<div class="style-selector-fixed">
+    <span class="selector-label">STYLE:</span>
+    @foreach (var styleId in TemplateService.GetAllStyleIds())
+    {
+        var t = TemplateService.GetTemplate(styleId);
+        <button class="style-select-btn @(_currentStyle == styleId ? "active" : "")"
+                style="--btn-color: @t.Colors.Primary"
+                @onclick="() => SetStyle(styleId)">
+            @styleId.ToUpper()
+        </button>
+    }
+</div>
+
+@* Template Info Display *@
+<div class="template-info">
+    <span>Template: <strong>@_template.Name</strong></span>
+    <span>Description: @_template.Description</span>
+</div>
+
+@* Full Menu Layout Demo *@
+<MenuLayout MenuStyle="@_currentStyle" Class="menu-test-layout">
+    <HeaderContent>
+        <MenuHeader Title="TrekGame"
+                    Subtitle="The Final Strategy Frontier"
+                    CommunityTag="A <span class='yot-highlight'>YOT</span> Community Project" />
+    </HeaderContent>
+
+    <SidebarContent>
+        <MenuSidebar HeaderTitle="MAIN MENU"
+                     NavItems="@_navItems"
+                     SecondaryNavItems="@_secondaryNavItems" />
+    </SidebarContent>
+
+    <MainContent>
+        @if (_currentPanel == "welcome")
+        {
+            <MenuPanel>
+                <ChildContent>
+                    <div class="welcome-content">
+                        <div class="starfleet-emblem">🌟</div>
+                        <h2>WELCOME, COMMANDER</h2>
+                        <p>The galaxy awaits your leadership. Choose your path and shape the future of the Alpha Quadrant.</p>
+
+                        <div class="game-summary">
+                            <div class="summary-header">CURRENT MISSION</div>
+                            <div class="summary-stats">
+                                <div class="stat">
+                                    <span class="stat-label">STARDATE</span>
+                                    <span class="stat-value">47634.44</span>
+                                </div>
+                                <div class="stat">
+                                    <span class="stat-label">FACTIONS</span>
+                                    <span class="stat-value">6</span>
+                                </div>
+                                <div class="stat">
+                                    <span class="stat-label">SYSTEMS</span>
+                                    <span class="stat-value">128</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="quick-actions">
+                            <MenuButton Icon="🎨" Secondary="true">Asset Gallery</MenuButton>
+                            <MenuButton Icon="🖼" Secondary="true">Showcase</MenuButton>
+                        </div>
+                    </div>
+                </ChildContent>
+            </MenuPanel>
+        }
+        else if (_currentPanel == "newgame")
+        {
+            <MenuPanel Title="NEW MISSION" ShowCloseButton="true" OnClose="@(() => ShowPanel("welcome"))">
+                <ChildContent>
+                    <div class="newgame-content">
+                        <div class="faction-grid">
+                            @foreach (var faction in _factions)
+                            {
+                                <div class="faction-card @(_selectedFaction == faction.Id ? "selected" : "")"
+                                     @onclick="() => _selectedFaction = faction.Id">
+                                    <div class="faction-emblem" style="background: @faction.Color;">
+                                        <span>@faction.Icon</span>
+                                    </div>
+                                    <div class="faction-info">
+                                        <h3>@faction.Name</h3>
+                                        <p>@faction.Description</p>
+                                    </div>
+                                    <div class="faction-traits">
+                                        @foreach (var trait in faction.Traits)
+                                        {
+                                            <span class="trait">@trait</span>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </ChildContent>
+                <FooterContent>
+                    <MenuButton Secondary="true" OnClick="@(() => ShowPanel("welcome"))">CANCEL</MenuButton>
+                    <MenuButton Primary="true" Disabled="@(_selectedFaction == null)">ENGAGE</MenuButton>
+                </FooterContent>
+            </MenuPanel>
+        }
+        else if (_currentPanel == "credits")
+        {
+            <MenuPanel Title="CREDITS" ShowCloseButton="true" OnClose="@(() => ShowPanel("welcome"))">
+                <ChildContent>
+                    <div class="credits-content">
+                        <div class="credit-section">
+                            <h3 class="credit-heading">COMMUNITY</h3>
+                            <p class="credit-line highlight"><span class="yot-badge">YOT</span> Yesterday or Tomorrow</p>
+                            <p class="credit-line small">The community behind this project</p>
+                        </div>
+                        <div class="credit-divider"></div>
+                        <div class="credit-section">
+                            <h3 class="credit-heading">INSPIRED BY</h3>
+                            <p class="credit-line">Star Trek™ Universe</p>
+                            <p class="credit-line">Birth of the Federation (1999)</p>
+                            <p class="credit-line">Stellaris by Paradox Interactive</p>
+                        </div>
+                    </div>
+                </ChildContent>
+            </MenuPanel>
+        }
+        else if (_currentPanel == "buttons")
+        {
+            <MenuPanel Title="BUTTON STYLES" ShowCloseButton="true" OnClose="@(() => ShowPanel("welcome"))">
+                <ChildContent>
+                    <div class="buttons-test">
+                        <h3>Button Styles</h3>
+                        <div class="button-row">
+                            <MenuButton>DEFAULT</MenuButton>
+                            <MenuButton Primary="true">PRIMARY</MenuButton>
+                            <MenuButton Secondary="true">SECONDARY</MenuButton>
+                            <MenuButton Danger="true">DANGER</MenuButton>
+                        </div>
+                        <div class="button-row">
+                            <MenuButton Icon="▶" Primary="true">WITH ICON</MenuButton>
+                            <MenuButton Icon="⚙">SETTINGS</MenuButton>
+                            <MenuButton Disabled="true">DISABLED</MenuButton>
+                        </div>
+                    </div>
+                </ChildContent>
+            </MenuPanel>
+        }
+    </MainContent>
+
+    <FooterContent>
+        <MenuFooter Version="1.43.64" VersionName="Building Blocks" />
+    </FooterContent>
+</MenuLayout>
+
+<style>
+    /* Style selector - fixed above everything */
+    .style-selector-fixed {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 99999;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        background: rgba(0,0,0,0.95);
+        border-bottom: 2px solid var(--menu-primary, #ff9900);
+    }
+    .selector-label { font-size: 10px; color: #666; letter-spacing: 2px; }
+    .style-select-btn {
+        padding: 4px 12px;
+        background: transparent;
+        border: 1px solid var(--btn-color);
+        color: var(--btn-color);
+        font-size: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.15s;
+    }
+    .style-select-btn:hover { background: var(--btn-color); color: #000; }
+    .style-select-btn.active { background: var(--btn-color); color: #000; box-shadow: 0 0 10px var(--btn-color); }
+
+    /* Template info bar */
+    .template-info {
+        position: fixed;
+        top: 36px;
+        left: 0;
+        right: 0;
+        z-index: 99998;
+        display: flex;
+        gap: 20px;
+        padding: 4px 12px;
+        background: rgba(0,0,0,0.8);
+        font-size: 10px;
+        color: #888;
+    }
+    .template-info strong { color: var(--menu-primary, #ff9900); }
+
+    /* Layout adjustment for fixed bars */
+    .menu-test-layout {
+        padding-top: 56px;
+    }
+
+    /* Welcome panel styles */
+    .welcome-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        min-height: 400px;
+    }
+
+    .starfleet-emblem {
+        font-size: 80px;
+        margin-bottom: 20px;
+        animation: emblem-glow 3s ease-in-out infinite;
+    }
+
+    @@keyframes emblem-glow {
+        0%, 100% { filter: drop-shadow(0 0 20px rgba(255, 153, 0, 0.5)); }
+        50% { filter: drop-shadow(0 0 40px rgba(255, 153, 0, 0.8)); }
+    }
+
+    .welcome-content h2 {
+        font-family: var(--st-font-display);
+        font-size: 28px;
+        color: var(--menu-primary, #ff9900);
+        letter-spacing: 4px;
+        margin: 0 0 16px;
+    }
+
+    .welcome-content p {
+        font-size: 14px;
+        color: var(--menu-tertiary, #ffcc99);
+        max-width: 500px;
+        line-height: 1.6;
+    }
+
+    .game-summary {
+        margin-top: 30px;
+        background: rgba(255, 153, 0, 0.1);
+        border: 1px solid var(--menu-primary, #ff9900);
+        border-radius: 10px;
+        padding: 20px;
+        width: 100%;
+        max-width: 400px;
+    }
+
+    .summary-header {
+        font-family: var(--st-font-display);
+        font-size: 12px;
+        color: var(--menu-accent, #cc99ff);
+        letter-spacing: 2px;
+        margin-bottom: 16px;
+    }
+
+    .summary-stats {
+        display: flex;
+        justify-content: space-around;
+    }
+
+    .stat { text-align: center; }
+    .stat-label { display: block; font-size: 10px; color: var(--menu-secondary, #cc9966); letter-spacing: 1px; margin-bottom: 4px; }
+    .stat-value { font-family: var(--st-font-display); font-size: 24px; color: var(--menu-primary, #ff9900); }
+
+    .quick-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 30px;
+    }
+
+    /* Faction grid */
+    .faction-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+    .faction-card {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 16px;
+        background: rgba(0, 0, 0, 0.5);
+        border: 1px solid var(--menu-secondary, #cc9966);
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.15s;
+    }
+
+    .faction-card:hover {
+        border-color: var(--menu-primary, #ff9900);
+        background: rgba(255, 153, 0, 0.1);
+    }
+
+    .faction-card.selected {
+        border-color: var(--menu-primary, #ff9900);
+        border-width: 2px;
+        box-shadow: 0 0 20px rgba(255, 153, 0, 0.3);
+    }
+
+    .faction-emblem {
+        width: 60px;
+        height: 60px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 30px;
+    }
+
+    .faction-info h3 {
+        font-family: var(--st-font-display);
+        font-size: 14px;
+        color: var(--menu-primary, #ff9900);
+        margin: 0;
+    }
+
+    .faction-info p {
+        font-size: 11px;
+        color: var(--menu-tertiary, #ffcc99);
+        margin: 4px 0 0;
+    }
+
+    .faction-traits {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+
+    .trait {
+        font-size: 9px;
+        padding: 2px 8px;
+        background: rgba(153, 153, 204, 0.2);
+        border-radius: 10px;
+        color: var(--menu-accent, #cc99ff);
+    }
+
+    /* Credits */
+    .credits-content { text-align: center; padding: 40px; }
+    .credit-section { margin-bottom: 20px; }
+    .credit-heading { font-family: var(--st-font-display); font-size: 12px; color: var(--menu-accent, #cc99ff); letter-spacing: 3px; margin-bottom: 12px; }
+    .credit-line { font-family: var(--st-font-display); font-size: 16px; color: var(--menu-primary, #ff9900); margin: 12px 0; }
+    .credit-line.highlight { font-size: 20px; color: #ffcc00; }
+    .credit-line.small { font-size: 11px; color: var(--menu-secondary, #cc9966); }
+    .yot-badge { display: inline-block; background: linear-gradient(135deg, #ffcc00, #ff9900); color: #000; padding: 4px 12px; border-radius: 4px; font-weight: 700; font-size: 14px; margin-right: 8px; letter-spacing: 2px; }
+    .credit-divider { height: 2px; background: var(--menu-secondary, #cc9966); margin: 30px auto; width: 200px; }
+    .yot-highlight { color: #ffcc00; font-weight: 700; text-shadow: 0 0 10px rgba(255, 204, 0, 0.5); }
+
+    /* Buttons test */
+    .buttons-test h3 { color: var(--menu-primary, #ff9900); margin-bottom: 20px; }
+    .button-row { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+</style>
+
+@code {
+    private string _currentStyle = "lcars";
+    private MenuTemplate _template = null!;
+    private string _currentPanel = "welcome";
+    private string? _selectedFaction = null;
+
+    private List<MenuSidebar.NavItemData> _navItems = new();
+    private List<MenuSidebar.NavItemData> _secondaryNavItems = new();
+
+    private List<FactionOption> _factions = new()
+    {
+        new("federation", "United Federation", "#4488ff", "🖖", "Exploration and diplomacy", new[] { "+Research", "+Diplomacy" }),
+        new("klingon", "Klingon Empire", "#cc2222", "⚔️", "Honor through combat", new[] { "+Combat", "+Honor" }),
+        new("romulan", "Romulan Star Empire", "#22aa66", "🦅", "Shadows and intrigue", new[] { "+Espionage", "+Cloaking" }),
+        new("cardassian", "Cardassian Union", "#cc8822", "🔱", "Order through strength", new[] { "+Production", "+Control" }),
+    };
+
+    protected override void OnInitialized()
+    {
+        _template = TemplateService.GetTemplate(_currentStyle);
+        InitializeNavItems();
+    }
+
+    private void SetStyle(string style)
+    {
+        _currentStyle = style;
+        _template = TemplateService.GetTemplate(style);
+        StateHasChanged();
+    }
+
+    private void InitializeNavItems()
+    {
+        _navItems = new List<MenuSidebar.NavItemData>
+        {
+            new() { Label = "CONTINUE", Icon = "▶", IsPrimary = true, OnClick = EventCallback.Factory.Create(this, () => ShowPanel("welcome")) },
+            new() { Label = "NEW GAME", Icon = "✦", OnClick = EventCallback.Factory.Create(this, () => ShowPanel("newgame")) },
+            new() { Label = "LOAD GAME", Icon = "◉", OnClick = EventCallback.Factory.Create(this, () => ShowPanel("welcome")) },
+        };
+
+        _secondaryNavItems = new List<MenuSidebar.NavItemData>
+        {
+            new() { Label = "SETTINGS", Icon = "⚙", OnClick = EventCallback.Factory.Create(this, () => ShowPanel("buttons")) },
+            new() { Label = "CREDITS", Icon = "★", OnClick = EventCallback.Factory.Create(this, () => ShowPanel("credits")) },
+        };
+    }
+
+    private void ShowPanel(string panel)
+    {
+        _currentPanel = panel;
+        StateHasChanged();
+    }
+
+    record FactionOption(string Id, string Name, string Color, string Icon, string Description, string[] Traits);
+}

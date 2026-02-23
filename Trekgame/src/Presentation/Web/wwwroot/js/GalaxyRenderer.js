@@ -41,6 +41,7 @@ class GalaxyRenderer {
         this.hyperlanes = [];
         this.fleets = [];
         this.territories = new Map();
+        this.asteroidFields = [];  // Asteroid field regions
         
         // Selection
         this.selectedSystemId = null;
@@ -99,24 +100,125 @@ class GalaxyRenderer {
     }
 
     async loadAssets() {
-        // Star type images - we'll generate procedural ones
-        const starTypes = ['yellow', 'orange', 'red', 'blue', 'white', 'neutron', 'blackhole'];
-        
-        for (const type of starTypes) {
-            this.assets.stars[type] = this.generateStarImage(type);
+        // Try to load star spritesheet first, fall back to procedural
+        try {
+            await this.loadStarSpritesheet();
+            console.log('Star spritesheet loaded successfully');
+        } catch (err) {
+            console.log('Spritesheet unavailable, using procedural stars:', err);
+            // Fall back to procedural star generation
+            const starTypes = ['yellow', 'orange', 'red', 'blue', 'white', 'neutron', 'blackhole'];
+            for (const type of starTypes) {
+                this.assets.stars[type] = this.generateStarImage(type);
+            }
         }
-        
+
         // Generate nebula textures
         for (let i = 0; i < 5; i++) {
             this.assets.nebulae.push(this.generateNebulaImage(i));
         }
-        
+
         // Generate icons
         this.assets.icons.colony = this.generateIcon('colony');
         this.assets.icons.fleet = this.generateIcon('fleet');
         this.assets.icons.starbase = this.generateIcon('starbase');
-        
+
         console.log('Galaxy assets loaded');
+    }
+
+    async loadStarSpritesheet() {
+        // Load spritesheet image
+        this.starSpritesheet = new Image();
+        this.starSpritesheet.crossOrigin = "anonymous";  // Allow CORS if needed
+        this.starSpritesheet.src = '/assets/universal/stars_spritesheet.png';
+
+        console.log('🌟 Loading star spritesheet from:', this.starSpritesheet.src);
+
+        // Wait for image to load
+        await new Promise((resolve, reject) => {
+            this.starSpritesheet.onload = () => {
+                console.log('🌟 Star spritesheet loaded successfully:',
+                    this.starSpritesheet.width, 'x', this.starSpritesheet.height);
+                resolve();
+            };
+            this.starSpritesheet.onerror = (err) => {
+                console.error('🌟 Star spritesheet failed to load:', err);
+                reject(err);
+            };
+        });
+
+        // Star type to grid position mapping
+        // Based on stars_manifest.json: 4x4 grid, 360px cells
+        this.starGridMap = {
+            'yellow': { row: 0, col: 0 },      // Star Yellow Dwarf
+            'orange': { row: 0, col: 1 },      // Star Orange Dwarf
+            'red': { row: 0, col: 2 },         // Star Red Dwarf
+            'blue': { row: 0, col: 3 },        // Star Blue Giant
+            'redgiant': { row: 1, col: 0 },    // Star Red Giant
+            'bluesupergiant': { row: 1, col: 1 }, // Star Blue Supergiant
+            'white': { row: 1, col: 2 },       // Star White Giant
+            'orangegiant': { row: 1, col: 3 }, // Star Orange Giant
+            'neutron': { row: 2, col: 0 },     // Star Neutron Pulsar
+            'blackhole': { row: 2, col: 1 },   // Star Black Hole
+            'whitedwarf': { row: 2, col: 2 },  // Star White Dwarf
+            'browndwarf': { row: 2, col: 3 },  // Star Brown Dwarf
+            'binary': { row: 3, col: 0 },      // Star Binary System
+            'trinary': { row: 3, col: 1 },     // Star Trinary System
+            'protostar': { row: 3, col: 2 },   // Star Protostar Nebula
+            'supernova': { row: 3, col: 3 }    // Star Supernova Remnant
+        };
+
+        this.starCellSize = 360;
+        this.useStarSpritesheet = true;
+    }
+
+    getStarGridPosition(starType, systemName) {
+        let type = (starType || 'yellow').toLowerCase();
+
+        // Handle "unknown" star types by generating a consistent random type based on system name
+        if (type === 'unknown' || type === '' || type === 'undefined') {
+            const starTypes = ['yellow', 'orange', 'red', 'blue', 'white'];
+            // Use simple hash of system name for consistent star type
+            const hash = (systemName || 'default').split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+            type = starTypes[hash % starTypes.length];
+        }
+
+        // Map backend enum names to our sprite names
+        const typeAliases = {
+            'mainsequence': 'yellow',
+            'main_sequence': 'yellow',
+            'yellowdwarf': 'yellow',
+            'yellow_dwarf': 'yellow',
+            'orangedwarf': 'orange',
+            'orange_dwarf': 'orange',
+            'reddwarf': 'red',
+            'red_dwarf': 'red',
+            'bluegiant': 'blue',
+            'blue_giant': 'blue',
+            'redgiant': 'redgiant',
+            'red_giant': 'redgiant',
+            'whitedwarf': 'whitedwarf',
+            'white_dwarf': 'whitedwarf',
+            'browndwarf': 'browndwarf',
+            'brown_dwarf': 'browndwarf',
+            'neutronstar': 'neutron',
+            'neutron_star': 'neutron',
+            'pulsar': 'neutron',
+            'binarysystem': 'binary',
+            'binary_system': 'binary',
+            'trinarysystem': 'trinary',
+            'trinary_system': 'trinary',
+            'class_g': 'yellow',
+            'class_k': 'orange',
+            'class_m': 'red',
+            'class_o': 'blue',
+            'class_b': 'blue',
+            'class_a': 'white',
+            'class_f': 'yellow'
+        };
+
+        const mappedType = typeAliases[type] || type;
+        return this.starGridMap[mappedType] || this.starGridMap['yellow'];
     }
 
     generateStarImage(type) {
@@ -592,12 +694,15 @@ class GalaxyRenderer {
         const ctx = this.mainCtx;
         const w = this.mainCanvas.width;
         const h = this.mainCanvas.height;
-        
+
         ctx.clearRect(0, 0, w, h);
-        
+
+        // Render asteroid fields (behind hyperlanes and systems)
+        this.renderAsteroidFields(ctx);
+
         // Render hyperlanes
         this.renderHyperlanes(ctx);
-        
+
         // Render territory overlay
         this.renderTerritories(ctx);
         
@@ -660,6 +765,64 @@ class GalaxyRenderer {
         });
     }
 
+    renderAsteroidFields(ctx) {
+        if (!this.asteroidFields || this.asteroidFields.length === 0) return;
+
+        this.asteroidFields.forEach(field => {
+            const cx = this.worldToScreenX(field.x);
+            const cy = this.worldToScreenY(field.y);
+            const radius = (field.radius || 40) * this.zoom;
+
+            // Skip if off-screen
+            if (cx < -radius || cx > this.mainCanvas.width + radius ||
+                cy < -radius || cy > this.mainCanvas.height + radius) {
+                return;
+            }
+
+            // Draw brownish/rocky gradient cloud
+            const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
+            const density = field.density || 0.5;
+            gradient.addColorStop(0, `rgba(140, 110, 70, ${0.25 * density})`);
+            gradient.addColorStop(0.5, `rgba(120, 90, 50, ${0.15 * density})`);
+            gradient.addColorStop(1, 'rgba(100, 80, 40, 0)');
+
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Draw individual asteroids at higher zoom levels
+            if (this.zoom > 1.2) {
+                this.renderAsteroidDots(ctx, field, cx, cy, radius);
+            }
+        });
+    }
+
+    renderAsteroidDots(ctx, field, cx, cy, radius) {
+        const seed = field.id ? field.id.charCodeAt(0) : 42;
+        const count = Math.floor((field.density || 0.5) * 60);
+
+        for (let i = 0; i < count; i++) {
+            // Golden angle distribution for natural spread
+            const angle = i * 2.39996; // Golden angle in radians
+            const dist = Math.sqrt(i / count) * radius * 0.9;
+
+            const ax = cx + Math.cos(angle) * dist;
+            const ay = cy + Math.sin(angle) * dist;
+
+            // Size varies by seed
+            const size = 1 + ((seed + i * 7) % 4) * this.zoom * 0.5;
+
+            // Color varies slightly
+            const brightness = 100 + ((seed + i * 13) % 80);
+            ctx.fillStyle = `rgb(${brightness}, ${brightness * 0.75}, ${brightness * 0.5})`;
+
+            ctx.beginPath();
+            ctx.arc(ax, ay, size, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+
     renderSystems(ctx) {
         this.systems.forEach(system => {
             const x = this.worldToScreenX(system.x);
@@ -675,13 +838,42 @@ class GalaxyRenderer {
             const isHovered = system.id === this.hoveredSystemId;
             const starSize = (isSelected || isHovered ? 40 : 32) * this.zoom;
             
-            // Draw star
+            // Draw star (use spritesheet if available, otherwise procedural)
             const starType = system.starType || 'yellow';
-            const starImage = this.assets.stars[starType] || this.assets.stars.yellow;
-            
-            ctx.drawImage(starImage, 
-                x - starSize/2, y - starSize/2, 
-                starSize, starSize);
+
+            // Debug first few systems
+            if (this._debugCount === undefined) this._debugCount = 0;
+            if (this._debugCount < 5) {
+                console.log(`🌟 System ${system.name}: starType="${starType}", spritesheet=${this.useStarSpritesheet}, complete=${this.starSpritesheet?.complete}`);
+                this._debugCount++;
+            }
+
+            if (this.useStarSpritesheet && this.starSpritesheet && this.starSpritesheet.complete) {
+                // Use spritesheet rendering
+                const gridPos = this.getStarGridPosition(starType, system.name);
+                const sx = gridPos.col * this.starCellSize;
+                const sy = gridPos.row * this.starCellSize;
+
+                ctx.drawImage(this.starSpritesheet,
+                    sx, sy, this.starCellSize, this.starCellSize,  // Source rect
+                    x - starSize/2, y - starSize/2,                 // Dest position
+                    starSize, starSize);                             // Dest size
+            } else {
+                // Fall back to procedural star image
+                // Handle unknown types consistently with system name
+                let proceduralType = starType;
+                if (starType === 'unknown' || !this.assets.stars[starType]) {
+                    const starTypes = ['yellow', 'orange', 'red', 'blue', 'white'];
+                    const hash = (system.name || 'default').split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+                    proceduralType = starTypes[hash % starTypes.length];
+                }
+                const starImage = this.assets.stars[proceduralType] || this.assets.stars.yellow;
+                if (starImage) {
+                    ctx.drawImage(starImage,
+                        x - starSize/2, y - starSize/2,
+                        starSize, starSize);
+                }
+            }
             
             // Ownership ring
             if (system.factionId) {
@@ -880,12 +1072,17 @@ class GalaxyRenderer {
 window.GalaxyRenderer = GalaxyRenderer;
 
 // Blazor interop functions
-window.initGalaxyMap = function(containerId) {
+window.initGalaxyMap = async function(containerId) {
     if (window.galaxyRenderer) {
         window.galaxyRenderer.destroy();
     }
     window.galaxyRenderer = new GalaxyRenderer(containerId);
-    console.log('🌌 Galaxy renderer initialized');
+    console.log('🌌 Galaxy renderer initialized, loading assets...');
+
+    // Load assets (spritesheets, etc)
+    await window.galaxyRenderer.loadAssets();
+    console.log('🌌 Galaxy renderer assets loaded');
+
     return true;
 };
 
@@ -894,6 +1091,10 @@ window.setGalaxySystems = function(systemsJson) {
     if (window.galaxyRenderer) {
         const systems = JSON.parse(systemsJson);
         console.log('🌟 Parsed systems:', systems?.length || 0);
+        // Debug: log first 5 system star types
+        if (systems?.length > 0) {
+            console.log('🌟 Star types in data:', systems.slice(0, 10).map(s => `${s.name}:${s.starType}`));
+        }
         window.galaxyRenderer.setSystems(systems);
     } else {
         console.error('🌟 No galaxy renderer!');
@@ -910,6 +1111,13 @@ window.setGalaxyHyperlanes = function(hyperlanesJson) {
 window.setGalaxyFleets = function(fleetsJson) {
     if (window.galaxyRenderer) {
         window.galaxyRenderer.setFleets(JSON.parse(fleetsJson));
+    }
+};
+
+window.setGalaxyAsteroidFields = function(fieldsJson) {
+    console.log('🪨 setGalaxyAsteroidFields called');
+    if (window.galaxyRenderer) {
+        window.galaxyRenderer.asteroidFields = JSON.parse(fieldsJson);
     }
 };
 

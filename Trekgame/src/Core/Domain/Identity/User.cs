@@ -28,7 +28,7 @@ public class User : Entity
     public UserStatus Status { get; private set; } = UserStatus.Active;
     public string? BanReason { get; private set; }
     public DateTime? BannedUntil { get; private set; }
-    public DateTime CreatedAt { get; private set; }
+    public new DateTime CreatedAt { get; private set; }
     public DateTime LastLoginAt { get; private set; }
     public int LoginCount { get; private set; }
     

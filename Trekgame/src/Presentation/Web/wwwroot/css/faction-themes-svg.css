@@ -1,0 +1,1011 @@
+/* ===========================================
+   GALACTIC STRATEGY - DRAMATIC SVG FACTION THEMES
+
+   KOMPLETT ANDERE UIs PRO FRAKTION
+   Wie auf einem echten Schiff der Fraktion zu sitzen
+   =========================================== */
+
+/* ===========================================
+   CSS VARIABLES FOR ASSET PATHS
+   =========================================== */
+:root {
+    --theme-assets: '/assets/ui/themes/default';
+    --theme-font-display: 'Orbitron', 'Eurostile', sans-serif;
+    --theme-font-ui: 'Roboto', 'Segoe UI', sans-serif;
+}
+
+html[data-theme="federation"] {
+    --theme-assets: '/assets/ui/themes/lcars';
+    --theme-font-display: 'Okuda', 'Antonio', 'Orbitron', sans-serif;
+}
+
+html[data-theme="klingon"] {
+    --theme-assets: '/assets/ui/themes/klingon';
+    --theme-font-display: 'Klingon', 'Impact', 'Orbitron', sans-serif;
+}
+
+html[data-theme="romulan"] {
+    --theme-assets: '/assets/ui/themes/romulan';
+    --theme-font-display: 'Romulan', 'Cinzel', 'Orbitron', sans-serif;
+}
+
+html[data-theme="borg"] {
+    --theme-assets: '/assets/ui/themes/borg';
+    --theme-font-display: 'Roboto Mono', 'Consolas', monospace;
+}
+
+
+/* ╔═══════════════════════════════════════════════════════════════════════════╗
+   ║                                                                           ║
+   ║   FEDERATION / LCARS - ENTERPRISE BRIDGE CONSOLE                          ║
+   ║   Orange/Tan/Purple pill shapes, rounded corners, multiple color bars     ║
+   ║   Inspired by TNG/DS9/Voyager LCARS interfaces                            ║
+   ║                                                                           ║
+   ╚═══════════════════════════════════════════════════════════════════════════╝ */
+
+/* Federation Root Background */
+html[data-theme="federation"] body {
+    background: #000011 !important;
+}
+
+html[data-theme="federation"] .stellaris-layout {
+    background: #000011 !important;
+}
+
+/* Federation LCARS Frame Overlay - DISABLED - was blocking content */
+/* The frame SVG overlay is now handled by individual panel styling instead */
+/*
+html[data-theme="federation"] .stellaris-layout::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 9999;
+    background:
+        url('/assets/ui/themes/lcars/panel-frame-detailed.svg') no-repeat center center;
+    background-size: cover;
+    opacity: 0.95;
+}
+*/
+
+/* Federation Top Bar - LCARS Header Style */
+html[data-theme="federation"] .st-topbar {
+    background: transparent !important;
+    border: none !important;
+    height: 80px !important;
+    position: relative;
+    z-index: 10000;
+    padding-left: 130px !important;
+}
+
+html[data-theme="federation"] .st-topbar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background:
+        linear-gradient(180deg, #FF9944 0%, #DD7722 15%, #DD7722 85%, #FF9944 100%);
+    clip-path: polygon(
+        0 0, 100% 0, 100% 100%,
+        150px 100%, 130px 70%, 110px 70%, 100px 100%, 0 100%
+    );
+    z-index: -1;
+}
+
+/* LCARS color bars on top bar */
+html[data-theme="federation"] .st-topbar::after {
+    content: '';
+    position: absolute;
+    top: 10px;
+    left: 150px;
+    right: 20px;
+    height: 35px;
+    background:
+        linear-gradient(90deg,
+            #FFCC99 0%, #FFCC99 15%,
+            transparent 15%, transparent 16%,
+            #CC99FF 16%, #CC99FF 30%,
+            transparent 30%, transparent 31%,
+            #99CCFF 31%, #99CCFF 50%,
+            transparent 50%, transparent 51%,
+            #FFAACC 51%, #FFAACC 70%,
+            transparent 70%, transparent 71%,
+            #FF9944 71%, #FF9944 100%
+        );
+    border-radius: 20px;
+    z-index: 1;
+}
+
+/* Federation Left Sidebar - Vertical LCARS Column */
+html[data-theme="federation"] .st-sidebar-left {
+    background: transparent !important;
+    border: none !important;
+    width: 120px !important;
+    position: relative;
+    z-index: 10000;
+    padding-top: 90px !important;
+}
+
+html[data-theme="federation"] .st-sidebar-left::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('/assets/ui/themes/lcars/sidebar-detailed.svg') no-repeat top left;
+    background-size: 100% 100%;
+    z-index: -1;
+}
+
+/* Federation Navigation Buttons - LCARS Pill Shape */
+html[data-theme="federation"] .st-nav-btn {
+    background: url('/assets/ui/themes/lcars/button-detailed.svg') no-repeat center !important;
+    background-size: 100% 100% !important;
+    border: none !important;
+    border-radius: 0 !important;
+    color: #000 !important;
+    font-family: 'Orbitron', 'Antonio', sans-serif !important;
+    font-weight: 800 !important;
+    font-size: 9px !important;
+    letter-spacing: 1px !important;
+    text-transform: uppercase !important;
+    padding: 14px 10px !important;
+    margin: 8px 10px !important;
+    min-height: 48px !important;
+    text-shadow: none !important;
+    transition: filter 0.15s ease !important;
+}
+
+html[data-theme="federation"] .st-nav-btn:hover {
+    filter: brightness(1.25) !important;
+}
+
+html[data-theme="federation"] .st-nav-btn.active {
+    filter: hue-rotate(-30deg) brightness(1.2) saturate(1.3) !important;
+}
+
+/* Federation Action/Filter Buttons */
+html[data-theme="federation"] .action-btn,
+html[data-theme="federation"] .filter-btn,
+html[data-theme="federation"] .st-btn,
+html[data-theme="federation"] .mud-button-root {
+    background: linear-gradient(180deg, #FFBB77 0%, #FF9944 20%, #DD7722 80%, #FFBB77 100%) !important;
+    border: none !important;
+    border-radius: 25px !important;
+    color: #000 !important;
+    font-family: 'Orbitron', sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 11px !important;
+    letter-spacing: 1px !important;
+    text-transform: uppercase !important;
+    padding: 12px 24px !important;
+    box-shadow: 0 0 15px rgba(255, 153, 68, 0.3) !important;
+}
+
+html[data-theme="federation"] .action-btn:hover,
+html[data-theme="federation"] .filter-btn:hover,
+html[data-theme="federation"] .st-btn:hover {
+    filter: brightness(1.15) !important;
+    box-shadow: 0 0 25px rgba(255, 153, 68, 0.5) !important;
+}
+
+html[data-theme="federation"] .filter-btn.active {
+    background: linear-gradient(180deg, #CC99FF 0%, #AA77DD 20%, #8855BB 80%, #CC99FF 100%) !important;
+}
+
+/* Federation End Turn Button */
+html[data-theme="federation"] .st-end-turn-btn {
+    background: linear-gradient(180deg, #FFCC99 0%, #FF9944 50%, #CC6633 100%) !important;
+    border: none !important;
+    border-radius: 30px !important;
+    color: #000 !important;
+    font-family: 'Orbitron', sans-serif !important;
+    font-weight: 900 !important;
+    font-size: 14px !important;
+    letter-spacing: 3px !important;
+    padding: 16px 40px !important;
+    box-shadow:
+        0 0 30px rgba(255, 153, 68, 0.5),
+        inset 0 2px 0 rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Federation Panels - LCARS Style with left color bar */
+html[data-theme="federation"] .empire-card,
+html[data-theme="federation"] .empire-detail-panel,
+html[data-theme="federation"] .content-card,
+html[data-theme="federation"] .panel {
+    background: rgba(0, 0, 20, 0.9) !important;
+    border: none !important;
+    border-radius: 0 30px 30px 0 !important;
+    position: relative;
+    overflow: hidden !important;
+    margin-left: 15px !important;
+}
+
+html[data-theme="federation"] .empire-card::before,
+html[data-theme="federation"] .empire-detail-panel::before,
+html[data-theme="federation"] .content-card::before,
+html[data-theme="federation"] .panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -15px;
+    width: 20px;
+    height: 100%;
+    background: linear-gradient(180deg,
+        #FF9944 0%, #FF9944 30%,
+        #000 30%, #000 32%,
+        #CC99FF 32%, #CC99FF 60%,
+        #000 60%, #000 62%,
+        #FFCC99 62%, #FFCC99 100%
+    );
+}
+
+/* Federation Content Areas */
+html[data-theme="federation"] .diplomacy-content,
+html[data-theme="federation"] .main-content,
+html[data-theme="federation"] .st-main-content {
+    background: radial-gradient(ellipse at center, #0a0a25 0%, #000011 70%, #000008 100%) !important;
+    padding-left: 130px !important;
+    padding-top: 90px !important;
+}
+
+/* Federation Text Colors */
+html[data-theme="federation"] h1,
+html[data-theme="federation"] h2,
+html[data-theme="federation"] h3,
+html[data-theme="federation"] .diplomacy-header h1,
+html[data-theme="federation"] .content-section h3 {
+    color: #FF9944 !important;
+    font-family: 'Orbitron', sans-serif !important;
+    letter-spacing: 3px !important;
+    text-shadow: 0 0 20px rgba(255, 153, 68, 0.3) !important;
+}
+
+html[data-theme="federation"] .status-label,
+html[data-theme="federation"] .data-label {
+    color: #CC99FF !important;
+}
+
+html[data-theme="federation"] .data-value {
+    color: #FFCC99 !important;
+}
+
+
+/* ╔═══════════════════════════════════════════════════════════════════════════╗
+   ║                                                                           ║
+   ║   KLINGON EMPIRE - WARRIOR WARSHIP CONSOLE                                ║
+   ║   Dark metal, aggressive angles, red accents, triangular shapes           ║
+   ║   Industrial, battle-worn aesthetic                                       ║
+   ║                                                                           ║
+   ╚═══════════════════════════════════════════════════════════════════════════╝ */
+
+/* Klingon Root Background */
+html[data-theme="klingon"] body {
+    background: #080202 !important;
+}
+
+html[data-theme="klingon"] .stellaris-layout {
+    background: #080202 !important;
+}
+
+/* Klingon Frame Overlay - DISABLED - was blocking content */
+/*
+html[data-theme="klingon"] .stellaris-layout::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 9999;
+    background: url('/assets/ui/themes/klingon/panel-frame-detailed.svg') no-repeat center center;
+    background-size: cover;
+    opacity: 0.95;
+}
+*/
+
+/* Klingon Top Bar - Angular Metal */
+html[data-theme="klingon"] .st-topbar {
+    background: transparent !important;
+    border: none !important;
+    height: 80px !important;
+    position: relative;
+    z-index: 10000;
+    padding-left: 130px !important;
+}
+
+html[data-theme="klingon"] .st-topbar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(180deg, #3A3A3A 0%, #252525 50%, #3A3A3A 100%);
+    clip-path: polygon(
+        50px 0, calc(100% - 50px) 0, 100% 50px, 100% 100%,
+        0 100%, 0 50px
+    );
+    z-index: -1;
+}
+
+/* Klingon red warning stripe */
+html[data-theme="klingon"] .st-topbar::after {
+    content: '';
+    position: absolute;
+    top: 5px;
+    left: 60px;
+    right: 60px;
+    height: 8px;
+    background: linear-gradient(90deg, #880000, #CC0000, #FF4444, #CC0000, #880000);
+    clip-path: polygon(20px 0, calc(100% - 20px) 0, 100% 100%, 0 100%);
+    box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+    z-index: 1;
+}
+
+/* Klingon Left Sidebar - Fortress Wall */
+html[data-theme="klingon"] .st-sidebar-left {
+    background: transparent !important;
+    border: none !important;
+    width: 120px !important;
+    position: relative;
+    z-index: 10000;
+    padding-top: 90px !important;
+}
+
+html[data-theme="klingon"] .st-sidebar-left::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('/assets/ui/themes/klingon/sidebar-detailed.svg') no-repeat top left;
+    background-size: 100% 100%;
+    z-index: -1;
+}
+
+/* Klingon Navigation Buttons - Hexagonal */
+html[data-theme="klingon"] .st-nav-btn {
+    background: url('/assets/ui/themes/klingon/button-detailed.svg') no-repeat center !important;
+    background-size: 100% 100% !important;
+    border: none !important;
+    color: #FFCCCC !important;
+    font-family: 'Orbitron', 'Impact', sans-serif !important;
+    font-weight: 900 !important;
+    font-size: 8px !important;
+    letter-spacing: 2px !important;
+    text-transform: uppercase !important;
+    text-shadow: 0 0 10px rgba(255, 50, 50, 0.8) !important;
+    padding: 14px 8px !important;
+    margin: 6px 8px !important;
+    min-height: 48px !important;
+    transition: all 0.15s ease !important;
+}
+
+html[data-theme="klingon"] .st-nav-btn:hover {
+    filter: brightness(1.3) drop-shadow(0 0 15px rgba(255, 50, 50, 0.6)) !important;
+}
+
+html[data-theme="klingon"] .st-nav-btn.active {
+    filter: brightness(1.4) drop-shadow(0 0 25px rgba(255, 68, 68, 0.8)) !important;
+}
+
+/* Klingon Action Buttons - Hexagonal Metal */
+html[data-theme="klingon"] .action-btn,
+html[data-theme="klingon"] .filter-btn,
+html[data-theme="klingon"] .st-btn,
+html[data-theme="klingon"] .mud-button-root {
+    background: linear-gradient(180deg, #4A4A4A 0%, #2A2A2A 50%, #4A4A4A 100%) !important;
+    border: 2px solid #880000 !important;
+    clip-path: polygon(15px 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 15px 100%, 0 50%) !important;
+    color: #FFCCCC !important;
+    font-family: 'Orbitron', 'Impact', sans-serif !important;
+    font-weight: 800 !important;
+    font-size: 11px !important;
+    letter-spacing: 2px !important;
+    text-transform: uppercase !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8) !important;
+    padding: 14px 28px !important;
+}
+
+html[data-theme="klingon"] .action-btn:hover,
+html[data-theme="klingon"] .filter-btn:hover {
+    filter: brightness(1.2) !important;
+    border-color: #CC0000 !important;
+    box-shadow: 0 0 20px rgba(200, 0, 0, 0.5) !important;
+}
+
+/* Klingon End Turn Button - Golden Honor */
+html[data-theme="klingon"] .st-end-turn-btn {
+    background: linear-gradient(180deg, #D4AF37 0%, #B8960B 30%, #8B6914 70%, #D4AF37 100%) !important;
+    border: 3px solid #FFD700 !important;
+    clip-path: polygon(20px 0, calc(100% - 20px) 0, 100% 50%, calc(100% - 20px) 100%, 20px 100%, 0 50%) !important;
+    color: #000 !important;
+    font-family: 'Orbitron', sans-serif !important;
+    font-weight: 900 !important;
+    font-size: 14px !important;
+    letter-spacing: 3px !important;
+    padding: 16px 40px !important;
+    text-shadow: 0 1px 0 rgba(255, 255, 200, 0.5) !important;
+    box-shadow: 0 0 30px rgba(212, 175, 55, 0.5) !important;
+}
+
+/* Klingon Panels - Angular with triangular accents */
+html[data-theme="klingon"] .empire-card,
+html[data-theme="klingon"] .empire-detail-panel,
+html[data-theme="klingon"] .content-card,
+html[data-theme="klingon"] .panel {
+    background: linear-gradient(135deg, rgba(40, 10, 10, 0.95) 0%, rgba(20, 5, 5, 0.98) 100%) !important;
+    border: 2px solid #660000 !important;
+    clip-path: polygon(0 20px, 20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%) !important;
+    position: relative;
+}
+
+html[data-theme="klingon"] .empire-card::before,
+html[data-theme="klingon"] .empire-detail-panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 35px 35px 0 0;
+    border-color: #CC0000 transparent transparent transparent;
+}
+
+html[data-theme="klingon"] .empire-card::after,
+html[data-theme="klingon"] .empire-detail-panel::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 0 35px 35px;
+    border-color: transparent transparent #CC0000 transparent;
+}
+
+/* Klingon Content Areas */
+html[data-theme="klingon"] .diplomacy-content,
+html[data-theme="klingon"] .main-content,
+html[data-theme="klingon"] .st-main-content {
+    background:
+        radial-gradient(ellipse at 30% 20%, rgba(100, 0, 0, 0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at 70% 80%, rgba(80, 0, 0, 0.1) 0%, transparent 50%),
+        linear-gradient(180deg, #100404 0%, #080202 100%) !important;
+    padding-left: 130px !important;
+    padding-top: 90px !important;
+}
+
+/* Klingon Text Colors */
+html[data-theme="klingon"] h1,
+html[data-theme="klingon"] h2,
+html[data-theme="klingon"] h3,
+html[data-theme="klingon"] .diplomacy-header h1,
+html[data-theme="klingon"] .content-section h3 {
+    color: #FF4444 !important;
+    font-family: 'Orbitron', 'Impact', sans-serif !important;
+    letter-spacing: 4px !important;
+    text-shadow: 0 0 25px rgba(255, 0, 0, 0.6) !important;
+}
+
+html[data-theme="klingon"] .status-label,
+html[data-theme="klingon"] .data-label {
+    color: #FF8844 !important;
+}
+
+html[data-theme="klingon"] .data-value {
+    color: #FFCCAA !important;
+}
+
+
+/* ╔═══════════════════════════════════════════════════════════════════════════╗
+   ║                                                                           ║
+   ║   ROMULAN STAR EMPIRE - ELEGANT WARBIRD BRIDGE                            ║
+   ║   Emerald green, bronze accents, curved elegant shapes, V-motifs          ║
+   ║   Sophisticated military aesthetic                                        ║
+   ║                                                                           ║
+   ╚═══════════════════════════════════════════════════════════════════════════╝ */
+
+/* Romulan Root Background */
+html[data-theme="romulan"] body {
+    background: #020a06 !important;
+}
+
+html[data-theme="romulan"] .stellaris-layout {
+    background: #020a06 !important;
+}
+
+/* Romulan Frame Overlay - DISABLED - was blocking content */
+/*
+html[data-theme="romulan"] .stellaris-layout::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 9999;
+    background: url('/assets/ui/themes/romulan/panel-frame-detailed.svg') no-repeat center center;
+    background-size: cover;
+    opacity: 0.95;
+}
+*/
+
+/* Romulan Top Bar - Elegant Curved */
+html[data-theme="romulan"] .st-topbar {
+    background: transparent !important;
+    border: none !important;
+    height: 80px !important;
+    position: relative;
+    z-index: 10000;
+    padding-left: 130px !important;
+}
+
+html[data-theme="romulan"] .st-topbar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(180deg, #1A3A2A 0%, #0D2015 100%);
+    border-bottom: 2px solid;
+    border-image: linear-gradient(90deg, transparent, #00AA44, #44FFAA, #00AA44, transparent) 1;
+    z-index: -1;
+}
+
+/* Romulan V-accent */
+html[data-theme="romulan"] .st-topbar::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 50px solid transparent;
+    border-right: 50px solid transparent;
+    border-top: 20px solid #00AA44;
+    filter: drop-shadow(0 0 15px rgba(68, 255, 170, 0.5));
+    z-index: 1;
+}
+
+/* Romulan Left Sidebar */
+html[data-theme="romulan"] .st-sidebar-left {
+    background: linear-gradient(90deg, #030c08 0%, #051810 100%) !important;
+    border: none !important;
+    width: 110px !important;
+    position: relative;
+    z-index: 10000;
+    padding-top: 90px !important;
+}
+
+html[data-theme="romulan"] .st-sidebar-left::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 3px;
+    height: 100%;
+    background: linear-gradient(180deg,
+        transparent 0%,
+        #00AA44 10%,
+        #44FFAA 30%,
+        #00FFCC 50%,
+        #44FFAA 70%,
+        #00AA44 90%,
+        transparent 100%
+    );
+    box-shadow: 0 0 15px rgba(68, 255, 170, 0.5);
+}
+
+/* Romulan Navigation Buttons - Trapezoid */
+html[data-theme="romulan"] .st-nav-btn {
+    background: url('/assets/ui/themes/romulan/button-detailed.svg') no-repeat center !important;
+    background-size: 100% 100% !important;
+    border: none !important;
+    color: #CCFFEE !important;
+    font-family: 'Orbitron', 'Cinzel', sans-serif !important;
+    font-weight: 500 !important;
+    font-size: 9px !important;
+    letter-spacing: 1px !important;
+    text-transform: uppercase !important;
+    text-shadow: 0 0 10px rgba(68, 255, 170, 0.6) !important;
+    padding: 12px 8px !important;
+    margin: 5px 8px !important;
+    min-height: 45px !important;
+}
+
+html[data-theme="romulan"] .st-nav-btn:hover {
+    filter: brightness(1.25) drop-shadow(0 0 15px rgba(68, 255, 170, 0.5)) !important;
+}
+
+html[data-theme="romulan"] .st-nav-btn.active {
+    filter: brightness(1.35) drop-shadow(0 0 20px rgba(68, 255, 170, 0.7)) !important;
+}
+
+/* Romulan Action Buttons */
+html[data-theme="romulan"] .action-btn,
+html[data-theme="romulan"] .filter-btn,
+html[data-theme="romulan"] .st-btn,
+html[data-theme="romulan"] .mud-button-root {
+    background: linear-gradient(180deg, #00DDAA 0%, #00AA77 50%, #008855 100%) !important;
+    border: 1px solid #44FFCC !important;
+    clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0 calc(100% - 10px), 0 10px) !important;
+    color: #000 !important;
+    font-family: 'Orbitron', sans-serif !important;
+    font-weight: 600 !important;
+    font-size: 10px !important;
+    letter-spacing: 1px !important;
+    padding: 12px 22px !important;
+    box-shadow: 0 0 15px rgba(68, 255, 170, 0.3) !important;
+}
+
+html[data-theme="romulan"] .action-btn:hover,
+html[data-theme="romulan"] .filter-btn:hover {
+    filter: brightness(1.15) !important;
+    box-shadow: 0 0 25px rgba(68, 255, 170, 0.5) !important;
+}
+
+/* Romulan End Turn Button - Bronze Honor */
+html[data-theme="romulan"] .st-end-turn-btn {
+    background: linear-gradient(180deg, #D4AF37 0%, #B8960B 50%, #8B6914 100%) !important;
+    border: 2px solid #D4AF37 !important;
+    clip-path: polygon(15px 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 15px 100%, 0 50%) !important;
+    color: #000 !important;
+    font-family: 'Orbitron', sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 13px !important;
+    letter-spacing: 2px !important;
+    padding: 14px 36px !important;
+    box-shadow: 0 0 25px rgba(212, 175, 55, 0.5) !important;
+}
+
+/* Romulan Panels */
+html[data-theme="romulan"] .empire-card,
+html[data-theme="romulan"] .empire-detail-panel,
+html[data-theme="romulan"] .content-card,
+html[data-theme="romulan"] .panel {
+    background: linear-gradient(135deg, rgba(5, 25, 18, 0.95) 0%, rgba(3, 15, 10, 0.98) 100%) !important;
+    border: 1px solid rgba(68, 255, 170, 0.4) !important;
+    border-left: 4px solid #00AA44 !important;
+    position: relative;
+}
+
+html[data-theme="romulan"] .empire-card::before,
+html[data-theme="romulan"] .empire-detail-panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg,
+        #00AA44 0%,
+        #44FFAA 30%,
+        #00FFCC 50%,
+        #44FFAA 70%,
+        #00AA44 100%
+    );
+}
+
+/* Romulan Content Areas */
+html[data-theme="romulan"] .diplomacy-content,
+html[data-theme="romulan"] .main-content,
+html[data-theme="romulan"] .st-main-content {
+    background:
+        radial-gradient(ellipse at 50% 0%, rgba(0, 80, 50, 0.12) 0%, transparent 50%),
+        linear-gradient(180deg, #030c08 0%, #020806 100%) !important;
+    padding-left: 120px !important;
+    padding-top: 90px !important;
+}
+
+/* Romulan Text Colors */
+html[data-theme="romulan"] h1,
+html[data-theme="romulan"] h2,
+html[data-theme="romulan"] h3,
+html[data-theme="romulan"] .diplomacy-header h1,
+html[data-theme="romulan"] .content-section h3 {
+    color: #44FFAA !important;
+    font-family: 'Orbitron', 'Cinzel', sans-serif !important;
+    letter-spacing: 2px !important;
+    text-shadow: 0 0 20px rgba(68, 255, 170, 0.4) !important;
+}
+
+html[data-theme="romulan"] .status-label,
+html[data-theme="romulan"] .data-label {
+    color: #D4AF37 !important;
+}
+
+html[data-theme="romulan"] .data-value {
+    color: #AAFFDD !important;
+}
+
+
+/* ╔═══════════════════════════════════════════════════════════════════════════╗
+   ║                                                                           ║
+   ║   BORG COLLECTIVE - CYBERNETIC CUBE INTERFACE                             ║
+   ║   Black/Green, hexagonal grid, circuit patterns, cold mechanical          ║
+   ║   Assimilation aesthetic                                                  ║
+   ║                                                                           ║
+   ╚═══════════════════════════════════════════════════════════════════════════╝ */
+
+/* Borg Root Background */
+html[data-theme="borg"] body {
+    background: #020604 !important;
+}
+
+html[data-theme="borg"] .stellaris-layout {
+    background: #020604 !important;
+}
+
+/* Borg Frame Overlay - DISABLED - was blocking content */
+/*
+html[data-theme="borg"] .stellaris-layout::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 9999;
+    background: url('/assets/ui/themes/borg/panel-frame-detailed.svg') no-repeat center center;
+    background-size: cover;
+    opacity: 0.95;
+}
+*/
+
+/* Borg Hexagonal Grid Overlay */
+html[data-theme="borg"] .stellaris-layout::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 1;
+    background:
+        repeating-linear-gradient(0deg, rgba(0, 255, 0, 0.02) 0px, transparent 1px, transparent 40px),
+        repeating-linear-gradient(90deg, rgba(0, 255, 0, 0.02) 0px, transparent 1px, transparent 40px);
+}
+
+/* Borg Top Bar */
+html[data-theme="borg"] .st-topbar {
+    background: rgba(5, 15, 10, 0.95) !important;
+    border: none !important;
+    border-bottom: 2px solid rgba(0, 255, 0, 0.6) !important;
+    height: 70px !important;
+    position: relative;
+    z-index: 10000;
+    padding-left: 120px !important;
+}
+
+html[data-theme="borg"] .st-topbar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #00FF00, transparent);
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+}
+
+html[data-theme="borg"] .st-topbar::after {
+    content: 'COLLECTIVE INTERFACE // RESISTANCE IS FUTILE // SPECIES DESIGNATION PENDING';
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Roboto Mono', 'Consolas', monospace;
+    font-size: 9px;
+    letter-spacing: 4px;
+    color: rgba(0, 255, 0, 0.5);
+    text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+}
+
+/* Borg Left Sidebar */
+html[data-theme="borg"] .st-sidebar-left {
+    background:
+        repeating-linear-gradient(0deg, rgba(0, 255, 0, 0.02) 0px, transparent 1px, transparent 25px),
+        repeating-linear-gradient(90deg, rgba(0, 255, 0, 0.02) 0px, transparent 1px, transparent 25px),
+        rgba(5, 15, 10, 0.95) !important;
+    border: none !important;
+    border-right: 2px solid rgba(0, 255, 0, 0.5) !important;
+    width: 110px !important;
+    position: relative;
+    z-index: 10000;
+    padding-top: 80px !important;
+}
+
+/* Borg Navigation Buttons - Hexagonal Nodes */
+html[data-theme="borg"] .st-nav-btn {
+    background: url('/assets/ui/themes/borg/button-detailed.svg') no-repeat center !important;
+    background-size: 100% 100% !important;
+    border: none !important;
+    color: #00FF00 !important;
+    font-family: 'Roboto Mono', 'Consolas', monospace !important;
+    font-weight: 400 !important;
+    font-size: 8px !important;
+    letter-spacing: 3px !important;
+    text-transform: uppercase !important;
+    text-shadow: 0 0 15px rgba(0, 255, 0, 1) !important;
+    padding: 14px 6px !important;
+    margin: 4px 6px !important;
+    min-height: 46px !important;
+}
+
+html[data-theme="borg"] .st-nav-btn:hover {
+    filter: brightness(1.3) !important;
+    box-shadow: 0 0 25px rgba(0, 255, 0, 0.5), inset 0 0 15px rgba(0, 255, 0, 0.2) !important;
+}
+
+html[data-theme="borg"] .st-nav-btn.active {
+    filter: brightness(1.5) !important;
+    box-shadow: 0 0 35px rgba(0, 255, 0, 0.7), inset 0 0 25px rgba(0, 255, 0, 0.3) !important;
+}
+
+/* Borg Action Buttons - Cyber Hexagonal */
+html[data-theme="borg"] .action-btn,
+html[data-theme="borg"] .filter-btn,
+html[data-theme="borg"] .st-btn,
+html[data-theme="borg"] .mud-button-root {
+    background: rgba(0, 255, 0, 0.1) !important;
+    border: 1px solid rgba(0, 255, 0, 0.5) !important;
+    clip-path: polygon(12% 0%, 88% 0%, 100% 50%, 88% 100%, 12% 100%, 0% 50%) !important;
+    color: #00FF00 !important;
+    font-family: 'Roboto Mono', monospace !important;
+    font-weight: 400 !important;
+    font-size: 10px !important;
+    letter-spacing: 3px !important;
+    text-shadow: 0 0 15px rgba(0, 255, 0, 1) !important;
+    padding: 14px 28px !important;
+}
+
+html[data-theme="borg"] .action-btn:hover,
+html[data-theme="borg"] .filter-btn:hover {
+    background: rgba(0, 255, 0, 0.25) !important;
+    box-shadow: 0 0 30px rgba(0, 255, 0, 0.6) !important;
+}
+
+/* Borg End Turn Button - Assimilate */
+html[data-theme="borg"] .st-end-turn-btn {
+    background: rgba(0, 255, 0, 0.15) !important;
+    border: 2px solid #00FF00 !important;
+    clip-path: polygon(15% 0%, 85% 0%, 100% 50%, 85% 100%, 15% 100%, 0% 50%) !important;
+    color: #00FF00 !important;
+    font-family: 'Roboto Mono', monospace !important;
+    font-weight: 400 !important;
+    font-size: 12px !important;
+    letter-spacing: 5px !important;
+    padding: 16px 40px !important;
+    text-shadow: 0 0 20px rgba(0, 255, 0, 1) !important;
+    box-shadow: 0 0 40px rgba(0, 255, 0, 0.5), inset 0 0 20px rgba(0, 255, 0, 0.2) !important;
+}
+
+/* Borg Panels - Grid Interface */
+html[data-theme="borg"] .empire-card,
+html[data-theme="borg"] .empire-detail-panel,
+html[data-theme="borg"] .content-card,
+html[data-theme="borg"] .panel {
+    background:
+        repeating-linear-gradient(0deg, rgba(0, 255, 0, 0.02) 0px, transparent 1px, transparent 20px),
+        repeating-linear-gradient(90deg, rgba(0, 255, 0, 0.02) 0px, transparent 1px, transparent 20px),
+        rgba(5, 15, 10, 0.95) !important;
+    border: 1px solid rgba(0, 255, 0, 0.5) !important;
+}
+
+html[data-theme="borg"] .empire-card::before,
+html[data-theme="borg"] .empire-detail-panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #00FF00, transparent);
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+}
+
+/* Borg Content Areas */
+html[data-theme="borg"] .diplomacy-content,
+html[data-theme="borg"] .main-content,
+html[data-theme="borg"] .st-main-content {
+    background:
+        repeating-linear-gradient(0deg, rgba(0, 255, 0, 0.01) 0px, transparent 1px, transparent 50px),
+        repeating-linear-gradient(90deg, rgba(0, 255, 0, 0.01) 0px, transparent 1px, transparent 50px),
+        radial-gradient(ellipse at center, #051510 0%, #020604 100%) !important;
+    padding-left: 120px !important;
+    padding-top: 80px !important;
+}
+
+/* Borg Text Colors */
+html[data-theme="borg"] h1,
+html[data-theme="borg"] h2,
+html[data-theme="borg"] h3,
+html[data-theme="borg"] .diplomacy-header h1,
+html[data-theme="borg"] .content-section h3 {
+    color: #00FF00 !important;
+    font-family: 'Roboto Mono', monospace !important;
+    letter-spacing: 5px !important;
+    text-shadow: 0 0 25px rgba(0, 255, 0, 0.8) !important;
+}
+
+html[data-theme="borg"] .status-label,
+html[data-theme="borg"] .data-label {
+    color: rgba(0, 255, 0, 0.7) !important;
+    font-family: 'Roboto Mono', monospace !important;
+}
+
+html[data-theme="borg"] .data-value {
+    color: #00FF00 !important;
+    font-family: 'Roboto Mono', monospace !important;
+}
+
+
+/* ╔═══════════════════════════════════════════════════════════════════════════╗
+   ║                                                                           ║
+   ║   COMMON STYLES FOR ALL THEMES                                            ║
+   ║                                                                           ║
+   ╚═══════════════════════════════════════════════════════════════════════════╝ */
+
+/* Navigation icon and label sizes */
+html[data-theme="federation"] .st-nav-icon,
+html[data-theme="klingon"] .st-nav-icon,
+html[data-theme="romulan"] .st-nav-icon,
+html[data-theme="borg"] .st-nav-icon {
+    font-size: 18px !important;
+    margin-bottom: 4px !important;
+}
+
+html[data-theme="federation"] .st-nav-label,
+html[data-theme="klingon"] .st-nav-label,
+html[data-theme="romulan"] .st-nav-label,
+html[data-theme="borg"] .st-nav-label {
+    font-size: 7px !important;
+    white-space: nowrap !important;
+}
+
+/* Action button icons */
+html[data-theme="federation"] .action-icon,
+html[data-theme="klingon"] .action-icon,
+html[data-theme="romulan"] .action-icon {
+    font-size: 18px !important;
+}
+
+html[data-theme="borg"] .action-icon {
+    font-size: 16px !important;
+    filter: drop-shadow(0 0 8px rgba(0, 255, 0, 1)) !important;
+}
+
+/* Ensure content is visible above overlays */
+html[data-theme="federation"] .st-main-content > *,
+html[data-theme="klingon"] .st-main-content > *,
+html[data-theme="romulan"] .st-main-content > *,
+html[data-theme="borg"] .st-main-content > * {
+    position: relative;
+    z-index: 10;
+}
+
+/* MudBlazor Component Overrides */
+html[data-theme="federation"] .mud-paper,
+html[data-theme="klingon"] .mud-paper,
+html[data-theme="romulan"] .mud-paper,
+html[data-theme="borg"] .mud-paper {
+    background: transparent !important;
+}

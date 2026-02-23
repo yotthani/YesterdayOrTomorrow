@@ -1,0 +1,484 @@
+{
+  "description": "Visual design system for each faction - defines the unique look and feel while staying true to Star Trek canon",
+  "designPhilosophy": "Each faction's UI should feel like being on a ship of that faction, looking at their console screens",
+
+  "layoutStructure": {
+    "description": "Fixed layout structure shared by ALL factions - only visuals change, not positions",
+    "note": "This defines WHERE things go. HOW they look is faction-specific.",
+    "fixedElements": {
+      "header": {
+        "position": "top",
+        "height": "60-80px",
+        "contains": ["logo/emblem", "page-title", "resource-summary", "alerts"]
+      },
+      "navigation": {
+        "position": "left-sidebar",
+        "width": "100-130px",
+        "contains": ["main-nav-buttons", "faction-emblem"]
+      },
+      "mainContent": {
+        "position": "center-fill",
+        "contains": ["page-specific-content"]
+      },
+      "contextPanel": {
+        "position": "right-sidebar-optional",
+        "width": "280-350px",
+        "contains": ["selection-details", "actions"]
+      },
+      "minimap": {
+        "position": "bottom-left-corner",
+        "size": "180-220px"
+      },
+      "statusBar": {
+        "position": "bottom",
+        "height": "30-40px",
+        "contains": ["turn-info", "date", "notifications"]
+      }
+    },
+    "functionalAreas": [
+      "Galaxy Map - strategic overview",
+      "System View - tactical planet/star view",
+      "Fleet Management - ship lists and orders",
+      "Diplomacy - faction relations",
+      "Research - tech trees",
+      "Economy - resource management",
+      "Ship Design - customization"
+    ]
+  },
+
+  "factions": {
+    "federation": {
+      "name": "United Federation of Planets",
+      "designConcept": "Optimistic futurism - clean, accessible, information-focused. The UI of explorers and scientists.",
+      "personality": ["Welcoming", "Organized", "Transparent", "Hopeful"],
+
+      "colors": {
+        "primary": "#FF9900",
+        "secondary": "#CC99FF",
+        "tertiary": "#FFCC99",
+        "accent1": "#9999FF",
+        "accent2": "#99CCFF",
+        "alert": "#FF6666",
+        "success": "#66FF99",
+        "background": "#000000",
+        "surface": "#1A1A2E",
+        "text": "#FFFFFF",
+        "textMuted": "#AAAAAA"
+      },
+
+      "shapes": {
+        "cornerRadius": "pill",
+        "edgeStyle": "rounded",
+        "barEnds": "capsule",
+        "cornerPieces": "elbow-sweep",
+        "buttonShape": "pill-horizontal"
+      },
+
+      "effects": {
+        "glow": true,
+        "glowIntensity": 0.6,
+        "glowColor": "primary",
+        "innerShadow": false,
+        "gradient": "subtle-vertical",
+        "texture": "none",
+        "scanlines": false
+      },
+
+      "layout": {
+        "framePosition": "left-and-top",
+        "contentAlignment": "left",
+        "buttonSpacing": "tight",
+        "panelPadding": "medium",
+        "headerStyle": "integrated-bar"
+      },
+
+      "typography": {
+        "fontFamily": "LCARS-style sans-serif",
+        "fontWeight": "bold",
+        "letterSpacing": "wide",
+        "textTransform": "uppercase",
+        "numberStyle": "tabular"
+      },
+
+      "animations": {
+        "dataScroll": true,
+        "blinkingIndicators": true,
+        "transitionSpeed": "fast"
+      }
+    },
+
+    "klingon": {
+      "name": "Klingon Empire",
+      "designConcept": "Brutal efficiency - war-ready, intimidating, built for battle. The UI of warriors.",
+      "personality": ["Aggressive", "Powerful", "Battle-tested", "Honorable"],
+
+      "colors": {
+        "primary": "#CC0000",
+        "secondary": "#4A4A4A",
+        "tertiary": "#8B7355",
+        "accent1": "#FF6600",
+        "accent2": "#B8860B",
+        "alert": "#FF0000",
+        "success": "#996633",
+        "background": "#0A0000",
+        "surface": "#1A0A0A",
+        "text": "#FFCCAA",
+        "textMuted": "#886644"
+      },
+
+      "shapes": {
+        "cornerRadius": "angular",
+        "edgeStyle": "beveled",
+        "barEnds": "spiked",
+        "cornerPieces": "blade-cut",
+        "buttonShape": "hexagonal-aggressive"
+      },
+
+      "effects": {
+        "glow": true,
+        "glowIntensity": 0.4,
+        "glowColor": "primary",
+        "innerShadow": true,
+        "gradient": "metallic-vertical",
+        "texture": "brushed-metal-scratched",
+        "scanlines": false
+      },
+
+      "layout": {
+        "framePosition": "all-sides-heavy",
+        "contentAlignment": "center",
+        "buttonSpacing": "spaced",
+        "panelPadding": "thick",
+        "headerStyle": "separate-bar"
+      },
+
+      "typography": {
+        "fontFamily": "Angular warrior-style",
+        "fontWeight": "heavy",
+        "letterSpacing": "normal",
+        "textTransform": "uppercase",
+        "numberStyle": "bold"
+      },
+
+      "decorations": {
+        "rivets": true,
+        "scratches": true,
+        "battleDamage": "subtle",
+        "cornerSpikes": true,
+        "trefoilEmblem": true
+      },
+
+      "animations": {
+        "redPulse": true,
+        "flickerOnAlert": true,
+        "transitionSpeed": "instant"
+      }
+    },
+
+    "romulan": {
+      "name": "Romulan Star Empire",
+      "designConcept": "Elegant deception - refined, sophisticated, hiding secrets. The UI of spies and senators.",
+      "personality": ["Secretive", "Refined", "Calculating", "Imperial"],
+
+      "colors": {
+        "primary": "#00AA44",
+        "secondary": "#D4AF37",
+        "tertiary": "#004433",
+        "accent1": "#00FFAA",
+        "accent2": "#B8860B",
+        "alert": "#FF4444",
+        "success": "#00FF88",
+        "background": "#000A05",
+        "surface": "#0A1A15",
+        "text": "#CCFFDD",
+        "textMuted": "#668877"
+      },
+
+      "shapes": {
+        "cornerRadius": "sweeping-curve",
+        "edgeStyle": "flowing",
+        "barEnds": "tapered",
+        "cornerPieces": "wing-motif",
+        "buttonShape": "lens-horizontal"
+      },
+
+      "effects": {
+        "glow": true,
+        "glowIntensity": 0.5,
+        "glowColor": "primary",
+        "innerShadow": false,
+        "gradient": "polished-bronze",
+        "texture": "subtle-brushed",
+        "scanlines": false
+      },
+
+      "layout": {
+        "framePosition": "elegant-border",
+        "contentAlignment": "center",
+        "buttonSpacing": "balanced",
+        "panelPadding": "refined",
+        "headerStyle": "curved-banner"
+      },
+
+      "typography": {
+        "fontFamily": "Elegant serif-influenced",
+        "fontWeight": "medium",
+        "letterSpacing": "slightly-wide",
+        "textTransform": "title-case",
+        "numberStyle": "elegant"
+      },
+
+      "decorations": {
+        "birdMotif": true,
+        "bronzeAccents": true,
+        "hiddenPanelAesthetic": true,
+        "nebulaBackground": "subtle"
+      },
+
+      "animations": {
+        "greenPulse": "subtle",
+        "revealEffects": true,
+        "transitionSpeed": "smooth"
+      }
+    },
+
+    "borg": {
+      "name": "Borg Collective",
+      "designConcept": "Cold efficiency - no individuality, pure function, technological horror. The UI of machines.",
+      "personality": ["Relentless", "Efficient", "Collective", "Terrifying"],
+
+      "colors": {
+        "primary": "#00FF00",
+        "secondary": "#002200",
+        "tertiary": "#333333",
+        "accent1": "#33FF33",
+        "accent2": "#FFFFFF",
+        "alert": "#00FF00",
+        "success": "#00FF00",
+        "background": "#000500",
+        "surface": "#001100",
+        "text": "#00FF00",
+        "textMuted": "#006600"
+      },
+
+      "shapes": {
+        "cornerRadius": "none",
+        "edgeStyle": "sharp",
+        "barEnds": "square",
+        "cornerPieces": "hexagonal",
+        "buttonShape": "hexagonal-uniform"
+      },
+
+      "effects": {
+        "glow": true,
+        "glowIntensity": 0.7,
+        "glowColor": "primary",
+        "innerShadow": false,
+        "gradient": "none",
+        "texture": "circuit-pattern",
+        "scanlines": true
+      },
+
+      "layout": {
+        "framePosition": "grid-based",
+        "contentAlignment": "grid",
+        "buttonSpacing": "uniform",
+        "panelPadding": "minimal",
+        "headerStyle": "designation-bar"
+      },
+
+      "typography": {
+        "fontFamily": "Monospace terminal",
+        "fontWeight": "normal",
+        "letterSpacing": "fixed",
+        "textTransform": "uppercase",
+        "numberStyle": "designation"
+      },
+
+      "decorations": {
+        "honeycombPattern": true,
+        "dataStreams": true,
+        "implantNodes": true,
+        "assimilationProgress": true
+      },
+
+      "animations": {
+        "dataFlow": true,
+        "glitchEffect": "occasional",
+        "pulsingNodes": true,
+        "transitionSpeed": "instant"
+      }
+    },
+
+    "cardassian": {
+      "name": "Cardassian Union",
+      "designConcept": "Surveillance state - efficient, hierarchical, watching everything. The UI of control.",
+      "personality": ["Orderly", "Watchful", "Hierarchical", "Pragmatic"],
+
+      "colors": {
+        "primary": "#FF8800",
+        "secondary": "#4A3520",
+        "tertiary": "#FFCC00",
+        "accent1": "#FFEECC",
+        "accent2": "#CC6600",
+        "alert": "#FF4400",
+        "success": "#FFAA00",
+        "background": "#0A0500",
+        "surface": "#1A1005",
+        "text": "#FFDDAA",
+        "textMuted": "#AA8855"
+      },
+
+      "shapes": {
+        "cornerRadius": "geometric",
+        "edgeStyle": "precise",
+        "barEnds": "notched",
+        "cornerPieces": "neck-ridge-motif",
+        "buttonShape": "rectangular-notched"
+      },
+
+      "effects": {
+        "glow": true,
+        "glowIntensity": 0.4,
+        "glowColor": "primary",
+        "innerShadow": true,
+        "gradient": "warm-vertical",
+        "texture": "subtle-grid",
+        "scanlines": false
+      },
+
+      "layout": {
+        "framePosition": "structured-border",
+        "contentAlignment": "hierarchical",
+        "buttonSpacing": "regimented",
+        "panelPadding": "efficient",
+        "headerStyle": "status-bar"
+      },
+
+      "typography": {
+        "fontFamily": "Geometric sans-serif",
+        "fontWeight": "semi-bold",
+        "letterSpacing": "tight",
+        "textTransform": "uppercase",
+        "numberStyle": "precise"
+      },
+
+      "decorations": {
+        "statusIndicators": true,
+        "hierarchyBadges": true,
+        "surveillanceMotif": true,
+        "geometricPatterns": true
+      },
+
+      "animations": {
+        "amberPulse": "status-based",
+        "scanningLines": true,
+        "transitionSpeed": "precise"
+      }
+    },
+
+    "dominion": {
+      "name": "Dominion",
+      "designConcept": "Divine authority - majestic yet menacing, absolute power. The UI of gods.",
+      "personality": ["Commanding", "Absolute", "Ancient", "Terrifying"],
+
+      "colors": {
+        "primary": "#9933FF",
+        "secondary": "#2A1A4A",
+        "tertiary": "#FFCC00",
+        "accent1": "#CC99FF",
+        "accent2": "#FFD700",
+        "alert": "#FF3366",
+        "success": "#9966FF",
+        "background": "#050010",
+        "surface": "#100520",
+        "text": "#EEDDFF",
+        "textMuted": "#8866AA"
+      },
+
+      "shapes": {
+        "cornerRadius": "imperial",
+        "edgeStyle": "commanding",
+        "barEnds": "authority",
+        "cornerPieces": "founder-motif",
+        "buttonShape": "imperial-diamond"
+      },
+
+      "effects": {
+        "glow": true,
+        "glowIntensity": 0.6,
+        "glowColor": "primary",
+        "innerShadow": false,
+        "gradient": "royal-vertical",
+        "texture": "subtle-shimmer",
+        "scanlines": false
+      },
+
+      "layout": {
+        "framePosition": "commanding-border",
+        "contentAlignment": "center",
+        "buttonSpacing": "measured",
+        "panelPadding": "grand",
+        "headerStyle": "throne-banner"
+      },
+
+      "typography": {
+        "fontFamily": "Imperial serif",
+        "fontWeight": "medium",
+        "letterSpacing": "wide",
+        "textTransform": "title-case",
+        "numberStyle": "elegant"
+      },
+
+      "decorations": {
+        "founderSymbol": true,
+        "vorta/JemHadar icons": true,
+        "ketracelIndicators": true
+      },
+
+      "animations": {
+        "purplePulse": "divine",
+        "shimmerEffect": true,
+        "transitionSpeed": "majestic"
+      }
+    }
+  },
+
+  "sharedElements": {
+    "minimapFrame": "faction-styled border around tactical display",
+    "resourceBar": "horizontal bar with faction colors showing dilithium/credits/etc",
+    "alertLevels": ["green-normal", "yellow-caution", "red-alert", "blue-info"],
+    "tooltipStyle": "faction-colored popup with info",
+    "modalDialog": "centered panel with faction frame"
+  },
+
+  "cssFileStructure": {
+    "description": "Each faction theme should be a separate CSS file for maintainability",
+    "baseFile": "ui-system.css - shared component classes using CSS variables",
+    "defaultTheme": "stellaris-ui.css - neutral blue Stellaris-style default",
+    "factionFiles": {
+      "federation": "themes/theme-federation.css",
+      "klingon": "themes/theme-klingon.css",
+      "romulan": "themes/theme-romulan.css",
+      "borg": "themes/theme-borg.css",
+      "cardassian": "themes/theme-cardassian.css",
+      "dominion": "themes/theme-dominion.css",
+      "ferengi": "themes/theme-ferengi.css"
+    },
+    "themeSelector": "html[data-theme='factionName'] - applied to root element",
+    "noHardcoding": "Pages should use CSS variables and classes, never hardcode faction-specific values"
+  },
+
+  "assetPaths": {
+    "description": "Generated UI assets per faction",
+    "pattern": "/assets/ui/themes/{faction}/{element}.png",
+    "elements": [
+      "panel-frame-detailed.svg",
+      "sidebar-detailed.svg",
+      "button-detailed.svg",
+      "progress-bar.svg",
+      "corner-accent.svg",
+      "header-bar.svg"
+    ]
+  }
+}

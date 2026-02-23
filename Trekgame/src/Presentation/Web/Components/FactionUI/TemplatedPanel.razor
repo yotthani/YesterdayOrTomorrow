@@ -1,0 +1,212 @@
+@using StarTrekGame.Web.Services
+@inject FactionTemplateService TemplateService
+@inject ThemeService ThemeService
+
+@* Data-driven panel that renders based on template definition *@
+
+@{
+    var template = TemplateService.GetTemplate(ThemeService.CurrentTheme);
+    var panel = template.Panel;
+    var style = BuildStyle(panel);
+}
+
+<div class="templated-panel @panel.CssClass @Class" style="@style">
+    @* Render decorations first (positioned absolute) *@
+    @foreach (var decoration in panel.Decorations)
+    {
+        @RenderDecoration(decoration, template)
+    }
+
+    @* Render structure parts *@
+    @foreach (var part in panel.Structure)
+    {
+        @RenderStructurePart(part, template)
+    }
+</div>
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public string Title { get; set; } = "";
+    [Parameter] public string Class { get; set; } = "";
+
+    private string BuildStyle(PanelTemplate panel)
+    {
+        var styles = new List<string>();
+        if (!string.IsNullOrEmpty(panel.BorderRadius))
+            styles.Add($"border-radius: {panel.BorderRadius}");
+        if (!string.IsNullOrEmpty(panel.ClipPath))
+            styles.Add($"clip-path: {panel.ClipPath}");
+        return string.Join("; ", styles);
+    }
+
+    private RenderFragment RenderDecoration(DecorationElement decoration, FactionTemplate template) => builder =>
+    {
+        // Position can be: "left", "corners", "corner-tl", "top-center", "header-left", etc.
+        // We keep hyphens for CSS class compatibility
+        var positionClass = decoration.Position;
+
+        switch (decoration.Type)
+        {
+            case "color-bar":
+                builder.OpenElement(0, "div");
+                builder.AddAttribute(1, "class", $"panel-decoration color-bar {positionClass}");
+                if (decoration.Colors != null)
+                {
+                    foreach (var color in decoration.Colors)
+                    {
+                        builder.OpenElement(2, "div");
+                        builder.AddAttribute(3, "class", $"color-segment {color}");
+                        builder.CloseElement();
+                    }
+                }
+                builder.CloseElement();
+                break;
+
+            case "triangle":
+            case "diamond":
+                // Single decoration at specified position
+                builder.OpenElement(0, "div");
+                builder.AddAttribute(1, "class", $"panel-decoration {decoration.Type} {positionClass}");
+                if (!string.IsNullOrEmpty(decoration.Color))
+                    builder.AddAttribute(2, "data-color", decoration.Color);
+                builder.CloseElement();
+                break;
+
+            case "hex":
+            case "notch":
+                // If position is "corners", render all four corners
+                if (positionClass == "corners")
+                {
+                    foreach (var pos in new[] { "tl", "tr", "bl", "br" })
+                    {
+                        builder.OpenElement(0, "div");
+                        builder.AddAttribute(1, "class", $"panel-decoration {decoration.Type} corners {pos}");
+                        builder.CloseElement();
+                    }
+                }
+                else
+                {
+                    builder.OpenElement(0, "div");
+                    builder.AddAttribute(1, "class", $"panel-decoration {decoration.Type} {positionClass}");
+                    builder.CloseElement();
+                }
+                break;
+
+            case "rivet":
+                // Render multiple rivets at all corners
+                foreach (var pos in new[] { "tl", "tr", "bl", "br" })
+                {
+                    builder.OpenElement(0, "div");
+                    builder.AddAttribute(1, "class", $"panel-decoration rivet {pos}");
+                    builder.CloseElement();
+                }
+                break;
+
+            case "scanlines":
+            case "grid-pattern":
+            case "shimmer":
+                builder.OpenElement(0, "div");
+                builder.AddAttribute(1, "class", $"panel-decoration {decoration.Type} overlay");
+                builder.CloseElement();
+                break;
+
+            case "data-stream":
+            case "glow-line":
+            case "gold-line":
+            case "surveillance-line":
+                builder.OpenElement(0, "div");
+                builder.AddAttribute(1, "class", $"panel-decoration {decoration.Type} {positionClass}");
+                builder.CloseElement();
+                break;
+
+            case "node-indicator":
+            case "status-light":
+            case "hierarchy-badge":
+            case "founder-symbol":
+                builder.OpenElement(0, "div");
+                builder.AddAttribute(1, "class", $"panel-decoration {decoration.Type} {positionClass}");
+                builder.CloseElement();
+                break;
+
+            default:
+                builder.OpenElement(0, "div");
+                builder.AddAttribute(1, "class", $"panel-decoration {decoration.Type} {positionClass}");
+                builder.CloseElement();
+                break;
+        }
+    };
+
+    private RenderFragment RenderStructurePart(string part, FactionTemplate template) => builder =>
+    {
+        switch (part)
+        {
+            case "header":
+            case "designation-header":
+            case "bronze-header":
+            case "status-header":
+            case "founder-header":
+                if (!string.IsNullOrEmpty(Title))
+                {
+                    builder.OpenElement(0, "div");
+                    builder.AddAttribute(1, "class", $"panel-header {part}");
+                    builder.OpenElement(2, "span");
+                    builder.AddAttribute(3, "class", "panel-title-text");
+                    builder.AddContent(4, Title);
+                    builder.CloseElement();
+                    builder.CloseElement();
+                }
+                break;
+
+            case "body":
+            case "content-area":
+                builder.OpenElement(0, "div");
+                builder.AddAttribute(1, "class", "panel-body");
+                builder.AddContent(2, ChildContent);
+                builder.CloseElement();
+                break;
+
+            case "color-sidebar":
+                builder.OpenElement(0, "div");
+                builder.AddAttribute(1, "class", "panel-color-sidebar");
+                // Colors are handled by CSS
+                builder.CloseElement();
+                break;
+
+            case "elbow-corner":
+            case "curve-bottom":
+            case "hex-corners":
+            case "corner-accents":
+            case "notch-corners":
+            case "wing-top":
+            case "diamond-top":
+                builder.OpenElement(0, "div");
+                builder.AddAttribute(1, "class", $"panel-part {part}");
+                builder.CloseElement();
+                break;
+
+            case "scanlines":
+                builder.OpenElement(0, "div");
+                builder.AddAttribute(1, "class", "panel-scanlines");
+                builder.CloseElement();
+                break;
+
+            case "data-stream":
+            case "shimmer-overlay":
+            case "scan-line":
+                builder.OpenElement(0, "div");
+                builder.AddAttribute(1, "class", $"panel-effect {part}");
+                builder.CloseElement();
+                break;
+
+            case "rivets":
+                // Rendered via decorations
+                break;
+
+            default:
+                builder.OpenElement(0, "div");
+                builder.AddAttribute(1, "class", $"panel-part {part}");
+                builder.CloseElement();
+                break;
+        }
+    };
+}

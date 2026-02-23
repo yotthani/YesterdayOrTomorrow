@@ -29,7 +29,7 @@
    ============================================== */
 
 .ship-card.dominion.military {
-    background-image: url('/images/ships/dominion/military_ships.png');
+    background-image: url('/assets/factions/dominion/dominion_militaryships_spritesheet.png');
 }
 
 /* Row 1 - Light Combat */
@@ -67,7 +67,7 @@
    ============================================== */
 
 .ship-card.dominion.civilian {
-    background-image: url('/images/ships/dominion/civilian_ships.png');
+    background-image: url('/assets/factions/dominion/dominion_civilianships_spritesheet.png');
 }
 
 /* Row 1 */

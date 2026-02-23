@@ -1,0 +1,148 @@
+@using StarTrekGame.Web.Services
+@inject MainMenuTemplateService TemplateService
+
+@* Data-driven menu sidebar that renders based on template definition *@
+
+@{
+    var template = TemplateService.GetTemplate(_currentStyle);
+    var sidebar = template.Sidebar;
+}
+
+@if (sidebar.Position != "none")
+{
+    <aside class="menu-sidebar @sidebar.Style @Class" style="width: @sidebar.Width;">
+        @* Render structure parts *@
+        @foreach (var part in sidebar.Structure)
+        {
+            @RenderStructurePart(part, template)
+        }
+    </aside>
+}
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public string Class { get; set; } = "";
+    [Parameter] public string? HeaderTitle { get; set; }
+    [Parameter] public List<NavItemData>? NavItems { get; set; }
+    [Parameter] public List<NavItemData>? SecondaryNavItems { get; set; }
+
+    /// <summary>
+    /// Override the default menu style
+    /// </summary>
+    [Parameter] public string? Style { get; set; }
+
+    [CascadingParameter(Name = "MenuStyle")]
+    public string? CascadedStyle { get; set; }
+
+    private string _currentStyle => Style ?? CascadedStyle ?? "lcars";
+
+    private RenderFragment RenderStructurePart(string part, MenuTemplate template) => builder =>
+    {
+        var sidebar = template.Sidebar;
+
+        switch (part)
+        {
+            case "cap-header":
+                builder.OpenElement(0, "div");
+                builder.AddAttribute(1, "class", "sidebar-cap header");
+                builder.AddContent(2, HeaderTitle ?? "MENU");
+                builder.CloseElement();
+                break;
+
+            case "cap-footer":
+                builder.OpenElement(0, "div");
+                builder.AddAttribute(1, "class", "sidebar-cap footer");
+                builder.CloseElement();
+                break;
+
+            case "nav-items":
+            case "nav-items-vertical":
+                builder.OpenElement(0, "nav");
+                builder.AddAttribute(1, "class", "sidebar-nav primary");
+                if (NavItems != null)
+                {
+                    foreach (var item in NavItems)
+                    {
+                        RenderNavItem(builder, item, template);
+                    }
+                }
+                builder.CloseElement();
+                break;
+
+            case "nav-items-secondary":
+                if (SecondaryNavItems != null && SecondaryNavItems.Any())
+                {
+                    builder.OpenElement(0, "nav");
+                    builder.AddAttribute(1, "class", "sidebar-nav secondary");
+                    foreach (var item in SecondaryNavItems)
+                    {
+                        RenderNavItem(builder, item, template);
+                    }
+                    builder.CloseElement();
+                }
+                break;
+
+            case "spacer":
+                builder.OpenElement(0, "div");
+                builder.AddAttribute(1, "class", "sidebar-spacer");
+                builder.CloseElement();
+                break;
+
+            case "nav-header":
+                builder.OpenElement(0, "div");
+                builder.AddAttribute(1, "class", "sidebar-nav-header");
+                builder.AddContent(2, HeaderTitle ?? "NAVIGATION");
+                builder.CloseElement();
+                break;
+
+            case "progress-indicator":
+                builder.OpenElement(0, "div");
+                builder.AddAttribute(1, "class", "sidebar-progress");
+                builder.CloseElement();
+                break;
+
+            case "fade-bottom":
+                builder.OpenElement(0, "div");
+                builder.AddAttribute(1, "class", "sidebar-fade-bottom");
+                builder.CloseElement();
+                break;
+
+            default:
+                builder.OpenElement(0, "div");
+                builder.AddAttribute(1, "class", $"sidebar-part {part}");
+                builder.CloseElement();
+                break;
+        }
+    };
+
+    private void RenderNavItem(Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder builder, NavItemData item, MenuTemplate template)
+    {
+        builder.OpenElement(10, "button");
+        builder.AddAttribute(11, "class", $"sidebar-nav-item {(item.IsPrimary ? "primary" : "")} {(item.IsActive ? "active" : "")}");
+        builder.AddAttribute(12, "onclick", item.OnClick);
+
+        if (!string.IsNullOrEmpty(item.Icon))
+        {
+            builder.OpenElement(13, "span");
+            builder.AddAttribute(14, "class", "nav-icon");
+            builder.AddContent(15, item.Icon);
+            builder.CloseElement();
+        }
+
+        builder.OpenElement(16, "span");
+        builder.AddAttribute(17, "class", "nav-label");
+        builder.AddContent(18, item.Label);
+        builder.CloseElement();
+
+        builder.CloseElement();
+    }
+
+    public class NavItemData
+    {
+        public string Label { get; set; } = "";
+        public string? Icon { get; set; }
+        public bool IsPrimary { get; set; }
+        public bool IsActive { get; set; }
+        public EventCallback OnClick { get; set; }
+    }
+}

@@ -1,0 +1,467 @@
+@page "/css-preview"
+@layout EmptyLayout
+@implements IAsyncDisposable
+@using StarTrekGame.Web.Services
+@inject ThemeService ThemeService
+@inject IJSRuntime JS
+
+<PageTitle>CSS Theme Preview - @_currentTheme.ToUpper()</PageTitle>
+
+<div class="preview-chrome" data-theme="@_currentTheme">
+
+@* ── Sticky Theme Switcher ── *@
+<div class="preview-toolbar">
+    <span class="preview-toolbar-label">CSS THEME PREVIEW</span>
+    @foreach (var t in _themes)
+    {
+        <button class="preview-theme-btn @(_currentTheme == t ? "active" : "")"
+                @onclick="() => SwitchTheme(t)">
+            @t.ToUpper()
+        </button>
+    }
+    <span class="preview-toolbar-note">⚡ Changes to faction-themes.css apply instantly (hot-reload)</span>
+</div>
+
+@* ── Simulated Game Layout Structure ── *@
+<div class="preview-layout st-app-wrapper">
+
+    @* Topbar *@
+    <div class="preview-topbar st-topbar">
+        <div class="st-empire-badge">
+            <span class="st-empire-name">@GetEmpireName(_currentTheme)</span>
+            <span class="st-empire-type">@GetGovType(_currentTheme)</span>
+        </div>
+        <div class="preview-resources">
+            <div class="st-resource-item">⚡ <span class="st-resource-current">12,450</span></div>
+            <div class="st-resource-item">💎 <span class="st-resource-current">3,280</span></div>
+            <div class="st-resource-item">🔬 <span class="st-resource-current">890</span></div>
+            <div class="st-resource-item">🌾 <span class="st-resource-current">2,100</span></div>
+        </div>
+        <div class="st-topbar-controls">
+            <span class="st-date-label">STARDATE</span>
+            <span class="st-date-value">47634.44</span>
+            <button class="st-end-turn-btn">END TURN</button>
+            <button class="st-btn sm">⚙</button>
+        </div>
+    </div>
+
+    <div class="preview-body">
+        @* Sidebar *@
+        <div class="preview-sidebar st-sidebar-left">
+            @foreach (var item in _navItems)
+            {
+                <a class="st-nav-btn @(item == _activeNav ? "active" : "")"
+                   @onclick="() => _activeNav = item">
+                    <span>@item[0]</span>
+                    <span>@item</span>
+                </a>
+            }
+        </div>
+
+        @* Main content area *@
+        <div class="preview-main">
+
+            @* Row 1: Buttons + Status *@
+            <div class="preview-row">
+                <div class="preview-section stellaris-panel">
+                    <div class="st-section-header">TEMPLATED BUTTONS</div>
+                    <div class="preview-buttons">
+                        <button class="mud-button-root mud-button-filled mud-button-primary">PRIMARY</button>
+                        <button class="mud-button-root mud-button-filled">SECONDARY</button>
+                        <button class="mud-button-root mud-button-outlined">OUTLINED</button>
+                        <button class="mud-button-root mud-button-filled st-btn">DANGER</button>
+                    </div>
+                    <div class="preview-chips">
+                        <span class="mud-chip">ACTIVE</span>
+                        <span class="mud-chip">PATROL</span>
+                        <span class="mud-chip">DOCKED</span>
+                    </div>
+                </div>
+
+                <div class="preview-section stellaris-panel">
+                    <div class="st-section-header">STATUS DISPLAY</div>
+                    <div class="preview-progress">
+                        <div class="preview-stat-row">
+                            <span>Hull Integrity</span>
+                            <div class="mud-progress-linear-bar">
+                                <div class="mud-progress-linear-bar-1" style="width:85%"></div>
+                            </div>
+                            <span>85%</span>
+                        </div>
+                        <div class="preview-stat-row">
+                            <span>Shield Power</span>
+                            <div class="mud-progress-linear-bar">
+                                <div class="mud-progress-linear-bar-1" style="width:62%; background:#4488ff"></div>
+                            </div>
+                            <span>62%</span>
+                        </div>
+                        <div class="preview-stat-row">
+                            <span>Critical</span>
+                            <div class="mud-progress-linear-bar">
+                                <div class="mud-progress-linear-bar-1" style="width:23%; background:#ff3030"></div>
+                            </div>
+                            <span>23%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @* Row 2: Cards + Table *@
+            <div class="preview-row">
+                <div class="preview-section stellaris-panel">
+                    <div class="st-section-header">FLEET ROSTER</div>
+                    @foreach (var (name, status) in _fleets)
+                    {
+                        <div class="fleet-row">
+                            <span>@name</span>
+                            <span class="mud-chip">@status</span>
+                        </div>
+                    }
+                </div>
+
+                <div class="preview-section mud-card">
+                    <div class="st-section-header">EMPIRE CARD</div>
+                    @foreach (var (label, val) in _stats)
+                    {
+                        <div class="empire-card">
+                            <span>@label</span>
+                            <span class="st-resource-current">@val</span>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            @* Row 3: LCARS two-tone pattern (federation only visible) *@
+            <div class="preview-row">
+                <div class="preview-section stellaris-panel">
+                    <div class="st-section-header">DATA READOUTS (lcars-readout pattern)</div>
+                    <div class="preview-readouts">
+                        @foreach (var (lbl, val, cls) in _readouts)
+                        {
+                            <div class="lcars-readout">
+                                <span class="lcars-label">@lbl</span>
+                                <span class="lcars-value @cls">@val</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="preview-section stellaris-panel">
+                    <div class="st-section-header">MUD TABLE</div>
+                    <div class="mud-table-row">
+                        <span class="mud-table-cell">USS Enterprise</span>
+                        <span class="mud-table-cell">Sovereign</span>
+                        <span class="mud-table-cell status-ok">ACTIVE</span>
+                    </div>
+                    <div class="mud-divider"></div>
+                    <div class="mud-table-row">
+                        <span class="mud-table-cell">IKS Rotarran</span>
+                        <span class="mud-table-cell">B'rel</span>
+                        <span class="mud-table-cell status-warn">PATROL</span>
+                    </div>
+                    <div class="mud-divider"></div>
+                    <div class="mud-table-row">
+                        <span class="mud-table-cell">IRW Valdore</span>
+                        <span class="mud-table-cell">D'deridex</span>
+                        <span class="mud-table-cell status-alert">CLOAKED</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        @* Right context panel *@
+        <div class="preview-context">
+            <div class="preview-section stellaris-panel">
+                <div class="st-section-header">SELECTION INFO</div>
+                <p class="st-text-bright">USS Enterprise</p>
+                <p class="st-text-muted" style="font-size:11px">Sovereign-class · NCC-1701</p>
+                <div class="mud-divider" style="margin:8px 0"></div>
+                <div class="empire-card"><span>Hull</span><span>2,500</span></div>
+                <div class="empire-card"><span>Shields</span><span>1,800</span></div>
+                <div class="empire-card"><span>Crew</span><span>430</span></div>
+                <div style="margin-top:12px">
+                    <button class="mud-button-root mud-button-filled mud-button-primary" style="width:100%;margin-bottom:6px">MOVE</button>
+                    <button class="mud-button-root mud-button-filled" style="width:100%;margin-bottom:6px">PATROL</button>
+                    <button class="mud-button-root mud-button-filled st-btn" style="width:100%">ATTACK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @* Bottom bar *@
+    <div class="preview-bottombar st-bottombar">
+        <span style="font-size:10px;letter-spacing:1px;text-transform:uppercase;opacity:0.5">
+            @GetEmpireName(_currentTheme) · @GetGovType(_currentTheme) · TURN 47 · STARDATE 47634.44
+        </span>
+    </div>
+</div>
+
+</div>
+
+<style>
+    /* Preview chrome - does NOT interfere with theme CSS */
+    .preview-chrome {
+        min-height: 100vh;
+        background: #000;
+    }
+
+    .preview-toolbar {
+        position: sticky;
+        top: 0;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 8px;
+        background: #111;
+        border-bottom: 1px solid #333;
+        flex-wrap: wrap;
+    }
+
+    .preview-toolbar-label {
+        color: #888;
+        font-size: 9px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        margin-right: 8px;
+        font-family: monospace;
+    }
+
+    .preview-toolbar-note {
+        color: #555;
+        font-size: 9px;
+        margin-left: auto;
+        font-family: monospace;
+    }
+
+    .preview-theme-btn {
+        padding: 3px 10px;
+        font-size: 9px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        border: 1px solid #444;
+        background: #1a1a1a;
+        color: #888;
+        cursor: pointer;
+        border-radius: 3px;
+    }
+
+    .preview-theme-btn.active {
+        background: #333;
+        color: #fff;
+        border-color: #aaa;
+    }
+
+    /* Simulated game layout structure */
+    .preview-layout {
+        display: flex;
+        flex-direction: column;
+        height: calc(100vh - 34px);
+    }
+
+    .preview-topbar {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 0 12px;
+        height: 50px;
+        flex-shrink: 0;
+    }
+
+    .preview-resources {
+        display: flex;
+        gap: 6px;
+        flex: 1;
+    }
+
+    .preview-body {
+        display: flex;
+        flex: 1;
+        overflow: hidden;
+    }
+
+    .preview-sidebar {
+        width: 64px;
+        display: flex;
+        flex-direction: column;
+        padding: 8px 4px;
+        gap: 2px;
+        overflow-y: auto;
+    }
+
+    .preview-main {
+        flex: 1;
+        padding: 12px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .preview-context {
+        width: 200px;
+        padding: 8px;
+        overflow-y: auto;
+    }
+
+    .preview-bottombar {
+        height: 32px;
+        display: flex;
+        align-items: center;
+        padding: 0 12px;
+        flex-shrink: 0;
+    }
+
+    .preview-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    .preview-section {
+        padding: 10px;
+    }
+
+    .preview-buttons {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        margin: 8px 0;
+    }
+
+    .preview-chips {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+
+    .preview-progress {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 8px;
+    }
+
+    .preview-stat-row {
+        display: grid;
+        grid-template-columns: 100px 1fr 40px;
+        align-items: center;
+        gap: 8px;
+        font-size: 11px;
+    }
+
+    .mud-progress-linear-bar {
+        height: 6px;
+        border-radius: 3px;
+        overflow: hidden;
+    }
+
+    .mud-progress-linear-bar-1 {
+        height: 100%;
+        background: #00c8e8;
+        border-radius: 3px;
+    }
+
+    .preview-readouts {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        margin-top: 8px;
+    }
+
+    .mud-table-row {
+        display: flex;
+        gap: 12px;
+        padding: 6px 4px;
+        font-size: 11px;
+    }
+
+    .mud-table-cell:first-child { flex: 1; }
+
+    .mud-divider {
+        height: 1px;
+        background: rgba(255,255,255,0.08);
+    }
+</style>
+
+@code {
+    private string _currentTheme = "default";
+    private string _activeNav = "GALAXY";
+
+    private static readonly string[] _themes = {
+        "default", "federation", "klingon", "romulan", "cardassian",
+        "ferengi", "bajoran", "borg", "dominion", "tholian", "hirogen"
+    };
+
+    private static readonly string[] _navItems = {
+        "GALAXY", "SYSTEMS", "FLEETS", "DIPLOMACY", "RESEARCH", "ECONOMY"
+    };
+
+    private static readonly (string, string)[] _fleets = {
+        ("1st Exploration Fleet", "ACTIVE"),
+        ("Home Defense Force", "PATROL"),
+        ("Construction Corps", "DOCKED")
+    };
+
+    private static readonly (string, string)[] _stats = {
+        ("Systems", "47"),
+        ("Colonies", "23"),
+        ("Fleets", "8"),
+        ("Ships", "142")
+    };
+
+    private static readonly (string, string, string)[] _readouts = {
+        ("SHIELDS", "100%", "ok"),
+        ("HULL", "85%", "ok"),
+        ("WEAPONS", "ONLINE", "ok"),
+        ("ENGINES", "WARP 6", ""),
+        ("LIFE SUPPORT", "NOMINAL", "ok"),
+        ("ALERT", "YELLOW", "warn")
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ThemeService.ApplyTemporaryThemeAsync(_currentTheme);
+    }
+
+    private async Task SwitchTheme(string theme)
+    {
+        _currentTheme = theme;
+        await ThemeService.ApplyTemporaryThemeAsync(theme);
+        StateHasChanged();
+    }
+
+    private static string GetEmpireName(string theme) => theme switch
+    {
+        "federation"  => "United Federation of Planets",
+        "klingon"     => "Klingon Empire",
+        "romulan"     => "Romulan Star Empire",
+        "cardassian"  => "Cardassian Union",
+        "borg"        => "The Borg Collective",
+        "ferengi"     => "Ferengi Alliance",
+        "bajoran"     => "Bajoran Republic",
+        "dominion"    => "The Dominion",
+        "tholian"     => "Tholian Assembly",
+        "hirogen"     => "Hirogen Network",
+        _             => "Galactic Strategy"
+    };
+
+    private static string GetGovType(string theme) => theme switch
+    {
+        "federation"  => "Democratic Republic",
+        "klingon"     => "Warrior Empire",
+        "romulan"     => "Authoritarian State",
+        "cardassian"  => "Military Dictatorship",
+        "borg"        => "Hive Mind",
+        "ferengi"     => "Corporate Democracy",
+        "bajoran"     => "Theocratic Democracy",
+        "dominion"    => "Subjugation State",
+        _             => "Star Trek Universe"
+    };
+
+    public async ValueTask DisposeAsync()
+    {
+        await ThemeService.RestorePersistedThemeAsync();
+    }
+}

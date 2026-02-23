@@ -1,0 +1,366 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game UI Preview</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Segoe+UI:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --federation-bg-dark: #000000;
+            --federation-bg-medium: #0a0a14;
+            --federation-bg-light: #141428;
+            --federation-panel-bg: rgba(10, 10, 20, 0.95);
+            --federation-primary: #0099ff;
+            --federation-primary-dark: #0066cc;
+            --federation-primary-light: #66ccff;
+            --federation-accent: #ff9900;
+            --federation-accent-dark: #cc6600;
+            --federation-accent-light: #ffcc66;
+            --federation-text: #ffffff;
+            --federation-text-dim: #99aacc;
+            --federation-border: #336699;
+            --federation-success: #33cc66;
+            --federation-warning: #ffcc00;
+            --federation-danger: #ff3333;
+            --federation-corner-radius: 20px;
+            --federation-button-radius: 12px;
+            --panel-padding: 16px;
+            --header-height: 50px;
+            --nav-width: 260px;
+            --info-panel-width: 320px;
+            --font-main: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            --font-display: 'Orbitron', 'Audiowide', sans-serif;
+            --transition-fast: 150ms ease;
+            --transition-normal: 300ms ease;
+        }
+
+        body {
+            background: var(--federation-bg-dark);
+            color: var(--federation-text);
+            font-family: var(--font-main);
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        /* --- Main Layout Structure --- */
+        .layout-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .game-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--header-height);
+            background: linear-gradient(180deg, var(--federation-bg-medium) 0%, var(--federation-bg-dark) 100%);
+            border-bottom: 2px solid var(--federation-primary);
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            z-index: 500;
+        }
+
+        .header-logo {
+            font-family: var(--font-display);
+            font-size: 20px;
+            color: var(--federation-accent-light);
+            letter-spacing: 3px;
+            cursor: pointer;
+        }
+
+        .header-nav {
+            display: flex;
+            gap: 16px;
+            margin-left: 48px;
+        }
+
+        .header-nav-item {
+            color: var(--federation-text-dim);
+            text-decoration: none;
+            font-size: 14px;
+            letter-spacing: 1px;
+            transition: color var(--transition-fast);
+        }
+        .header-nav-item:hover, .header-nav-item.active {
+            color: var(--federation-primary-light);
+            text-shadow: 0 0 5px var(--federation-primary-light);
+        }
+
+        .header-right-controls {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .nav-drawer {
+            position: fixed;
+            top: var(--header-height);
+            left: 0;
+            bottom: 0;
+            width: var(--nav-width);
+            display: flex;
+            padding: 16px;
+            z-index: 400;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            padding-top: var(--header-height);
+            padding-left: var(--nav-width);
+            padding-right: var(--info-panel-width);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .info-panel {
+            position: fixed;
+            top: var(--header-height);
+            right: 0;
+            bottom: 0;
+            width: var(--info-panel-width);
+            z-index: 300;
+            padding: 16px;
+            display: flex;
+        }
+        
+        /* --- Federation Components --- */
+        .federation-panel {
+            background: var(--federation-panel-bg);
+            border: 1px solid var(--federation-border);
+            border-radius: var(--federation-corner-radius);
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .federation-panel-header {
+            background: var(--federation-primary);
+            color: var(--federation-bg-dark);
+            padding: 8px var(--panel-padding);
+            margin: -1px -1px 0 -1px;
+            border-radius: var(--federation-corner-radius) var(--federation-corner-radius) 0 0;
+            font-family: var(--font-display);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 14px;
+            border-bottom: 1px solid var(--federation-border);
+        }
+         .federation-panel-header.secondary { background: var(--federation-accent); }
+
+        .federation-panel-content {
+            padding: var(--panel-padding);
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+
+        .federation-button {
+            background: var(--federation-primary);
+            color: white;
+            border: 1px solid var(--federation-border);
+            padding: 10px 20px;
+            border-radius: var(--federation-button-radius);
+            font-family: var(--font-display);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        .federation-button:hover {
+            background: var(--federation-primary-light);
+            color: var(--federation-bg-dark);
+            box-shadow: 0 0 10px var(--federation-primary-light);
+        }
+        .federation-button.secondary { background: var(--federation-accent); }
+        .federation-button.outline { background: transparent; border-color: var(--federation-primary); color: var(--federation-primary); }
+
+        .federation-data-card {
+            background: var(--federation-bg-light);
+            border: 1px solid var(--federation-border);
+            border-radius: 8px;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .federation-data-card .icon { font-size: 2rem; }
+        .federation-data-card .label { color: var(--federation-text-dim); }
+        .federation-data-card .value { font-size: 1.5rem; font-weight: bold; }
+        .federation-data-card.success { border-left: 4px solid var(--federation-success); }
+        .federation-data-card.danger { border-left: 4px solid var(--federation-danger); }
+
+        /* --- Mock Game View Specifics --- */
+        .galaxy-map-placeholder {
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at 40% 50%, rgba(0, 153, 255, 0.1) 0%, transparent 70%);
+            position: relative;
+        }
+        .star {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 1.5s infinite alternate;
+        }
+        @keyframes twinkle { from { opacity: 0.5; } to { opacity: 1; } }
+        
+        .selected-system {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border: 2px solid var(--federation-accent-light);
+            border-radius: 50%;
+            top: 40%;
+            left: 35%;
+            transform: translate(-50%, -50%);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 var(--federation-accent-light); }
+            70% { box-shadow: 0 0 10px 15px rgba(255, 153, 0, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 153, 0, 0); }
+        }
+
+        .nav-menu { list-style: none; padding: 0; margin: 0; }
+        .nav-item {
+            padding: 12px 16px;
+            color: var(--federation-text-dim);
+            cursor: pointer;
+            transition: background var(--transition-fast);
+            border-radius: 4px;
+            margin-bottom: 4px;
+        }
+        .nav-item:hover, .nav-item.active {
+            background: var(--federation-primary-dark);
+            color: white;
+        }
+
+        .info-section { margin-bottom: 1.5rem; }
+        .info-title { font-family: var(--font-display); color: var(--federation-accent-light); margin-bottom: 0.5rem; }
+        .info-row { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 0.5rem; }
+        .info-label { color: var(--federation-text-dim); }
+        .info-value { font-weight: bold; }
+        .info-value.positive { color: var(--federation-success); }
+        .info-value.negative { color: var(--federation-danger); }
+
+    </style>
+</head>
+<body>
+
+    <header class="game-header">
+        <div class="header-logo">GALACTIC STRATEGY</div>
+        <nav class="header-nav">
+            <a href="#" class="header-nav-item active">Map</a>
+            <a href="#" class="header-nav-item">Fleets</a>
+            <a href="#" class="header-nav-item">Colonies</a>
+            <a href="#" class="header-nav-item">Research</a>
+        </nav>
+        <div class="header-right-controls">
+            <div class="federation-button outline">End Turn</div>
+        </div>
+    </header>
+
+    <div class="layout-container">
+        <aside class="nav-drawer">
+            <div class="federation-panel">
+                <div class="federation-panel-header">Navigation</div>
+                <div class="federation-panel-content">
+                    <ul class="nav-menu">
+                        <li class="nav-item active">Overview</li>
+                        <li class="nav-item">Galaxy Map</li>
+                        <li class="nav-item">Fleets</li>
+                        <li class="nav-item">Colonies</li>
+                        <li class="nav-item">Research</li>
+                        <li class="nav-item">Ship Designer</li>
+                        <li class="nav-item">Settings</li>
+                    </ul>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="galaxy-map-placeholder">
+                <div class="star" style="top: 20%; left: 30%;"></div>
+                <div class="star" style="top: 40%; left: 35%; width: 12px; height: 12px; background: #ffdd44;"></div>
+                <div class="star" style="top: 55%; left: 60%; animation-delay: -0.5s;"></div>
+                <div class="star" style="top: 80%; left: 25%;"></div>
+                <div class="star" style="top: 35%; left: 75%; animation-delay: -1s;"></div>
+                <div class="selected-system"></div>
+            </div>
+        </main>
+
+        <aside class="info-panel">
+            <div class="federation-panel">
+                <div class="federation-panel-header secondary">Sol System</div>
+                <div class="federation-panel-content">
+                    <div class="info-section">
+                        <div class="info-title">System Details</div>
+                        <div class="info-row">
+                            <span class="info-label">Star Type:</span>
+                            <span class="info-value">G-Type (Yellow)</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Planets:</span>
+                            <span class="info-value">9</span>
+                        </div>
+                         <div class="info-row">
+                            <span class="info-label">Owner:</span>
+                            <span class="info-value" style="color: #99c1f1;">United Federation</span>
+                        </div>
+                    </div>
+
+                    <div class="info-section">
+                        <div class="info-title">Colony: Earth</div>
+                        <div style="display: flex; flex-direction: column; gap: 1rem;">
+                           <div class="federation-data-card">
+                                <div class="icon">🧑‍🤝‍🧑</div>
+                                <div>
+                                    <div class="label">Population</div>
+                                    <div class="value">8.2B / 10B</div>
+                                </div>
+                            </div>
+                             <div class="federation-data-card success">
+                                <div class="icon">📈</div>
+                                <div>
+                                    <div class="label">Stability</div>
+                                    <div class="value">95%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-section">
+                        <div class="info-title">System Output</div>
+                        <div class="info-row">
+                            <span class="info-label">⚡ Energy:</span>
+                            <span class="info-value positive">+152</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">⛏️ Minerals:</span>
+                            <span class="info-value positive">+88</span>
+                        </div>
+                         <div class="info-row">
+                            <span class="info-label">🔬 Research:</span>
+                            <span class="info-value positive">+210</span>
+                        </div>
+                    </div>
+
+                     <div class="federation-button" style="width: 100%;">Manage Colony</div>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+</body>
+</html>

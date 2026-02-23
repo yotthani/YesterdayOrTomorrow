@@ -1,12 +1,16 @@
 @page "/game/economy"
+@layout StellarisLayout
 @using System.Text.Json
+@using StarTrekGame.Web.Services
+@using Blazored.LocalStorage
+@inject IGameApiClient Api
+@inject ILocalStorageService LocalStorage
 @inject HttpClient Http
 @inject NavigationManager Nav
 
 <div class="economy-dashboard @GetFactionClass()">
-    <div class="dashboard-header">
+    <div class="dashboard-page-header">
         <h1>💰 Empire Economy</h1>
-        <button class="btn-back" @onclick="GoBack">← Back to Galaxy</button>
     </div>
 
     @if (_loading)
@@ -259,20 +263,19 @@
 
 <style>
     .economy-dashboard {
-        min-height: 100vh;
+        flex: 1;
         padding: 20px;
-        background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3a 100%);
         color: white;
+        overflow-y: auto;
     }
 
-    .dashboard-header {
+    .dashboard-page-header {
         display: flex;
-        justify-content: space-between;
         align-items: center;
         margin-bottom: 20px;
     }
 
-    .dashboard-header h1 {
+    .dashboard-page-header h1 {
         margin: 0;
     }
 
@@ -575,14 +578,6 @@
 
     .btn-confirm { background: #27ae60; color: white; }
     .btn-cancel { background: #7f8c8d; color: white; }
-    .btn-back {
-        padding: 10px 20px;
-        background: rgba(255,255,255,0.1);
-        border: 1px solid rgba(255,255,255,0.2);
-        border-radius: 5px;
-        color: white;
-        cursor: pointer;
-    }
 
     .loading {
         text-align: center;
@@ -614,10 +609,11 @@
     private int _tradeAmount = 100;
 
     private string _factionId = "federation";
-    private Guid _houseId = Guid.Empty; // Would come from game state
+    private Guid? _factionGuid;
 
     protected override async Task OnInitializedAsync()
     {
+        _factionGuid = await LocalStorage.GetItemAsync<Guid?>("currentFactionId");
         await LoadData();
     }
 
@@ -686,8 +682,6 @@
         _loading = false;
     }
 
-    private void GoBack() => Nav.NavigateTo("/game/galaxy");
-
     private string GetFactionClass() => _factionId.ToLower();
     
     private string GetChangeClass(int value) => value switch
@@ -740,22 +734,41 @@
 
     private async Task ExecuteTrade()
     {
-        // Would call API
-        await Task.Delay(100);
+        if (_factionGuid.HasValue)
+        {
+            try
+            {
+                await Api.ExecuteTradeAsync(_factionGuid.Value, _tradeResource, _tradeAmount, _isBuying);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Trade failed: {ex.Message}");
+            }
+        }
         CloseTradeModal();
         await LoadData();
     }
 
     private async Task CancelRoute(Guid routeId)
     {
-        // Would call API
-        await Task.Delay(100);
+        if (_factionGuid.HasValue)
+        {
+            try
+            {
+                await Api.CancelTradeRouteAsync(routeId);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Cancel route failed: {ex.Message}");
+            }
+        }
         await LoadData();
     }
 
     private void ShowNewRouteModal()
     {
-        // Would show route creation modal
+        // Route creation needs system selection UI - navigate to galaxy map
+        Nav.NavigateTo("/game/galaxy");
     }
 
     // Data classes

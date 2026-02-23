@@ -8,8 +8,8 @@ using StarTrekGame.Domain.SharedKernel;
 /// </summary>
 public class Commander : Entity
 {
-    public string Name { get; private set; }
-    public string Title { get; private set; }  // Captain, Admiral, General, etc.
+    public string Name { get; private set; } = default!;
+    public string Title { get; private set; } = default!;  // Captain, Admiral, General, etc.
     public Guid? AssignedFleetId { get; private set; }
     public Guid EmpireId { get; private set; }
     
@@ -244,8 +244,8 @@ public enum CommanderRank
 public class CommanderAbility
 {
     public AbilityType Type { get; init; }
-    public string Name { get; init; }
-    public string Description { get; init; }
+    public string Name { get; init; } = default!;
+    public string Description { get; init; } = default!;
     public int CooldownRounds { get; init; }
     public int MaxUsesPerBattle { get; init; }  // 0 = unlimited
     public int DisorderCost { get; init; }       // Using ability causes disorder
@@ -406,8 +406,8 @@ public enum AbilityType
 public class CommanderTrait
 {
     public TraitType Type { get; init; }
-    public string Name { get; init; }
-    public string Description { get; init; }
+    public string Name { get; init; } = default!;
+    public string Description { get; init; } = default!;
     public bool IsPositive { get; init; }
 
     public static CommanderTrait Aggressive() => new()

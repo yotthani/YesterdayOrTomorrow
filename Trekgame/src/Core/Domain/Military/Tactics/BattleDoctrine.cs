@@ -15,7 +15,7 @@ namespace StarTrekGame.Domain.Military.Tactics;
 public class BattleDoctrine : Entity
 {
     public Guid FleetId { get; private set; }
-    public string Name { get; private set; }
+    public string Name { get; private set; } = default!;
     
     // Core doctrine settings (set at base)
     public EngagementPolicy EngagementPolicy { get; private set; }

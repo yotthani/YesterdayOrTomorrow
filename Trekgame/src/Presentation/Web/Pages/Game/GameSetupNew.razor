@@ -2,78 +2,233 @@
 @page "/game/new"
 @page "/game/setup/{GameId:guid}"
 @page "/game/new-game"
-@layout StellarisLayout
+@layout MainLayout
+@using StarTrekGame.Web.Components.UI
 @inject NavigationManager Nav
+
 <PageTitle>New Game - Galactic Strategy</PageTitle>
-<div class="setup-page">
-    <div class="setup-bg"><div class="stars"></div></div>
-    <div class="setup-content">
-        <h1>NEW GAME SETUP</h1>
-        <div class="setup-layout">
-            <div class="setup-section faction-select">
-                <h2>SELECT YOUR EMPIRE</h2>
+
+<div class="new-game-container">
+    <FederationPanel Title="New Game Setup" HeaderColor="primary" AccentColor="accent" Rounded="tl,tr,bl,br">
+        <div class="setup-grid">
+            
+            <FederationPanel Title="Select Your Empire" HeaderColor="secondary" AccentColor="primary" Padding="0" Class="grid-span-2">
                 <div class="factions-grid">
-                    @foreach(var f in _factions){<div class="faction-option @(_selectedFaction==f.Id?"selected":"")" @onclick="()=>_selectedFaction=f.Id"><div class="faction-banner @f.Id"><div class="faction-emblem">@f.Icon</div></div><div class="faction-info"><span class="faction-name">@f.Name</span><span class="faction-trait">@f.Trait</span></div><div class="faction-stats"><span>⚔ @f.Military</span><span>🔬 @f.Science</span><span>💰 @f.Economy</span></div></div>}
+                    @foreach(var f in _factions)
+                    {
+                        <div class="faction-card @(_selectedFaction==f.Id?"selected":"")" @onclick="()=>_selectedFaction=f.Id">
+                            <div class="faction-card-banner @f.Id">
+                                <div class="faction-card-icon">@f.Icon</div>
+                                <div class="faction-card-name">@f.Name</div>
+                            </div>
+                            <div class="faction-card-trait">@f.Trait</div>
+                        </div>
+                    }
                 </div>
-            </div>
-            <div class="setup-section galaxy-settings">
-                <h2>GALAXY SETTINGS</h2>
-                <div class="setting-row"><span class="setting-label">Galaxy Size</span><div class="setting-options">@foreach(var s in new[]{"Small","Medium","Large","Huge"}){<button class="option-btn @(_galaxySize==s?"active":"")" @onclick="()=>_galaxySize=s">@s</button>}</div></div>
-                <div class="setting-row"><span class="setting-label">Star Density</span><div class="setting-options">@foreach(var s in new[]{"Sparse","Normal","Dense"}){<button class="option-btn @(_starDensity==s?"active":"")" @onclick="()=>_starDensity=s">@s</button>}</div></div>
-                <div class="setting-row"><span class="setting-label">AI Empires</span><div class="setting-options">@for(int i=2;i<=8;i+=2){var n=i;<button class="option-btn @(_aiCount==n?"active":"")" @onclick="()=>_aiCount=n">@n</button>}</div></div>
-                <div class="setting-row"><span class="setting-label">Difficulty</span><div class="setting-options">@foreach(var s in new[]{"Cadet","Captain","Admiral"}){<button class="option-btn @(_difficulty==s?"active":"")" @onclick="()=>_difficulty=s">@s</button>}</div></div>
-                <div class="setting-row"><span class="setting-label">Victory Conditions</span><div class="victory-checks"><label><input type="checkbox" checked /> Conquest</label><label><input type="checkbox" checked /> Diplomacy</label><label><input type="checkbox" checked /> Technology</label><label><input type="checkbox" /> Score</label></div></div>
-            </div>
-            <div class="setup-section empire-preview">
-                <h2>EMPIRE PREVIEW</h2>
+            </FederationPanel>
+            
+            <FederationPanel Title="Empire Preview" HeaderColor="secondary" AccentColor="primary">
                 @{var sel=_factions.FirstOrDefault(f=>f.Id==_selectedFaction);}
-                @if(sel!=null){
-                <div class="preview-card @sel.Id">
-                    <div class="preview-header"><div class="preview-emblem">@sel.Icon</div><div class="preview-title"><h3>@sel.Name</h3><span>@sel.Government</span></div></div>
-                    <div class="preview-body">
-                        <p class="preview-desc">@sel.Description</p>
-                        <div class="preview-traits"><h4>EMPIRE TRAITS</h4>@foreach(var t in sel.Traits){<span class="trait-tag @(t.StartsWith("-")?"negative":"positive")">@t</span>}</div>
-                        <div class="preview-stats"><div class="pstat"><span class="pstat-label">Starting Systems</span><span class="pstat-val">3</span></div><div class="pstat"><span class="pstat-label">Starting Ships</span><span class="pstat-val">5</span></div><div class="pstat"><span class="pstat-label">Home World</span><span class="pstat-val">@sel.Homeworld</span></div></div>
+                @if(sel!=null)
+                {
+                    <div class="preview-content">
+                        <h3>@sel.Name (@sel.Government)</h3>
+                        <p>@sel.Description</p>
+                        
+                        <h4>Empire Traits:</h4>
+                        <div class="traits-list">
+                            @foreach(var t in sel.Traits)
+                            {
+                                <span class="trait-tag @(t.StartsWith("-")?"negative":"positive")">@t</span>
+                            }
+                        </div>
+
+                        <h4>Base Ratings:</h4>
+                        <div class="stats-grid">
+                            <FederationDataCard Label="Military" Value="@sel.Military.ToString()" Color="danger" Compact="true" />
+                            <FederationDataCard Label="Science" Value="@sel.Science.ToString()" Color="primary" Compact="true" />
+                            <FederationDataCard Label="Economy" Value="@sel.Economy.ToString()" Color="accent" Compact="true" />
+                        </div>
+                        
+                        <h5>Homeworld: @sel.Homeworld</h5>
                     </div>
-                </div>}
-            </div>
+                }
+            </FederationPanel>
+            
+            <FederationPanel Title="Galaxy Settings" HeaderColor="secondary" AccentColor="primary" Class="grid-span-3">
+                <div class="galaxy-settings-grid">
+                    <div class="setting-group">
+                        <label>Galaxy Size</label>
+                        <FederationButton OnClick="@(() => _galaxySize = "Small")" Variant="@(_galaxySize == "Small" ? "primary" : "outline")">Small</FederationButton>
+                        <FederationButton OnClick="@(() => _galaxySize = "Medium")" Variant="@(_galaxySize == "Medium" ? "primary" : "outline")">Medium</FederationButton>
+                        <FederationButton OnClick="@(() => _galaxySize = "Large")" Variant="@(_galaxySize == "Large" ? "primary" : "outline")">Large</FederationButton>
+                    </div>
+                    <div class="setting-group">
+                        <label>Star Density</label>
+                        <FederationButton OnClick="@(() => _starDensity = "Sparse")" Variant="@(_starDensity == "Sparse" ? "primary" : "outline")">Sparse</FederationButton>
+                        <FederationButton OnClick="@(() => _starDensity = "Normal")" Variant="@(_starDensity == "Normal" ? "primary" : "outline")">Normal</FederationButton>
+                        <FederationButton OnClick="@(() => _starDensity = "Dense")" Variant="@(_starDensity == "Dense" ? "primary" : "outline")">Dense</FederationButton>
+                    </div>
+                    <div class="setting-group">
+                        <label>AI Empires</label>
+                        <FederationButton OnClick="@(() => _aiCount = 2)" Variant="@(_aiCount == 2 ? "primary" : "outline")">2</FederationButton>
+                        <FederationButton OnClick="@(() => _aiCount = 4)" Variant="@(_aiCount == 4 ? "primary" : "outline")">4</FederationButton>
+                        <FederationButton OnClick="@(() => _aiCount = 6)" Variant="@(_aiCount == 6 ? "primary" : "outline")">6</FederationButton>
+                    </div>
+                    <div class="setting-group">
+                        <label>Difficulty</label>
+                        <FederationButton OnClick="@(() => _difficulty = "Cadet")" Variant="@(_difficulty == "Cadet" ? "primary" : "outline")">Cadet</FederationButton>
+                        <FederationButton OnClick="@(() => _difficulty = "Captain")" Variant="@(_difficulty == "Captain" ? "primary" : "outline")">Captain</FederationButton>
+                        <FederationButton OnClick="@(() => _difficulty = "Admiral")" Variant="@(_difficulty == "Admiral" ? "primary" : "outline")">Admiral</FederationButton>
+                    </div>
+                </div>
+            </FederationPanel>
         </div>
-        <div class="setup-actions"><button class="st-btn lg" @onclick='()=>Nav.NavigateTo("/menu")'>← BACK</button><button class="st-btn lg primary" @onclick="StartGame">START GAME →</button></div>
-    </div>
+
+        <div class="actions-bar">
+            <FederationButton OnClick="@(()=>Nav.NavigateTo("/"))" Variant="secondary" Size="large">← Back to Menu</FederationButton>
+            <FederationButton OnClick="StartGame" Variant="primary" Size="large">Start Game →</FederationButton>
+        </div>
+    </FederationPanel>
 </div>
+
 <style>
-.setup-page{position:fixed;inset:0;background:#040608;overflow:hidden}
-.setup-bg{position:absolute;inset:0}.stars{position:absolute;inset:0;background-image:radial-gradient(1px 1px at 50px 30px,#fff,transparent),radial-gradient(1px 1px at 150px 80px,rgba(255,255,255,0.6),transparent);background-size:200px 150px}
-.setup-content{position:relative;z-index:10;max-width:1400px;margin:0 auto;padding:40px;height:100%;display:flex;flex-direction:column}
-.setup-content h1{font-family:var(--st-font-display);font-size:28px;color:var(--st-text-white);letter-spacing:4px;margin:0 0 32px;text-align:center}
-.setup-layout{flex:1;display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px;overflow:hidden}
-.setup-section{background:var(--st-gradient-panel);border:1px solid var(--st-border-dark);border-radius:8px;padding:20px;overflow-y:auto}
-.setup-section h2{font-family:var(--st-font-display);font-size:14px;color:var(--st-text-muted);letter-spacing:2px;margin:0 0 20px;padding-bottom:12px;border-bottom:1px solid var(--st-border-dark)}
-.factions-grid{display:flex;flex-direction:column;gap:12px}
-.faction-option{display:flex;gap:12px;padding:12px;background:var(--st-bg-medium);border:2px solid transparent;border-radius:8px;cursor:pointer;transition:all 0.2s}
-.faction-option:hover{background:var(--st-bg-light)}.faction-option.selected{border-color:var(--st-accent-blue);background:rgba(74,158,255,0.1)}
-.faction-banner{width:60px;height:60px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:28px}
-.faction-banner.federation{background:linear-gradient(135deg,#1a4a8c,#0a2a5c)}.faction-banner.klingon{background:linear-gradient(135deg,#8c1a1a,#5c0a0a)}.faction-banner.romulan{background:linear-gradient(135deg,#1a5c3c,#0a3c2c)}.faction-banner.cardassian{background:linear-gradient(135deg,#8c6a1a,#5c4a0a)}.faction-banner.ferengi{background:linear-gradient(135deg,#8c8a1a,#5c5a0a)}.faction-banner.borg{background:linear-gradient(135deg,#1a3c1a,#0a2a0a)}
-.faction-info{flex:1}.faction-name{display:block;font-family:var(--st-font-display);font-size:14px;color:var(--st-text-white)}.faction-trait{font-size:11px;color:var(--st-text-dim)}
-.faction-stats{display:flex;flex-direction:column;gap:4px;font-size:11px;color:var(--st-text-muted)}
-.setting-row{margin-bottom:20px}.setting-label{display:block;font-size:12px;color:var(--st-text-muted);margin-bottom:10px}
-.setting-options{display:flex;gap:8px}.option-btn{padding:8px 16px;background:var(--st-gradient-button);border:1px solid var(--st-border-dark);border-radius:4px;color:var(--st-text-muted);font-size:12px;cursor:pointer;transition:all 0.15s}
-.option-btn:hover{background:var(--st-gradient-button-hover)}.option-btn.active{background:var(--st-accent-blue);border-color:var(--st-accent-blue);color:#fff}
-.victory-checks{display:flex;flex-wrap:wrap;gap:12px}.victory-checks label{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--st-text-muted);cursor:pointer}
-.preview-card{border-radius:8px;overflow:hidden}
-.preview-header{display:flex;gap:16px;padding:20px;background:rgba(0,0,0,0.3)}
-.preview-card.federation .preview-header{background:linear-gradient(135deg,rgba(26,74,140,0.5),transparent)}
-.preview-card.klingon .preview-header{background:linear-gradient(135deg,rgba(140,26,26,0.5),transparent)}
-.preview-emblem{width:64px;height:64px;background:rgba(0,0,0,0.3);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:36px}
-.preview-title h3{font-family:var(--st-font-display);font-size:20px;color:var(--st-text-white);margin:0 0 4px}.preview-title span{font-size:12px;color:var(--st-text-dim)}
-.preview-body{padding:20px}.preview-desc{font-size:12px;color:var(--st-text-muted);line-height:1.5;margin-bottom:20px}
-.preview-traits h4{font-size:11px;color:var(--st-text-dim);letter-spacing:1px;margin:0 0 10px}
-.trait-tag{display:inline-block;padding:4px 10px;margin:0 6px 6px 0;border-radius:4px;font-size:11px}
-.trait-tag.positive{background:rgba(68,221,102,0.2);color:var(--st-accent-green)}.trait-tag.negative{background:rgba(255,68,68,0.2);color:var(--st-accent-red)}
-.preview-stats{display:flex;gap:16px;margin-top:20px;padding-top:16px;border-top:1px solid var(--st-border-dark)}
-.pstat{flex:1;text-align:center}.pstat-label{display:block;font-size:10px;color:var(--st-text-dim);margin-bottom:4px}.pstat-val{font-family:var(--st-font-display);font-size:18px;color:var(--st-text-bright)}
-.setup-actions{display:flex;justify-content:space-between;margin-top:24px}
+    .new-game-container {
+        max-width: 1600px;
+        margin: auto;
+        padding: 2rem;
+    }
+
+    .setup-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+    }
+    
+    .grid-span-2 {
+        grid-column: span 2;
+    }
+    
+    .grid-span-3 {
+        grid-column: span 3;
+    }
+
+    .factions-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 8px;
+        padding: 16px;
+        max-height: 500px;
+        overflow-y: auto;
+    }
+    
+    .faction-card {
+        border: 2px solid var(--federation-border);
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all var(--transition-fast);
+        overflow: hidden;
+    }
+    
+    .faction-card:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 10px var(--federation-primary-light);
+    }
+    
+    .faction-card.selected {
+        border-color: var(--federation-primary-light);
+        box-shadow: 0 0 15px var(--federation-primary);
+    }
+    
+    .faction-card-banner {
+        padding: 12px;
+        text-align: center;
+        font-family: var(--font-display);
+    }
+    .faction-card-banner.federation { background: linear-gradient(135deg, #005aa7, #fffde4); color: white;}
+    .faction-card-banner.klingon { background: linear-gradient(135deg, #d31027, #ea384d); color: white;}
+    .faction-card-banner.romulan { background: linear-gradient(135deg, #004d40, #00796b); color: white;}
+    .faction-card-banner.cardassian { background: linear-gradient(135deg, #4e342e, #8d6e63); color: white;}
+    .faction-card-banner.ferengi { background: linear-gradient(135deg, #e65100, #ff9800); color: white;}
+    .faction-card-banner.borg { background: linear-gradient(135deg, #212121, #424242); color: #0f0;}
+
+    .faction-card-icon {
+        font-size: 2em;
+    }
+
+    .faction-card-trait {
+        text-align: center;
+        padding: 8px;
+        background: var(--federation-bg-light);
+        font-size: 0.8rem;
+        color: var(--federation-accent-light);
+    }
+
+    .preview-content h3 {
+        font-family: var(--font-display);
+        color: var(--federation-accent-light);
+    }
+    .preview-content h5 {
+        margin-top: 1rem;
+        color: var(--federation-text-dim);
+    }
+    .preview-content p {
+        font-size: 0.9rem;
+        color: var(--federation-text-dim);
+        line-height: 1.6;
+    }
+
+    .traits-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 8px;
+    }
+    
+    .trait-tag{
+        display:inline-block;
+        padding: 4px 10px;
+        margin: 0 6px 6px 0;
+        border-radius:4px;
+        font-size:11px;
+    }
+    .trait-tag.positive{ background:rgba(51, 204, 102, 0.2); color: var(--federation-success); border: 1px solid var(--federation-success);}
+    .trait-tag.negative{ background:rgba(255, 51, 51, 0.2); color: var(--federation-danger); border: 1px solid var(--federation-danger);}
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        margin-top: 1rem;
+    }
+    
+    .galaxy-settings-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 24px;
+    }
+    
+    .setting-group {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .setting-group label {
+        font-weight: bold;
+        color: var(--federation-text-dim);
+        margin-right: 8px;
+    }
+
+    .actions-bar {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 16px;
+        border-top: 1px solid var(--federation-border);
+        padding-top: 16px;
+    }
 </style>
+
 @code{
     string _selectedFaction="federation";string _galaxySize="Medium";string _starDensity="Normal";int _aiCount=4;string _difficulty="Captain";
     List<FactionInfo> _factions=new(){

@@ -9,8 +9,8 @@ namespace StarTrekGame.Domain.Population;
 /// </summary>
 public class Job : Entity
 {
-    public string Name { get; private set; }
-    public string Description { get; private set; }
+    public string Name { get; private set; } = default!;
+    public string Description { get; private set; } = default!;
     public JobCategory Category { get; private set; }
     
     // Slots

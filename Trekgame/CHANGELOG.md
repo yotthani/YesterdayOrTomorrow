@@ -1,3 +1,415 @@
+# Changelog
+
+## [1.43.82] - 2026-02-12 - "UI Findings & Hirogen Complete"
+
+### Added - Hirogen Race Complete (1.43.80)
+- **6 Hirogen Leader Traits**: hunt_master, trophy_hunter, prey_tracker, alpha_hunter, nomadic_instinct, the_hunt_obsession
+- **Hirogen Attire** in PromptBuilderService: Alpha, Tracker/Scout, Elder, Hunter variants
+- **CanonFactionTemplate** für HirogenClans: 4 Bonuses, 2 Restrictions
+- **Government Type**: hunter_clans (AuthorityType.Imperial, "Alpha Hunter")
+- **3 Hirogen Civics**: the_hunt, nomadic, trophy_collectors
+- **2 neue Schiffsklassen**: hirogen_pursuit_craft (Corvette/Exploration), hirogen_alpha_ship (Battleship/Flagship)
+- **5 einzigartige Gebäude**: alpha_lodge, trophy_hall, hunting_arena, prey_database, sensor_workshop
+- **StartingConditions** für Hirogen Faction
+
+### Fixed - 5 UI Findings (1.43.81)
+
+**1. ThemeTest.razor — Data-Driven statt Hardcoded:**
+- CommandContent → `GetCommandItems()` für alle 14 Factions
+- FooterContent → `GetFooterData()` mit Faction-spezifischem Inhalt/Farben
+- EdgeNavItems → `GetEdgeNavData()` für klingon, hirogen, kazon, gorn + default
+- `GetFactionSubtitle()` erweitert auf alle 14 Factions
+- Edge-Nav aktualisiert sich bei Theme-Wechsel
+
+**2. GalaxyMapNew.razor — CSS Bug + fehlende Race Themes:**
+- CSS Syntax Error behoben (`.help-btn:hover {` war leer/ungeschlossen)
+- **8 neue Race Themes**: dominion, bajoran, tholian, gorn, breen, orion, kazon, hirogen
+- Jedes Theme mit CSS-Variablen, top-bar, end-turn-btn, empire-flag Styles
+- `validRaces` Array von 6 → 14 erweitert
+- `GetFactionColor()` um 8 neue Factions erweitert
+
+**3. SystemViewNew.razor — Tooltips:**
+- Planeten-Tooltips: Name, Typ, Größe, Habitability (farbcodiert), Colony-Info
+- Stern-Tooltip: Systemname, Sterntyp, Planeten-/Habitable-/Colony-Anzahl
+- Fleet-Marker: Ship-Count Anzeige + title-Attribut
+- Tooltip-CSS: glasähnlicher Hintergrund, smooth transition
+
+**4. GalaxyMapNew.razor — Neue Sidebar-Links:**
+- Economy (📊 → `/game/economy`)
+- Intelligence (🕵 → `/game/intelligence`)
+- Victory (🏆 → `/game/victory-status`)
+
+**5. Admin Force-End-Turn:**
+- `_isAdmin` Flag (erster menschlicher Spieler oder localStorage)
+- `⚡ FORCE` Button neben End Turn (nur für Admin sichtbar)
+- `ForceProcessTurn()` nutzt `ProcessTurnAsync()` API
+- Orange/Gold Styling
+
+### Added - UI Component System (1.43.80)
+- **FactionUI Components**: FactionButton, FactionHeader, FactionPanel, FactionSidebar, TemplatedButton, TemplatedHeader, TemplatedLayout, TemplatedPanel, TemplatedSidebar
+- **MainMenuUI Components**: MenuButton, MenuFooter, MenuHeader, MenuLayout, MenuPanel, MenuSidebar
+- **FactionTemplateService**: 14 Faction-UI-Templates mit Button/Panel/Sidebar/Header/Colors/Layout
+- **MainMenuTemplateService**: Main Menu Styling pro Faction
+- **15 Theme CSS-Dateien**: `wwwroot/css/themes/theme-{faction}.css` + `_base.css`
+- **faction-ui-components.css** + **main-menu-components.css**: Component Stylesheets
+- **MenuStyleTest.razor**: Test-Seite für Main Menu Components
+
+### Technical
+- Builds: 0 Errors, 0 Warnings
+- 73 Dateien geändert (30.735 Insertions)
+
+---
+
+## [1.43.79] - 2026-02-12 - "Services Integration"
+
+### Changed
+- **CombatService** erweitert um ShipDefinitions-Integration:
+  - Neue `CalculateShipPower()` Methode mit Bonus-Parsing
+  - Ship Abilities: Cloak, Adaptation (Borg), Energy Dampener (Breen), Web Spinner (Tholian)
+  - `ShipCombatState` erweitert: HasCloak, HasAdaptation, RegenerationRate, AlphaStrikeBonus, BoardingBonus
+  - Neue Combat-Methoden: `ApplyStartOfRoundEffects()`, `ApplyEndOfRoundEffects()`, `SelectTarget()`
+  - Role-basiertes Targeting (Screens → kleine Schiffe, Raiders → beschädigte Schiffe)
+  - Alpha Strike System für cloaked Ships
+
+- **CrisisService** erweitert um CrisisDefinitions-Integration:
+  - `TryTriggerExtendedCrisisAsync()` für erweiterte Crisis-Auslösung
+  - `EvaluateCrisisConditionsAsync()` prüft: no_active_crisis, tech_level, faction_exists
+  - `StartExtendedCrisisAsync()` mit Severity-zu-ThreatLevel Mapping
+  - `SpawnExtendedCrisisFleetAsync()` nutzt CrisisStage.SpawnFleets
+
+- **DiplomacyService** erweitert um DiplomacyDefinitions-Integration:
+  - `ProposeTreatyAsync()` nutzt `TreatyDef.OpinionRequired`, `TrustRequired`, `RestrictedFactions`
+  - `ValidateCasusBelliAsync()` nutzt `CasusBelliDef.RequiresFaction`, `MinThreatLevel`
+  - `CalculateOpinionModifiers()` für Factions-spezifische Opinion-Modifiers
+  - Borg-Sonderbedingungen: können keine Allianzen bilden
+  - Neue Helper: `CheckIdeologyConflictAsync()`
+
+- **ColonyService** erweitert um JobDefinitions-Integration:
+  - Neue `AssignPopToJobAsync()` Methode mit Faction-Exclusive und Stratum-Checks
+  - Neue `GetAvailableJobsAsync()` liefert verfügbare Job-Slots mit Output-Info
+  - `JobSlotInfo` Klasse mit CreditsOutput, EnergyOutput, NavalCapBonus etc.
+  - `MapJobIdToJobType()` und `MapJobStratumToPopStratum()` Helper
+
+### Added
+- `DiplomacyDefinitions`: Neue Helper-Methoden:
+  - `GetOpinionModifiersFor(factionRace, targetRace)`
+  - `GetTreatiesByCategory(category)`
+  - `GetActionsFor(factionRace)`
+- `OpinionModifierDef`: Neue Properties `AppliesTo`, `TargetFaction`, `IsPermanent`
+- `CasusBelliDef`: Neue Property `RequiresFaction[]`
+- `TreatyDef`: Neue Properties `OpinionRequired`, `TrustBonus`, `RestrictedFactions[]`
+
+### Technical
+- Services nutzen jetzt durchgehend die Data-Driven Definitions
+- Alle Builds: 0 Errors, 0 Warnings
+
+---
+
+## [1.43.78] - 2026-02-12 - "Late-Game Crises"
+
+### Added
+- **Neue CrisisDefinitions.cs** mit 15 Galaxy-weiten Krisen:
+
+  **Borg Related (2):**
+  - `borg_invasion`: Catastrophic 3-stage invasion (Initial Contact → Probing → Full Invasion)
+  - `unimatrix_zero_uprising`: Borg civil war opportunity
+
+  **Dominion Related (2):**
+  - `dominion_war`: Catastrophic Alpha Quadrant invasion with forced alliances
+  - `founder_infiltration_crisis`: Changeling infiltration affecting all empires
+
+  **Extra-Dimensional (2):**
+  - `species_8472_invasion`: Extinction-level threat from fluidic space
+  - `mirror_universe_invasion`: Terran Empire crossover with evil counterparts
+
+  **Temporal (2):**
+  - `temporal_cold_war`: Future factions manipulating the timeline
+  - `krenim_temporal_weapon`: Civilizations erased from history
+
+  **Natural/Cosmic (3):**
+  - `omega_particle_crisis`: Subspace ruptures making warp impossible
+  - `stellar_extinction_event`: Stars dying prematurely
+  - `subspace_rupture`: Expanding warp-travel dead zone
+
+  **Political/Internal (3):**
+  - `federation_civil_war`: Member worlds seceding
+  - `klingon_succession_crisis`: Great Houses warring for Chancellorship
+  - `romulan_supernova`: Evacuation crisis (help or ignore?)
+
+### Technical
+- CrisisDef mit: Category, Severity, EarliestTurn, TriggerChance, TriggerConditions
+- CrisisStage System: Multi-stage progression with SpawnFleets, Duration, SpecialEvents
+- GlobalEffects Dictionary für galaxy-weite Modifiers
+- Victory/Defeat Conditions und Resolution paths
+- Special Mechanics: ForcesAlliances, CanBeAssisted, SplitsEmpire, TemporalFactions
+- CrisisRewards: InfluenceGain, TechUnlocks, OpinionBonus
+- CrisisCategory Enum: ExternalThreat, Internal, Natural, Temporal, Opportunity
+- CrisisSeverity Enum: Minor, Moderate, Severe, Catastrophic, Extinction
+
+---
+
+## [1.43.77] - 2026-02-12 - "Playable Factions"
+
+### Added
+- **Neue FactionDefinitions.cs** mit vollständigem Factions-Framework:
+
+  **Playable Factions (8):**
+  - **Federation**: Federal Republic, Exploration Mandate, Prime Directive, Scientific Focus
+  - **Klingon Empire**: Feudal Empire, Warrior Culture, Great Houses, Honor Bound
+  - **Romulan Star Empire**: Stratocracy, Tal Shiar, Shadow Council, Expansionist
+  - **Cardassian Union**: Military Junta, Obsidian Order, Resource Exploitation
+  - **Ferengi Alliance**: Corporate Dominion, Rules of Acquisition, Merchant Guilds
+  - **Dominion**: Divine Empire, Founder Worship, Genetic Engineering, Ketracel Control
+  - **Borg Collective**: Hive Mind, Assimilation, Collective Consciousness, Adaptive
+  - **Bajoran Republic**: Theocratic Republic, Prophets' Chosen, Spiritual Leaders
+
+  **Minor/NPC Factions (6):**
+  - Gorn Hegemony, Tholian Assembly, Breen Confederacy
+  - Orion Syndicate, Hirogen Clans, Kazon Sects
+
+  **Government Types (8):**
+  - Federal Republic, Feudal Empire, Stratocracy, Military Junta
+  - Corporate Dominion, Divine Empire, Hive Mind, Theocratic Republic
+  - Mit AuthorityType: Democratic, Oligarchic, Imperial, Gestalt
+
+  **Civics (7+):**
+  - Exploration Mandate, Prime Directive, Warrior Culture
+  - Shadow Council, Rules of Acquisition, Assimilation, Prophets' Chosen
+
+### Technical
+- FactionDef mit: Government, Civics, Ethics, PrimarySpecies, SecondarySpecies, HomeSystem/World
+- StartingConditions: All Resources, StartingSystems/Colonies/Pops/FleetSize, StartingTechs/Ships/Buildings
+- Faction Bonuses Dictionary: diplomacy, research, military, trade, espionage, etc.
+- Unique Content: UniqueBuildings, UniqueTechs, UniqueShips per Faction
+- Special Flags: CanAssimilate, NoDiplomacy, RequiresKetracelWhite, HasProphets
+- GovernmentDef mit: AuthorityType, RulerTitle, CouncilName, ElectionCycle, Bonuses
+- CivicDef mit: Bonuses, Restrictions, Prerequisites
+- AI Personalities für alle Factions definiert
+
+---
+
+## [1.43.76] - 2026-02-12 - "Leader System"
+
+### Added
+- **Neue LeaderDefinitions.cs** mit vollständigem Leader-Framework:
+
+  **Leader Classes (8 Typen):**
+  - Admiral: Fleet command, naval operations (CanCommandFleet, MaxFleetSize)
+  - Captain: Ship command, exploration, diplomacy (CanCommandShip, CanExploreAnomalies)
+  - Governor: Colony administration (CanGovernColony)
+  - Scientist: Research leadership (CanLeadResearch, CanExploreAnomalies)
+  - General: Ground forces command (CanCommandArmy, MaxArmySize)
+  - Spy/Intelligence Agent: Espionage operations (CanConductEspionage, CanCounterEspionage)
+  - Envoy: Diplomatic missions (CanNegotiateTreaties, CanImproveRelations)
+  - Ruler: Supreme empire leader (IsRuler)
+
+  **Leader Skills (35+ Skills):**
+  - Naval/Combat: fleet_logistics, aggressive_tactics, defensive_formation, carrier_master, ambush_specialist, boarding_expert
+  - Exploration: anomaly_expert, first_contact, cartographer
+  - Science: physics_specialist, engineering_specialist, society_specialist, warp_theorist, weapons_researcher, xenobiologist
+  - Administration: efficient_bureaucracy, resource_manager, population_growth, happiness_focus, industrial_focus, trade_expert
+  - Ground Combat: offensive_doctrine, defensive_doctrine, siege_master, guerrilla_warfare
+  - Espionage: infiltration_expert, tech_theft, saboteur, assassin, counter_intelligence
+  - Diplomacy: negotiator, cultural_attache, trade_negotiator, federation_advocate
+  - Leadership: inspiring_presence, veteran_leader, charismatic
+
+  **Leader Traits (25+ Traits):**
+  - Positive: genius, tactical_genius, brave, adaptable, meticulous, aggressive, cautious, diplomat, resilient
+  - Negative: substance_abuser, corrupt, coward, arrogant, paranoid, glory_hound, slow_learner
+  - Faction-specific: mind_meld_capable (Vulcan), battle_hardened (Klingon/Jem'Hadar), rules_of_acquisition (Ferengi), linked (Changeling), assimilated_knowledge (Borg)
+
+### Technical
+- LeaderClassDef mit: BaseStats, AvailableSkillCategories, UpkeepCredits, RecruitCost, BaseLifespan
+- LeaderStats Klasse: Tactics, Leadership, Engineering, Science, Diplomacy, Administration, Subterfuge, Charisma, Curiosity, Aggression
+- LeaderSkillDef mit: Category, MaxLevel, Effects Dictionary
+- LeaderTraitDef mit: Rarity, ApplicableClasses, SpeciesExclusive, StatModifiers, Effects, SkillPointBonus, ExperienceGainBonus, LifespanBonus
+- TraitRarity Enum: Common, Uncommon, Rare, Legendary
+
+---
+
+## [1.43.75] - 2026-02-12 - "Diplomacy System Foundations"
+
+### Added
+- **Neue DiplomacyDefinitions.cs** mit vollständigem Diplomatie-Framework:
+
+  **Treaties (17 Typen):**
+  - Peace: non_aggression_pact, ceasefire, peace_treaty
+  - Economic: trade_agreement, commercial_pact
+  - Scientific: research_agreement, technology_sharing
+  - Military: defensive_pact, alliance, military_access, mutual_intelligence
+  - Diplomatic: open_borders, embassy_exchange, non_interference, border_demarcation
+  - Subjugation: vassalization, protectorate
+  - Union: federation_membership (Federation-exklusiv)
+
+  **Casus Belli (15 Kriegsgründe):**
+  - Standard: conquest, border_conflict, humiliation, subjugation, liberation, revenge, defensive_war, treaty_breach, ideology_war, containment
+  - Faction-spezifisch: assimilation (Borg), dominion_integration (Dominion), honor_war (Klingon), the_hunt (Hirogen), profit_war (Ferengi)
+
+  **Opinion Modifiers (30+):**
+  - Positive: alliance_partner, saved_from_destruction, liberated_us, similar_ethics, etc.
+  - Negative: broke_treaty, declared_war, espionage_caught, xenophobia, etc.
+  - Faction-spezifisch: profit_potential, warrior_respect, worthy_prey, assimilation_target
+
+  **Diplomatic Actions (17):**
+  - Standard: declare_war, offer_peace, propose_treaty, send_gift, insult, embargo, etc.
+  - Faction-spezifisch: challenge_honor (Klingon), offer_bribe (Ferengi), demand_assimilation (Borg)
+
+### Technical
+- TreatyDef mit: TrustRequired, Duration, OpinionBonus, BreakPenalty, TradeBonus, ResearchBonus, Prerequisites, und 25+ Flags
+- CasusBelliDef mit: WarGoalType, AggressionCost, WarExhaustionGain, JustificationTime, MaxSystemsClaimed
+- OpinionModifierDef mit: Value, DecayPerMonth, StacksPerGift
+- DiplomaticActionDef mit: InfluenceCost, OpinionImpact, TrustImpact, Prerequisites
+- Enums: TreatyCategory, WarGoalType, ActionCategory
+
+---
+
+## [1.43.74] - 2026-02-12 - "Species Traits System"
+
+### Added
+- **Neue TraitDefinitions.cs** mit ~100 Traits für Spezies und Leader:
+  - **Physical (13)**: strong, weak, resilient, regenerating, redundant_organs, slow, cold_blooded, cold_adapted, heat_dependent, aquatic, light_sensitive, nocturnal, methane_breather
+  - **Biological (9)**: long_lived, short_lived, fast_breeding, polygamous, cloned, engineered, reptilian, insectoid, crystalline
+  - **Mental (7)**: intelligent, quick_learners, logical, wise, long_memory, photographic_memory, simple
+  - **Psychic (4)**: telepathic, empathic, telepathic_resistant, mental_powers
+  - **Social (40+)**: adaptable, diplomatic, traders, greedy, honorable, warrior, aggressive, pacifist, paranoid, cunning, stubborn, argumentative, friendly, cheerful, optimistic, gentle, cowardly, authoritarian, disciplined, spiritual, artistic, nomadic, tribal, resourceful, passionate, mysterious, und viele mehr
+  - **Special (15+)**: cybernetic, hive_mind, shapeshifter, adaptive, emotionless, joined, temporal_sensitivity, listeners, extra_dimensional, immune_to_borg, ketracel_dependent, link_dependent, phage_infected, energy_dampening, web_spinners
+
+### Technical
+- TraitDef Klasse mit vollständigen Modifier-Properties:
+  - Production: Mining, Energy, Food, Credits, ConsumerGoods, Research, Engineering, Society, Trade
+  - Military: ArmyDamage, ArmyHealth, ArmyMorale, Evasion, Defensive, NavalTactics
+  - Intelligence: Spy, CounterIntel, Sabotage, TechStealChance
+  - Social: Diplomacy, Stability, Happiness, GrowthRate, Loyalty, Crime, Amenities
+  - Leader: Lifespan, Experience, Skill, DecisionSpeed
+  - Habitability: Bonuses/Penalties für Arctic, Tropical, Desert, Ocean, Toxic, etc.
+- TraitCategory Enum: Physical, Biological, Mental, Psychic, Social, Special
+- Cost-System für Species-Customization (positive/negative point costs)
+- Special Flags: CanBeAssimilated, RequiresKetracelWhite, RequiresOrgans, RequiresBreathingApparatus, RequiresEnergy
+
+---
+
+## [1.43.73] - 2026-02-12 - "Galactic Populations"
+
+### Added
+- **25 neue Spezies** in SpeciesDefinitions.cs (13 → 38 total):
+  - **Dominion (2)**: Vorta (diplomats), Changeling (Founders)
+  - **Gamma/Delta Quadrant (8)**: Gorn, Tholian, Breen, Hirogen, Kazon, Vidiian, Talaxian, Ocampa
+  - **Alpha Quadrant Minor (8)**: Orion, Nausicaan, Denobulan, Bolian, Benzite, Pakled, Reman, El-Aurian
+  - **Enterprise Era Xindi (5)**: Reptilian, Insectoid, Aquatic, Primate, Arboreal
+  - **Other (2)**: Species 8472, Suliban
+
+- **28 neue Jobs** in JobDefinitions.cs (17 → 45 total):
+  - **Worker (4)**: dockworker, recycler, replicator_tech, transporter_operator
+  - **Specialist (12)**: xenobiologist, warp_theorist, combat_tactician, counselor, holoprogram_designer, navigator, archaeologist, linguist, saboteur, diplomat, pilot, vedek
+  - **Ruler (8)**: fleet_admiral, governor, high_priest, nagus, obsidian_agent, tal_shiar_operative, first, founder, section_31_agent
+  - **Special/Faction (4)**: borg_drone_worker, ketracel_producer, tholian_web_spinner, orion_syndicate_boss, hunter, holographic_worker
+
+### Technical
+- SpeciesDef erweitert um: RequiresOrgans (Vidiian), Lifespan property
+- JobDef erweitert um: NavalCapBonus, FleetCommandBonus, ShipBuildSpeedBonus, ShipSpeedBonus, ShipEvasionBonus, CounterIntelBonus, AssassinationBonus, SabotageStrength, DiplomacyBonus, FirstContactBonus, ArtifactFindChance, CrimeIncrease, KetracelProduction, TrophyGeneration, ProphetFavorChance, FactionExclusive, RequiresKetracelWhite, RequiresHoloEmitters
+- Alle Spezies haben komplette Habitat-Modifier und Traits
+- Faction-spezifische Jobs für alle Hauptfaktionen
+
+---
+
+## [1.43.72] - 2026-02-12 - "Colony Infrastructure"
+
+### Added
+- **34 neue Gebäude** in BuildingDefinitions.cs (20 → 54 total):
+  - **Resource (5)**: agri_dome, advanced_reactor, deuterium_processor, replicator_facility, latinum_exchange
+  - **Population (5)**: luxury_housing, clone_vats, cultural_center, promenade, temple
+  - **Research (4)**: xenobiology_lab, daystrom_institute, vulcan_science_academy, subspace_array
+  - **Infrastructure (4)**: planetary_capital, subspace_relay, orbital_elevator, commercial_megaplex
+  - **Military (4)**: shipyard, weapons_factory, orbital_defense_grid, military_academy
+  - **Faction-specific (12)**: obsidian_order_hq (Cardassian), tal_shiar_base (Romulan), tower_of_commerce (Ferengi), ketracel_facility (Dominion), warrior_hall (Klingon), assimilation_complex (Borg), tholian_assembly, gorn_hatchery, orion_syndicate_den, holographic_research_center, transporter_hub, hydroponics_bay
+
+### Technical
+- BuildingDef erweitert um: StabilityBonus, ShipBuildSpeedBonus, OrbitalDefensePower, ArmyDamageBonus, ArmyMoraleBonus, CounterIntelBonus, AssassinationBonus, CrimeIncrease, MaxPerColony, MaxPerEmpire, FactionExclusive, FactionBonus
+- Alle Factions haben nun unique Buildings
+
+---
+
+## [1.43.71] - 2026-02-12 - "Fleet Expansion"
+
+### Added
+- **32 neue Schiffsklassen** in ShipDefinitions.cs (16 → 48 total):
+  - **Federation (4)**: sovereign_class, defiant_class, intrepid_class, akira_class
+  - **Klingon (3)**: vorcha_class, neghvar_class, kvort_class
+  - **Romulan (3)**: mogai_class, scimitar_class, valdore_class
+  - **Cardassian (3)**: galor_class, keldon_class, hutet_class
+  - **Dominion (3)**: jemhadar_fighter, jemhadar_battlecruiser, jemhadar_dreadnought
+  - **Ferengi (2)**: dkora_class, nagus_class
+  - **Breen (2)**: breen_warship, breen_dreadnought
+  - **Gorn (2)**: gorn_cruiser (Vishap), gorn_battleship (Balaur)
+  - **Tholian (2)**: tholian_vessel (Mesh Weaver), tholian_tarantula
+  - **Borg (2)**: borg_sphere, borg_diamond
+  - **Hirogen (2)**: hirogen_hunter, hirogen_venatic
+  - **Orion (2)**: orion_interceptor, orion_brigand
+  - **Kazon (2)**: kazon_raider, kazon_carrier
+
+### Technical
+- Alle Schiffe haben Faction-spezifische Bonuses und Tech-Requirements
+- Korrekte Balancing nach ShipClass (Corvette → Titan)
+- MaxPerFleet für Flaggschiffe implementiert
+
+---
+
+## [1.43.70] - 2026-02-12 - "Extended Research Tree"
+
+### Added
+- **50 neue Technologien** in TechnologyDefinitions.cs (50 → 100 total):
+  - **Physics (15)**: disruptor_technology, polaron_weapons, tetryon_weapons, antiproton_weapons, plasma_torpedoes, gravimetric_torpedoes, metaphasic_shields, covariant_shields, resilient_shields, gravimetric_sensors, lateral_sensors, temporal_sensors, warp_core_efficiency, quantum_slipstream
+  - **Engineering (11)**: modular_construction, multi_vector_assault, bioneural_gel_packs, ablative_hull_armor, neutronium_alloys, impulse_upgrades, emergency_warp, coaxial_warp, dilithium_synthesis, gas_giant_harvesting, planetary_mining_drones
+  - **Society (13)**: holographic_technology, emergency_medical_hologram, genetic_engineering, ketracel_white, cloning_technology, trade_federation, subspace_comms, martial_law, obsidian_order_methods, section_31, tal_shiar_network, orbital_habitats, underwater_colonies, subterranean_colonies
+  - **Faction-specific (11)**: energy_dampening (Breen), organic_technology (Dominion), web_technology (Tholian), thermal_adaptation, gorn_regeneration, orion_pheromones, kazon_raiding, hirogen_hunting, prophets_guidance (Bajoran), vorta_diplomacy, vulcan_logic, mind_meld
+
+### Technical
+- Research Tree jetzt vollständig: 100 Technologien über 3 Branches
+- Alle Factions haben nun spezifische Techs: Breen, Tholian, Gorn, Orion, Kazon, Hirogen, Bajoran, Dominion erweitert
+- Neue TechCategories genutzt: mehr Waffen-Vielfalt, Kolonisation-Optionen
+
+---
+
+## [1.43.69] - 2026-02-11 - "Extended Event System"
+
+### Added
+- **17 neue Events** in EventDefinitions.cs:
+  - **Military (3)**: pirate_attack, fleet_mutiny, enemy_spy_captured
+  - **Economic (3)**: dilithium_discovery, trade_dispute, latinum_shortage
+  - **Research (3)**: breakthrough, research_accident, alien_artifact
+  - **Story (3)**: temporal_anomaly, mirror_universe, founder_infiltration
+  - **Exploration (2)**: spatial_anomaly, first_contact_warp
+  - **Colony (2)**: plague_outbreak, colony_independence
+- Alle neuen Events haben:
+  - Factions-spezifische Optionen (Ferengi, Klingon, Romulan, Borg, Federation, Bajoran, Dominion)
+  - Risk/Reward Mechaniken mit RiskChance und RiskEffects
+  - Event Chains (CanChain) für Story-Fortsetzungen
+  - Passende Star Trek Thematik
+
+### Technical
+- Event System jetzt vollständig: 26 Events über 8 Kategorien
+- Categories neu befüllt: Military, Economic, Research, Story (vorher leer)
+
+---
+
+## [1.43.68] - 2026-02-11 - "Documentation Consolidation & ComfyUI Improvements"
+
+### Added
+- **CLAUDE.md** — Projekt-Leitfaden für Claude Sessions (Konventionen, Versionierung, Checklisten)
+- **docs/INDEX.md** — Zentrale Dokumentations-Übersicht mit Quick Links
+- **docs/ROADMAP.md** — Konsolidierte Projekt-Roadmap (einzige offizielle Quelle)
+- **SDPromptTransformer.cs** — Transformiert natürlich-sprachliche Prompts in SD-optimierte Tag-basierte Prompts für ComfyUI
+
+### Changed
+- **ComfyUIApiService.cs** — Integriert SDPromptTransformer für bessere Bild-Generierung
+- **FLYER.html** — Version auf 1.43.x aktualisiert, Roadmap aktualisiert
+
+### Documentation
+- Dokumentation analysiert und kategorisiert
+- Veraltete/redundante Docs identifiziert (siehe INDEX.md "Deprecated")
+- Klare Struktur für zukünftige Docs definiert
+
+---
 
 ## v1.43.65 — Federation Emblem: Premium + Stitched + Flat (2026-02-02)
 

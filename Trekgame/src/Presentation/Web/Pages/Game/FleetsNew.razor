@@ -8,35 +8,15 @@
 @inject IGameApiClient Api
 @inject NavigationManager Navigation
 @inject ILocalStorageService LocalStorage
+@inject ISnackbar Snackbar
 
 <PageTitle>Fleet Command - Galactic Strategy</PageTitle>
 
-<div class="stellaris-layout" data-theme="@(_faction?.RaceId?.ToLower() ?? "federation")">
-    <header class="st-topbar">
-        <div class="st-empire-badge"><div class="st-empire-flag">🌐</div><div class="st-empire-info"><span class="st-empire-name">@(_faction?.Name ?? "United Federation")</span><span class="st-empire-type">Starfleet Command</span></div></div>
-        <div class="st-resources">
-            <div class="st-resource"><span class="st-resource-icon">⚡</span><div class="st-resource-values"><span class="st-resource-current">1,250</span><span class="st-resource-income positive">+45</span></div></div>
-            <div class="st-resource"><span class="st-resource-icon">💎</span><div class="st-resource-values"><span class="st-resource-current">890</span></div></div>
-            <div class="st-resource"><span class="st-resource-icon">🔩</span><div class="st-resource-values"><span class="st-resource-current">340</span></div></div>
-        </div>
-        <div class="st-game-controls"><div class="st-date-display"><span class="st-date-label">STARDATE</span><span class="st-date-value">24.56</span></div><button class="st-end-turn-btn">END TURN</button></div>
-    </header>
-
-    <div class="st-main">
-        <aside class="st-sidebar-left">
-            <nav class="st-nav">
-                <a href="/game/galaxy" class="st-nav-btn"><span class="st-nav-icon">🌌</span><span class="st-nav-label">Galaxy</span></a>
-                <a href="/game/research" class="st-nav-btn"><span class="st-nav-icon">🔬</span><span class="st-nav-label">Research</span></a>
-                <a href="/game/military" class="st-nav-btn active"><span class="st-nav-icon">🚀</span><span class="st-nav-label">Fleets</span></a>
-                <a href="/game/planets" class="st-nav-btn"><span class="st-nav-icon">🏠</span><span class="st-nav-label">Planets</span></a>
-            </nav>
-        </aside>
-
-        <div class="fleets-content">
+<div class="fleets-content">
             <div class="fleets-header">
                 <h1>FLEET COMMAND</h1>
                 <div class="fleet-capacity"><div class="capacity-bar"><div class="capacity-fill" style="width: @(_totalShips * 100 / _fleetCap)%"></div></div><span class="capacity-text">@_totalShips / @_fleetCap Naval Capacity</span></div>
-                <div class="fleet-actions"><button class="st-btn">+ NEW FLEET</button></div>
+                <div class="fleet-actions"><button class="st-btn" @onclick="CreateNewFleet">+ NEW FLEET</button></div>
             </div>
 
             <div class="fleets-layout">
@@ -70,7 +50,7 @@
                             <div class="stat-item"><span class="stat-icon">⚡</span><span class="stat-name">Speed</span><span class="stat-value">@_selectedFleet.Speed</span></div>
                         </div>
                         <div class="ships-section">
-                            <div class="section-header"><span>SHIP COMPOSITION</span><button class="st-btn sm">+ ADD</button></div>
+                            <div class="section-header"><span>SHIP COMPOSITION</span><button class="st-btn sm" @onclick="NavigateToDesigner">+ ADD</button></div>
                             <div class="ships-grid">
                                 @foreach (var ship in _selectedFleet.Ships)
                                 {
@@ -85,19 +65,71 @@
                         <div class="orders-section">
                             <div class="section-header"><span>ORDERS</span></div>
                             <div class="orders-buttons">
-                                <button class="order-btn"><span class="order-icon">🎯</span><span class="order-text">MOVE</span></button>
-                                <button class="order-btn"><span class="order-icon">🔄</span><span class="order-text">PATROL</span></button>
-                                <button class="order-btn"><span class="order-icon">🌍</span><span class="order-text">ORBIT</span></button>
-                                <button class="order-btn aggressive"><span class="order-icon">⚔</span><span class="order-text">ATTACK</span></button>
+                                <button class="order-btn @(_currentOrder == "move" ? "active" : "")" @onclick="ShowMoveDialog"><span class="order-icon">🎯</span><span class="order-text">MOVE</span></button>
+                                @if (_selectedFleet.IsMoving)
+                                {
+                                    <button class="order-btn aggressive" @onclick="CancelMove"><span class="order-icon">✋</span><span class="order-text">CANCEL MOVE</span></button>
+                                }
+                                <button class="order-btn @(_currentOrder == "patrol" ? "active" : "")" @onclick='() => IssueOrder("patrol")'><span class="order-icon">🔄</span><span class="order-text">PATROL</span></button>
+                                <button class="order-btn @(_currentOrder == "orbit" ? "active" : "")" @onclick='() => IssueOrder("orbit")'><span class="order-icon">🌍</span><span class="order-text">ORBIT</span></button>
+                                <button class="order-btn aggressive @(_currentOrder == "attack" ? "active" : "")" @onclick='() => IssueOrder("attack")'><span class="order-icon">⚔</span><span class="order-text">ATTACK</span></button>
                             </div>
                         </div>
                     }
                     else { <div class="no-selection"><span class="icon">🚀</span><p>Select a fleet</p></div> }
                 </div>
             </div>
+
+@* Move Target Dialog *@
+@if (_showMoveDialog && _selectedFleet != null)
+{
+    <div class="modal-overlay" @onclick="() => _showMoveDialog = false">
+        <div class="move-modal" @onclick:stopPropagation="true">
+            <div class="modal-header"><h3>SELECT DESTINATION</h3><span class="modal-sub">Fleet: @_selectedFleet.Name</span></div>
+            <div class="modal-body">
+                @if (_knownSystems.Any())
+                {
+                    <input type="text" class="st-input" placeholder="Search systems..." @bind="_systemSearch" @bind:event="oninput" style="width:100%;margin-bottom:12px;" />
+                    <div class="systems-list">
+                        @foreach (var sys in FilteredSystems)
+                        {
+                            <div class="system-option @(sys.Id == _selectedFleet.CurrentSystemId ? "current" : "") @(_moveTargetId == sys.Id ? "selected" : "")"
+                                 @onclick="() => _moveTargetId = sys.Id">
+                                <span class="system-name">@sys.Name</span>
+                                @if (sys.ControllingFactionId.HasValue) {<span class="system-owner">Controlled</span>}
+                                @if (sys.Id == _selectedFleet.CurrentSystemId) {<span class="system-current">📍 HERE</span>}
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p style="color:var(--st-text-dim);">Loading systems...</p>
+                }
+            </div>
+            <div class="modal-actions">
+                <button class="st-btn" @onclick="() => _showMoveDialog = false">CANCEL</button>
+                <button class="st-btn primary" disabled="@(!_moveTargetId.HasValue || _moveTargetId == _selectedFleet.CurrentSystemId || _isProcessing)" @onclick="ExecuteMove">MOVE FLEET</button>
+            </div>
         </div>
     </div>
-    <footer class="st-bottombar"><div class="st-notifications"></div></footer>
+}
+
+@* Build Ship Dialog *@
+@if (_showBuildShipDialog && _selectedFleet != null)
+{
+    <div class="modal-overlay" @onclick="() => _showBuildShipDialog = false">
+        <div class="move-modal" @onclick:stopPropagation="true">
+            <div class="modal-header"><h3>BUILD SHIPS</h3><span class="modal-sub">At: @_selectedFleet.CurrentSystemName</span></div>
+            <div class="modal-body">
+                <p style="color:var(--st-text-dim);font-size:12px;">Ship building is done from colony view. Navigate to a colony to build ships.</p>
+            </div>
+            <div class="modal-actions">
+                <button class="st-btn" @onclick="() => _showBuildShipDialog = false">CLOSE</button>
+            </div>
+        </div>
+    </div>
+}
 </div>
 
 <style>
@@ -128,36 +160,56 @@
 .ships-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
 .ship-card{background:var(--st-bg-medium);border:1px solid var(--st-border-dark);border-radius:6px;padding:10px;transition:all 0.15s}.ship-card:hover{border-color:var(--st-border-light)}.ship-card.flagship{border-color:var(--st-accent-gold);background:rgba(255,200,68,0.05)}
 .ship-image{position:relative;height:60px;display:flex;align-items:center;justify-content:center;margin-bottom:8px}
-.ship-sprite{width:80px;height:60px;background-repeat:no-repeat;background-position:center;background-size:contain}
-.ship-sprite.federation{background-image:url('/images/ships/federation/military_ships.png');background-size:2000px 1103px}
-.ship-sprite.klingon{background-image:url('/images/ships/klingon/military_ships.png');background-size:2000px 1103px}
-.ship-sprite.romulan{background-image:url('/images/ships/romulan/military_ships.png');background-size:2000px 1103px}
-.ship-sprite.cardassian{background-image:url('/images/ships/cardassian/military_ships.png');background-size:2000px 1103px}
-.ship-sprite.borg{background-image:url('/images/ships/borg/military_ships.png');background-size:2000px 1103px}
-.ship-sprite.ferengi{background-image:url('/images/ships/ferengi/military_ships.png');background-size:2000px 1103px}
-/* Federation ships - assuming 6 columns (~333px each), 4 rows (~275px each) */
-.ship-sprite.constitution{background-position:0 0}
-.ship-sprite.miranda{background-position:-333px 0}
-.ship-sprite.excelsior{background-position:-666px 0}
-.ship-sprite.galaxy{background-position:-999px 0}
-.ship-sprite.defiant{background-position:-1332px 0}
-.ship-sprite.intrepid{background-position:-1665px 0}
-.ship-sprite.akira{background-position:0 -275px}
-.ship-sprite.nova{background-position:-333px -275px}
-.ship-sprite.oberth{background-position:-666px -275px}
-.ship-sprite.nebula{background-position:-999px -275px}
-/* Klingon ships */
+/* Ship sprites: 6x6 grid, 360px cells, 2160x2160px total spritesheet */
+/* Display size 80x60px = scale factor ~0.167 (60/360) */
+/* background-size = 2160 * 0.167 = 360px, but we need to fit 360px cell into 80x60 display */
+/* Scale: 80/360 = 0.222 for width, so 2160 * 0.222 = 480px */
+.ship-sprite{width:80px;height:80px;background-repeat:no-repeat;background-size:480px 480px}
+.ship-sprite.federation{background-image:url('/assets/factions/federation/federation_militaryships_spritesheet.png')}
+.ship-sprite.klingon{background-image:url('/assets/factions/klingon/klingon_militaryships_spritesheet.png')}
+.ship-sprite.romulan{background-image:url('/assets/factions/romulan/romulan_militaryships_spritesheet.png')}
+.ship-sprite.cardassian{background-image:url('/assets/factions/cardassian/cardassian_militaryships_spritesheet.png')}
+.ship-sprite.borg{background-image:url('/assets/factions/borg/borg_militaryships_spritesheet.png')}
+.ship-sprite.ferengi{background-image:url('/assets/factions/ferengi/ferengi_militaryships_spritesheet.png')}
+/* Federation ships - 6 cols x 6 rows, 360px cells scaled to 80px = factor 0.222 */
+/* Position = col * 360 * 0.222 = col * 80 */
+.ship-sprite.constitution{background-position:0 0}       /* row 0, col 0 */
+.ship-sprite.galaxy{background-position:-80px 0}         /* row 0, col 1 */
+.ship-sprite.sovereign{background-position:-160px 0}     /* row 0, col 2 */
+.ship-sprite.defiant{background-position:-240px 0}       /* row 0, col 3 */
+.ship-sprite.intrepid{background-position:-320px 0}      /* row 0, col 4 */
+.ship-sprite.excelsior{background-position:-400px 0}     /* row 0, col 5 */
+.ship-sprite.nebula{background-position:0 -80px}         /* row 1, col 0 */
+.ship-sprite.akira{background-position:-80px -80px}      /* row 1, col 1 */
+.ship-sprite.prometheus{background-position:-160px -80px}/* row 1, col 2 */
+.ship-sprite.nova{background-position:-240px -80px}      /* row 1, col 3 */
+.ship-sprite.ambassador{background-position:-320px -80px}/* row 1, col 4 */
+.ship-sprite.miranda{background-position:-400px -80px}   /* row 1, col 5 */
+.ship-sprite.oberth{background-position:0 -160px}        /* row 2, col 0 */
+/* Klingon ships - same grid structure */
 .ship-sprite.d7{background-position:0 0}
-.ship-sprite.birdofprey{background-position:-333px 0}
-.ship-sprite.vorcha{background-position:-666px 0}
-.ship-sprite.neghvar{background-position:-999px 0}
+.ship-sprite.birdofprey{background-position:-80px 0}
+.ship-sprite.vorcha{background-position:-160px 0}
+.ship-sprite.neghvar{background-position:-240px 0}
 .flagship-badge{position:absolute;top:0;right:0;color:var(--st-accent-gold);font-size:16px}
 .ship-info{text-align:center;margin-bottom:6px}.ship-name{display:block;font-size:11px;font-weight:500;color:var(--st-text-bright)}.ship-class{display:block;font-size:9px;color:var(--st-text-dim)}
 .orders-buttons{display:flex;gap:10px;flex-wrap:wrap}
 .order-btn{display:flex;flex-direction:column;align-items:center;padding:16px 24px;background:var(--st-gradient-button);border:1px solid var(--st-border-dark);border-radius:6px;cursor:pointer;transition:all 0.15s;min-width:80px}
-.order-btn:hover{background:var(--st-gradient-button-hover);border-color:var(--st-border-light)}.order-btn.aggressive{border-color:rgba(255,68,85,0.5)}.order-btn.aggressive:hover{background:rgba(255,68,85,0.2)}
+.order-btn:hover{background:var(--st-gradient-button-hover);border-color:var(--st-border-light)}.order-btn.active{background:rgba(74,158,255,0.2);border-color:var(--st-accent-blue)}.order-btn.aggressive{border-color:rgba(255,68,85,0.5)}.order-btn.aggressive:hover{background:rgba(255,68,85,0.2)}.order-btn.aggressive.active{background:rgba(255,68,85,0.3);border-color:#ff4455}
 .order-icon{font-size:24px;margin-bottom:4px}.order-text{font-size:10px;font-weight:600;color:var(--st-text-muted);letter-spacing:1px}
 .no-selection{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--st-text-dim);gap:16px}.no-selection .icon{font-size:48px;opacity:0.2;filter:grayscale(100%)}
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);display:flex;align-items:center;justify-content:center;z-index:1000}
+.move-modal{background:var(--st-bg-dark,#0a0f18);border:1px solid var(--st-border-medium,#2a3a4a);border-radius:12px;width:420px;max-height:70vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.6)}
+.modal-header{padding:16px 20px;border-bottom:1px solid var(--st-border-dark);}.modal-header h3{margin:0;font-family:var(--st-font-display);font-size:16px;color:var(--st-text-white);letter-spacing:1px}.modal-sub{font-size:11px;color:var(--st-text-dim)}
+.modal-body{padding:16px 20px;flex:1;overflow-y:auto}
+.systems-list{max-height:300px;overflow-y:auto;display:flex;flex-direction:column;gap:4px}
+.system-option{display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--st-bg-medium,#141c28);border:1px solid transparent;border-radius:6px;cursor:pointer;transition:all 0.15s}
+.system-option:hover{background:var(--st-bg-light,#1c2838);border-color:var(--st-border-light,#3a4a5a)}
+.system-option.selected{border-color:var(--st-accent-blue,#4a9eff);background:rgba(74,158,255,0.15)}
+.system-option.current{opacity:0.5}
+.system-name{flex:1;font-size:13px;color:var(--st-text-bright,#e0e0e0)}.system-owner{font-size:10px;color:var(--st-text-dim);padding:2px 6px;background:rgba(100,100,100,0.2);border-radius:3px}
+.system-current{font-size:10px;color:var(--st-accent-gold,#ffc844)}
+.modal-actions{padding:12px 20px;border-top:1px solid var(--st-border-dark);display:flex;gap:8px;justify-content:flex-end}
 </style>
 
 @code {
@@ -165,8 +217,22 @@
     private List<FleetDetailDto> _fleets = new();
     private FleetDetailDto? _selectedFleet;
     private Guid? _factionId;
+    private Guid? _gameId;
     private int _totalShips => _fleets.Sum(f => f.ShipCount);
     private int _fleetCap = 100;
+    private string? _currentOrder;
+    private bool _isProcessing;
+
+    // Move dialog state
+    private bool _showMoveDialog;
+    private bool _showBuildShipDialog;
+    private List<StarSystemDto> _knownSystems = new();
+    private Guid? _moveTargetId;
+    private string _systemSearch = "";
+
+    private IEnumerable<StarSystemDto> FilteredSystems => _knownSystems
+        .Where(s => string.IsNullOrEmpty(_systemSearch) || s.Name.Contains(_systemSearch, StringComparison.OrdinalIgnoreCase))
+        .OrderBy(s => s.Name);
 
     protected override async Task OnInitializedAsync()
     {
@@ -185,18 +251,19 @@
     {
         try
         {
-            // Load faction info first
             var games = await Api.GetGamesAsync();
             var game = games.FirstOrDefault();
             if (game != null)
             {
+                _gameId = game.Id;
                 var gameDetail = await Api.GetGameAsync(game.Id);
                 if (gameDetail != null && _factionId.HasValue)
                 {
                     _faction = await Api.GetMyFactionAsync(gameDetail.Id, _factionId.Value);
+                    _knownSystems = await Api.GetKnownSystemsAsync(gameDetail.Id, _factionId.Value);
                 }
             }
-            
+
             _fleets = await Api.GetFleetsAsync(_factionId!.Value);
             _selectedFleet = _fleets.FirstOrDefault();
         }
@@ -210,11 +277,11 @@
     {
         _fleets = new List<FleetDetailDto>
         {
-            new(Guid.NewGuid(), "1st Exploration Fleet", Guid.Empty, Guid.NewGuid(), "Sol", null, null, 0, "Defensive", 80, 100, 
+            new(Guid.NewGuid(), "1st Exploration Fleet", Guid.Empty, Guid.NewGuid(), "Sol", null, null, 0, "Defensive", 80, 100,
                 new() { new("Constitution", 2, 400, 300, 6), new("Miranda", 4, 200, 150, 7), new("Excelsior", 2, 500, 400, 5) }, 2400),
-            new(Guid.NewGuid(), "2nd Defense Squadron", Guid.Empty, Guid.NewGuid(), "Vulcan", Guid.NewGuid(), "Andoria", 50, "Aggressive", 90, 200, 
+            new(Guid.NewGuid(), "2nd Defense Squadron", Guid.Empty, Guid.NewGuid(), "Vulcan", Guid.NewGuid(), "Andoria", 50, "Aggressive", 90, 200,
                 new() { new("Defiant", 3, 350, 250, 8), new("Akira", 2, 450, 350, 6) }, 1800),
-            new(Guid.NewGuid(), "3rd Patrol Group", Guid.Empty, Guid.NewGuid(), "Alpha Centauri", null, null, 0, "Evasive", 75, 50, 
+            new(Guid.NewGuid(), "3rd Patrol Group", Guid.Empty, Guid.NewGuid(), "Alpha Centauri", null, null, 0, "Evasive", 75, 50,
                 new() { new("Nova", 3, 150, 100, 9) }, 900),
         };
         _selectedFleet = _fleets.FirstOrDefault();
@@ -227,10 +294,10 @@
         "Evasive" => "💨",
         _ => "▲"
     };
-    
+
     private int GetTotalFirepower(FleetDetailDto fleet) => fleet.ShipGroups?.Sum(g => g.AttackPower * g.Count) ?? 0;
     private int GetTotalHull(FleetDetailDto fleet) => fleet.ShipGroups?.Sum(g => g.DefensePower * g.Count) ?? 0;
-    
+
     private string GetFactionClass()
     {
         var raceId = _faction?.RaceId?.ToLower() ?? "federation";
@@ -244,14 +311,12 @@
             _ => "federation"
         };
     }
-    
+
     private string GetShipSpriteClass(string shipClass)
     {
-        // Extract base class name (e.g., "Constitution #1" -> "constitution")
         var baseName = shipClass?.Split(' ', '#')[0]?.ToLower() ?? "unknown";
         return baseName switch
         {
-            // Federation
             "constitution" => "constitution",
             "miranda" => "miranda",
             "excelsior" => "excelsior",
@@ -262,13 +327,86 @@
             "nova" => "nova",
             "oberth" => "oberth",
             "nebula" => "nebula",
-            // Klingon
             "d7" => "d7",
             "birdofprey" or "bird" => "birdofprey",
             "vorcha" or "vor'cha" => "vorcha",
             "neghvar" or "negh'var" => "neghvar",
-            // Default - use first sprite
             _ => "constitution"
         };
+    }
+
+    private void CreateNewFleet()
+    {
+        // Note: No create-fleet API endpoint exists yet. Create locally as placeholder.
+        var newFleet = new FleetDetailDto(
+            Guid.NewGuid(), $"Fleet {_fleets.Count + 1}", _factionId ?? Guid.Empty,
+            _fleets.FirstOrDefault()?.CurrentSystemId ?? Guid.NewGuid(),
+            _fleets.FirstOrDefault()?.CurrentSystemName ?? "Unknown",
+            null, null, 0, "Defensive", 50, 0, new(), 0);
+        _fleets.Add(newFleet);
+        _selectedFleet = newFleet;
+        Snackbar.Add("New fleet created (ships must be built at colonies)", MudBlazor.Severity.Info);
+    }
+
+    private void NavigateToDesigner() => Navigation.NavigateTo("/game/ship-designer");
+
+    private void ShowMoveDialog()
+    {
+        if (_selectedFleet == null) return;
+        _moveTargetId = null;
+        _systemSearch = "";
+        _showMoveDialog = true;
+    }
+
+    private async Task ExecuteMove()
+    {
+        if (_selectedFleet == null || !_moveTargetId.HasValue) return;
+        _isProcessing = true;
+        try
+        {
+            await Api.SetFleetDestinationAsync(_selectedFleet.Id, _moveTargetId.Value);
+            var targetName = _knownSystems.FirstOrDefault(s => s.Id == _moveTargetId)?.Name ?? "Unknown";
+            Snackbar.Add($"Fleet '{_selectedFleet.Name}' moving to {targetName}", MudBlazor.Severity.Success);
+            _showMoveDialog = false;
+            // Reload fleet data to reflect new movement state
+            if (_factionId.HasValue)
+            {
+                _fleets = await Api.GetFleetsAsync(_factionId.Value);
+                _selectedFleet = _fleets.FirstOrDefault(f => f.Id == _selectedFleet.Id) ?? _fleets.FirstOrDefault();
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Failed to move fleet: {ex.Message}", MudBlazor.Severity.Error);
+        }
+        _isProcessing = false;
+    }
+
+    private async Task CancelMove()
+    {
+        if (_selectedFleet == null) return;
+        _isProcessing = true;
+        try
+        {
+            await Api.CancelFleetMovementAsync(_selectedFleet.Id);
+            Snackbar.Add($"Movement cancelled for '{_selectedFleet.Name}'", MudBlazor.Severity.Info);
+            if (_factionId.HasValue)
+            {
+                _fleets = await Api.GetFleetsAsync(_factionId.Value);
+                _selectedFleet = _fleets.FirstOrDefault(f => f.Id == _selectedFleet.Id) ?? _fleets.FirstOrDefault();
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Failed to cancel movement: {ex.Message}", MudBlazor.Severity.Error);
+        }
+        _isProcessing = false;
+    }
+
+    private void IssueOrder(string order)
+    {
+        if (_selectedFleet == null) return;
+        _currentOrder = _currentOrder == order ? null : order;
+        Snackbar.Add($"Order: {order.ToUpper()} - Select target on galaxy map", MudBlazor.Severity.Info);
     }
 }

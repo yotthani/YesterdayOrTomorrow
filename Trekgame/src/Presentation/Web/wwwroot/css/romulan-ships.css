@@ -28,7 +28,7 @@
    ============================================== */
 
 .ship-card.romulan.military {
-    background-image: url('/images/ships/romulan/military_ships.png');
+    background-image: url('/assets/factions/romulan/romulan_militaryships_spritesheet.png');
 }
 
 /* Row 1 */
@@ -65,7 +65,7 @@
    ============================================== */
 
 .ship-card.romulan.civilian {
-    background-image: url('/images/ships/romulan/civilian_ships.png');
+    background-image: url('/assets/factions/romulan/romulan_civilianships_spritesheet.png');
 }
 
 /* Row 1 */

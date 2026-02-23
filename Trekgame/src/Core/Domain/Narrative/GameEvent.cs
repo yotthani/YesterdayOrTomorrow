@@ -8,8 +8,8 @@ namespace StarTrekGame.Domain.Narrative;
 /// </summary>
 public class GameEvent : Entity
 {
-    public string Title { get; private set; }
-    public string Description { get; private set; }
+    public string Title { get; private set; } = null!;
+    public string Description { get; private set; } = null!;
     public EventCategory Category { get; private set; }
     public EventScope Scope { get; private set; }
     public int TurnGenerated { get; private set; }
@@ -274,8 +274,8 @@ public class StoryArc : Entity
     private readonly List<StoryChapter> _chapters = new();
     private int _currentChapterIndex = 0;
 
-    public string Name { get; private set; }
-    public string Description { get; private set; }
+    public string Name { get; private set; } = default!;
+    public string Description { get; private set; } = default!;
     public StoryScale Scale { get; private set; }
     public bool IsComplete { get; private set; }
     public int TurnStarted { get; private set; }

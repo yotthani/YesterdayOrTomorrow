@@ -1,4 +1,5 @@
 @page "/game/colony-detail/{ColonyId:guid}"
+@layout StellarisLayout
 @using StarTrekGame.Web.Services
 @inject HttpClient Http
 @inject IJSRuntime JS
@@ -15,7 +16,7 @@
     else if (_colony != null)
     {
         <!-- Header -->
-        <div class="colony-header">
+        <div class="colony-page-header">
             <div class="colony-title">
                 <h1>@_colony.ColonyName</h1>
                 <span class="colony-location">@_colony.PlanetName, @_colony.SystemName System</span>
@@ -23,7 +24,6 @@
             <div class="colony-designation @_colony.Designation.ToLower()">
                 <span>@_colony.Designation</span>
             </div>
-            <button class="btn-back" @onclick="GoBack">← Back to Galaxy</button>
         </div>
 
         <div class="colony-content">
@@ -262,15 +262,18 @@
 
 <style>
     .colony-management {
-        min-height: 100vh;
+        flex: 1;
         padding: 20px;
-        background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3a 100%);
+        color: white;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
     }
 
-    .colony-header {
+    .colony-page-header {
         display: flex;
-        justify-content: space-between;
         align-items: center;
+        gap: 20px;
         padding: 15px 20px;
         background: rgba(0,0,0,0.5);
         border-radius: 10px;
@@ -301,9 +304,11 @@
     .colony-designation.fortress { background: #c0392b; }
 
     .colony-content {
+        flex: 1;
         display: grid;
         grid-template-columns: 300px 1fr 300px;
         gap: 20px;
+        overflow: hidden;
     }
 
     .panel {
@@ -311,6 +316,7 @@
         border-radius: 10px;
         padding: 20px;
         border: 1px solid rgba(255,255,255,0.1);
+        overflow-y: auto;
     }
 
     .panel h2 {
@@ -647,15 +653,6 @@
         color: #f39c12;
     }
 
-    .btn-back {
-        padding: 10px 20px;
-        background: rgba(255,255,255,0.1);
-        border: 1px solid rgba(255,255,255,0.2);
-        border-radius: 5px;
-        color: white;
-        cursor: pointer;
-    }
-
     .btn-close {
         width: 100%;
         padding: 12px;
@@ -672,7 +669,8 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        height: 100vh;
+        height: 100%;
+        min-height: 300px;
     }
 
     .spinner {
@@ -756,7 +754,7 @@
 
     private async Task ConstructBuilding(string buildingId)
     {
-        await Http.PostAsJsonAsync($"api/colonies/{ColonyId}/build", new { BuildingTypeId = buildingId });
+        await Http.PostAsJsonAsync($"api/colonies/{ColonyId}/build", new { BuildingType = buildingId });
         _showBuildMenu = false;
         await LoadColonyData();
     }
@@ -781,8 +779,6 @@
             await LoadColonyData();
         }
     }
-
-    private void GoBack() => Nav.NavigateTo("/game/galaxy");
 
     private (string Name, string Description, int Credits, int Minerals, int SlotsRequired) GetBuildingDef(string id)
     {

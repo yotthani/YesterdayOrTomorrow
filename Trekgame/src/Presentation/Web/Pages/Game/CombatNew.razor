@@ -105,6 +105,10 @@
     }
     void AutoResolve(){while(!_combatEnded)NextPhase();}
     void Retreat(){_combatEnded=true;_playerWon=false;_combatLog.Add(new(){Turn=_round,Type="info",Message="Fleet retreating..."});}
-    class ShipState{public string Name="";public string Class="";public int Health;public bool IsFiring;public bool IsTarget;}
+    class ShipState{public string Name="";public string Class="";public int Health;public bool IsFiring;
+#pragma warning disable CS0649
+        public bool IsTarget;
+#pragma warning restore CS0649
+    }
     class LogEntry{public int Turn;public string Type="";public string Message="";}
 }

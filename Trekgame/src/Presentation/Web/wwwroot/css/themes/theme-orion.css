@@ -1,0 +1,261 @@
+/* ===========================================
+   ORION THEME - SYNDICATE UNDERWORLD INTERFACE
+
+   Design Philosophy: Criminal elegance meets danger.
+   The Orion Syndicate operates in shadows, deals in
+   secrets, and displays wealth through gold accents
+   while maintaining an air of seductive menace.
+
+   Visual Language:
+   - Emerald green primary (Orion skin)
+   - Gold/latinum accents (wealth)
+   - Dark shadows and mystery
+   - Chain-link patterns
+   - Currency/credit displays
+   - Smoke/shadow overlays
+   =========================================== */
+
+/* ===== ORION THEME VARIABLES ===== */
+html[data-theme="orion"],
+html[data-theme="orion"] .stellaris-layout,
+html[data-theme="orion"] .stellaris-app {
+    --theme-primary: #33AA66;
+    --theme-secondary: #55CC88;
+    --theme-accent: #FFD700;
+    --theme-text: #CCFFDD;
+    --theme-text-dim: #669977;
+    --theme-bg: #050a08;
+    --theme-panel-bg: rgba(8, 15, 12, 0.98);
+    --theme-border-radius: 10px;
+    --theme-btn-radius: 8px;
+    --theme-border-width: 2px;
+    --theme-corner-style: shadowed;
+
+    --orion-emerald: #33AA66;
+    --orion-jade: #44BB77;
+    --orion-dark-green: #225544;
+    --orion-gold: #FFD700;
+    --orion-latinum: #CCAA00;
+    --orion-shadow: rgba(0, 0, 0, 0.6);
+    --orion-danger: #CC3366;
+
+    --st-bg-darkest: #030605;
+    --st-bg-darker: #050a08;
+    --st-bg-dark: #0a1510;
+    --st-bg-medium: #102018;
+    --st-bg-light: #152820;
+    --st-bg-lighter: #1a3028;
+
+    --st-border-dark: rgba(51, 170, 102, 0.3);
+    --st-border-medium: rgba(51, 170, 102, 0.5);
+    --st-border-light: rgba(85, 204, 136, 0.6);
+    --st-border-bright: rgba(255, 215, 0, 0.8);
+
+    --st-gradient-header: linear-gradient(180deg, #0a1510 0%, #050a08 100%);
+    --st-gradient-panel: linear-gradient(180deg, rgba(10, 21, 16, 0.95) 0%, rgba(5, 10, 8, 0.98) 100%);
+    --st-gradient-button: linear-gradient(180deg, #33AA66 0%, #225544 100%);
+    --st-gradient-button-hover: linear-gradient(180deg, #55CC88 0%, #33AA66 100%);
+
+    --st-shadow-glow-green: 0 0 20px rgba(51, 170, 102, 0.4);
+    --st-shadow-glow-gold: 0 0 20px rgba(255, 215, 0, 0.4);
+}
+
+/* ===== ORION PANEL STYLE ===== */
+html[data-theme="orion"] .mud-paper,
+html[data-theme="orion"] .mud-card {
+    background:
+        /* Shadow vignette */
+        radial-gradient(ellipse at center, transparent 40%, rgba(0, 0, 0, 0.4) 100%),
+        var(--st-gradient-panel) !important;
+    border: 2px solid var(--orion-dark-green) !important;
+    border-radius: 10px !important;
+    position: relative;
+    box-shadow:
+        0 5px 20px rgba(0, 0, 0, 0.5),
+        inset 0 1px 0 rgba(85, 204, 136, 0.1);
+}
+
+/* Gold accent line */
+html[data-theme="orion"] .mud-paper::before,
+html[data-theme="orion"] .mud-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 10%;
+    right: 10%;
+    height: 2px;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        var(--orion-latinum) 20%,
+        var(--orion-gold) 50%,
+        var(--orion-latinum) 80%,
+        transparent 100%
+    );
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* ===== ORION BUTTONS ===== */
+html[data-theme="orion"] .mud-button-root {
+    border-radius: 8px !important;
+    text-transform: none !important;
+    letter-spacing: 0.5px !important;
+    font-weight: 500 !important;
+    transition: all 0.25s ease !important;
+}
+
+html[data-theme="orion"] .mud-button-filled {
+    background: linear-gradient(180deg, #33AA66 0%, #225544 100%) !important;
+    color: #000 !important;
+    border: 1px solid var(--orion-jade) !important;
+    box-shadow:
+        0 3px 10px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+}
+
+html[data-theme="orion"] .mud-button-filled:hover {
+    background: linear-gradient(180deg, #55CC88 0%, #33AA66 100%) !important;
+    box-shadow:
+        0 5px 20px rgba(51, 170, 102, 0.4),
+        0 0 15px rgba(255, 215, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Gold accent button */
+html[data-theme="orion"] .mud-button-filled.accent,
+html[data-theme="orion"] .mud-button-filled-secondary {
+    background: linear-gradient(180deg, #FFD700 0%, #CC9900 100%) !important;
+    border-color: #FFEE55 !important;
+    color: #000 !important;
+}
+
+/* ===== ORION APP BAR ===== */
+html[data-theme="orion"] .mud-appbar {
+    background:
+        /* Smoke effect */
+        radial-gradient(ellipse 80% 50% at 50% 100%, rgba(51, 170, 102, 0.08) 0%, transparent 50%),
+        linear-gradient(180deg, #0a1510 0%, #050a08 100%) !important;
+    border-bottom: none !important;
+    position: relative;
+}
+
+html[data-theme="orion"] .mud-appbar::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        var(--orion-dark-green) 10%,
+        var(--orion-emerald) 30%,
+        var(--orion-gold) 50%,
+        var(--orion-emerald) 70%,
+        var(--orion-dark-green) 90%,
+        transparent 100%
+    );
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+}
+
+/* ===== ORION DRAWER ===== */
+html[data-theme="orion"] .mud-drawer {
+    background:
+        linear-gradient(90deg, #050a08 0%, #0a1510 100%) !important;
+    border-right: none !important;
+    position: relative;
+}
+
+html[data-theme="orion"] .mud-drawer::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 2px;
+    height: 100%;
+    background: linear-gradient(180deg,
+        transparent 0%,
+        var(--orion-dark-green) 15%,
+        var(--orion-gold) 50%,
+        var(--orion-dark-green) 85%,
+        transparent 100%
+    );
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+}
+
+/* ===== ORION NAVIGATION ===== */
+html[data-theme="orion"] .mud-nav-link {
+    border-radius: 8px !important;
+    margin: 4px 8px !important;
+    padding: 10px 14px !important;
+    background: rgba(51, 170, 102, 0.08) !important;
+    border-left: 3px solid transparent !important;
+    transition: all 0.25s ease !important;
+}
+
+html[data-theme="orion"] .mud-nav-link:hover {
+    background: rgba(51, 170, 102, 0.18) !important;
+    border-left-color: var(--orion-jade) !important;
+}
+
+html[data-theme="orion"] .mud-nav-link.active {
+    background: linear-gradient(90deg, rgba(255, 215, 0, 0.15) 0%, rgba(51, 170, 102, 0.1) 100%) !important;
+    color: var(--orion-gold) !important;
+    border-left-color: var(--orion-gold) !important;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.1) !important;
+}
+
+/* ===== ORION SPECIFIC DECORATIONS ===== */
+
+/* Credit display */
+html[data-theme="orion"] .credit-display {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 12px;
+    background: linear-gradient(180deg, rgba(255, 215, 0, 0.15) 0%, rgba(204, 170, 0, 0.1) 100%);
+    border: 1px solid var(--orion-latinum);
+    border-radius: 15px;
+    color: var(--orion-gold);
+    font-weight: 600;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
+}
+
+/* Chain link pattern */
+html[data-theme="orion"] .chain-pattern {
+    background:
+        repeating-linear-gradient(90deg,
+            transparent 0px,
+            transparent 8px,
+            var(--orion-dark-green) 8px,
+            var(--orion-dark-green) 12px,
+            transparent 12px,
+            transparent 16px
+        ),
+        repeating-linear-gradient(0deg,
+            transparent 0px,
+            transparent 4px,
+            var(--orion-dark-green) 4px,
+            var(--orion-dark-green) 6px
+        );
+}
+
+/* Shadow overlay */
+html[data-theme="orion"] .shadow-overlay {
+    background: radial-gradient(ellipse at center, transparent 30%, rgba(0, 0, 0, 0.5) 100%);
+}
+
+/* Deal/transaction indicator */
+@keyframes orion-deal-pulse {
+    0%, 100% {
+        box-shadow: 0 0 5px rgba(255, 215, 0, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 15px rgba(255, 215, 0, 0.6), 0 0 25px rgba(51, 170, 102, 0.3);
+    }
+}
+
+html[data-theme="orion"] .deal-active {
+    animation: orion-deal-pulse 2s ease-in-out infinite;
+}

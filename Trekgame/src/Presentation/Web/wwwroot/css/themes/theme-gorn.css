@@ -1,0 +1,1080 @@
+/* ===========================================
+   GORN THEME - REPTILIAN PREDATOR HIVE INTERFACE
+
+   Design Philosophy: Based on Star Trek Strange New Worlds
+
+   CONCEPT: "What if Velociraptors survived and formed a civilization?"
+   The Gorn are aggressive REPTILIAN apex predators - intelligent
+   dinosaur-like creatures that evolved bio-organic hive technology.
+   Ships grown rather than built, with bioluminescent egg chambers,
+   rib-like structural elements, and orange holographic targeting.
+
+   Species Traits:
+   - Intelligent evolved Velociraptors / dinosaur descendants
+   - Aggressive reptilian apex predators
+   - Xenomorph-style parasitic breeding cycle
+   - Hive-mind coordination for pack hunting
+   - Extremely territorial and violent
+   - Bio-organic technology (grown, not manufactured)
+
+   Visual Language:
+   - ORANGE/AMBER: UI displays, holographics, targeting
+                   Gelatinous breeding chambers (egg-like)
+   - GREEN: Shields and energy fields
+   - Dark teal organic backgrounds
+   - Rib-like organic structural patterns
+   - Round targeting/tracking displays
+   - Grown/organic panel shapes
+
+   Ship Reference:
+   - Hunters: Bronze/metal star-shaped small craft
+   - Mothership: Massive organic bio-mechanical carrier
+   =========================================== */
+
+/* ===== GORN THEME VARIABLES ===== */
+html[data-theme="gorn"],
+html[data-theme="gorn"] .stellaris-layout,
+html[data-theme="gorn"] .stellaris-app {
+    /* PRIMARY: Orange/Amber (holographic displays) */
+    --theme-primary: #FF6622;
+    --theme-secondary: #FF8844;
+    --theme-accent: #FFCC44;
+    --theme-text: #DDCCAA;
+    --theme-text-dim: #887755;
+    --theme-bg: #050807;
+    --theme-panel-bg: rgba(8, 12, 10, 0.98);
+    --theme-border-radius: 8px;
+    --theme-btn-radius: 6px;
+    --theme-border-width: 2px;
+    --theme-corner-style: organic;
+
+    /* Gorn Orange/Amber palette (holographics) */
+    --gorn-orange: #FF6622;
+    --gorn-orange-bright: #FF8844;
+    --gorn-orange-dim: #CC4400;
+    --gorn-amber: #FFAA33;
+
+    /* Bioluminescent accents (eggs) */
+    --gorn-bio-yellow: #FFDD66;
+    --gorn-bio-glow: #FFEE88;
+    --gorn-egg-core: #FFCC33;
+
+    /* GREEN for shields & energy fields */
+    --gorn-shield-green: #44DD44;
+    --gorn-shield-dim: #22AA22;
+    --gorn-shield-bright: #66FF66;
+    --gorn-energy-field: #33CC33;
+    --gorn-energy-pulse: #88FF44;
+    --gorn-shield-dark: #228822;
+
+    /* Organic dark base */
+    --gorn-organic-dark: #0a0f0c;
+    --gorn-organic-mid: #152520;
+    --gorn-organic-light: #1a3530;
+    --gorn-teal-dark: #0d1a18;
+    --gorn-teal: #1a3333;
+
+    /* Rib/bone structure */
+    --gorn-rib: #2a3a35;
+    --gorn-rib-highlight: #3a4a45;
+
+    --st-bg-darkest: #030504;
+    --st-bg-darker: #050807;
+    --st-bg-dark: #0a0f0c;
+    --st-bg-medium: #101815;
+    --st-bg-light: #152520;
+    --st-bg-lighter: #1a3530;
+
+    --st-border-dark: rgba(255, 102, 34, 0.25);
+    --st-border-medium: rgba(255, 102, 34, 0.4);
+    --st-border-light: rgba(255, 136, 68, 0.6);
+    --st-border-bright: rgba(255, 170, 51, 0.8);
+
+    --st-text-dim: #665544;
+    --st-text-muted: #887766;
+    --st-text-normal: #BBAA99;
+    --st-text-bright: #DDCCBB;
+
+    --st-gradient-header: linear-gradient(180deg, #0a0f0c 0%, #050807 100%);
+    --st-gradient-panel: linear-gradient(180deg, rgba(15, 25, 20, 0.95) 0%, rgba(8, 12, 10, 0.98) 100%);
+    --st-gradient-button: linear-gradient(180deg, #CC4400 0%, #882200 100%);
+    --st-gradient-button-hover: linear-gradient(180deg, #FF6622 0%, #CC4400 100%);
+
+    --st-shadow-glow-orange: 0 0 30px rgba(255, 102, 34, 0.5);
+    --st-shadow-glow-bio: 0 0 25px rgba(255, 221, 102, 0.4);
+    --st-shadow-glow-green: 0 0 25px rgba(68, 221, 68, 0.5);
+}
+
+/* ===== GORN PANEL STYLE ===== */
+/* Bio-organic panels with rib structure */
+html[data-theme="gorn"] .mud-paper,
+html[data-theme="gorn"] .mud-card {
+    background:
+        /* Organic rib pattern on sides */
+        repeating-linear-gradient(
+            0deg,
+            transparent 0px,
+            transparent 25px,
+            rgba(42, 58, 53, 0.15) 25px,
+            rgba(42, 58, 53, 0.15) 28px,
+            transparent 28px,
+            transparent 35px
+        ),
+        /* Subtle organic texture */
+        radial-gradient(ellipse at 20% 50%, rgba(26, 53, 48, 0.3) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 50%, rgba(26, 53, 48, 0.3) 0%, transparent 50%),
+        var(--st-gradient-panel) !important;
+    border: 2px solid var(--gorn-organic-mid) !important;
+    border-radius: 12px 12px 8px 8px !important;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Orange holographic top strip */
+html[data-theme="gorn"] .mud-paper::before,
+html[data-theme="gorn"] .mud-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 10%;
+    right: 10%;
+    height: 3px;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        var(--gorn-orange-dim) 20%,
+        var(--gorn-orange) 40%,
+        var(--gorn-orange-bright) 50%,
+        var(--gorn-orange) 60%,
+        var(--gorn-orange-dim) 80%,
+        transparent 100%
+    );
+    box-shadow:
+        0 0 15px var(--gorn-orange),
+        0 0 30px rgba(255, 102, 34, 0.4);
+    border-radius: 0 0 50% 50%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Bioluminescent indicator spots */
+html[data-theme="gorn"] .mud-paper::after {
+    content: '';
+    position: absolute;
+    top: 12px;
+    right: 15px;
+    width: 12px;
+    height: 12px;
+    background: radial-gradient(circle,
+        var(--gorn-bio-glow) 0%,
+        var(--gorn-egg-core) 40%,
+        var(--gorn-orange-dim) 70%,
+        transparent 100%
+    );
+    border-radius: 50%;
+    box-shadow:
+        0 0 10px var(--gorn-bio-yellow),
+        0 0 20px rgba(255, 204, 51, 0.5);
+    animation: gorn-egg-pulse 3s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes gorn-egg-pulse {
+    0%, 100% {
+        opacity: 0.7;
+        transform: scale(1);
+        box-shadow: 0 0 10px var(--gorn-bio-yellow), 0 0 20px rgba(255, 204, 51, 0.3);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.1);
+        box-shadow: 0 0 15px var(--gorn-bio-glow), 0 0 30px rgba(255, 238, 136, 0.5);
+    }
+}
+
+/* ===== GORN BUTTONS ===== */
+/* Organic rounded buttons with orange glow */
+html[data-theme="gorn"] .mud-button-root {
+    border-radius: 20px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    font-weight: 600 !important;
+    transition: all 0.2s ease !important;
+    position: relative;
+}
+
+html[data-theme="gorn"] .mud-button-filled {
+    background: var(--st-gradient-button) !important;
+    color: #FFEECC !important;
+    border: 2px solid var(--gorn-orange-dim) !important;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 200, 150, 0.2),
+        0 0 15px rgba(255, 102, 34, 0.3) !important;
+}
+
+html[data-theme="gorn"] .mud-button-filled:hover {
+    background: var(--st-gradient-button-hover) !important;
+    border-color: var(--gorn-orange) !important;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 200, 150, 0.3),
+        0 0 25px rgba(255, 102, 34, 0.5),
+        0 0 40px rgba(255, 102, 34, 0.2) !important;
+    transform: scale(1.02);
+}
+
+html[data-theme="gorn"] .mud-button-outlined {
+    border: 2px solid var(--gorn-orange-dim) !important;
+    color: var(--gorn-orange) !important;
+    background: transparent !important;
+    border-radius: 20px !important;
+}
+
+html[data-theme="gorn"] .mud-button-outlined:hover {
+    border-color: var(--gorn-orange) !important;
+    background: rgba(255, 102, 34, 0.1) !important;
+    box-shadow: 0 0 20px rgba(255, 102, 34, 0.3) !important;
+}
+
+/* ===== GORN APP BAR ===== */
+html[data-theme="gorn"] .mud-appbar {
+    background:
+        /* Rib structure pattern */
+        repeating-linear-gradient(
+            90deg,
+            transparent 0px,
+            transparent 80px,
+            rgba(42, 58, 53, 0.2) 80px,
+            rgba(42, 58, 53, 0.2) 85px,
+            transparent 85px,
+            transparent 90px
+        ),
+        linear-gradient(180deg, #0a0f0c 0%, #050807 100%) !important;
+    border-bottom: none !important;
+    position: relative;
+}
+
+/* Orange holographic bar */
+html[data-theme="gorn"] .mud-appbar::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 5%;
+    right: 5%;
+    height: 4px;
+    background:
+        linear-gradient(90deg,
+            transparent 0%,
+            var(--gorn-orange-dim) 15%,
+            var(--gorn-orange) 35%,
+            var(--gorn-orange-bright) 50%,
+            var(--gorn-orange) 65%,
+            var(--gorn-orange-dim) 85%,
+            transparent 100%
+        );
+    border-radius: 50% 50% 0 0;
+    box-shadow:
+        0 0 20px rgba(255, 102, 34, 0.6),
+        0 0 40px rgba(255, 102, 34, 0.3);
+}
+
+/* ===== GORN DRAWER ===== */
+html[data-theme="gorn"] .mud-drawer {
+    background:
+        /* Vertical rib structures */
+        repeating-linear-gradient(
+            180deg,
+            transparent 0px,
+            transparent 40px,
+            rgba(42, 58, 53, 0.2) 40px,
+            rgba(42, 58, 53, 0.2) 45px,
+            rgba(58, 74, 69, 0.15) 45px,
+            rgba(58, 74, 69, 0.15) 48px,
+            transparent 48px,
+            transparent 60px
+        ),
+        linear-gradient(90deg, #050807 0%, #0a0f0c 100%) !important;
+    border-right: none !important;
+    position: relative;
+}
+
+/* Orange glow edge */
+html[data-theme="gorn"] .mud-drawer::after {
+    content: '';
+    position: absolute;
+    top: 10%;
+    right: 0;
+    width: 3px;
+    height: 80%;
+    background: linear-gradient(180deg,
+        transparent 0%,
+        var(--gorn-orange-dim) 20%,
+        var(--gorn-orange) 50%,
+        var(--gorn-orange-dim) 80%,
+        transparent 100%
+    );
+    border-radius: 3px 0 0 3px;
+    box-shadow:
+        0 0 15px rgba(255, 102, 34, 0.5),
+        0 0 30px rgba(255, 102, 34, 0.25);
+}
+
+/* Egg chamber indicators along sidebar */
+html[data-theme="gorn"] .mud-drawer::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 15px;
+    width: 8px;
+    height: 8px;
+    background: radial-gradient(circle, var(--gorn-bio-glow), var(--gorn-egg-core));
+    border-radius: 50%;
+    box-shadow:
+        0 60px 0 var(--gorn-bio-yellow),
+        0 120px 0 var(--gorn-bio-yellow),
+        0 180px 0 rgba(255, 221, 102, 0.5),
+        0 0 10px var(--gorn-bio-yellow);
+    animation: gorn-egg-pulse 3s ease-in-out infinite;
+}
+
+/* ===== GORN NAVIGATION ===== */
+html[data-theme="gorn"] .mud-nav-link {
+    border-radius: 0 20px 20px 0 !important;
+    margin: 6px 8px 6px 0 !important;
+    padding: 12px 16px !important;
+    background: rgba(21, 37, 32, 0.5) !important;
+    border-left: 3px solid transparent !important;
+    transition: all 0.2s ease !important;
+    position: relative;
+}
+
+html[data-theme="gorn"] .mud-nav-link:hover {
+    background: rgba(26, 53, 48, 0.7) !important;
+    border-left-color: var(--gorn-orange-dim) !important;
+}
+
+html[data-theme="gorn"] .mud-nav-link.active {
+    background:
+        linear-gradient(90deg, rgba(255, 102, 34, 0.2) 0%, rgba(21, 37, 32, 0.5) 100%) !important;
+    color: var(--gorn-orange-bright) !important;
+    border-left-color: var(--gorn-orange) !important;
+    box-shadow:
+        inset 0 0 25px rgba(255, 102, 34, 0.15),
+        0 0 15px rgba(255, 102, 34, 0.2) !important;
+}
+
+/* Targeting reticle on active */
+html[data-theme="gorn"] .mud-nav-link.active::after {
+    content: '';
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 14px;
+    height: 14px;
+    border: 2px solid var(--gorn-orange);
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--gorn-orange);
+}
+
+html[data-theme="gorn"] .mud-nav-link.active::before {
+    content: '';
+    position: absolute;
+    right: 17px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 4px;
+    background: var(--gorn-orange-bright);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--gorn-orange);
+}
+
+/* ===== GORN SPECIFIC DECORATIONS ===== */
+
+/* Holographic targeting circle */
+html[data-theme="gorn"] .targeting-circle {
+    width: 80px;
+    height: 80px;
+    border: 3px solid var(--gorn-orange);
+    border-radius: 50%;
+    position: relative;
+    box-shadow:
+        0 0 20px rgba(255, 102, 34, 0.5),
+        inset 0 0 20px rgba(255, 102, 34, 0.2);
+}
+
+html[data-theme="gorn"] .targeting-circle::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60%;
+    height: 60%;
+    border: 1px solid var(--gorn-orange-dim);
+    border-radius: 50%;
+}
+
+html[data-theme="gorn"] .targeting-circle::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 10px;
+    height: 10px;
+    background: var(--gorn-orange-bright);
+    border-radius: 50%;
+    box-shadow: 0 0 15px var(--gorn-orange);
+}
+
+/* Egg chamber display */
+html[data-theme="gorn"] .egg-chamber {
+    width: 50px;
+    height: 60px;
+    background:
+        radial-gradient(ellipse at center,
+            var(--gorn-bio-glow) 0%,
+            var(--gorn-egg-core) 30%,
+            var(--gorn-orange-dim) 60%,
+            var(--gorn-organic-dark) 100%
+        );
+    border-radius: 40% 40% 50% 50%;
+    border: 2px solid var(--gorn-rib);
+    box-shadow:
+        0 0 20px rgba(255, 221, 102, 0.5),
+        inset 0 0 15px rgba(255, 238, 136, 0.3);
+    animation: gorn-egg-glow 4s ease-in-out infinite;
+}
+
+@keyframes gorn-egg-glow {
+    0%, 100% {
+        box-shadow:
+            0 0 15px rgba(255, 221, 102, 0.4),
+            inset 0 0 10px rgba(255, 238, 136, 0.2);
+    }
+    50% {
+        box-shadow:
+            0 0 30px rgba(255, 238, 136, 0.6),
+            inset 0 0 20px rgba(255, 238, 136, 0.4);
+    }
+}
+
+/* Organic rib structure */
+html[data-theme="gorn"] .rib-structure {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+html[data-theme="gorn"] .rib-structure .rib {
+    height: 4px;
+    background: linear-gradient(90deg,
+        var(--gorn-rib) 0%,
+        var(--gorn-rib-highlight) 50%,
+        var(--gorn-rib) 100%
+    );
+    border-radius: 2px;
+}
+
+/* Bio-organic status bar */
+html[data-theme="gorn"] .bio-status-bar {
+    height: 8px;
+    background: var(--gorn-organic-dark);
+    border: 1px solid var(--gorn-rib);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+html[data-theme="gorn"] .bio-status-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg,
+        var(--gorn-orange-dim) 0%,
+        var(--gorn-orange) 50%,
+        var(--gorn-orange-bright) 100%
+    );
+    box-shadow: 0 0 10px var(--gorn-orange);
+    border-radius: 3px;
+    transition: width 0.5s ease;
+}
+
+/* Holographic text display */
+html[data-theme="gorn"] .holo-text {
+    font-family: 'Roboto Mono', monospace;
+    color: var(--gorn-orange);
+    text-shadow:
+        0 0 10px var(--gorn-orange),
+        0 0 20px rgba(255, 102, 34, 0.5);
+}
+
+/* Organic divider with glow nodes */
+html[data-theme="gorn"] .organic-divider {
+    height: 2px;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        var(--gorn-rib) 20%,
+        var(--gorn-orange-dim) 45%,
+        var(--gorn-orange) 50%,
+        var(--gorn-orange-dim) 55%,
+        var(--gorn-rib) 80%,
+        transparent 100%
+    );
+    margin: 12px 0;
+    position: relative;
+}
+
+html[data-theme="gorn"] .organic-divider::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px;
+    height: 8px;
+    background: var(--gorn-orange);
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--gorn-orange);
+}
+
+/* Tracking scan animation */
+@keyframes gorn-scan {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+html[data-theme="gorn"] .tracking-scan {
+    width: 60px;
+    height: 60px;
+    border: 2px solid var(--gorn-organic-mid);
+    border-radius: 50%;
+    position: relative;
+    overflow: hidden;
+}
+
+html[data-theme="gorn"] .tracking-scan::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 50%;
+    height: 2px;
+    background: linear-gradient(90deg, var(--gorn-orange), transparent);
+    transform-origin: left center;
+    animation: gorn-scan 3s linear infinite;
+}
+
+/* Predator eye indicator */
+html[data-theme="gorn"] .predator-eye {
+    width: 30px;
+    height: 12px;
+    background: linear-gradient(180deg,
+        transparent 0%,
+        var(--gorn-bio-yellow) 40%,
+        var(--gorn-egg-core) 50%,
+        var(--gorn-bio-yellow) 60%,
+        transparent 100%
+    );
+    border-radius: 50%;
+    box-shadow:
+        0 0 15px var(--gorn-bio-yellow),
+        inset 0 0 5px rgba(255, 238, 136, 0.5);
+    animation: gorn-eye-blink 5s ease-in-out infinite;
+}
+
+@keyframes gorn-eye-blink {
+    0%, 85%, 100% { height: 12px; opacity: 1; }
+    90% { height: 2px; opacity: 0.5; }
+}
+
+/* Hive communication signal */
+html[data-theme="gorn"] .hive-signal {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+
+html[data-theme="gorn"] .hive-signal-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--gorn-orange);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--gorn-orange);
+    animation: gorn-hive-pulse 1.5s ease-in-out infinite;
+}
+
+html[data-theme="gorn"] .hive-signal-dot:nth-child(2) { animation-delay: 0.2s; }
+html[data-theme="gorn"] .hive-signal-dot:nth-child(3) { animation-delay: 0.4s; }
+html[data-theme="gorn"] .hive-signal-dot:nth-child(4) { animation-delay: 0.6s; }
+
+@keyframes gorn-hive-pulse {
+    0%, 100% { opacity: 0.3; transform: scale(0.8); }
+    50% { opacity: 1; transform: scale(1.2); }
+}
+
+/* ===== BIO-ORGANIC BREEDING ELEMENTS ===== */
+/* Orange/amber gelatinous breeding chambers as seen in SNW */
+
+/* Breeding chamber - orange gelatinous egg pod */
+html[data-theme="gorn"] .breeding-chamber {
+    width: 45px;
+    height: 60px;
+    background:
+        /* Gelatinous translucent effect */
+        radial-gradient(ellipse at center 30%,
+            rgba(255, 238, 136, 0.95) 0%,
+            rgba(255, 204, 51, 0.85) 20%,
+            rgba(255, 170, 51, 0.75) 40%,
+            rgba(204, 68, 0, 0.6) 65%,
+            rgba(136, 34, 0, 0.4) 85%,
+            transparent 100%
+        );
+    border-radius: 40% 40% 48% 48%;
+    border: 2px solid rgba(255, 136, 68, 0.6);
+    box-shadow:
+        /* Outer glow */
+        0 0 30px rgba(255, 170, 51, 0.7),
+        0 0 50px rgba(255, 136, 68, 0.4),
+        /* Inner gelatinous shine */
+        inset 0 -15px 25px rgba(204, 68, 0, 0.5),
+        inset 0 8px 20px rgba(255, 238, 136, 0.6),
+        inset 5px 0 15px rgba(255, 204, 51, 0.3),
+        inset -5px 0 15px rgba(255, 204, 51, 0.3);
+    animation: gorn-egg-chamber-pulse 4s ease-in-out infinite;
+    position: relative;
+}
+
+/* Embryo silhouette (darker core) */
+html[data-theme="gorn"] .breeding-chamber::before {
+    content: '';
+    position: absolute;
+    top: 25%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 22px;
+    height: 32px;
+    background: radial-gradient(ellipse,
+        rgba(60, 30, 10, 0.5) 0%,
+        rgba(100, 50, 20, 0.3) 50%,
+        transparent 80%
+    );
+    border-radius: 35% 35% 45% 45%;
+}
+
+/* Membrane highlight (wet gelatinous look) */
+html[data-theme="gorn"] .breeding-chamber::after {
+    content: '';
+    position: absolute;
+    top: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 55%;
+    height: 10px;
+    background: linear-gradient(180deg,
+        rgba(255, 255, 200, 0.9) 0%,
+        rgba(255, 238, 136, 0.5) 50%,
+        transparent 100%
+    );
+    border-radius: 50%;
+    animation: gorn-membrane-pulse 2.5s ease-in-out infinite;
+}
+
+@keyframes gorn-egg-chamber-pulse {
+    0%, 100% {
+        box-shadow:
+            0 0 25px rgba(255, 170, 51, 0.6),
+            0 0 45px rgba(255, 136, 68, 0.3),
+            inset 0 -15px 25px rgba(204, 68, 0, 0.5),
+            inset 0 8px 20px rgba(255, 238, 136, 0.5);
+        transform: scale(1);
+    }
+    50% {
+        box-shadow:
+            0 0 40px rgba(255, 204, 51, 0.8),
+            0 0 60px rgba(255, 170, 51, 0.5),
+            inset 0 -15px 30px rgba(204, 68, 0, 0.6),
+            inset 0 10px 25px rgba(255, 238, 136, 0.7);
+        transform: scale(1.03);
+    }
+}
+
+@keyframes gorn-membrane-pulse {
+    0%, 100% { opacity: 0.6; width: 55%; }
+    50% { opacity: 1; width: 65%; }
+}
+
+/* Spawn pool (floor/surface element) - orange gelatinous */
+html[data-theme="gorn"] .spawn-pool {
+    width: 100px;
+    height: 50px;
+    background:
+        radial-gradient(ellipse at center,
+            rgba(255, 221, 102, 0.9) 0%,
+            rgba(255, 170, 51, 0.7) 30%,
+            rgba(204, 68, 0, 0.5) 60%,
+            var(--gorn-organic-dark) 100%
+        );
+    border-radius: 50%;
+    box-shadow:
+        0 0 35px rgba(255, 170, 51, 0.5),
+        0 0 60px rgba(255, 136, 68, 0.3),
+        inset 0 0 25px rgba(255, 238, 136, 0.4);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Bubbling effect in spawn pool */
+html[data-theme="gorn"] .spawn-pool::before {
+    content: '';
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: rgba(255, 238, 136, 0.8);
+    border-radius: 50%;
+    top: 35%;
+    left: 25%;
+    box-shadow:
+        18px -6px 0 rgba(255, 221, 102, 0.7),
+        40px 4px 0 rgba(255, 204, 51, 0.6),
+        55px -5px 0 rgba(255, 238, 136, 0.5);
+    animation: gorn-bubble 3s ease-in-out infinite;
+}
+
+/* Surface sheen */
+html[data-theme="gorn"] .spawn-pool::after {
+    content: '';
+    position: absolute;
+    top: 8px;
+    left: 20%;
+    width: 60%;
+    height: 12px;
+    background: linear-gradient(180deg,
+        rgba(255, 255, 220, 0.6) 0%,
+        transparent 100%
+    );
+    border-radius: 50%;
+}
+
+@keyframes gorn-bubble {
+    0%, 100% { transform: translateY(0); opacity: 0.6; }
+    50% { transform: translateY(-10px); opacity: 1; }
+}
+
+/* Hatchery status indicator (amber/orange themed) */
+html[data-theme="gorn"] .hatchery-status {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 16px;
+    background: linear-gradient(90deg,
+        rgba(204, 68, 0, 0.15) 0%,
+        rgba(10, 15, 12, 0.9) 50%,
+        rgba(255, 170, 51, 0.15) 100%
+    );
+    border: 1px solid var(--gorn-orange-dim);
+    border-radius: 20px;
+    box-shadow: inset 0 0 15px rgba(255, 136, 68, 0.1);
+}
+
+html[data-theme="gorn"] .hatchery-status .spawn-count {
+    color: var(--gorn-bio-yellow);
+    text-shadow: 0 0 10px var(--gorn-bio-yellow);
+    font-weight: 700;
+}
+
+html[data-theme="gorn"] .hatchery-status .hunter-count {
+    color: var(--gorn-orange);
+    text-shadow: 0 0 10px var(--gorn-orange);
+    font-weight: 700;
+}
+
+/* ===== GREEN SHIELD & ENERGY FIELD ELEMENTS ===== */
+
+/* Shield status indicator */
+html[data-theme="gorn"] .shield-indicator {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--gorn-shield-green);
+    border-radius: 50%;
+    position: relative;
+    box-shadow:
+        0 0 20px rgba(68, 221, 68, 0.5),
+        inset 0 0 15px rgba(68, 221, 68, 0.2);
+    animation: gorn-shield-pulse 2s ease-in-out infinite;
+}
+
+html[data-theme="gorn"] .shield-indicator::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60%;
+    height: 60%;
+    border: 2px solid var(--gorn-shield-dim);
+    border-radius: 50%;
+}
+
+html[data-theme="gorn"] .shield-indicator::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px;
+    height: 8px;
+    background: var(--gorn-shield-bright);
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--gorn-shield-green);
+}
+
+@keyframes gorn-shield-pulse {
+    0%, 100% {
+        box-shadow: 0 0 15px rgba(68, 221, 68, 0.4), inset 0 0 10px rgba(68, 221, 68, 0.15);
+    }
+    50% {
+        box-shadow: 0 0 30px rgba(68, 221, 68, 0.7), inset 0 0 20px rgba(68, 221, 68, 0.3);
+    }
+}
+
+/* Energy field barrier */
+html[data-theme="gorn"] .energy-field {
+    background: linear-gradient(180deg,
+        rgba(68, 221, 68, 0.1) 0%,
+        rgba(51, 204, 51, 0.2) 50%,
+        rgba(68, 221, 68, 0.1) 100%
+    );
+    border: 2px solid var(--gorn-shield-green);
+    border-radius: 8px;
+    box-shadow:
+        0 0 25px rgba(68, 221, 68, 0.3),
+        inset 0 0 30px rgba(51, 204, 51, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Animated energy ripple */
+html[data-theme="gorn"] .energy-field::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    right: -50%;
+    bottom: -50%;
+    background: conic-gradient(
+        from 0deg,
+        transparent 0deg,
+        rgba(68, 221, 68, 0.3) 30deg,
+        transparent 60deg
+    );
+    animation: gorn-energy-rotate 4s linear infinite;
+}
+
+@keyframes gorn-energy-rotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Shield strength bar (green) */
+html[data-theme="gorn"] .shield-bar {
+    height: 10px;
+    background: var(--gorn-organic-dark);
+    border: 1px solid var(--gorn-shield-dark);
+    border-radius: 5px;
+    overflow: hidden;
+    position: relative;
+}
+
+html[data-theme="gorn"] .shield-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg,
+        var(--gorn-shield-dark) 0%,
+        var(--gorn-shield-green) 50%,
+        var(--gorn-shield-bright) 100%
+    );
+    box-shadow: 0 0 10px var(--gorn-shield-green);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+    position: relative;
+}
+
+html[data-theme="gorn"] .shield-bar-fill::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 25px;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(102, 255, 102, 0.6) 100%
+    );
+    animation: gorn-shield-shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes gorn-shield-shimmer {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+}
+
+/* Energy node indicator */
+html[data-theme="gorn"] .energy-node {
+    width: 20px;
+    height: 20px;
+    background: radial-gradient(circle,
+        var(--gorn-energy-pulse) 0%,
+        var(--gorn-shield-green) 50%,
+        transparent 70%
+    );
+    border-radius: 50%;
+    box-shadow: 0 0 15px rgba(136, 255, 68, 0.6);
+    animation: gorn-energy-node 2s ease-in-out infinite;
+}
+
+@keyframes gorn-energy-node {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 15px rgba(136, 255, 68, 0.5);
+    }
+    50% {
+        transform: scale(1.2);
+        box-shadow: 0 0 25px rgba(136, 255, 68, 0.8);
+    }
+}
+
+/* Power grid display */
+html[data-theme="gorn"] .power-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+    padding: 8px;
+    background: rgba(34, 136, 34, 0.1);
+    border: 1px solid var(--gorn-shield-dim);
+    border-radius: 6px;
+}
+
+html[data-theme="gorn"] .power-grid .cell {
+    width: 12px;
+    height: 12px;
+    background: var(--gorn-shield-dark);
+    border-radius: 2px;
+}
+
+html[data-theme="gorn"] .power-grid .cell.active {
+    background: var(--gorn-shield-green);
+    box-shadow: 0 0 8px var(--gorn-shield-green);
+}
+
+/* Organic wall texture (dark teal organic) */
+html[data-theme="gorn"] .organic-wall {
+    background:
+        /* Rib structure */
+        repeating-linear-gradient(
+            0deg,
+            transparent 0px,
+            transparent 30px,
+            rgba(42, 58, 53, 0.2) 30px,
+            rgba(42, 58, 53, 0.2) 34px,
+            transparent 34px,
+            transparent 40px
+        ),
+        /* Orange veins */
+        radial-gradient(ellipse at 20% 30%, rgba(255, 102, 34, 0.08) 0%, transparent 30%),
+        radial-gradient(ellipse at 70% 60%, rgba(255, 170, 51, 0.06) 0%, transparent 25%),
+        var(--st-gradient-panel);
+    border: 2px solid var(--gorn-organic-mid);
+    border-radius: 8px;
+}
+
+/* Hive divider (orange themed) */
+html[data-theme="gorn"] .hive-divider {
+    height: 3px;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        var(--gorn-orange-dim) 15%,
+        var(--gorn-orange) 40%,
+        var(--gorn-bio-yellow) 50%,
+        var(--gorn-orange) 60%,
+        var(--gorn-orange-dim) 85%,
+        transparent 100%
+    );
+    margin: 16px 0;
+    position: relative;
+    box-shadow: 0 0 15px rgba(255, 102, 34, 0.4);
+}
+
+html[data-theme="gorn"] .hive-divider::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 12px;
+    height: 12px;
+    background: radial-gradient(circle,
+        var(--gorn-bio-glow) 0%,
+        var(--gorn-bio-yellow) 50%,
+        var(--gorn-orange) 100%
+    );
+    border-radius: 50%;
+    box-shadow: 0 0 15px var(--gorn-bio-yellow);
+}
+
+/* Life cycle indicator (all orange/amber stages) */
+html[data-theme="gorn"] .lifecycle-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+html[data-theme="gorn"] .lifecycle-indicator .stage {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid var(--gorn-rib);
+    position: relative;
+}
+
+html[data-theme="gorn"] .lifecycle-indicator .stage.egg {
+    background: var(--gorn-bio-yellow);
+    box-shadow: 0 0 8px var(--gorn-bio-yellow);
+}
+
+html[data-theme="gorn"] .lifecycle-indicator .stage.larva {
+    background: linear-gradient(135deg, var(--gorn-bio-yellow) 0%, var(--gorn-amber) 100%);
+    box-shadow: 0 0 8px var(--gorn-amber);
+}
+
+html[data-theme="gorn"] .lifecycle-indicator .stage.juvenile {
+    background: var(--gorn-orange);
+    box-shadow: 0 0 8px var(--gorn-orange);
+}
+
+html[data-theme="gorn"] .lifecycle-indicator .stage.hunter {
+    background: var(--gorn-orange-bright);
+    box-shadow: 0 0 8px var(--gorn-orange-bright);
+}
+
+html[data-theme="gorn"] .lifecycle-indicator .stage-connector {
+    width: 20px;
+    height: 2px;
+    background: linear-gradient(90deg, var(--gorn-rib), var(--gorn-rib-highlight));
+}
+
+/* Shield + Weapon combined status */
+html[data-theme="gorn"] .combat-status {
+    display: flex;
+    gap: 16px;
+    padding: 10px 16px;
+    background: var(--st-gradient-panel);
+    border: 1px solid var(--gorn-rib);
+    border-radius: 8px;
+}
+
+html[data-theme="gorn"] .combat-status .shields {
+    color: var(--gorn-shield-green);
+    text-shadow: 0 0 10px var(--gorn-shield-green);
+}
+
+html[data-theme="gorn"] .combat-status .weapons {
+    color: var(--gorn-orange);
+    text-shadow: 0 0 10px var(--gorn-orange);
+}

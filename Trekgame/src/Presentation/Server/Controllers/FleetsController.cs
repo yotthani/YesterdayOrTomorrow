@@ -77,7 +77,6 @@ public class FleetsController : ControllerBase
 
         await _hub.Clients.Group(fleet.Faction.GameId.ToString()).SendAsync("FleetUpdated", new { Id = fleet.Id, Name = fleet.Name, IsMoving = true });
 
-        return Ok();
         return Ok(MapToFleetDetailDto(fleet));
     }
 
@@ -98,7 +97,6 @@ public class FleetsController : ControllerBase
 
         await _db.SaveChangesAsync();
 
-        return Ok();
         return Ok(MapToFleetDetailDto(fleet));
     }
 
@@ -115,11 +113,10 @@ public class FleetsController : ControllerBase
         {
             fleet.Stance = (FleetStance)(int)stance;
             await _db.SaveChangesAsync();
-            return Ok();
+            return Ok(MapToFleetDetailDto(fleet));
         }
 
         return BadRequest("Invalid stance");
-        return Ok(MapToFleetDetailDto(fleet));
     }
 
     /// <summary>
@@ -134,7 +131,6 @@ public class FleetsController : ControllerBase
         fleet.Name = request.Name;
         await _db.SaveChangesAsync();
 
-        return Ok();
         return Ok(MapToFleetDetailDto(fleet));
     }
 
@@ -232,7 +228,6 @@ public class FleetsController : ControllerBase
         await _db.SaveChangesAsync();
 
         return NoContent();
-        return Ok(MapToFleetDetailDto(fleet));
     }
 
     private static FleetDetailDto MapToDto(FleetEntity fleet)

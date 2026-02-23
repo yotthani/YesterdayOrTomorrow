@@ -1,0 +1,259 @@
+/* ===========================================
+   CARDASSIAN THEME - CENTRAL COMMAND CONSOLE
+
+   Design Philosophy: Surveillance state - efficient, hierarchical,
+   watching everything. The UI of control.
+
+   Visual Language:
+   - Amber/orange warm tones with brown
+   - Geometric precision, notched corners
+   - Neck ridge motif in decorations
+   - Status indicators and hierarchy badges
+   - Tight letter spacing, precise numbers
+   - Regimented, efficient layout
+   =========================================== */
+
+/* ===== CARDASSIAN THEME VARIABLES ===== */
+html[data-theme="cardassian"],
+html[data-theme="cardassian"] .stellaris-layout,
+html[data-theme="cardassian"] .stellaris-app {
+    --theme-primary: #ff8800;
+    --theme-secondary: #4a3520;
+    --theme-accent: #ffcc00;
+    --theme-text: #ffddaa;
+    --theme-text-dim: #aa8855;
+    --theme-bg: #0a0500;
+    --theme-panel-bg: rgba(26, 16, 5, 0.98);
+    --theme-border-radius: 4px;
+    --theme-btn-radius: 4px;
+    --theme-border-width: 2px;
+    --theme-corner-style: geometric;
+
+    --st-accent-blue: #ff8800;
+    --st-accent-cyan: #ffaa44;
+    --st-accent-gold: #ffcc00;
+    --st-accent-orange: #ff6600;
+    --st-accent-green: #aaaa00;
+    --st-accent-red: #ff4400;
+    --st-accent-purple: #aa6644;
+
+    --st-bg-darkest: #050300;
+    --st-bg-darker: #0a0500;
+    --st-bg-dark: #100a05;
+    --st-bg-medium: #1a1005;
+    --st-bg-light: #251808;
+    --st-bg-lighter: #302010;
+
+    --st-border-dark: rgba(255, 136, 0, 0.3);
+    --st-border-medium: rgba(255, 136, 0, 0.5);
+    --st-border-light: rgba(255, 170, 68, 0.6);
+    --st-border-bright: rgba(255, 204, 0, 0.8);
+
+    --st-text-dim: #886644;
+    --st-text-muted: #aa8855;
+    --st-text-normal: #ccaa77;
+    --st-text-bright: #ffddaa;
+
+    --st-gradient-header: linear-gradient(180deg, #1a1005 0%, #0a0500 100%);
+    --st-gradient-panel: linear-gradient(180deg, rgba(26, 16, 5, 0.95) 0%, rgba(15, 8, 2, 0.98) 100%);
+    --st-gradient-button: linear-gradient(180deg, #ff8800 0%, #aa5500 100%);
+    --st-gradient-button-hover: linear-gradient(180deg, #ffaa22 0%, #ff8800 100%);
+
+    --st-shadow-glow-blue: 0 0 20px rgba(255, 136, 0, 0.4);
+    --st-shadow-glow-gold: 0 0 20px rgba(255, 204, 0, 0.4);
+}
+
+
+/* ===== CARDASSIAN PANEL STYLE ===== */
+/* Geometric with notched corners */
+html[data-theme="cardassian"] .mud-paper,
+html[data-theme="cardassian"] .mud-card {
+    background: var(--st-gradient-panel) !important;
+    border: 2px solid rgba(255, 136, 0, 0.5) !important;
+    border-radius: 4px !important;
+    clip-path: polygon(
+        6% 0, 94% 0,
+        100% 6%, 100% 94%,
+        94% 100%, 6% 100%,
+        0 94%, 0 6%
+    ) !important;
+    position: relative;
+}
+
+/* Amber status bar at top */
+html[data-theme="cardassian"] .mud-paper::before,
+html[data-theme="cardassian"] .mud-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 10%;
+    right: 10%;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #ff8800, #ffcc00, #ff8800, transparent);
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Inner shadow for depth */
+html[data-theme="cardassian"] .mud-paper {
+    box-shadow:
+        inset 1px 1px 0 rgba(255, 200, 100, 0.1),
+        inset -1px -1px 0 rgba(0, 0, 0, 0.3),
+        0 0 15px rgba(255, 136, 0, 0.2) !important;
+}
+
+
+/* ===== CARDASSIAN BUTTONS ===== */
+/* Notched rectangular */
+html[data-theme="cardassian"] .mud-button-root {
+    border-radius: 4px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    font-weight: 600 !important;
+    clip-path: polygon(
+        4px 0, calc(100% - 4px) 0,
+        100% 4px, 100% calc(100% - 4px),
+        calc(100% - 4px) 100%, 4px 100%,
+        0 calc(100% - 4px), 0 4px
+    ) !important;
+}
+
+html[data-theme="cardassian"] .mud-button-filled {
+    background: linear-gradient(180deg, #ff8800 0%, #aa5500 50%, #cc6600 100%) !important;
+    color: #000 !important;
+    border: 1px solid #ffaa44 !important;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 200, 100, 0.3),
+        0 0 12px rgba(255, 136, 0, 0.4) !important;
+}
+
+html[data-theme="cardassian"] .mud-button-filled:hover {
+    background: linear-gradient(180deg, #ffaa22 0%, #cc7700 50%, #ee8800 100%) !important;
+    box-shadow: 0 0 20px rgba(255, 136, 0, 0.6) !important;
+}
+
+html[data-theme="cardassian"] .mud-button-outlined {
+    border: 2px solid #ff8800 !important;
+    color: #ffaa44 !important;
+    background: rgba(100, 60, 20, 0.3) !important;
+}
+
+
+/* ===== CARDASSIAN APP BAR ===== */
+html[data-theme="cardassian"] .mud-appbar {
+    background: linear-gradient(180deg, #1a1005 0%, #0a0500 100%) !important;
+    border-bottom: none !important;
+    position: relative;
+}
+
+/* Surveillance line */
+html[data-theme="cardassian"] .mud-appbar::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #4a3520, #ff8800, #ffcc00, #ff8800, #4a3520);
+    pointer-events: none;
+}
+
+/* Hierarchy indicator marks */
+html[data-theme="cardassian"] .mud-appbar::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 6px;
+    background: #ffcc00;
+    clip-path: polygon(20% 0, 80% 0, 100% 100%, 0 100%);
+    pointer-events: none;
+}
+
+
+/* ===== CARDASSIAN DRAWER/SIDEBAR ===== */
+html[data-theme="cardassian"] .mud-drawer {
+    background: linear-gradient(90deg, #0a0500 0%, #150a03 100%) !important;
+    border-right: none !important;
+    position: relative;
+}
+
+/* Structured edge */
+html[data-theme="cardassian"] .mud-drawer::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, #4a3520 0%, #ff8800 30%, #ffcc00 50%, #ff8800 70%, #4a3520 100%);
+    pointer-events: none;
+}
+
+
+/* ===== CARDASSIAN NAVIGATION LINKS ===== */
+html[data-theme="cardassian"] .mud-nav-link {
+    border-radius: 2px !important;
+    margin: 4px 8px !important;
+    padding: 10px 14px !important;
+    background: rgba(100, 60, 20, 0.2) !important;
+    border-left: 3px solid transparent !important;
+    transition: all 0.2s ease !important;
+}
+
+html[data-theme="cardassian"] .mud-nav-link:hover {
+    background: rgba(255, 136, 0, 0.2) !important;
+    border-left-color: #ffaa44 !important;
+}
+
+html[data-theme="cardassian"] .mud-nav-link.active {
+    background: linear-gradient(90deg, rgba(255, 136, 0, 0.4) 0%, transparent 100%) !important;
+    color: #ffddaa !important;
+    border-left-color: #ffcc00 !important;
+}
+
+
+/* ===== CARDASSIAN SPECIFIC DECORATIONS ===== */
+
+/* Status-based amber pulse */
+@keyframes cardassian-pulse {
+    0%, 100% {
+        box-shadow: 0 0 10px rgba(255, 136, 0, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(255, 136, 0, 0.5);
+    }
+}
+
+html[data-theme="cardassian"] .status-pulse {
+    animation: cardassian-pulse 2s ease-in-out infinite;
+}
+
+/* Scanning line effect */
+@keyframes cardassian-scan {
+    0% { transform: translateY(-100%); opacity: 1; }
+    100% { transform: translateY(100%); opacity: 0; }
+}
+
+html[data-theme="cardassian"] .scan-line::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #ff8800, transparent);
+    animation: cardassian-scan 3s ease-in-out infinite;
+}
+
+/* Hierarchy badge */
+html[data-theme="cardassian"] .hierarchy-badge {
+    background: linear-gradient(180deg, #4a3520, #302010);
+    border: 1px solid #ff8800;
+    clip-path: polygon(10% 0, 90% 0, 100% 50%, 90% 100%, 10% 100%, 0 50%);
+    padding: 4px 12px;
+    font-size: 10px;
+    letter-spacing: 1px;
+}

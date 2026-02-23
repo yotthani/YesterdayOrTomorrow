@@ -1,0 +1,55 @@
+@using StarTrekGame.Web.Services
+@inject MainMenuTemplateService TemplateService
+
+@* Data-driven menu button that renders based on template definition *@
+
+@{
+    var template = TemplateService.GetTemplate(_currentStyle);
+    var button = template.Button;
+}
+
+<button class="menu-btn @button.Style @Class @(Primary ? "primary" : "") @(Secondary ? "secondary" : "") @(Danger ? "danger" : "")"
+        style="@BuildButtonStyle(button)"
+        disabled="@Disabled"
+        @onclick="OnClick">
+    @if (!string.IsNullOrEmpty(Icon))
+    {
+        <span class="btn-icon">@Icon</span>
+    }
+    @if (ChildContent != null)
+    {
+        @ChildContent
+    }
+</button>
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public string Class { get; set; } = "";
+    [Parameter] public string? Icon { get; set; }
+    [Parameter] public bool Primary { get; set; }
+    [Parameter] public bool Secondary { get; set; }
+    [Parameter] public bool Danger { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+    [Parameter] public EventCallback OnClick { get; set; }
+
+    /// <summary>
+    /// Override the default menu style (lcars, cinematic, minimal, academy)
+    /// </summary>
+    [Parameter] public string? Style { get; set; }
+
+    /// <summary>
+    /// Cascaded from MenuLayout or can be set directly
+    /// </summary>
+    [CascadingParameter(Name = "MenuStyle")]
+    public string? CascadedStyle { get; set; }
+
+    private string _currentStyle => Style ?? CascadedStyle ?? "lcars";
+
+    private string BuildButtonStyle(MenuButtonTemplate button)
+    {
+        var styles = new List<string>();
+        if (!string.IsNullOrEmpty(button.BorderRadius))
+            styles.Add($"border-radius: {button.BorderRadius}");
+        return string.Join("; ", styles);
+    }
+}

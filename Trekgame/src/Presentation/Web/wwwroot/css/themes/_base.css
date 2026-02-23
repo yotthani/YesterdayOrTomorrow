@@ -1,0 +1,106 @@
+/* ===========================================
+   GALACTIC STRATEGY - BASE THEME SYSTEM
+
+   This file defines the DEFAULT theme (neutral Stellaris blue)
+   and the CSS variable structure that ALL faction themes must follow.
+
+   Faction themes override these variables but DO NOT change layout.
+   Layout is fixed - only visuals change per faction.
+   =========================================== */
+
+/* ===== DEFAULT THEME VARIABLES (Stellaris Blue) ===== */
+:root {
+    /* Core Theme Colors - override these in faction themes */
+    --theme-primary: #4a9eff;
+    --theme-secondary: #00d4ff;
+    --theme-accent: #ffc844;
+    --theme-text: #d0e4f8;
+    --theme-text-dim: #8098b8;
+    --theme-bg: #040608;
+    --theme-panel-bg: rgba(20, 30, 45, 0.95);
+
+    /* Shape Properties - define the visual style */
+    --theme-border-radius: 6px;
+    --theme-btn-radius: 6px;
+    --theme-border-width: 1px;
+    --theme-corner-style: rounded; /* rounded, angular, hexagonal, etc */
+
+    /* Extended Color Palette */
+    --st-accent-blue: #4a9eff;
+    --st-accent-cyan: #00d4ff;
+    --st-accent-gold: #ffc844;
+    --st-accent-orange: #ff8844;
+    --st-accent-green: #44ff88;
+    --st-accent-red: #ff4444;
+    --st-accent-purple: #aa66ff;
+
+    /* Background Hierarchy */
+    --st-bg-darkest: #020304;
+    --st-bg-darker: #040608;
+    --st-bg-dark: #080c10;
+    --st-bg-medium: #101820;
+    --st-bg-light: #182028;
+    --st-bg-lighter: #202830;
+
+    /* Border Opacity Levels */
+    --st-border-dark: rgba(74, 158, 255, 0.2);
+    --st-border-medium: rgba(74, 158, 255, 0.4);
+    --st-border-light: rgba(74, 158, 255, 0.6);
+    --st-border-bright: rgba(74, 158, 255, 0.8);
+
+    /* Text Hierarchy */
+    --st-text-dim: #506878;
+    --st-text-muted: #708898;
+    --st-text-normal: #90a8b8;
+    --st-text-bright: #d0e4f8;
+
+    /* Gradients */
+    --st-gradient-header: linear-gradient(180deg, #101820 0%, #080c10 100%);
+    --st-gradient-panel: linear-gradient(180deg, rgba(20, 30, 45, 0.95) 0%, rgba(10, 15, 25, 0.98) 100%);
+    --st-gradient-button: linear-gradient(180deg, #4a9eff 0%, #2a6ecc 100%);
+    --st-gradient-button-hover: linear-gradient(180deg, #5ab0ff 0%, #4a9eff 100%);
+
+    /* Glow Effects */
+    --st-shadow-glow-blue: 0 0 20px rgba(74, 158, 255, 0.3);
+    --st-shadow-glow-gold: 0 0 20px rgba(255, 200, 68, 0.3);
+    --st-shadow-glow-primary: 0 0 15px var(--theme-primary);
+
+    /* Animation Speeds */
+    --theme-transition-fast: 0.15s ease;
+    --theme-transition-normal: 0.25s ease;
+    --theme-transition-slow: 0.4s ease;
+}
+
+/* ===========================================
+   FIXED LAYOUT STRUCTURE
+   These positions NEVER change between themes
+   =========================================== */
+
+.game-layout {
+    display: grid;
+    grid-template-areas:
+        "header header header"
+        "nav    main   context"
+        "nav    main   context"
+        "status status status";
+    grid-template-columns: var(--nav-width, 120px) 1fr var(--context-width, 0px);
+    grid-template-rows: var(--header-height, 60px) 1fr auto var(--status-height, 32px);
+    min-height: 100vh;
+    background: var(--theme-bg);
+}
+
+.game-header { grid-area: header; }
+.game-nav { grid-area: nav; }
+.game-main { grid-area: main; }
+.game-context { grid-area: context; }
+.game-status { grid-area: status; }
+
+/* Minimap is positioned absolutely within main */
+.game-minimap {
+    position: fixed;
+    bottom: calc(var(--status-height, 32px) + 16px);
+    left: calc(var(--nav-width, 120px) + 16px);
+    width: var(--minimap-size, 200px);
+    height: var(--minimap-size, 200px);
+    z-index: 100;
+}

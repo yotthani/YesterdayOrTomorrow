@@ -15,7 +15,7 @@ public class PlayerFaction : AggregateRoot
     public Guid GameId { get; private set; }
     public RaceType Race { get; private set; }
     public RaceType RaceType => Race;  // Alias
-    public string Name { get; private set; }
+    public string Name { get; private set; } = default!;
     public bool IsEliminated { get; private set; }
     
     // Leadership
@@ -44,7 +44,7 @@ public class PlayerFaction : AggregateRoot
     public IReadOnlyList<FactionTrait> Traits => _traits.AsReadOnly();
     
     // Reputation with minor factions
-    public GalacticReputation Reputation { get; private set; }
+    public GalacticReputation Reputation { get; private set; } = default!;
     
     // Diplomacy
     private readonly Dictionary<Guid, DiplomaticRelation> _relations = new();

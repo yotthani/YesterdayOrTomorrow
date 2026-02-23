@@ -1,0 +1,476 @@
+@page "/game/theme-test"
+@page "/ui-test"
+@layout EmptyLayout
+@using MudBlazor
+@using StarTrekGame.Web.Services
+@using StarTrekGame.Web.Components.FactionUI
+@inject ThemeService ThemeService
+@inject FactionTemplateService TemplateService
+@inject IJSRuntime JS
+
+<PageTitle>UI Theme Test - @_currentTheme.ToUpper()</PageTitle>
+
+@{
+    var template = TemplateService.GetTemplate(_currentTheme);
+}
+
+@* Theme Selector - Fixed at top (always visible) *@
+<div class="theme-selector-fixed">
+    <span class="selector-label">THEME:</span>
+    @foreach (var factionId in TemplateService.GetAllFactionIds())
+    {
+        var t = TemplateService.GetTemplate(factionId);
+        <button class="theme-select-btn @(_currentTheme == factionId ? "active" : "")"
+                style="--btn-color: @t.Colors.Primary"
+                @onclick="() => SetTheme(factionId)">
+            @factionId.ToUpper()
+        </button>
+    }
+</div>
+
+@* Template Info Display *@
+<div class="template-info">
+    <span>Template: <strong>@template.Name</strong></span>
+    <span>Layout: @template.Layout.GridAreas</span>
+    <span>Features: @string.Join(", ", template.Layout.Features)</span>
+</div>
+
+@* Full Templated Layout - structure changes per faction *@
+<TemplatedLayout Class="theme-test-layout"
+                 EdgeNavItems="@_edgeNavItems"
+                 EdgeStatusItems="@_edgeStatusItems"
+                 EdgeToothItems="@_edgeToothItems"
+                 Title="@GetEdgeTitle(_currentTheme)"
+                 Emblem="@GetEdgeEmblem(_currentTheme)">
+    <HeaderContent>
+        <TemplatedHeader Title="GALACTIC STRATEGY" Subtitle="@GetFactionSubtitle(_currentTheme)">
+            <ResourceContent>
+                <div class="resource-display"><span>⚡</span><span class="value">12,450</span></div>
+                <div class="resource-display"><span>💎</span><span class="value">3,280</span></div>
+                <div class="resource-display"><span>🔬</span><span class="value">890</span></div>
+            </ResourceContent>
+            <ActionContent>
+                <TemplatedButton Class="end-turn">END TURN</TemplatedButton>
+            </ActionContent>
+        </TemplatedHeader>
+    </HeaderContent>
+
+    <SidebarLeftContent>
+        <TemplatedSidebar NavItems="@_navItems" />
+    </SidebarLeftContent>
+
+    <MainContent>
+        <div class="content-panels">
+            @* Templated Panel - Buttons Test *@
+            <TemplatedPanel Title="TEMPLATED BUTTONS" Class="test-card">
+                <div class="button-grid">
+                    <TemplatedButton>PRIMARY</TemplatedButton>
+                    <TemplatedButton Class="secondary">SECONDARY</TemplatedButton>
+                    <TemplatedButton Class="danger">DANGER</TemplatedButton>
+                </div>
+                <p class="info-text">
+                    Shape: <code>@template.Button.Shape</code><br/>
+                    Structure: <code>@string.Join(" → ", template.Button.Structure)</code>
+                </p>
+            </TemplatedPanel>
+
+            @* Templated Panel - Status Display *@
+            <TemplatedPanel Title="STATUS DISPLAY" Class="test-card">
+                <div class="status-row">
+                    <span class="status-label">Hull Integrity</span>
+                    <div class="status-bar"><div class="status-fill health" style="width:85%"></div></div>
+                    <span class="data-value">85%</span>
+                </div>
+                <div class="status-row">
+                    <span class="status-label">Shield Power</span>
+                    <div class="status-bar"><div class="status-fill shields" style="width:62%"></div></div>
+                    <span class="data-value">62%</span>
+                </div>
+                <div class="status-row">
+                    <span class="status-label">Critical</span>
+                    <div class="status-bar"><div class="status-fill danger" style="width:23%"></div></div>
+                    <span class="data-value">23%</span>
+                </div>
+            </TemplatedPanel>
+
+            @* Templated Panel - Fleet Roster *@
+            <TemplatedPanel Title="FLEET ROSTER" Class="test-card">
+                <div class="fleet-item">
+                    <span class="fleet-name">1st Exploration Fleet</span>
+                    <span class="fleet-status online">ACTIVE</span>
+                </div>
+                <div class="fleet-item">
+                    <span class="fleet-name">Home Defense Force</span>
+                    <span class="fleet-status online">PATROL</span>
+                </div>
+                <div class="fleet-item">
+                    <span class="fleet-name">Construction Corps</span>
+                    <span class="fleet-status offline">DOCKED</span>
+                </div>
+            </TemplatedPanel>
+
+            @* Template Structure Info *@
+            <TemplatedPanel Title="LAYOUT INFO" Class="test-card">
+                <div class="template-details">
+                    <h4>Grid Areas:</h4>
+                    <code>@template.Layout.GridAreas</code>
+
+                    <h4>Active Areas:</h4>
+                    <code>@string.Join(" | ", template.Layout.Areas)</code>
+
+                    <h4>Features:</h4>
+                    @if (template.Layout.Features.Any())
+                    {
+                        <ul>
+                            @foreach (var feature in template.Layout.Features)
+                            {
+                                <li><code>@feature</code></li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p>None</p>
+                    }
+
+                    <h4>Colors:</h4>
+                    <div class="color-swatches">
+                        <span class="swatch" style="background: @template.Colors.Primary" title="Primary">P</span>
+                        <span class="swatch" style="background: @template.Colors.Secondary" title="Secondary">S</span>
+                        <span class="swatch" style="background: @template.Colors.Accent" title="Accent">A</span>
+                    </div>
+                </div>
+            </TemplatedPanel>
+        </div>
+    </MainContent>
+
+    <SidebarRightContent>
+        <TemplatedPanel Title="SELECTION INFO" Class="context-panel">
+            <div class="selection-title">USS Enterprise</div>
+            <div class="selection-subtitle">Constitution-class - NCC-1701</div>
+            <hr class="divider" />
+            <div class="stat-row"><span class="data-label">Hull</span><span class="data-value">2,500</span></div>
+            <div class="stat-row"><span class="data-label">Shields</span><span class="data-value">1,800</span></div>
+            <div class="stat-row"><span class="data-label">Crew</span><span class="data-value">430</span></div>
+            <hr class="divider" />
+            <TemplatedButton Class="action-full">MOVE</TemplatedButton>
+            <TemplatedButton Class="action-full">PATROL</TemplatedButton>
+            <TemplatedButton Class="action-full danger">ATTACK</TemplatedButton>
+        </TemplatedPanel>
+    </SidebarRightContent>
+
+    <CommandContent>
+        @foreach (var cmd in GetCommandItems(_currentTheme))
+        {
+            <TemplatedButton>@cmd</TemplatedButton>
+        }
+    </CommandContent>
+
+    <FooterContent>
+        @{
+            var footerData = GetFooterData(_currentTheme);
+        }
+        @if (footerData.IsButtons)
+        {
+            @foreach (var btn in footerData.Items)
+            {
+                <TemplatedButton Class="@(btn.StartsWith("⚠") || btn.StartsWith("ATTACK") ? "danger" : "")">@btn</TemplatedButton>
+            }
+        }
+        else
+        {
+            @foreach (var status in footerData.Items)
+            {
+                <span class="faction-status" style="color: @footerData.Color; @footerData.ExtraCss">@status</span>
+            }
+        }
+    </FooterContent>
+</TemplatedLayout>
+
+<style>
+    /* Theme selector - fixed above everything */
+    .theme-selector-fixed {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 99999;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        background: rgba(0,0,0,0.95);
+        border-bottom: 2px solid var(--theme-primary, #4a9eff);
+    }
+    .selector-label { font-size: 10px; color: #666; letter-spacing: 2px; }
+    .theme-select-btn {
+        padding: 4px 12px;
+        background: transparent;
+        border: 1px solid var(--btn-color);
+        color: var(--btn-color);
+        font-size: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.15s;
+    }
+    .theme-select-btn:hover { background: var(--btn-color); color: #000; }
+    .theme-select-btn.active { background: var(--btn-color); color: #000; box-shadow: 0 0 10px var(--btn-color); }
+
+    /* Template info bar */
+    .template-info {
+        position: fixed;
+        top: 36px;
+        left: 0;
+        right: 0;
+        z-index: 99998;
+        display: flex;
+        gap: 20px;
+        padding: 4px 12px;
+        background: rgba(0,0,0,0.8);
+        font-size: 10px;
+        color: #888;
+    }
+    .template-info strong { color: var(--theme-primary, #4a9eff); }
+
+    /* Layout adjustment for fixed bars */
+    .theme-test-layout {
+        padding-top: 56px !important;
+    }
+
+    /* Resource displays in header */
+    .resource-display { display: flex; align-items: center; gap: 6px; padding: 6px 12px; background: rgba(0,0,0,0.3); border-radius: 4px; color: var(--st-text-bright, #d0e4f8); }
+    .resource-display .value { font-weight: 600; }
+
+    /* Content grid */
+    .content-panels { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; padding: 16px; }
+
+    /* Inside panels */
+    .button-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; }
+    .info-text { font-size: 11px; color: var(--st-text-muted, #708898); margin: 0; }
+    .info-text code { background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 3px; color: var(--theme-primary, #4a9eff); }
+
+    /* Status rows */
+    .status-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .status-label { width: 100px; font-size: 11px; color: var(--st-text-muted, #708898); }
+    .status-bar { flex: 1; height: 8px; background: var(--st-bg-dark, #080c10); border-radius: 4px; overflow: hidden; }
+    .status-fill { height: 100%; border-radius: 4px; }
+    .status-fill.health { background: linear-gradient(90deg, #44ff88, #88ffaa); }
+    .status-fill.shields { background: linear-gradient(90deg, #4488ff, #88aaff); }
+    .status-fill.danger { background: linear-gradient(90deg, #ff4444, #ff6666); }
+    .data-value { color: var(--st-text-bright, #d0e4f8); font-weight: 600; font-size: 12px; }
+
+    /* Fleet items */
+    .fleet-item { display: flex; justify-content: space-between; padding: 10px; background: var(--st-bg-dark, #080c10); border-radius: 4px; margin-bottom: 8px; }
+    .fleet-name { font-weight: 600; color: var(--st-text-bright, #d0e4f8); }
+    .fleet-status { font-size: 10px; padding: 2px 8px; border-radius: 4px; }
+    .fleet-status.online { background: rgba(68,255,136,0.2); color: #44ff88; }
+    .fleet-status.offline { background: rgba(100,100,100,0.2); color: #888; }
+
+    /* Template details */
+    .template-details h4 { color: var(--theme-primary, #4a9eff); font-size: 11px; margin: 12px 0 6px; letter-spacing: 1px; }
+    .template-details h4:first-child { margin-top: 0; }
+    .template-details code { background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 3px; font-size: 10px; color: var(--st-text-bright, #d0e4f8); }
+    .template-details ul { margin: 0; padding-left: 20px; font-size: 11px; }
+    .template-details li { margin: 4px 0; color: var(--st-text-muted, #708898); }
+    .color-swatches { display: flex; gap: 8px; }
+    .swatch { width: 30px; height: 30px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 12px; color: #000; }
+
+    /* Context panel */
+    .selection-title { font-size: 16px; font-weight: 600; color: var(--st-text-bright, #d0e4f8); }
+    .selection-subtitle { font-size: 11px; color: var(--st-text-muted, #708898); margin-top: 4px; }
+    .divider { border: none; border-top: 1px solid var(--st-border-dark, rgba(74,158,255,0.2)); margin: 12px 0; }
+    .stat-row { display: flex; justify-content: space-between; padding: 6px 0; }
+    .data-label { color: var(--st-text-muted, #708898); font-size: 12px; }
+    .context-panel .templated-btn.action-full { width: 100%; margin-bottom: 8px; }
+
+    /* Templated button sizing */
+    .templated-btn.end-turn { padding: 10px 24px; }
+
+    /* Faction status text (data-driven via inline style) */
+    .faction-status {
+        font-size: 10px;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+    }
+</style>
+
+@implements IAsyncDisposable
+
+@code {
+    private string _currentTheme = "default";
+    private string _originalTheme = "default";  // Store original to restore on leave
+    private List<TemplatedSidebar.NavItemData> _navItems = new();
+
+    // Klingon edge navigation items
+    private List<TemplatedLayout.EdgeNavItem>? _edgeNavItems;
+    private List<TemplatedLayout.EdgeNavItem>? _edgeStatusItems;
+    private List<TemplatedLayout.EdgeToothItem>? _edgeToothItems;
+
+    protected override void OnInitialized()
+    {
+        // Store the original theme so we can restore it when leaving
+        _originalTheme = ThemeService.CurrentTheme;
+        _currentTheme = "default";  // Start with default for testing
+        InitializeNavItems();
+        InitializeEdgeNavItems();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // Apply default theme temporarily (without saving to localStorage)
+            await ThemeService.ApplyTemporaryThemeAsync(_currentTheme);
+        }
+    }
+
+    private void InitializeNavItems()
+    {
+        _navItems = new List<TemplatedSidebar.NavItemData>
+        {
+            new() { Label = "GALAXY", Icon = "G", IsActive = true },
+            new() { Label = "SYSTEMS", Icon = "S", IsActive = false },
+            new() { Label = "FLEETS", Icon = "F", IsActive = false },
+            new() { Label = "DIPLOMACY", Icon = "D", IsActive = false },
+            new() { Label = "RESEARCH", Icon = "R", IsActive = false },
+            new() { Label = "ECONOMY", Icon = "E", IsActive = false }
+        };
+    }
+
+    private string GetFactionSubtitle(string theme) => theme switch
+    {
+        "federation" => "United Federation of Planets",
+        "klingon" => "Klingon Empire",
+        "romulan" => "Romulan Star Empire",
+        "borg" => "COLLECTIVE DESIGNATION ALPHA",
+        "cardassian" => "Cardassian Union",
+        "dominion" => "The Dominion",
+        "ferengi" => "Ferengi Alliance",
+        "bajoran" => "Bajoran Republic",
+        "tholian" => "Tholian Assembly",
+        "gorn" => "Gorn Hegemony",
+        "breen" => "Breen Confederacy",
+        "orion" => "Orion Syndicate",
+        "kazon" => "Kazon Sects",
+        "hirogen" => "Hirogen Hunters",
+        _ => "Star Trek Universe"
+    };
+
+    private async Task SetTheme(string theme)
+    {
+        _currentTheme = theme;
+        UpdateEdgeNavForTheme(theme);
+        // Use temporary theme - doesn't save to localStorage, doesn't affect other pages
+        await ThemeService.ApplyTemporaryThemeAsync(theme);
+        StateHasChanged();
+    }
+
+    private void InitializeEdgeNavItems()
+    {
+        UpdateEdgeNavForTheme(_currentTheme);
+    }
+
+    private void UpdateEdgeNavForTheme(string theme)
+    {
+        // Edge nav items are themed per faction (used by edge-nav layout feature)
+        var (navItems, statusItems, toothItems) = GetEdgeNavData(theme);
+        _edgeNavItems = navItems;
+        _edgeStatusItems = statusItems;
+        _edgeToothItems = toothItems;
+    }
+
+    private (List<TemplatedLayout.EdgeNavItem>, List<TemplatedLayout.EdgeNavItem>, List<TemplatedLayout.EdgeToothItem>) GetEdgeNavData(string theme) => theme switch
+    {
+        "klingon" => (
+            new() { new() { Label = "COMBAT", IsActive = true }, new() { Label = "FLEET" }, new() { Label = "EMPIRE" }, new() { Label = "HONOR" }, new() { Label = "WAR" } },
+            new() { new() { Label = "ALERTS" }, new() { Label = "SHIELDS" }, new() { Label = "POWER" } },
+            new() { new() { Icon = "⚔", IsPrimary = false }, new() { Icon = "🔥" }, new() { Icon = "⚡", IsPrimary = true }, new() { Icon = "💀" }, new() { Icon = "🏆" } }
+        ),
+        "hirogen" => (
+            new() { new() { Label = "HUNT", IsActive = true }, new() { Label = "TRACK" }, new() { Label = "TROPHY" }, new() { Label = "SENSOR" }, new() { Label = "PREY" } },
+            new() { new() { Label = "TARGETS" }, new() { Label = "RANGE" }, new() { Label = "STATUS" } },
+            new() { new() { Icon = "🎯", IsPrimary = false }, new() { Icon = "🔍" }, new() { Icon = "⚡", IsPrimary = true }, new() { Icon = "🏆" }, new() { Icon = "🗡" } }
+        ),
+        "kazon" => (
+            new() { new() { Label = "RAID", IsActive = true }, new() { Label = "SECT" }, new() { Label = "TERRITORY" }, new() { Label = "FIGHT" } },
+            new() { new() { Label = "RAIDS" }, new() { Label = "POWER" }, new() { Label = "SECTS" } },
+            new() { new() { Icon = "⚔" }, new() { Icon = "🔥", IsPrimary = true }, new() { Icon = "💀" }, new() { Icon = "⚡" } }
+        ),
+        "gorn" => (
+            new() { new() { Label = "HUNT", IsActive = true }, new() { Label = "HIVE" }, new() { Label = "BREED" }, new() { Label = "EXPAND" } },
+            new() { new() { Label = "EGGS" }, new() { Label = "SHIELDS" }, new() { Label = "PREY" } },
+            new() { new() { Icon = "🥚" }, new() { Icon = "🦎", IsPrimary = true }, new() { Icon = "🎯" }, new() { Icon = "⚡" } }
+        ),
+        _ => (
+            new() { new() { Label = "FLEET", IsActive = true }, new() { Label = "SYSTEMS" }, new() { Label = "DIPLOMACY" }, new() { Label = "RESEARCH" } },
+            new() { new() { Label = "ALERTS" }, new() { Label = "STATUS" }, new() { Label = "COMMS" } },
+            new() { new() { Icon = "🚀" }, new() { Icon = "🌟", IsPrimary = true }, new() { Icon = "⚡" }, new() { Icon = "🔬" } }
+        )
+    };
+
+    private string GetEdgeTitle(string theme) => theme switch
+    {
+        "klingon" => "GLORY TO THE EMPIRE",
+        "hirogen" => "THE HUNT IS ETERNAL",
+        "kazon" => "STRENGTH THROUGH CONQUEST",
+        "gorn" => "THE HEGEMONY ENDURES",
+        _ => ""
+    };
+
+    private string GetEdgeEmblem(string theme) => theme switch
+    {
+        "klingon" => "⚔",
+        "hirogen" => "🎯",
+        "kazon" => "🔥",
+        "gorn" => "🦎",
+        _ => ""
+    };
+
+    // Data-driven command bar items per faction
+    private string[] GetCommandItems(string theme) => theme switch
+    {
+        "dominion" => new[] { "FLEET COMMAND", "SUBJECT WORLDS", "KETRACEL WHITE" },
+        "cardassian" => new[] { "CENTRAL COMMAND", "OBSIDIAN ORDER", "SECTOR CONTROL" },
+        "borg" => new[] { "ASSIMILATE", "ADAPT", "COLLECTIVE LINK" },
+        "ferengi" => new[] { "PROFIT REPORT", "TRADE ROUTES", "LATINUM RESERVES" },
+        "federation" => new[] { "STARFLEET COMMAND", "DIPLOMACY", "EXPLORATION" },
+        "klingon" => new[] { "HIGH COUNCIL", "BATTLE PLANS", "HONOR GUARD" },
+        "romulan" => new[] { "TAL SHIAR", "CLOAKING OPS", "SENATE ORDERS" },
+        "bajoran" => new[] { "VEDEK ASSEMBLY", "MILITIA OPS", "ORB COUNSEL" },
+        "tholian" => new[] { "ASSEMBLY DIRECTIVE", "WEB DEPLOYMENT", "THERMAL OPS" },
+        "gorn" => new[] { "HIVE COMMAND", "BREEDING STATUS", "HUNT ORDERS" },
+        "breen" => new[] { "CONFEDERACY OPS", "ENERGY DAMPENER", "FLEET STATUS" },
+        "orion" => new[] { "SYNDICATE DEALS", "BLACK MARKET", "SMUGGLING OPS" },
+        "kazon" => new[] { "SECT COUNCIL", "RAID TARGETS", "TERRITORY" },
+        "hirogen" => new[] { "ALPHA'S ORDERS", "PREY DATABASE", "TROPHY HALL" },
+        _ => new[] { "FLEET COMMAND", "SYSTEMS", "OPERATIONS" }
+    };
+
+    // Data-driven footer content per faction
+    private record FooterContentData(bool IsButtons, string[] Items, string Color, string ExtraCss = "");
+
+    private FooterContentData GetFooterData(string theme) => theme switch
+    {
+        "klingon" => new(true, new[] { "ATTACK", "HONOR GUARD", "GLORY TO EMPIRE" }, ""),
+        "borg" => new(false, new[] { "COLLECTIVE STATUS: OPTIMAL", "DRONES: 1,847,293", "ASSIMILATION: 78%" }, "#00FF00", "font-family: 'Roboto Mono', monospace; text-shadow: 0 0 5px rgba(0,255,0,0.5);"),
+        "cardassian" => new(false, new[] { "SECTOR STATUS: MONITORED", "ALERTS: 3", "HIERARCHY: CENTRAL" }, "#FFAA44"),
+        "dominion" => new(false, new[] { "THE FOUNDERS WILL IT" }, "#CC99FF", "font-size: 12px; letter-spacing: 2px;"),
+        "ferengi" => new(false, new[] { "PROFIT: ▲ +12.4%", "LATINUM: 8,420 bars", "RULE OF ACQUISITION #34" }, "#FFD700"),
+        "federation" => new(false, new[] { "STARFLEET COMMAND: ONLINE", "SUBSPACE: CLEAR", "MISSION: EXPLORATION" }, "#FF9900"),
+        "romulan" => new(false, new[] { "TAL SHIAR: MONITORING", "CLOAKING: AVAILABLE", "SENATE: IN SESSION" }, "#00AA44"),
+        "bajoran" => new(false, new[] { "PROPHETS GUIDE US", "ORB RESONANCE: STABLE", "MILITIA: VIGILANT" }, "#00BBCC"),
+        "tholian" => new(false, new[] { "WEB STATUS: INTACT", "THERMAL: 480°K", "ASSEMBLY: UNIFIED" }, "#FF8800"),
+        "gorn" => new(false, new[] { "HIVE: ACTIVE", "EGG CHAMBERS: WARM", "HUNT: IN PROGRESS" }, "#FF6622"),
+        "breen" => new(false, new[] { "CONFEDERACY: UNIFIED", "DAMPENER: CHARGED", "COMM: ENCRYPTED" }, "#FFAA33"),
+        "orion" => new(false, new[] { "SYNDICATE: OPERATIONAL", "DEALS: 12 PENDING", "PROFIT: ▲ HIGH" }, "#33AA66"),
+        "kazon" => new(true, new[] { "RAID", "SEIZE", "CONQUER" }, ""),
+        "hirogen" => new(false, new[] { "HUNT STATUS: ACTIVE", "PREY: 3 TRACKED", "TROPHIES: 47" }, "#557744"),
+        _ => new(false, new[] { "SYSTEM READY" }, "#4a9eff")
+    };
+
+    public async ValueTask DisposeAsync()
+    {
+        // Restore the original theme when leaving the page
+        await ThemeService.RestorePersistedThemeAsync();
+    }
+}

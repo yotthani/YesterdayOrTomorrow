@@ -1,0 +1,232 @@
+/* ===========================================
+   ROMULAN THEME - WARBIRD BRIDGE CONSOLE
+
+   Design Philosophy: Elegant deception - refined, sophisticated,
+   hiding secrets. The UI of spies and senators.
+
+   Visual Language:
+   - Emerald green with bronze/gold accents
+   - Flowing curves and lens shapes
+   - V-motif (bird of prey wings)
+   - Subtle shimmer and reveal effects
+   - Elegant serif-influenced typography
+   - Smooth transitions
+   =========================================== */
+
+/* ===== ROMULAN THEME VARIABLES ===== */
+html[data-theme="romulan"],
+html[data-theme="romulan"] .stellaris-layout,
+html[data-theme="romulan"] .stellaris-app {
+    --theme-primary: #00aa44;
+    --theme-secondary: #44ff88;
+    --theme-accent: #d4af37;
+    --theme-text: #ccffdd;
+    --theme-text-dim: #88aa99;
+    --theme-bg: #020a05;
+    --theme-panel-bg: rgba(5, 20, 12, 0.98);
+    --theme-border-radius: 2px;
+    --theme-btn-radius: 4px;
+    --theme-border-width: 1px;
+    --theme-corner-style: flowing;
+
+    --st-accent-blue: #00aa44;
+    --st-accent-cyan: #44ff88;
+    --st-accent-gold: #d4af37;
+    --st-accent-orange: #66cc66;
+    --st-accent-green: #00ff66;
+    --st-accent-red: #ff4444;
+    --st-accent-purple: #44aa88;
+
+    --st-bg-darkest: #020804;
+    --st-bg-darker: #041008;
+    --st-bg-dark: #081810;
+    --st-bg-medium: #102018;
+    --st-bg-light: #183020;
+    --st-bg-lighter: #204028;
+
+    --st-border-dark: rgba(0, 170, 68, 0.3);
+    --st-border-medium: rgba(0, 170, 68, 0.5);
+    --st-border-light: rgba(68, 255, 136, 0.6);
+    --st-border-bright: rgba(68, 255, 136, 0.8);
+
+    --st-text-dim: #558866;
+    --st-text-muted: #77aa88;
+    --st-text-normal: #99ccaa;
+    --st-text-bright: #ccffdd;
+
+    --st-gradient-header: linear-gradient(180deg, #0a1a10 0%, #051008 100%);
+    --st-gradient-panel: linear-gradient(180deg, rgba(10, 25, 18, 0.95) 0%, rgba(5, 15, 10, 0.98) 100%);
+    --st-gradient-button: linear-gradient(180deg, #00aa44 0%, #006633 100%);
+    --st-gradient-button-hover: linear-gradient(180deg, #00cc55 0%, #00aa44 100%);
+
+    --st-shadow-glow-blue: 0 0 20px rgba(68, 255, 136, 0.3);
+    --st-shadow-glow-gold: 0 0 20px rgba(212, 175, 55, 0.4);
+}
+
+
+/* ===== ROMULAN PANEL STYLE ===== */
+/* Elegant with bronze top border and left accent */
+html[data-theme="romulan"] .mud-paper,
+html[data-theme="romulan"] .mud-card {
+    background: var(--st-gradient-panel) !important;
+    border: 1px solid rgba(0, 170, 68, 0.4) !important;
+    border-left: 4px solid #00aa44 !important;
+    border-radius: 2px !important;
+    position: relative;
+}
+
+/* Bronze gradient top bar */
+html[data-theme="romulan"] .mud-paper::before,
+html[data-theme="romulan"] .mud-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg,
+        #d4af37 0%,
+        #44ffaa 30%,
+        #00ffcc 50%,
+        #44ffaa 70%,
+        #d4af37 100%
+    );
+    pointer-events: none;
+    z-index: 1;
+}
+
+
+/* ===== ROMULAN BUTTONS ===== */
+html[data-theme="romulan"] .mud-button-root {
+    border-radius: 4px !important;
+    text-transform: capitalize !important;
+    letter-spacing: 1px !important;
+    font-weight: 500 !important;
+}
+
+html[data-theme="romulan"] .mud-button-filled {
+    background: linear-gradient(180deg, #00bb55 0%, #008844 50%, #006633 100%) !important;
+    color: #000 !important;
+    border: 1px solid #44ffaa !important;
+    box-shadow: 0 0 15px rgba(68, 255, 136, 0.3) !important;
+}
+
+html[data-theme="romulan"] .mud-button-filled:hover {
+    background: linear-gradient(180deg, #00dd66 0%, #00aa55 100%) !important;
+    box-shadow: 0 0 25px rgba(68, 255, 136, 0.5) !important;
+}
+
+html[data-theme="romulan"] .mud-button-outlined {
+    border: 1px solid #00aa44 !important;
+    color: #44ff88 !important;
+    background: rgba(0, 100, 50, 0.2) !important;
+}
+
+
+/* ===== ROMULAN APP BAR ===== */
+html[data-theme="romulan"] .mud-appbar {
+    background: linear-gradient(180deg, #0a1810 0%, #051008 100%) !important;
+    border-bottom: 2px solid !important;
+    border-image: linear-gradient(90deg, transparent, #00aa44, #44ffaa, #00aa44, transparent) 1 !important;
+    position: relative;
+}
+
+/* V-motif accent (bird wings) */
+html[data-theme="romulan"] .mud-appbar::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 50px solid transparent;
+    border-right: 50px solid transparent;
+    border-top: 20px solid #00aa44;
+    filter: drop-shadow(0 0 15px rgba(68, 255, 170, 0.5));
+    pointer-events: none;
+}
+
+
+/* ===== ROMULAN DRAWER/SIDEBAR ===== */
+html[data-theme="romulan"] .mud-drawer {
+    background: linear-gradient(90deg, #051008 0%, #081810 100%) !important;
+    border-right: none !important;
+    position: relative;
+}
+
+/* Elegant glowing edge */
+html[data-theme="romulan"] .mud-drawer::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 3px;
+    height: 100%;
+    background: linear-gradient(180deg,
+        transparent 0%,
+        #00aa44 10%,
+        #44ffaa 30%,
+        #00ffcc 50%,
+        #44ffaa 70%,
+        #00aa44 90%,
+        transparent 100%
+    );
+    box-shadow: 0 0 15px rgba(68, 255, 170, 0.5);
+    pointer-events: none;
+}
+
+
+/* ===== ROMULAN NAVIGATION LINKS ===== */
+html[data-theme="romulan"] .mud-nav-link {
+    border-radius: 2px !important;
+    margin: 4px 8px !important;
+    padding: 10px 16px !important;
+    background: rgba(0, 100, 50, 0.15) !important;
+    border-left: 2px solid transparent !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+html[data-theme="romulan"] .mud-nav-link:hover {
+    background: rgba(0, 170, 68, 0.25) !important;
+    border-left-color: #44ffaa !important;
+}
+
+html[data-theme="romulan"] .mud-nav-link.active {
+    background: linear-gradient(90deg, rgba(0, 170, 68, 0.4) 0%, transparent 100%) !important;
+    color: #ccffdd !important;
+    border-left-color: #d4af37 !important;
+}
+
+
+/* ===== ROMULAN SPECIFIC DECORATIONS ===== */
+
+/* Subtle green pulse */
+@keyframes romulan-pulse {
+    0%, 100% {
+        box-shadow: 0 0 10px rgba(68, 255, 136, 0.2);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(68, 255, 136, 0.4);
+    }
+}
+
+html[data-theme="romulan"] .status-glow {
+    animation: romulan-pulse 3s ease-in-out infinite;
+}
+
+/* Hidden panel reveal effect */
+@keyframes romulan-reveal {
+    0% { opacity: 0.5; transform: translateY(5px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+html[data-theme="romulan"] .panel-reveal {
+    animation: romulan-reveal 0.5s ease-out;
+}
+
+/* Bronze honor highlight */
+html[data-theme="romulan"] .honor-highlight {
+    border-color: #d4af37 !important;
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.4) !important;
+}

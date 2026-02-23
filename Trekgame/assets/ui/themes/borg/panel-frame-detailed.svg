@@ -1,0 +1,249 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" fill="none">
+  <!-- BORG DETAILED PANEL: Cybernetic grid structure with green circuitry and assimilation aesthetic -->
+  <defs>
+    <!-- Borg color gradients -->
+    <linearGradient id="borgBlack" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#1A1A1A"/>
+      <stop offset="50%" style="stop-color:#0A0A0A"/>
+      <stop offset="100%" style="stop-color:#1A1A1A"/>
+    </linearGradient>
+
+    <linearGradient id="borgGreen" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#00FF00"/>
+      <stop offset="50%" style="stop-color:#00AA00"/>
+      <stop offset="100%" style="stop-color:#00FF00"/>
+    </linearGradient>
+
+    <linearGradient id="borgGreenDark" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#00AA00"/>
+      <stop offset="50%" style="stop-color:#005500"/>
+      <stop offset="100%" style="stop-color:#00AA00"/>
+    </linearGradient>
+
+    <linearGradient id="borgMetal" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3A3A3A"/>
+      <stop offset="30%" style="stop-color:#252525"/>
+      <stop offset="70%" style="stop-color:#252525"/>
+      <stop offset="100%" style="stop-color:#3A3A3A"/>
+    </linearGradient>
+
+    <!-- Hexagonal grid pattern -->
+    <pattern id="borgHexGrid" x="0" y="0" width="40" height="46" patternUnits="userSpaceOnUse">
+      <path d="M 20 0 L 40 12 L 40 35 L 20 46 L 0 35 L 0 12 Z" fill="none" stroke="rgba(0,255,0,0.08)" stroke-width="0.5"/>
+      <path d="M 0 0 L 20 12 L 20 35 L 0 46" fill="none" stroke="rgba(0,255,0,0.08)" stroke-width="0.5"/>
+      <path d="M 40 0 L 20 12" fill="none" stroke="rgba(0,255,0,0.08)" stroke-width="0.5"/>
+    </pattern>
+
+    <!-- Circuit board pattern -->
+    <pattern id="borgCircuit" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
+      <rect width="100" height="100" fill="transparent"/>
+      <!-- Horizontal lines -->
+      <line x1="0" y1="20" x2="30" y2="20" stroke="rgba(0,255,0,0.15)" stroke-width="1"/>
+      <line x1="40" y1="20" x2="60" y2="20" stroke="rgba(0,255,0,0.1)" stroke-width="0.5"/>
+      <line x1="70" y1="50" x2="100" y2="50" stroke="rgba(0,255,0,0.15)" stroke-width="1"/>
+      <line x1="0" y1="80" x2="50" y2="80" stroke="rgba(0,255,0,0.1)" stroke-width="0.5"/>
+      <!-- Vertical lines -->
+      <line x1="30" y1="20" x2="30" y2="50" stroke="rgba(0,255,0,0.15)" stroke-width="1"/>
+      <line x1="70" y1="50" x2="70" y2="100" stroke="rgba(0,255,0,0.15)" stroke-width="1"/>
+      <line x1="50" y1="60" x2="50" y2="80" stroke="rgba(0,255,0,0.1)" stroke-width="0.5"/>
+      <!-- Junction nodes -->
+      <circle cx="30" cy="20" r="2" fill="rgba(0,255,0,0.3)"/>
+      <circle cx="30" cy="50" r="1.5" fill="rgba(0,255,0,0.2)"/>
+      <circle cx="70" cy="50" r="2" fill="rgba(0,255,0,0.3)"/>
+      <circle cx="50" cy="80" r="1.5" fill="rgba(0,255,0,0.2)"/>
+    </pattern>
+
+    <!-- Glow effects -->
+    <filter id="borgGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="8" result="blur"/>
+      <feFlood flood-color="#00FF00" flood-opacity="0.6"/>
+      <feComposite in2="blur" operator="in"/>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="borgGlowSmall" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3" result="blur"/>
+      <feFlood flood-color="#00FF00" flood-opacity="0.4"/>
+      <feComposite in2="blur" operator="in"/>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Data stream animation hint -->
+    <linearGradient id="dataStream" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:rgba(0,255,0,0)"/>
+      <stop offset="50%" style="stop-color:rgba(0,255,0,0.5)"/>
+      <stop offset="100%" style="stop-color:rgba(0,255,0,0)"/>
+    </linearGradient>
+  </defs>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- MAIN FRAME - Industrial cybernetic structure -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+
+  <!-- Background base -->
+  <rect x="0" y="0" width="800" height="600" fill="url(#borgBlack)"/>
+  <rect x="0" y="0" width="800" height="600" fill="url(#borgHexGrid)"/>
+
+  <!-- Top frame bar -->
+  <rect x="0" y="0" width="800" height="60" fill="url(#borgMetal)"/>
+  <rect x="0" y="0" width="800" height="60" fill="url(#borgCircuit)"/>
+  <rect x="0" y="58" width="800" height="2" fill="url(#borgGreen)" filter="url(#borgGlow)"/>
+
+  <!-- Left frame bar -->
+  <rect x="0" y="0" width="100" height="600" fill="url(#borgMetal)"/>
+  <rect x="0" y="0" width="100" height="600" fill="url(#borgCircuit)"/>
+  <rect x="98" y="60" width="2" height="480" fill="url(#borgGreen)" filter="url(#borgGlow)"/>
+
+  <!-- Bottom frame bar -->
+  <rect x="0" y="540" width="800" height="60" fill="url(#borgMetal)"/>
+  <rect x="0" y="540" width="800" height="60" fill="url(#borgCircuit)"/>
+  <rect x="0" y="540" width="800" height="2" fill="url(#borgGreen)" filter="url(#borgGlow)"/>
+
+  <!-- Right frame bar -->
+  <rect x="750" y="60" width="50" height="480" fill="url(#borgMetal)"/>
+  <rect x="750" y="60" width="50" height="480" fill="url(#borgCircuit)"/>
+  <rect x="750" y="60" width="2" height="480" fill="url(#borgGreen)" filter="url(#borgGlow)"/>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- BORG DATA NODES - Glowing junction points -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+
+  <!-- Corner nodes -->
+  <circle cx="100" cy="60" r="8" fill="#111"/>
+  <circle cx="100" cy="60" r="5" fill="url(#borgGreen)" filter="url(#borgGlow)"/>
+
+  <circle cx="750" cy="60" r="8" fill="#111"/>
+  <circle cx="750" cy="60" r="5" fill="url(#borgGreen)" filter="url(#borgGlow)"/>
+
+  <circle cx="100" cy="540" r="8" fill="#111"/>
+  <circle cx="100" cy="540" r="5" fill="url(#borgGreen)" filter="url(#borgGlow)"/>
+
+  <circle cx="750" cy="540" r="8" fill="#111"/>
+  <circle cx="750" cy="540" r="5" fill="url(#borgGreen)" filter="url(#borgGlow)"/>
+
+  <!-- Top bar data nodes -->
+  <circle cx="200" cy="30" r="4" fill="url(#borgGreen)" filter="url(#borgGlowSmall)"/>
+  <circle cx="300" cy="30" r="3" fill="url(#borgGreenDark)"/>
+  <circle cx="400" cy="30" r="5" fill="url(#borgGreen)" filter="url(#borgGlowSmall)"/>
+  <circle cx="500" cy="30" r="3" fill="url(#borgGreenDark)"/>
+  <circle cx="600" cy="30" r="4" fill="url(#borgGreen)" filter="url(#borgGlowSmall)"/>
+  <circle cx="700" cy="30" r="3" fill="url(#borgGreenDark)"/>
+
+  <!-- Left sidebar data nodes -->
+  <circle cx="50" cy="120" r="4" fill="url(#borgGreen)" filter="url(#borgGlowSmall)"/>
+  <circle cx="50" cy="200" r="3" fill="url(#borgGreenDark)"/>
+  <circle cx="50" cy="280" r="5" fill="url(#borgGreen)" filter="url(#borgGlowSmall)"/>
+  <circle cx="50" cy="360" r="3" fill="url(#borgGreenDark)"/>
+  <circle cx="50" cy="440" r="4" fill="url(#borgGreen)" filter="url(#borgGlowSmall)"/>
+  <circle cx="50" cy="500" r="3" fill="url(#borgGreenDark)"/>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- CIRCUITRY CONNECTIONS -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+
+  <!-- Horizontal circuit traces -->
+  <line x1="100" y1="120" x2="200" y2="120" stroke="url(#borgGreen)" stroke-width="1" opacity="0.5"/>
+  <line x1="100" y1="280" x2="250" y2="280" stroke="url(#borgGreen)" stroke-width="1" opacity="0.5"/>
+  <line x1="100" y1="440" x2="180" y2="440" stroke="url(#borgGreen)" stroke-width="1" opacity="0.5"/>
+
+  <!-- Vertical circuit traces in sidebar -->
+  <line x1="30" y1="80" x2="30" y2="180" stroke="url(#borgGreen)" stroke-width="1" opacity="0.4"/>
+  <line x1="70" y1="150" x2="70" y2="350" stroke="url(#borgGreen)" stroke-width="1" opacity="0.4"/>
+  <line x1="30" y1="320" x2="30" y2="520" stroke="url(#borgGreen)" stroke-width="1" opacity="0.4"/>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- SIDEBAR INTERFACE PANELS - Assimilation style -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+
+  <!-- Panel 1 -->
+  <rect x="10" y="80" width="80" height="50" fill="#0A0A0A"/>
+  <rect x="10" y="80" width="80" height="50" fill="url(#borgHexGrid)"/>
+  <rect x="10" y="80" width="80" height="2" fill="url(#borgGreen)" opacity="0.7"/>
+  <rect x="10" y="128" width="80" height="2" fill="url(#borgGreen)" opacity="0.5"/>
+
+  <!-- Panel 2 -->
+  <rect x="10" y="150" width="80" height="60" fill="#0A0A0A"/>
+  <rect x="10" y="150" width="80" height="60" fill="url(#borgHexGrid)"/>
+  <rect x="10" y="150" width="80" height="2" fill="url(#borgGreen)" opacity="0.7"/>
+  <rect x="10" y="208" width="80" height="2" fill="url(#borgGreen)" opacity="0.5"/>
+
+  <!-- Panel 3 -->
+  <rect x="10" y="230" width="80" height="50" fill="#0A0A0A"/>
+  <rect x="10" y="230" width="80" height="50" fill="url(#borgHexGrid)"/>
+  <rect x="10" y="230" width="80" height="2" fill="url(#borgGreen)" opacity="0.7"/>
+  <rect x="10" y="278" width="80" height="2" fill="url(#borgGreen)" opacity="0.5"/>
+
+  <!-- Panel 4 -->
+  <rect x="10" y="300" width="80" height="70" fill="#0A0A0A"/>
+  <rect x="10" y="300" width="80" height="70" fill="url(#borgHexGrid)"/>
+  <rect x="10" y="300" width="80" height="2" fill="url(#borgGreen)" opacity="0.7"/>
+  <rect x="10" y="368" width="80" height="2" fill="url(#borgGreen)" opacity="0.5"/>
+
+  <!-- Panel 5 -->
+  <rect x="10" y="390" width="80" height="50" fill="#0A0A0A"/>
+  <rect x="10" y="390" width="80" height="50" fill="url(#borgHexGrid)"/>
+  <rect x="10" y="390" width="80" height="2" fill="url(#borgGreen)" opacity="0.7"/>
+  <rect x="10" y="438" width="80" height="2" fill="url(#borgGreen)" opacity="0.5"/>
+
+  <!-- Panel 6 -->
+  <rect x="10" y="460" width="80" height="60" fill="#0A0A0A"/>
+  <rect x="10" y="460" width="80" height="60" fill="url(#borgHexGrid)"/>
+  <rect x="10" y="460" width="80" height="2" fill="url(#borgGreen)" opacity="0.7"/>
+  <rect x="10" y="518" width="80" height="2" fill="url(#borgGreen)" opacity="0.5"/>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- TOP BAR DATA DISPLAYS -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+
+  <rect x="120" y="10" width="100" height="40" fill="#0A0A0A"/>
+  <rect x="120" y="10" width="100" height="1" fill="url(#borgGreen)" opacity="0.8"/>
+  <rect x="120" y="49" width="100" height="1" fill="url(#borgGreen)" opacity="0.5"/>
+
+  <rect x="240" y="10" width="120" height="40" fill="#0A0A0A"/>
+  <rect x="240" y="10" width="120" height="1" fill="url(#borgGreen)" opacity="0.8"/>
+  <rect x="240" y="49" width="120" height="1" fill="url(#borgGreen)" opacity="0.5"/>
+
+  <rect x="380" y="10" width="150" height="40" fill="#0A0A0A"/>
+  <rect x="380" y="10" width="150" height="1" fill="url(#borgGreen)" opacity="0.8"/>
+  <rect x="380" y="49" width="150" height="1" fill="url(#borgGreen)" opacity="0.5"/>
+
+  <rect x="550" y="10" width="100" height="40" fill="#0A0A0A"/>
+  <rect x="550" y="10" width="100" height="1" fill="url(#borgGreen)" opacity="0.8"/>
+  <rect x="550" y="49" width="100" height="1" fill="url(#borgGreen)" opacity="0.5"/>
+
+  <rect x="670" y="10" width="110" height="40" fill="#0A0A0A"/>
+  <rect x="670" y="10" width="110" height="1" fill="url(#borgGreen)" opacity="0.8"/>
+  <rect x="670" y="49" width="110" height="1" fill="url(#borgGreen)" opacity="0.5"/>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- CONTENT AREA - Borg collective interface -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+
+  <rect x="105" y="65" width="640" height="470" fill="rgba(0,5,0,0.95)"/>
+  <rect x="105" y="65" width="640" height="470" fill="url(#borgHexGrid)"/>
+
+  <!-- Data stream overlay hint -->
+  <rect x="105" y="65" width="640" height="2" fill="url(#dataStream)" opacity="0.3"/>
+  <rect x="105" y="533" width="640" height="2" fill="url(#dataStream)" opacity="0.3"/>
+
+  <!-- Grid scan effect -->
+  <pattern id="borgScan" x="0" y="0" width="4" height="4" patternUnits="userSpaceOnUse">
+    <rect width="4" height="2" fill="rgba(0,50,0,0.05)"/>
+  </pattern>
+  <rect x="105" y="65" width="640" height="470" fill="url(#borgScan)"/>
+
+  <!-- BORG TEXT: "RESISTANCE IS FUTILE" encoded in the design -->
+  <!-- Represented as data blocks -->
+  <rect x="300" y="550" width="200" height="40" fill="#0A0A0A"/>
+  <rect x="300" y="550" width="200" height="1" fill="url(#borgGreen)" filter="url(#borgGlowSmall)"/>
+  <rect x="300" y="589" width="200" height="1" fill="url(#borgGreen)" opacity="0.5"/>
+
+  <!-- Borg designation indicator -->
+  <text x="400" y="575" font-family="monospace" font-size="10" fill="url(#borgGreen)" text-anchor="middle" opacity="0.5">COLLECTIVE INTERFACE v7.9</text>
+</svg>

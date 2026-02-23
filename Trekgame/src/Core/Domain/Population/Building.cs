@@ -8,8 +8,8 @@ namespace StarTrekGame.Domain.Population;
 /// </summary>
 public class Building : Entity
 {
-    public string Name { get; private set; }
-    public string Description { get; private set; }
+    public string Name { get; private set; } = default!;
+    public string Description { get; private set; } = default!;
     public BuildingType Type { get; private set; }
     public BuildingCategory Category { get; private set; }
     

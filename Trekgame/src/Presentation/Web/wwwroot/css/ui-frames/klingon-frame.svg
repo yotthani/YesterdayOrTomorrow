@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" preserveAspectRatio="none">
+  <defs>
+    <!-- Klingon Metal Gradient -->
+    <linearGradient id="kling-metal" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#554433"/>
+      <stop offset="30%" style="stop-color:#332211"/>
+      <stop offset="70%" style="stop-color:#221100"/>
+      <stop offset="100%" style="stop-color:#443322"/>
+    </linearGradient>
+    <linearGradient id="kling-red" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#ff4400"/>
+      <stop offset="50%" style="stop-color:#cc0000"/>
+      <stop offset="100%" style="stop-color:#880000"/>
+    </linearGradient>
+    <linearGradient id="kling-glow" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#ff6600;stop-opacity:0.8"/>
+      <stop offset="100%" style="stop-color:#cc0000;stop-opacity:0.3"/>
+    </linearGradient>
+    <!-- Red nebula background pattern -->
+    <radialGradient id="red-nebula" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" style="stop-color:#330000"/>
+      <stop offset="50%" style="stop-color:#1a0000"/>
+      <stop offset="100%" style="stop-color:#0a0000"/>
+    </radialGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect x="0" y="0" width="800" height="500" fill="url(#red-nebula)"/>
+
+  <!-- Main Frame - Rough Metal with Spikes -->
+  <!-- Top Border with Spikes -->
+  <path d="M50,30 L100,0 L120,25 L180,5 L200,30 L600,30 L620,5 L680,25 L700,0 L750,30 L750,35 L50,35 Z"
+        fill="url(#kling-metal)" stroke="#ff4400" stroke-width="1"/>
+
+  <!-- Top Left Corner Spike -->
+  <path d="M0,80 L30,30 L60,50 L50,80 Z" fill="url(#kling-metal)" stroke="#cc3300" stroke-width="1"/>
+
+  <!-- Top Right Corner Spike -->
+  <path d="M800,80 L770,30 L740,50 L750,80 Z" fill="url(#kling-metal)" stroke="#cc3300" stroke-width="1"/>
+
+  <!-- Left Border -->
+  <path d="M30,40 L50,40 L50,460 L30,460 L20,400 L30,350 L20,300 L30,250 L20,200 L30,150 L20,100 L30,40 Z"
+        fill="url(#kling-metal)" stroke="#ff4400" stroke-width="1"/>
+
+  <!-- Right Border -->
+  <path d="M770,40 L750,40 L750,460 L770,460 L780,400 L770,350 L780,300 L770,250 L780,200 L770,150 L780,100 L770,40 Z"
+        fill="url(#kling-metal)" stroke="#ff4400" stroke-width="1"/>
+
+  <!-- Bottom Border with Spikes -->
+  <path d="M50,465 L50,470 L100,500 L120,475 L180,495 L200,470 L600,470 L620,495 L680,475 L700,500 L750,470 L750,465 Z"
+        fill="url(#kling-metal)" stroke="#ff4400" stroke-width="1"/>
+
+  <!-- Bottom Corners -->
+  <path d="M0,420 L30,470 L60,450 L50,420 Z" fill="url(#kling-metal)" stroke="#cc3300" stroke-width="1"/>
+  <path d="M800,420 L770,470 L740,450 L750,420 Z" fill="url(#kling-metal)" stroke="#cc3300" stroke-width="1"/>
+
+  <!-- Glowing Red Lines -->
+  <line x1="60" y1="50" x2="60" y2="450" stroke="url(#kling-red)" stroke-width="2" filter="url(#glow)"/>
+  <line x1="740" y1="50" x2="740" y2="450" stroke="url(#kling-red)" stroke-width="2" filter="url(#glow)"/>
+  <line x1="60" y1="50" x2="740" y2="50" stroke="url(#kling-red)" stroke-width="2" filter="url(#glow)"/>
+  <line x1="60" y1="450" x2="740" y2="450" stroke="url(#kling-red)" stroke-width="2" filter="url(#glow)"/>
+
+  <!-- Corner Skull Decorations (simplified) -->
+  <circle cx="55" cy="45" r="8" fill="#332211" stroke="#ff4400" stroke-width="1"/>
+  <circle cx="745" cy="45" r="8" fill="#332211" stroke="#ff4400" stroke-width="1"/>
+  <circle cx="55" cy="455" r="8" fill="#332211" stroke="#ff4400" stroke-width="1"/>
+  <circle cx="745" cy="455" r="8" fill="#332211" stroke="#ff4400" stroke-width="1"/>
+
+  <!-- Inner Content Area -->
+  <rect x="70" y="60" width="660" height="380" fill="#0a0000" fill-opacity="0.8"/>
+</svg>

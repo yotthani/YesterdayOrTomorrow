@@ -1,13 +1,46 @@
 @namespace StarTrekGame.AssetGenerator
-<Router AppAssembly="@typeof(App).Assembly">
-    <Found Context="routeData">
-        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
-        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
-    </Found>
-    <NotFound>
-        <PageTitle>Not found</PageTitle>
-        <LayoutView Layout="@typeof(MainLayout)">
-            <p role="alert">Sorry, there's nothing at this address.</p>
-        </LayoutView>
-    </NotFound>
-</Router>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="/" />
+    <HeadOutlet />
+</head>
+
+<body>
+    <Routes />
+
+    <!-- Blazor reconnection UI -->
+    <div id="reconnect-modal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.8); z-index:9999; justify-content:center; align-items:center;">
+        <div style="background:#1a1a2e; border:2px solid #4a9eff; border-radius:8px; padding:30px; text-align:center; color:#fff;">
+            <div style="font-size:20px; margin-bottom:15px;">🔄 Verbindung wird wiederhergestellt...</div>
+            <div style="color:#888;">Bitte warten Sie, die Bildgenerierung läuft möglicherweise noch.</div>
+        </div>
+    </div>
+
+    <script src="_framework/blazor.web.js" autostart="false"></script>
+    <script>
+        // Configure Blazor with custom reconnection handling
+        Blazor.start({
+            reconnectionOptions: {
+                maxRetries: 30,
+                retryIntervalMilliseconds: 2000
+            },
+            reconnectionHandler: {
+                onConnectionDown: (options, error) => {
+                    console.log('Connection down:', error);
+                    document.getElementById('reconnect-modal').style.display = 'flex';
+                },
+                onConnectionUp: () => {
+                    console.log('Connection restored');
+                    document.getElementById('reconnect-modal').style.display = 'none';
+                }
+            }
+        });
+    </script>
+    <script src="js/asset-generator.js"></script>
+</body>
+
+</html>

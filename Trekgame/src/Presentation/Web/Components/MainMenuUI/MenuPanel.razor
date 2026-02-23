@@ -1,0 +1,119 @@
+@using StarTrekGame.Web.Services
+@inject MainMenuTemplateService TemplateService
+
+@* Data-driven menu panel that renders based on template definition *@
+
+@{
+    var template = TemplateService.GetTemplate(_currentStyle);
+    var panel = template.Panel;
+}
+
+<div class="menu-panel @panel.Style @Class" style="@BuildPanelStyle(panel)">
+    @* Render structure parts *@
+    @foreach (var part in panel.Structure)
+    {
+        @RenderStructurePart(part, template)
+    }
+
+    @* Main content area *@
+    <div class="panel-content-area">
+        @if (!string.IsNullOrEmpty(Title))
+        {
+            <div class="panel-header">
+                <h2 class="panel-title">@Title</h2>
+                @if (ShowCloseButton)
+                {
+                    <button class="panel-close-btn" @onclick="OnClose">✕</button>
+                }
+            </div>
+        }
+        <div class="panel-body">
+            @ChildContent
+        </div>
+        @if (FooterContent != null)
+        {
+            <div class="panel-footer">
+                @FooterContent
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public RenderFragment? FooterContent { get; set; }
+    [Parameter] public string Class { get; set; } = "";
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public bool ShowCloseButton { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+
+    /// <summary>
+    /// Override the default menu style
+    /// </summary>
+    [Parameter] public string? Style { get; set; }
+
+    [CascadingParameter(Name = "MenuStyle")]
+    public string? CascadedStyle { get; set; }
+
+    private string _currentStyle => Style ?? CascadedStyle ?? "lcars";
+
+    private string BuildPanelStyle(MenuPanelTemplate panel)
+    {
+        var styles = new List<string>();
+        if (!string.IsNullOrEmpty(panel.BorderRadius))
+            styles.Add($"border-radius: {panel.BorderRadius}");
+        return string.Join("; ", styles);
+    }
+
+    private RenderFragment RenderStructurePart(string part, MenuTemplate template) => builder =>
+    {
+        switch (part)
+        {
+            case "color-strip-left":
+                builder.OpenElement(0, "div");
+                builder.AddAttribute(1, "class", "panel-decoration color-strip left");
+                builder.CloseElement();
+                break;
+
+            case "color-strip-right":
+                builder.OpenElement(0, "div");
+                builder.AddAttribute(1, "class", "panel-decoration color-strip right");
+                builder.CloseElement();
+                break;
+
+            case "glass-backdrop":
+                builder.OpenElement(0, "div");
+                builder.AddAttribute(1, "class", "panel-decoration glass-backdrop");
+                builder.CloseElement();
+                break;
+
+            case "glow-border":
+                builder.OpenElement(0, "div");
+                builder.AddAttribute(1, "class", "panel-decoration glow-border");
+                builder.CloseElement();
+                break;
+
+            case "header-bar":
+                builder.OpenElement(0, "div");
+                builder.AddAttribute(1, "class", "panel-decoration header-bar");
+                builder.CloseElement();
+                break;
+
+            case "footer-bar":
+                builder.OpenElement(0, "div");
+                builder.AddAttribute(1, "class", "panel-decoration footer-bar");
+                builder.CloseElement();
+                break;
+
+            case "content-area":
+                // This is handled by the main content div
+                break;
+
+            default:
+                builder.OpenElement(0, "div");
+                builder.AddAttribute(1, "class", $"panel-decoration {part}");
+                builder.CloseElement();
+                break;
+        }
+    };
+}

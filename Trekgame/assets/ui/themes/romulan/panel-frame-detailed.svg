@@ -1,0 +1,282 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" fill="none">
+  <!-- ROMULAN DETAILED PANEL: Elegant curves with emerald and bronze, bird-of-prey motifs -->
+  <defs>
+    <!-- Romulan color gradients -->
+    <linearGradient id="romulanEmerald" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#00FFAA"/>
+      <stop offset="15%" style="stop-color:#00DD88"/>
+      <stop offset="50%" style="stop-color:#008855"/>
+      <stop offset="85%" style="stop-color:#00DD88"/>
+      <stop offset="100%" style="stop-color:#00FFAA"/>
+    </linearGradient>
+
+    <linearGradient id="romulanBronze" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#D4AF37"/>
+      <stop offset="20%" style="stop-color:#B8960B"/>
+      <stop offset="50%" style="stop-color:#8B6914"/>
+      <stop offset="80%" style="stop-color:#B8960B"/>
+      <stop offset="100%" style="stop-color:#D4AF37"/>
+    </linearGradient>
+
+    <linearGradient id="romulanTeal" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#00CCAA"/>
+      <stop offset="50%" style="stop-color:#007766"/>
+      <stop offset="100%" style="stop-color:#00CCAA"/>
+    </linearGradient>
+
+    <linearGradient id="romulanDarkGreen" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1A3A2A"/>
+      <stop offset="50%" style="stop-color:#0D2015"/>
+      <stop offset="100%" style="stop-color:#1A3A2A"/>
+    </linearGradient>
+
+    <!-- Elegant pattern -->
+    <pattern id="romulanPattern" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+      <rect width="40" height="40" fill="transparent"/>
+      <path d="M 0 20 Q 10 10, 20 20 T 40 20" fill="none" stroke="rgba(0,255,170,0.05)" stroke-width="0.5"/>
+      <path d="M 0 30 Q 10 20, 20 30 T 40 30" fill="none" stroke="rgba(212,175,55,0.03)" stroke-width="0.3"/>
+    </pattern>
+
+    <!-- Glow effects -->
+    <filter id="emeraldGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="6" result="blur"/>
+      <feFlood flood-color="#00FFAA" flood-opacity="0.5"/>
+      <feComposite in2="blur" operator="in"/>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="bronzeGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="4" result="blur"/>
+      <feFlood flood-color="#D4AF37" flood-opacity="0.4"/>
+      <feComposite in2="blur" operator="in"/>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Inner shadow -->
+    <filter id="romulanShadow">
+      <feDropShadow dx="2" dy="2" stdDeviation="4" flood-color="#000" flood-opacity="0.4"/>
+    </filter>
+
+    <!-- Metallic sheen -->
+    <linearGradient id="romulanSheen" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:rgba(255,255,255,0)"/>
+      <stop offset="50%" style="stop-color:rgba(255,255,255,0.15)"/>
+      <stop offset="100%" style="stop-color:rgba(255,255,255,0)"/>
+    </linearGradient>
+  </defs>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- MAIN FRAME - Elegant curved design -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+
+  <!-- Top frame with sweeping curves -->
+  <path d="
+    M 0 0
+    L 800 0
+    L 800 80
+    Q 700 70, 600 80
+    Q 400 95, 200 80
+    Q 150 75, 100 80
+    L 100 80
+    L 0 80
+    Z
+  " fill="url(#romulanDarkGreen)" filter="url(#romulanShadow)"/>
+  <path d="
+    M 0 0
+    L 800 0
+    L 800 80
+    Q 700 70, 600 80
+    Q 400 95, 200 80
+    Q 150 75, 100 80
+    L 100 80
+    L 0 80
+    Z
+  " fill="url(#romulanPattern)"/>
+
+  <!-- Left sidebar with elegant curve -->
+  <path d="
+    M 0 0
+    L 100 0
+    L 100 80
+    Q 110 300, 100 520
+    L 100 600
+    L 0 600
+    Z
+  " fill="url(#romulanDarkGreen)" filter="url(#romulanShadow)"/>
+  <path d="
+    M 0 0
+    L 100 0
+    L 100 80
+    Q 110 300, 100 520
+    L 100 600
+    L 0 600
+    Z
+  " fill="url(#romulanPattern)"/>
+
+  <!-- Bottom frame -->
+  <path d="
+    M 0 520
+    L 100 520
+    Q 110 530, 200 520
+    Q 400 505, 600 520
+    Q 700 530, 800 520
+    L 800 600
+    L 0 600
+    Z
+  " fill="url(#romulanDarkGreen)" filter="url(#romulanShadow)"/>
+  <path d="
+    M 0 520
+    L 100 520
+    Q 110 530, 200 520
+    Q 400 505, 600 520
+    Q 700 530, 800 520
+    L 800 600
+    L 0 600
+    Z
+  " fill="url(#romulanPattern)"/>
+
+  <!-- Right sidebar thin -->
+  <rect x="760" y="80" width="40" height="440" fill="url(#romulanDarkGreen)"/>
+  <rect x="760" y="80" width="40" height="440" fill="url(#romulanPattern)"/>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- EMERALD ACCENT BANDS -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+
+  <!-- Top emerald swoosh -->
+  <path d="
+    M 150 10
+    Q 400 25, 650 10
+    L 650 5
+    Q 400 20, 150 5
+    Z
+  " fill="url(#romulanEmerald)" filter="url(#emeraldGlow)"/>
+
+  <!-- Left sidebar emerald accents -->
+  <path d="
+    M 5 100
+    L 90 100
+    Q 95 100, 95 105
+    L 95 160
+    Q 95 165, 90 165
+    L 5 165
+    Z
+  " fill="url(#romulanEmerald)" filter="url(#emeraldGlow)" opacity="0.8"/>
+
+  <path d="
+    M 5 280
+    L 90 280
+    Q 95 280, 95 285
+    L 95 330
+    Q 95 335, 90 335
+    L 5 335
+    Z
+  " fill="url(#romulanTeal)" opacity="0.7"/>
+
+  <path d="
+    M 5 450
+    L 90 450
+    Q 95 450, 95 455
+    L 95 510
+    Q 95 515, 90 515
+    L 5 515
+    Z
+  " fill="url(#romulanEmerald)" filter="url(#emeraldGlow)" opacity="0.8"/>
+
+  <!-- Bottom emerald swoosh -->
+  <path d="
+    M 150 590
+    Q 400 575, 650 590
+    L 650 595
+    Q 400 580, 150 595
+    Z
+  " fill="url(#romulanEmerald)" filter="url(#emeraldGlow)"/>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- BRONZE ACCENT DECORATIONS -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+
+  <!-- Top bronze trim line -->
+  <path d="
+    M 0 75
+    Q 200 85, 400 75
+    Q 600 65, 800 75
+  " fill="none" stroke="url(#romulanBronze)" stroke-width="3" filter="url(#bronzeGlow)"/>
+
+  <!-- Left bronze vertical accent -->
+  <rect x="95" y="100" width="5" height="400" fill="url(#romulanBronze)" filter="url(#bronzeGlow)"/>
+
+  <!-- Bronze V-shapes (bird of prey motif) -->
+  <path d="M 50 50 L 70 30 L 90 50 L 80 50 L 70 40 L 60 50 Z" fill="url(#romulanBronze)" filter="url(#bronzeGlow)"/>
+  <path d="M 50 550 L 70 570 L 90 550 L 80 550 L 70 560 L 60 550 Z" fill="url(#romulanBronze)" filter="url(#bronzeGlow)"/>
+
+  <!-- Corner bronze accents -->
+  <path d="M 110 85 Q 130 85, 130 105 L 125 105 Q 125 90, 110 90 Z" fill="url(#romulanBronze)"/>
+  <path d="M 110 515 Q 130 515, 130 495 L 125 495 Q 125 510, 110 510 Z" fill="url(#romulanBronze)"/>
+  <path d="M 755 85 Q 735 85, 735 105 L 740 105 Q 740 90, 755 90 Z" fill="url(#romulanBronze)"/>
+  <path d="M 755 515 Q 735 515, 735 495 L 740 495 Q 740 510, 755 510 Z" fill="url(#romulanBronze)"/>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- SIDEBAR BUTTON SEGMENTS -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+
+  <!-- Button backgrounds with trapezoid shape -->
+  <path d="M 10 180 L 85 180 L 90 195 L 90 220 L 85 235 L 10 235 L 5 220 L 5 195 Z" fill="rgba(0,50,35,0.8)"/>
+  <path d="M 12 182 L 83 182 L 87 195 L 87 218 L 83 231 L 12 231 L 8 218 L 8 195 Z" fill="rgba(0,100,70,0.3)"/>
+
+  <path d="M 10 250 L 85 250 L 90 265 L 90 290 L 85 305 L 10 305 L 5 290 L 5 265 Z" fill="rgba(0,50,35,0.8)"/>
+  <path d="M 12 252 L 83 252 L 87 265 L 87 288 L 83 301 L 12 301 L 8 288 L 8 265 Z" fill="rgba(0,100,70,0.3)"/>
+
+  <path d="M 10 350 L 85 350 L 90 365 L 90 390 L 85 405 L 10 405 L 5 390 L 5 365 Z" fill="rgba(0,50,35,0.8)"/>
+  <path d="M 12 352 L 83 352 L 87 365 L 87 388 L 83 401 L 12 401 L 8 388 L 8 365 Z" fill="rgba(0,100,70,0.3)"/>
+
+  <path d="M 10 420 L 85 420 L 90 435 L 90 460 L 85 475 L 10 475 L 5 460 L 5 435 Z" fill="rgba(0,50,35,0.8)"/>
+  <path d="M 12 422 L 83 422 L 87 435 L 87 458 L 83 471 L 12 471 L 8 458 L 8 435 Z" fill="rgba(0,100,70,0.3)"/>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- TOP BAR DATA DISPLAYS -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+
+  <rect x="130" y="20" width="100" height="40" rx="5" fill="rgba(0,50,35,0.8)"/>
+  <rect x="132" y="22" width="96" height="36" rx="4" fill="none" stroke="url(#romulanEmerald)" stroke-width="1"/>
+
+  <rect x="250" y="20" width="150" height="40" rx="5" fill="rgba(0,50,35,0.8)"/>
+  <rect x="252" y="22" width="146" height="36" rx="4" fill="none" stroke="url(#romulanTeal)" stroke-width="1"/>
+
+  <rect x="420" y="20" width="120" height="40" rx="5" fill="rgba(0,50,35,0.8)"/>
+  <rect x="422" y="22" width="116" height="36" rx="4" fill="none" stroke="url(#romulanBronze)" stroke-width="1"/>
+
+  <rect x="560" y="20" width="100" height="40" rx="5" fill="rgba(0,50,35,0.8)"/>
+  <rect x="562" y="22" width="96" height="36" rx="4" fill="none" stroke="url(#romulanEmerald)" stroke-width="1"/>
+
+  <rect x="680" y="20" width="100" height="40" rx="5" fill="rgba(0,50,35,0.8)"/>
+  <rect x="682" y="22" width="96" height="36" rx="4" fill="none" stroke="url(#romulanTeal)" stroke-width="1"/>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- CONTENT AREA -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+
+  <rect x="110" y="90" width="645" height="420" fill="rgba(0,15,10,0.9)"/>
+
+  <!-- Elegant scanline pattern -->
+  <pattern id="romulanScanlines" x="0" y="0" width="4" height="4" patternUnits="userSpaceOnUse">
+    <rect width="4" height="2" fill="rgba(0,100,70,0.02)"/>
+  </pattern>
+  <rect x="110" y="90" width="645" height="420" fill="url(#romulanScanlines)"/>
+
+  <!-- Corner glow indicators -->
+  <circle cx="120" cy="100" r="5" fill="url(#romulanEmerald)" filter="url(#emeraldGlow)" opacity="0.8"/>
+  <circle cx="745" cy="100" r="5" fill="url(#romulanEmerald)" filter="url(#emeraldGlow)" opacity="0.8"/>
+  <circle cx="120" cy="500" r="5" fill="url(#romulanEmerald)" filter="url(#emeraldGlow)" opacity="0.8"/>
+  <circle cx="745" cy="500" r="5" fill="url(#romulanEmerald)" filter="url(#emeraldGlow)" opacity="0.8"/>
+
+  <!-- Metallic sheen overlay -->
+  <rect x="0" y="0" width="800" height="80" fill="url(#romulanSheen)" opacity="0.3"/>
+  <rect x="0" y="520" width="800" height="80" fill="url(#romulanSheen)" opacity="0.3"/>
+</svg>

@@ -1,9 +1,13 @@
 @page "/game/tech-tree"
-@inject HttpClient Http
+@layout StellarisLayout
+@using StarTrekGame.Web.Services
+@using Blazored.LocalStorage
+@inject IGameApiClient Api
+@inject ILocalStorageService LocalStorage
 @inject NavigationManager Nav
 
 <div class="tech-tree @GetFactionClass()">
-    <div class="tech-header">
+    <div class="tech-page-header">
         <h1>🔬 Research & Technology</h1>
         <div class="research-output">
             <div class="output physics">
@@ -19,7 +23,6 @@
                 <span class="value">+@_report?.SocietyOutput/turn</span>
             </div>
         </div>
-        <button class="btn-back" @onclick="GoBack">← Back</button>
     </div>
 
     @if (_loading)
@@ -179,23 +182,23 @@
 
 <style>
     .tech-tree {
-        min-height: 100vh;
+        flex: 1;
         padding: 20px;
-        background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3a 100%);
         color: white;
+        overflow-y: auto;
     }
 
-    .tech-header {
+    .tech-page-header {
         display: flex;
-        justify-content: space-between;
         align-items: center;
+        gap: 20px;
         margin-bottom: 25px;
         padding: 15px 20px;
         background: rgba(0,0,0,0.4);
         border-radius: 10px;
     }
 
-    .tech-header h1 { margin: 0; }
+    .tech-page-header h1 { margin: 0; }
 
     .research-output {
         display: flex;
@@ -510,14 +513,6 @@
 
     .btn-research { background: #27ae60; color: white; }
     .btn-cancel { background: #7f8c8d; color: white; }
-    .btn-back {
-        padding: 10px 20px;
-        background: rgba(255,255,255,0.1);
-        border: 1px solid rgba(255,255,255,0.2);
-        border-radius: 5px;
-        color: white;
-        cursor: pointer;
-    }
 
     .loading {
         text-align: center;
@@ -539,9 +534,11 @@
     private TechOptionDisplay? _selectedTech;
     private bool _showSelectionModal = false;
     private string _factionId = "federation";
+    private Guid? _factionGuid;
 
     protected override async Task OnInitializedAsync()
     {
+        _factionGuid = await LocalStorage.GetItemAsync<Guid?>("currentFactionId");
         await LoadData();
     }
 
@@ -550,67 +547,107 @@
         _loading = true;
         try
         {
-            // Mock data
-            _report = new ResearchReportDisplay
+            if (_factionGuid.HasValue)
             {
-                PhysicsOutput = 25,
-                EngineeringOutput = 30,
-                SocietyOutput = 20,
-                StoredPhysics = 50,
-                StoredEngineering = 0,
-                StoredSociety = 15,
-                TotalResearched = 8,
-                CurrentPhysics = new CurrentResearchDisplay
-                {
-                    TechId = "photon_torpedoes",
-                    Name = "Photon Torpedoes",
-                    Progress = 350,
-                    Cost = 800,
-                    TurnsRemaining = 18
-                },
-                CurrentEngineering = null,
-                CurrentSociety = new CurrentResearchDisplay
-                {
-                    TechId = "cultural_diplomacy",
-                    Name = "Cultural Exchange Programs",
-                    Progress = 200,
-                    Cost = 750,
-                    TurnsRemaining = 28
-                },
-                ResearchedTechs = new()
-                {
-                    ["Physics"] = new() { "Improved Phasers", "Improved Shields", "Long Range Sensors" },
-                    ["Engineering"] = new() { "Duranium Hulls", "Warp 6 Engines", "Orbital Shipyards" },
-                    ["Society"] = new() { "Universal Translator", "Colonial Administration" }
-                }
-            };
+                await LoadFromApi();
+            }
 
-            _availableTechs = new List<TechOptionDisplay>
+            // Fallback to mock if API returned nothing
+            if (_report == null)
             {
-                // Physics
-                new() { TechId = "quantum_torpedoes", Name = "Quantum Torpedoes", Description = "Zero-point energy warheads with devastating yield.", Branch = TechBranch.Physics, Tier = 3, Cost = 1500, Effects = new() { "unlock_weapon:quantum_torpedo", "weapon_damage:+20%" } },
-                new() { TechId = "regenerative_shields", Name = "Regenerative Shields", Description = "Self-repairing shield matrix.", Branch = TechBranch.Physics, Tier = 2, Cost = 850, Effects = new() { "shield_regen:+5/turn" } },
-                new() { TechId = "zero_point_energy", Name = "Zero-Point Energy", Description = "Extract energy from quantum vacuum.", Branch = TechBranch.Physics, Tier = 3, Cost = 1600, Effects = new() { "energy_production:+40%" }, IsRare = true },
-                
-                // Engineering
-                new() { TechId = "warp_8", Name = "Warp 8 Engines", Description = "High-efficiency warp drives.", Branch = TechBranch.Engineering, Tier = 2, Cost = 1000, Effects = new() { "ship_speed:+30%" } },
-                new() { TechId = "starbases", Name = "Starbase Construction", Description = "Build large orbital stations.", Branch = TechBranch.Engineering, Tier = 2, Cost = 1100, Effects = new() { "unlock_orbital:starbase" } },
-                new() { TechId = "transwarp", Name = "Transwarp Drive", Description = "Break the warp 10 barrier.", Branch = TechBranch.Engineering, Tier = 4, Cost = 3500, Effects = new() { "ship_speed:+100%" }, IsRare = true },
-                
-                // Society
-                new() { TechId = "genome_mapping", Name = "Genome Mapping", Description = "Advanced genetics improve population health.", Branch = TechBranch.Society, Tier = 2, Cost = 700, Effects = new() { "pop_growth:+15%" } },
-                new() { TechId = "infiltration", Name = "Deep Cover Infiltration", Description = "Place agents in enemy governments.", Branch = TechBranch.Society, Tier = 2, Cost = 850, Effects = new() { "agent_skill:+20%" } },
-                new() { TechId = "psionic_theory", Name = "Psionic Theory", Description = "Harness telepathic abilities.", Branch = TechBranch.Society, Tier = 3, Cost = 1600, Effects = new() { "unlock_psionic_units" }, IsRare = true }
-            };
+                LoadMockData();
+            }
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error loading research: {ex.Message}");
+            LoadMockData();
         }
         _loading = false;
     }
 
-    private void GoBack() => Nav.NavigateTo("/game/galaxy");
+    private async Task LoadFromApi()
+    {
+        var status = await Api.GetResearchStatusAsync(_factionGuid!.Value);
+        var availableTech = await Api.GetAvailableTechnologiesAsync(_factionGuid.Value);
+
+        _report = new ResearchReportDisplay
+        {
+            PhysicsOutput = status.TotalScienceOutput / 3,
+            EngineeringOutput = status.TotalScienceOutput / 3,
+            SocietyOutput = status.TotalScienceOutput / 3,
+            TotalResearched = status.CompletedTechnologies.Count,
+            ResearchedTechs = new()
+            {
+                ["Physics"] = status.CompletedTechnologies.Where(t => availableTech.Any(a => a.Id == t && a.Category.ToLower() is "military" or "weapons" or "physics")).ToList(),
+                ["Engineering"] = status.CompletedTechnologies.Where(t => availableTech.Any(a => a.Id == t && a.Category.ToLower() is "engineering" or "propulsion")).ToList(),
+                ["Society"] = status.CompletedTechnologies.Where(t => availableTech.Any(a => a.Id == t && a.Category.ToLower() is "science" or "colonization" or "society")).ToList()
+            }
+        };
+
+        if (!string.IsNullOrEmpty(status.CurrentResearchId))
+        {
+            var currentTech = availableTech.FirstOrDefault(t => t.Id == status.CurrentResearchId);
+            if (currentTech != null)
+            {
+                var category = currentTech.Category.ToLower();
+                var display = new CurrentResearchDisplay
+                {
+                    TechId = currentTech.Id,
+                    Name = currentTech.Name,
+                    Progress = status.CurrentResearchProgress,
+                    Cost = currentTech.Cost,
+                    TurnsRemaining = status.TotalScienceOutput > 0 ? (currentTech.Cost - status.CurrentResearchProgress) / Math.Max(1, status.TotalScienceOutput / 3) : 999
+                };
+                if (category is "military" or "weapons" or "physics") _report.CurrentPhysics = display;
+                else if (category is "engineering" or "propulsion") _report.CurrentEngineering = display;
+                else _report.CurrentSociety = display;
+            }
+        }
+
+        _availableTechs = availableTech.Where(t => t.IsAvailable && !t.IsResearched).Select(t => new TechOptionDisplay
+        {
+            TechId = t.Id,
+            Name = t.Name,
+            Description = t.Description,
+            Branch = t.Category.ToLower() switch
+            {
+                "military" or "weapons" or "physics" => TechBranch.Physics,
+                "engineering" or "propulsion" => TechBranch.Engineering,
+                _ => TechBranch.Society
+            },
+            Tier = t.Tier,
+            Cost = t.Cost,
+            Effects = t.Unlocks
+        }).ToList();
+    }
+
+    private void LoadMockData()
+    {
+        _report = new ResearchReportDisplay
+        {
+            PhysicsOutput = 25, EngineeringOutput = 30, SocietyOutput = 20,
+            StoredPhysics = 50, StoredEngineering = 0, StoredSociety = 15, TotalResearched = 8,
+            CurrentPhysics = new CurrentResearchDisplay { TechId = "photon_torpedoes", Name = "Photon Torpedoes", Progress = 350, Cost = 800, TurnsRemaining = 18 },
+            CurrentSociety = new CurrentResearchDisplay { TechId = "cultural_diplomacy", Name = "Cultural Exchange Programs", Progress = 200, Cost = 750, TurnsRemaining = 28 },
+            ResearchedTechs = new()
+            {
+                ["Physics"] = new() { "Improved Phasers", "Improved Shields", "Long Range Sensors" },
+                ["Engineering"] = new() { "Duranium Hulls", "Warp 6 Engines", "Orbital Shipyards" },
+                ["Society"] = new() { "Universal Translator", "Colonial Administration" }
+            }
+        };
+        _availableTechs = new List<TechOptionDisplay>
+        {
+            new() { TechId = "quantum_torpedoes", Name = "Quantum Torpedoes", Description = "Zero-point energy warheads.", Branch = TechBranch.Physics, Tier = 3, Cost = 1500, Effects = new() { "weapon_damage:+20%" } },
+            new() { TechId = "regenerative_shields", Name = "Regenerative Shields", Description = "Self-repairing shield matrix.", Branch = TechBranch.Physics, Tier = 2, Cost = 850, Effects = new() { "shield_regen:+5/turn" } },
+            new() { TechId = "warp_8", Name = "Warp 8 Engines", Description = "High-efficiency warp drives.", Branch = TechBranch.Engineering, Tier = 2, Cost = 1000, Effects = new() { "ship_speed:+30%" } },
+            new() { TechId = "starbases", Name = "Starbase Construction", Description = "Build large orbital stations.", Branch = TechBranch.Engineering, Tier = 2, Cost = 1100, Effects = new() { "unlock_orbital:starbase" } },
+            new() { TechId = "genome_mapping", Name = "Genome Mapping", Description = "Advanced genetics.", Branch = TechBranch.Society, Tier = 2, Cost = 700, Effects = new() { "pop_growth:+15%" } },
+            new() { TechId = "infiltration", Name = "Deep Cover Infiltration", Description = "Place agents in enemy govs.", Branch = TechBranch.Society, Tier = 2, Cost = 850, Effects = new() { "agent_skill:+20%" } },
+        };
+    }
+
     private string GetFactionClass() => _factionId.ToLower();
 
     private string GetBranchIcon(string branch) => branch switch
@@ -657,10 +694,19 @@
     private async Task StartResearch()
     {
         if (_selectedTech == null) return;
-        
-        // Would call API
-        await Task.Delay(200);
-        
+
+        if (_factionGuid.HasValue)
+        {
+            try
+            {
+                await Api.StartResearchAsync(_factionGuid.Value, _selectedTech.TechId);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to start research: {ex.Message}");
+            }
+        }
+
         CloseModal();
         await LoadData();
     }

@@ -396,7 +396,7 @@ public class ResourceProduction
 
 public class ProductionModifier
 {
-    public string Name { get; init; }
+    public string Name { get; init; } = null!;
     public ModifierType Type { get; init; }
     public double Value { get; init; }
     public ResourceType? TargetResource { get; init; }

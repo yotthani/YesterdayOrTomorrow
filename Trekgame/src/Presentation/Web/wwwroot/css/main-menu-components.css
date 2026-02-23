@@ -1,0 +1,698 @@
+/* ============================================
+   MAIN MENU UI COMPONENTS
+   Templated components for menu screens
+   Separate from faction-ui-components.css
+   ============================================ */
+
+/* ============================================
+   CSS VARIABLES (per style)
+   ============================================ */
+
+/* LCARS Style Variables */
+.menu-layout.style-lcars {
+    --menu-primary: #FF9900;
+    --menu-secondary: #CC9966;
+    --menu-tertiary: #FFCC99;
+    --menu-accent: #CC99FF;
+    --menu-bg: #000011;
+    --menu-text: #FFCC99;
+    --menu-text-muted: #9999CC;
+    --menu-purple: #CC99CC;
+    --menu-lavender: #9999CC;
+    --menu-blue: #99CCFF;
+    --menu-red: #CC6666;
+    --menu-gold: #FFCC00;
+}
+
+/* Cinematic Style Variables */
+.menu-layout.style-cinematic {
+    --menu-primary: #FFDD88;
+    --menu-secondary: #88AACC;
+    --menu-tertiary: #334455;
+    --menu-accent: #FFB366;
+    --menu-bg: #000000;
+    --menu-text: #DDEEFF;
+    --menu-text-muted: #7799BB;
+}
+
+/* Minimal Style Variables */
+.menu-layout.style-minimal {
+    --menu-primary: #4A9EFF;
+    --menu-secondary: #00D4FF;
+    --menu-tertiary: #1A2530;
+    --menu-accent: #FFC844;
+    --menu-bg: #0A0E14;
+    --menu-text: #E0E8F0;
+    --menu-text-muted: #708898;
+}
+
+/* Academy Style Variables */
+.menu-layout.style-academy {
+    --menu-primary: #4488FF;
+    --menu-secondary: #88CCFF;
+    --menu-tertiary: #223344;
+    --menu-accent: #FFCC00;
+    --menu-bg: #001122;
+    --menu-text: #AACCEE;
+    --menu-text-muted: #6688AA;
+}
+
+/* ============================================
+   MENU LAYOUT
+   ============================================ */
+
+.menu-layout {
+    min-height: 100vh;
+    background: var(--menu-bg);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Background layers */
+.menu-background {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+}
+
+.stars-layer {
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(1px 1px at 20px 30px, white, transparent),
+        radial-gradient(1px 1px at 40px 70px, rgba(255,255,255,0.8), transparent),
+        radial-gradient(1px 1px at 90px 40px, rgba(255,255,255,0.6), transparent),
+        radial-gradient(2px 2px at 160px 120px, white, transparent),
+        radial-gradient(1px 1px at 230px 80px, rgba(255,255,255,0.7), transparent);
+    background-size: 300px 200px;
+    animation: stars-drift 60s linear infinite;
+}
+
+.nebula-layer {
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(ellipse at 20% 50%, rgba(100, 50, 150, 0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 30%, rgba(50, 100, 150, 0.1) 0%, transparent 40%),
+        radial-gradient(ellipse at 50% 80%, rgba(150, 100, 50, 0.08) 0%, transparent 45%);
+    animation: nebula-pulse 20s ease-in-out infinite;
+}
+
+@keyframes stars-drift {
+    from { background-position: 0 0; }
+    to { background-position: 600px 400px; }
+}
+
+@keyframes nebula-pulse {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+}
+
+.menu-content {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.layout-area.area-header {
+    padding: 20px 40px;
+}
+
+.layout-area.area-main-wrapper {
+    flex: 1;
+    display: flex;
+    padding: 0 40px 40px;
+    gap: 30px;
+}
+
+.layout-area.area-sidebar {
+    flex-shrink: 0;
+}
+
+.layout-area.area-main {
+    flex: 1;
+    min-width: 0;
+}
+
+.layout-area.area-footer {
+    padding: 20px 40px;
+}
+
+/* ============================================
+   MENU HEADER
+   ============================================ */
+
+.menu-header {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+}
+
+/* LCARS Header */
+.menu-header.lcars-bar {
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.menu-header .lcars-header-row {
+    display: flex;
+    align-items: center;
+    height: 40px;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.menu-header .header-title-block {
+    text-align: center;
+    width: 100%;
+}
+
+.menu-header .header-lcars-cap {
+    background: var(--menu-primary);
+    padding: 8px 20px;
+    font-family: var(--st-font-display, 'Orbitron', sans-serif);
+    font-size: 14px;
+    font-weight: 700;
+    color: #000;
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.menu-header .header-lcars-cap.left { border-radius: 20px 0 0 20px; }
+.menu-header .header-lcars-cap.right { border-radius: 0 20px 20px 0; }
+
+.menu-header .header-lcars-bar {
+    flex: 1;
+    display: flex;
+    height: 100%;
+}
+
+.menu-header .lcars-segment {
+    flex: 1;
+    margin: 0 2px;
+}
+
+.menu-header .lcars-segment.orange { background: var(--menu-primary); }
+.menu-header .lcars-segment.tan { background: var(--menu-secondary); }
+.menu-header .lcars-segment.peach { background: var(--menu-tertiary); }
+
+.menu-header .game-title {
+    font-family: 'Federation', 'Antonio', var(--st-font-display), sans-serif;
+    font-size: 56px;
+    font-weight: 700;
+    color: var(--menu-primary);
+    letter-spacing: 6px;
+    margin: 0;
+    text-shadow: 0 0 30px rgba(255, 153, 0, 0.5), 0 0 60px rgba(255, 153, 0, 0.3);
+    text-transform: uppercase;
+}
+
+.menu-header .header-title-block.trek-italic .game-title {
+    font-style: italic;
+    letter-spacing: 4px;
+}
+
+.menu-header .game-subtitle {
+    font-family: var(--st-font-display);
+    font-size: 16px;
+    color: var(--menu-tertiary);
+    letter-spacing: 6px;
+    margin-top: 8px;
+    text-transform: uppercase;
+}
+
+.menu-header .community-tag {
+    font-size: 12px;
+    color: var(--menu-accent);
+    letter-spacing: 2px;
+    margin-top: 12px;
+    opacity: 0.8;
+}
+
+/* Cinematic Header */
+.menu-header.cinematic-fade .header-glow-backdrop {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px;
+    height: 200px;
+    background: radial-gradient(ellipse, rgba(255, 180, 80, 0.15) 0%, transparent 60%);
+    pointer-events: none;
+    animation: glow-pulse 4s ease-in-out infinite;
+}
+
+@keyframes glow-pulse {
+    0%, 100% { opacity: 0.8; transform: translate(-50%, -50%) scale(1); }
+    50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+}
+
+.menu-header.cinematic-fade .header-title-block.glow-shimmer .game-title {
+    animation: title-shimmer 3s ease-in-out infinite;
+}
+
+@keyframes title-shimmer {
+    0%, 100% {
+        text-shadow: 0 0 30px rgba(255, 200, 100, 0.6), 0 0 60px rgba(255, 150, 50, 0.4);
+    }
+    50% {
+        text-shadow: 0 0 40px rgba(255, 220, 120, 0.8), 0 0 80px rgba(255, 180, 80, 0.5);
+    }
+}
+
+/* ============================================
+   MENU SIDEBAR
+   ============================================ */
+
+.menu-sidebar {
+    display: flex;
+    flex-direction: column;
+}
+
+/* LCARS Sidebar */
+.menu-sidebar.lcars-sidebar .sidebar-cap {
+    background: var(--menu-primary);
+    padding: 12px 20px;
+    font-family: var(--st-font-display);
+    font-size: 12px;
+    font-weight: 700;
+    color: #000;
+    letter-spacing: 2px;
+    text-align: center;
+}
+
+.menu-sidebar.lcars-sidebar .sidebar-cap.header {
+    border-radius: 20px 20px 0 0;
+}
+
+.menu-sidebar.lcars-sidebar .sidebar-cap.footer {
+    border-radius: 0 0 20px 20px;
+    min-height: 30px;
+    background: var(--menu-tertiary);
+}
+
+.menu-sidebar .sidebar-nav {
+    background: linear-gradient(180deg, var(--menu-secondary) 0%, var(--menu-secondary) 100%);
+    padding: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+}
+
+.menu-sidebar .sidebar-spacer {
+    height: 20px;
+    background: var(--menu-purple, #CC99CC);
+    margin: 8px 0;
+}
+
+.menu-sidebar .sidebar-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    background: #000;
+    border: none;
+    font-family: var(--st-font-display);
+    font-size: 13px;
+    color: var(--menu-primary);
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: left;
+}
+
+.menu-sidebar .sidebar-nav-item:hover {
+    background: rgba(255, 153, 0, 0.2);
+}
+
+.menu-sidebar .sidebar-nav-item.primary {
+    background: var(--menu-primary);
+    color: #000;
+}
+
+.menu-sidebar .sidebar-nav-item.primary:hover {
+    background: var(--menu-gold, #FFCC00);
+}
+
+.menu-sidebar .sidebar-nav-item .nav-icon {
+    font-size: 18px;
+    width: 24px;
+    text-align: center;
+}
+
+/* Cinematic Sidebar */
+.menu-sidebar.cinematic-transparent {
+    background: transparent;
+}
+
+.menu-sidebar.cinematic-transparent .sidebar-nav {
+    background: transparent;
+    padding: 0;
+    gap: 8px;
+}
+
+.menu-sidebar.cinematic-transparent .sidebar-nav-item {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: var(--menu-text);
+}
+
+.menu-sidebar.cinematic-transparent .sidebar-nav-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--menu-primary);
+}
+
+/* ============================================
+   MENU PANEL
+   ============================================ */
+
+.menu-panel {
+    position: relative;
+    background: rgba(0, 0, 0, 0.7);
+    height: 100%;
+    overflow: hidden;
+}
+
+/* LCARS Panel */
+.menu-panel.lcars-panel {
+    border: 2px solid var(--menu-primary);
+    border-radius: 0 30px 30px 0;
+}
+
+.menu-panel.lcars-panel .panel-decoration.color-strip.left {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 30px;
+    background: linear-gradient(180deg, var(--menu-primary) 0%, var(--menu-secondary) 50%, var(--menu-tertiary) 100%);
+}
+
+.menu-panel .panel-content-area {
+    padding: 30px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.menu-panel.lcars-panel .panel-content-area {
+    padding-left: 60px;
+}
+
+.menu-panel .panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.menu-panel .panel-title {
+    font-family: var(--st-font-display);
+    font-size: 24px;
+    color: var(--menu-primary);
+    letter-spacing: 3px;
+    margin: 0;
+}
+
+.menu-panel .panel-close-btn {
+    width: 36px;
+    height: 36px;
+    background: var(--menu-red, #CC6666);
+    border: none;
+    border-radius: 50%;
+    color: #fff;
+    font-size: 18px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.menu-panel .panel-close-btn:hover {
+    background: #ff6666;
+}
+
+.menu-panel .panel-body {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.menu-panel .panel-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 153, 0, 0.2);
+}
+
+/* Cinematic Panel */
+.menu-panel.cinematic-glass {
+    background: rgba(15, 20, 35, 0.85);
+    border: 1px solid rgba(100, 140, 180, 0.3);
+    border-radius: 16px;
+    backdrop-filter: blur(20px);
+}
+
+.menu-panel.cinematic-glass .panel-decoration.glow-border {
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+    pointer-events: none;
+    box-shadow: inset 0 0 30px rgba(100, 160, 220, 0.05);
+}
+
+/* ============================================
+   MENU BUTTON
+   ============================================ */
+
+.menu-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 12px 30px;
+    border: none;
+    font-family: var(--st-font-display);
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.menu-btn .btn-icon {
+    font-size: 16px;
+}
+
+/* LCARS Button */
+.menu-btn.lcars-rounded {
+    background: var(--menu-secondary);
+    color: #000;
+    border-radius: 20px;
+}
+
+.menu-btn.lcars-rounded:hover {
+    background: var(--menu-tertiary);
+}
+
+.menu-btn.lcars-rounded.primary {
+    background: var(--menu-primary);
+}
+
+.menu-btn.lcars-rounded.primary:hover {
+    background: var(--menu-gold, #FFCC00);
+}
+
+.menu-btn.lcars-rounded.secondary {
+    background: transparent;
+    border: 2px solid var(--menu-secondary);
+    color: var(--menu-secondary);
+}
+
+.menu-btn.lcars-rounded.secondary:hover {
+    background: rgba(204, 153, 102, 0.2);
+}
+
+.menu-btn.lcars-rounded.danger {
+    background: var(--menu-red, #CC6666);
+    color: #fff;
+}
+
+.menu-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Cinematic Button */
+.menu-btn.cinematic-glow {
+    background: rgba(60, 100, 140, 0.2);
+    border: 2px solid rgba(100, 160, 220, 0.5);
+    color: var(--menu-text);
+    border-radius: 8px;
+}
+
+.menu-btn.cinematic-glow:hover:not(:disabled) {
+    background: rgba(80, 140, 200, 0.3);
+    border-color: rgba(120, 180, 240, 0.7);
+    box-shadow: 0 0 20px rgba(100, 160, 220, 0.3);
+    transform: translateY(-2px);
+}
+
+.menu-btn.cinematic-glow.primary {
+    background: linear-gradient(135deg, rgba(255, 180, 80, 0.3), rgba(255, 140, 40, 0.2));
+    border-color: rgba(255, 180, 80, 0.6);
+    color: #ffdd99;
+}
+
+.menu-btn.cinematic-glow.primary:hover:not(:disabled) {
+    background: linear-gradient(135deg, rgba(255, 200, 100, 0.4), rgba(255, 160, 60, 0.3));
+    border-color: rgba(255, 200, 100, 0.8);
+    box-shadow: 0 0 25px rgba(255, 180, 80, 0.4);
+}
+
+/* Minimal Button */
+.menu-btn.minimal-flat {
+    background: rgba(74, 158, 255, 0.1);
+    border: 1px solid var(--menu-primary);
+    color: var(--menu-primary);
+    border-radius: 6px;
+}
+
+.menu-btn.minimal-flat:hover:not(:disabled) {
+    background: rgba(74, 158, 255, 0.2);
+}
+
+.menu-btn.minimal-flat.primary {
+    background: var(--menu-primary);
+    color: #000;
+}
+
+/* Academy Button */
+.menu-btn.academy-button {
+    background: var(--menu-tertiary);
+    border: 1px solid var(--menu-primary);
+    color: var(--menu-primary);
+    border-radius: 4px;
+}
+
+.menu-btn.academy-button:hover:not(:disabled) {
+    background: var(--menu-primary);
+    color: #000;
+}
+
+/* ============================================
+   MENU FOOTER
+   ============================================ */
+
+.menu-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* LCARS Footer */
+.menu-footer.lcars-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.menu-footer .footer-segment {
+    flex: 1;
+    height: 8px;
+    background: linear-gradient(90deg, var(--menu-purple, #CC99CC), var(--menu-lavender, #9999CC));
+    border-radius: 4px;
+}
+
+.menu-footer .footer-text {
+    font-family: var(--st-font-display);
+    font-size: 10px;
+    color: var(--menu-lavender, #9999CC);
+    letter-spacing: 3px;
+    white-space: nowrap;
+}
+
+.menu-footer .footer-version {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+}
+
+.menu-footer .version-number {
+    color: var(--menu-primary);
+    font-family: var(--st-font-display);
+    font-weight: 700;
+}
+
+.menu-footer .version-name {
+    color: var(--menu-tertiary);
+    font-style: italic;
+}
+
+.menu-footer .footer-disclaimer {
+    font-size: 11px;
+    color: rgba(150, 150, 150, 0.7);
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+/* Cinematic Footer */
+.menu-footer.cinematic-minimal {
+    text-align: center;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 768px) {
+    .menu-header .game-title {
+        font-size: 36px;
+        letter-spacing: 4px;
+    }
+
+    .menu-header .game-subtitle {
+        font-size: 11px;
+        letter-spacing: 3px;
+    }
+
+    .layout-area.area-main-wrapper {
+        flex-direction: column;
+        padding: 0 20px 20px;
+    }
+
+    .layout-area.area-sidebar {
+        width: 100% !important;
+    }
+
+    .menu-sidebar .sidebar-nav {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .menu-sidebar .sidebar-nav-item {
+        flex: 1;
+        min-width: 100px;
+        justify-content: center;
+    }
+
+    .menu-panel.lcars-panel {
+        border-radius: 16px;
+    }
+
+    .menu-panel.lcars-panel .panel-decoration.color-strip.left {
+        display: none;
+    }
+
+    .menu-panel.lcars-panel .panel-content-area {
+        padding-left: 30px;
+    }
+}

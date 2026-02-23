@@ -1,0 +1,226 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 800" fill="none">
+  <!-- KLINGON DETAILED SIDEBAR: Fortress wall with aggressive angles and warrior markings -->
+  <defs>
+    <!-- Metal gradients -->
+    <linearGradient id="sidebarMetal" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#4A4A4A"/>
+      <stop offset="30%" style="stop-color:#333333"/>
+      <stop offset="70%" style="stop-color:#333333"/>
+      <stop offset="100%" style="stop-color:#4A4A4A"/>
+    </linearGradient>
+
+    <linearGradient id="sidebarRedStripe" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#DD3333"/>
+      <stop offset="50%" style="stop-color:#991111"/>
+      <stop offset="100%" style="stop-color:#DD3333"/>
+    </linearGradient>
+
+    <linearGradient id="sidebarOrange" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#FF8833"/>
+      <stop offset="50%" style="stop-color:#CC5500"/>
+      <stop offset="100%" style="stop-color:#FF8833"/>
+    </linearGradient>
+
+    <!-- Texture patterns -->
+    <pattern id="sidebarBrushed" x="0" y="0" width="60" height="4" patternUnits="userSpaceOnUse">
+      <line x1="0" y1="0" x2="60" y2="0" stroke="rgba(255,255,255,0.04)" stroke-width="0.5"/>
+      <line x1="0" y1="2" x2="60" y2="2" stroke="rgba(0,0,0,0.1)" stroke-width="0.5"/>
+    </pattern>
+
+    <pattern id="sidebarScratches" x="0" y="0" width="40" height="80" patternUnits="userSpaceOnUse">
+      <line x1="5" y1="10" x2="25" y2="15" stroke="rgba(100,100,100,0.2)" stroke-width="0.3"/>
+      <line x1="30" y1="50" x2="15" y2="55" stroke="rgba(100,100,100,0.15)" stroke-width="0.2"/>
+    </pattern>
+
+    <!-- Glow filter -->
+    <filter id="sidebarRedGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="4" result="blur"/>
+      <feFlood flood-color="#FF3333" flood-opacity="0.4"/>
+      <feComposite in2="blur" operator="in"/>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Shadow -->
+    <filter id="sidebarShadow">
+      <feDropShadow dx="3" dy="0" stdDeviation="4" flood-color="#000" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- MAIN SIDEBAR BODY - Angular fortress wall -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+
+  <!-- Base metal panel -->
+  <path d="
+    M 30 0
+    L 120 0
+    L 120 800
+    L 0 800
+    L 0 30
+    Z
+  " fill="url(#sidebarMetal)" filter="url(#sidebarShadow)"/>
+
+  <!-- Brushed metal texture -->
+  <path d="
+    M 30 0
+    L 120 0
+    L 120 800
+    L 0 800
+    L 0 30
+    Z
+  " fill="url(#sidebarBrushed)"/>
+
+  <!-- Battle damage -->
+  <path d="
+    M 30 0
+    L 120 0
+    L 120 800
+    L 0 800
+    L 0 30
+    Z
+  " fill="url(#sidebarScratches)"/>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- TOP ANGULAR CAP -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+
+  <path d="
+    M 0 30
+    L 30 0
+    L 120 0
+    L 120 60
+    L 100 80
+    L 0 80
+    Z
+  " fill="url(#sidebarMetal)"/>
+  <path d="
+    M 0 30
+    L 30 0
+    L 120 0
+    L 120 60
+    L 100 80
+    L 0 80
+    Z
+  " fill="url(#sidebarBrushed)"/>
+
+  <!-- Red accent on top -->
+  <path d="
+    M 5 35
+    L 35 5
+    L 115 5
+    L 115 55
+    L 95 75
+    L 5 75
+    Z
+  " fill="url(#sidebarRedStripe)" opacity="0.3"/>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- RED WARRIOR STRIPES -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+
+  <rect x="5" y="100" width="110" height="8" fill="url(#sidebarRedStripe)" filter="url(#sidebarRedGlow)"/>
+  <rect x="5" y="250" width="110" height="6" fill="url(#sidebarRedStripe)"/>
+  <rect x="5" y="400" width="110" height="8" fill="url(#sidebarRedStripe)" filter="url(#sidebarRedGlow)"/>
+  <rect x="5" y="550" width="110" height="6" fill="url(#sidebarRedStripe)"/>
+  <rect x="5" y="700" width="110" height="8" fill="url(#sidebarRedStripe)" filter="url(#sidebarRedGlow)"/>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- TRIANGULAR ACCENTS -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+
+  <path d="M 100 120 L 115 120 L 100 150 Z" fill="url(#sidebarOrange)"/>
+  <path d="M 100 270 L 115 270 L 100 300 Z" fill="url(#sidebarOrange)"/>
+  <path d="M 100 420 L 115 420 L 100 450 Z" fill="url(#sidebarOrange)"/>
+  <path d="M 100 570 L 115 570 L 100 600 Z" fill="url(#sidebarOrange)"/>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- BUTTON AREAS - Hexagonal shapes -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+
+  <!-- Button 1 -->
+  <path d="M 15 140 L 95 140 L 105 155 L 95 170 L 15 170 L 5 155 Z" fill="#222"/>
+  <path d="M 17 142 L 93 142 L 102 155 L 93 168 L 17 168 L 8 155 Z" fill="#333"/>
+
+  <!-- Button 2 -->
+  <path d="M 15 190 L 95 190 L 105 205 L 95 220 L 15 220 L 5 205 Z" fill="#222"/>
+  <path d="M 17 192 L 93 192 L 102 205 L 93 218 L 17 218 L 8 205 Z" fill="#333"/>
+
+  <!-- Button 3 -->
+  <path d="M 15 320 L 95 320 L 105 335 L 95 350 L 15 350 L 5 335 Z" fill="#222"/>
+  <path d="M 17 322 L 93 322 L 102 335 L 93 348 L 17 348 L 8 335 Z" fill="#333"/>
+
+  <!-- Button 4 -->
+  <path d="M 15 370 L 95 370 L 105 385 L 95 400 L 15 400 L 5 385 Z" fill="#222"/>
+  <path d="M 17 372 L 93 372 L 102 385 L 93 398 L 17 398 L 8 385 Z" fill="#333"/>
+
+  <!-- Button 5 -->
+  <path d="M 15 470 L 95 470 L 105 485 L 95 500 L 15 500 L 5 485 Z" fill="#222"/>
+  <path d="M 17 472 L 93 472 L 102 485 L 93 498 L 17 498 L 8 485 Z" fill="#333"/>
+
+  <!-- Button 6 -->
+  <path d="M 15 520 L 95 520 L 105 535 L 95 550 L 15 550 L 5 535 Z" fill="#222"/>
+  <path d="M 17 522 L 93 522 L 102 535 L 93 548 L 17 548 L 8 535 Z" fill="#333"/>
+
+  <!-- Button 7 -->
+  <path d="M 15 620 L 95 620 L 105 635 L 95 650 L 15 650 L 5 635 Z" fill="#222"/>
+  <path d="M 17 622 L 93 622 L 102 635 L 93 648 L 17 648 L 8 635 Z" fill="#333"/>
+
+  <!-- Button 8 -->
+  <path d="M 15 670 L 95 670 L 105 685 L 95 700 L 15 700 L 5 685 Z" fill="#222"/>
+  <path d="M 17 672 L 93 672 L 102 685 L 93 698 L 17 698 L 8 685 Z" fill="#333"/>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- RIVETS -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+
+  <circle cx="20" cy="50" r="3" fill="#222"/>
+  <circle cx="20" cy="50" r="1.5" fill="#555"/>
+  <circle cx="100" cy="50" r="3" fill="#222"/>
+  <circle cx="100" cy="50" r="1.5" fill="#555"/>
+
+  <circle cx="60" cy="240" r="2.5" fill="#222"/>
+  <circle cx="60" cy="240" r="1.2" fill="#555"/>
+  <circle cx="60" cy="390" r="2.5" fill="#222"/>
+  <circle cx="60" cy="390" r="1.2" fill="#555"/>
+  <circle cx="60" cy="540" r="2.5" fill="#222"/>
+  <circle cx="60" cy="540" r="1.2" fill="#555"/>
+  <circle cx="60" cy="690" r="2.5" fill="#222"/>
+  <circle cx="60" cy="690" r="1.2" fill="#555"/>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- BOTTOM ANGULAR CAP -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+
+  <path d="
+    M 0 720
+    L 100 720
+    L 120 740
+    L 120 800
+    L 0 800
+    Z
+  " fill="url(#sidebarMetal)"/>
+  <path d="
+    M 0 720
+    L 100 720
+    L 120 740
+    L 120 800
+    L 0 800
+    Z
+  " fill="url(#sidebarBrushed)"/>
+
+  <!-- Bottom red accent -->
+  <path d="
+    M 5 725
+    L 95 725
+    L 115 745
+    L 115 795
+    L 5 795
+    Z
+  " fill="url(#sidebarRedStripe)" opacity="0.3"/>
+
+  <!-- Inner edge highlight -->
+  <line x1="115" y1="80" x2="115" y2="720" stroke="rgba(0,0,0,0.5)" stroke-width="2"/>
+</svg>

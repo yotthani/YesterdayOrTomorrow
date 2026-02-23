@@ -359,8 +359,8 @@ public enum PopEthos
 
 public class PopTrait
 {
-    public string Name { get; init; }
-    public string Description { get; init; }
+    public string Name { get; init; } = null!;
+    public string Description { get; init; } = null!;
     public double ProductivityModifier { get; init; } = 1.0;
     public double ResearchModifier { get; init; } = 1.0;
     public double HappinessModifier { get; init; } = 1.0;

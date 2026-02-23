@@ -1,0 +1,163 @@
+@using StarTrekGame.Web.Services
+@inject FactionTemplateService TemplateService
+@inject ThemeService ThemeService
+
+@* Data-driven sidebar that renders based on template definition *@
+
+@{
+    var template = TemplateService.GetTemplate(ThemeService.CurrentTheme);
+    var sidebar = template.Sidebar;
+}
+
+<aside class="templated-sidebar @sidebar.CssClass @Class">
+    @* Render structure parts *@
+    @foreach (var part in sidebar.Structure)
+    {
+        @RenderStructurePart(part, template)
+    }
+</aside>
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public string Class { get; set; } = "";
+    [Parameter] public List<NavItemData>? NavItems { get; set; }
+
+    private RenderFragment RenderStructurePart(string part, FactionTemplate template) => builder =>
+    {
+        switch (part)
+        {
+            case "nav-items":
+            case "nav-pills":
+            case "nav-blades":
+            case "nav-lenses":
+            case "nav-hexes":
+            case "nav-blocks":
+            case "nav-gems":
+                builder.OpenElement(0, "nav");
+                builder.AddAttribute(1, "class", $"sidebar-nav {part}");
+
+                if (NavItems != null)
+                {
+                    var navTemplate = template.Sidebar.NavItemTemplate;
+                    foreach (var item in NavItems)
+                    {
+                        builder.OpenElement(2, "button");
+                        builder.AddAttribute(3, "class", $"nav-item {navTemplate.CssClass} {(item.IsActive ? "active" : "")}");
+                        builder.AddAttribute(4, "onclick", item.OnClick);
+
+                        foreach (var itemPart in navTemplate.Structure)
+                        {
+                            RenderNavItemPart(builder, itemPart, item);
+                        }
+
+                        builder.CloseElement(); // button
+                    }
+                }
+                else if (ChildContent != null)
+                {
+                    builder.AddContent(5, ChildContent);
+                }
+
+                builder.CloseElement(); // nav
+                break;
+
+            case "vertical-bar":
+            case "metal-frame":
+            case "curved-frame":
+            case "hex-grid":
+            case "status-bar":
+            case "diamond-header":
+                builder.OpenElement(0, "div");
+                builder.AddAttribute(1, "class", $"sidebar-part {part}");
+                builder.CloseElement();
+                break;
+
+            case "emblem":
+            case "bird-emblem":
+            case "collective-node":
+            case "founder-emblem":
+                builder.OpenElement(0, "div");
+                builder.AddAttribute(1, "class", $"sidebar-emblem {part}");
+                builder.CloseElement();
+                break;
+
+            case "elbow-corner":
+            case "spike-bottom":
+            case "bronze-bottom":
+            case "data-conduit":
+            case "scan-line":
+            case "ketracel-indicator":
+                builder.OpenElement(0, "div");
+                builder.AddAttribute(1, "class", $"sidebar-decoration {part}");
+                builder.CloseElement();
+                break;
+
+            default:
+                builder.OpenElement(0, "div");
+                builder.AddAttribute(1, "class", $"sidebar-part {part}");
+                builder.CloseElement();
+                break;
+        }
+    };
+
+    private void RenderNavItemPart(Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder builder, string part, NavItemData item)
+    {
+        switch (part)
+        {
+            case "icon":
+            case "blade-icon":
+            case "hex-outer":
+            case "hex-inner":
+            case "gem-facet":
+            case "lens-glow":
+            case "indicator":
+                builder.OpenElement(10, "span");
+                builder.AddAttribute(11, "class", $"nav-part {part}");
+                if (!string.IsNullOrEmpty(item.Icon))
+                    builder.AddContent(12, item.Icon);
+                builder.CloseElement();
+                break;
+
+            case "label":
+            case "blade-text":
+            case "designation":
+            case "pill-end-left":
+            case "pill-end-right":
+            case "blade-edge":
+            case "notch":
+            case "shimmer":
+            case "pulse":
+                if (part == "label" || part == "blade-text" || part == "designation")
+                {
+                    builder.OpenElement(10, "span");
+                    builder.AddAttribute(11, "class", $"nav-part {part}");
+                    builder.AddContent(12, item.Label);
+                    builder.CloseElement();
+                }
+                else
+                {
+                    builder.OpenElement(10, "span");
+                    builder.AddAttribute(11, "class", $"nav-part {part}");
+                    builder.CloseElement();
+                }
+                break;
+
+            default:
+                builder.OpenElement(10, "span");
+                builder.AddAttribute(11, "class", $"nav-part {part}");
+                builder.CloseElement();
+                break;
+        }
+    }
+}
+
+@* Data class for nav items *@
+@code {
+    public class NavItemData
+    {
+        public string Label { get; set; } = "";
+        public string? Icon { get; set; }
+        public bool IsActive { get; set; }
+        public EventCallback OnClick { get; set; }
+    }
+}

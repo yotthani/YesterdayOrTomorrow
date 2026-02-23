@@ -1,0 +1,272 @@
+/* ===========================================
+   KLINGON THEME - WARRIOR WARSHIP CONSOLE
+
+   Design Philosophy: Brutal efficiency - war-ready, intimidating,
+   built for battle. The UI of warriors.
+
+   Visual Language:
+   - Blood red and metallic grays
+   - Angular/beveled edges, no curves
+   - Triangular corner accents (blade-cut)
+   - Brushed metal texture with battle scars
+   - Heavy bold typography
+   - Instant transitions (no delay for warriors)
+   =========================================== */
+
+/* ===== KLINGON THEME VARIABLES ===== */
+html[data-theme="klingon"],
+html[data-theme="klingon"] .stellaris-layout,
+html[data-theme="klingon"] .stellaris-app {
+    --theme-primary: #cc0000;
+    --theme-secondary: #ff4444;
+    --theme-accent: #ffaa00;
+    --theme-text: #ffcccc;
+    --theme-text-dim: #aa8888;
+    --theme-bg: #0a0505;
+    --theme-panel-bg: rgba(20, 8, 8, 0.98);
+    --theme-border-radius: 0;
+    --theme-btn-radius: 0;
+    --theme-border-width: 2px;
+    --theme-corner-style: angular;
+
+    --st-accent-blue: #cc0000;
+    --st-accent-cyan: #ff4444;
+    --st-accent-gold: #ffaa00;
+    --st-accent-orange: #ff6600;
+    --st-accent-green: #88aa00;
+    --st-accent-red: #ff0000;
+    --st-accent-purple: #aa4444;
+
+    --st-bg-darkest: #080202;
+    --st-bg-darker: #100404;
+    --st-bg-dark: #180808;
+    --st-bg-medium: #201010;
+    --st-bg-light: #281818;
+    --st-bg-lighter: #302020;
+
+    --st-border-dark: rgba(200, 0, 0, 0.4);
+    --st-border-medium: rgba(200, 0, 0, 0.6);
+    --st-border-light: rgba(255, 68, 68, 0.7);
+    --st-border-bright: rgba(255, 68, 68, 0.9);
+
+    --st-text-dim: #885555;
+    --st-text-muted: #aa7777;
+    --st-text-normal: #cc9999;
+    --st-text-bright: #ffcccc;
+
+    --st-gradient-header: linear-gradient(180deg, #1a0808 0%, #0a0202 100%);
+    --st-gradient-panel: linear-gradient(180deg, rgba(30, 10, 10, 0.95) 0%, rgba(15, 5, 5, 0.98) 100%);
+    --st-gradient-button: linear-gradient(180deg, #cc0000 0%, #880000 100%);
+    --st-gradient-button-hover: linear-gradient(180deg, #ff0000 0%, #cc0000 100%);
+
+    --st-shadow-glow-blue: 0 0 20px rgba(200, 0, 0, 0.5);
+    --st-shadow-glow-gold: 0 0 20px rgba(255, 170, 0, 0.4);
+}
+
+
+/* ===== KLINGON PANEL STYLE ===== */
+/* Angular with triangular corner cuts */
+html[data-theme="klingon"] .mud-paper,
+html[data-theme="klingon"] .mud-card {
+    background:
+        linear-gradient(135deg, rgba(80, 0, 0, 0.1) 0%, transparent 50%),
+        linear-gradient(315deg, rgba(80, 0, 0, 0.1) 0%, transparent 50%),
+        var(--st-gradient-panel) !important;
+    border: 2px solid #880000 !important;
+    border-radius: 0 !important;
+    clip-path: polygon(0 12px, 12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%) !important;
+    position: relative;
+}
+
+/* Triangular corner accents - top left */
+html[data-theme="klingon"] .mud-paper::before,
+html[data-theme="klingon"] .mud-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 30px 30px 0 0;
+    border-color: #cc0000 transparent transparent transparent;
+    pointer-events: none;
+    z-index: 2;
+}
+
+/* Triangular corner accents - bottom right */
+html[data-theme="klingon"] .mud-paper::after,
+html[data-theme="klingon"] .mud-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 0 30px 30px;
+    border-color: transparent transparent #cc0000 transparent;
+    pointer-events: none;
+    z-index: 2;
+}
+
+/* Metallic ridge effect */
+html[data-theme="klingon"] .mud-paper {
+    box-shadow:
+        inset 2px 2px 0 rgba(255, 100, 100, 0.3),
+        inset -2px -2px 0 rgba(0, 0, 0, 0.5),
+        0 0 20px rgba(200, 0, 0, 0.3) !important;
+}
+
+
+/* ===== KLINGON BUTTONS ===== */
+html[data-theme="klingon"] .mud-button-root {
+    border-radius: 0 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 3px !important;
+    font-weight: 900 !important;
+    clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px) !important;
+}
+
+html[data-theme="klingon"] .mud-button-filled {
+    background: linear-gradient(180deg, #cc0000 0%, #660000 50%, #880000 100%) !important;
+    color: #fff !important;
+    border: 1px solid #ff4444 !important;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 150, 150, 0.4),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.5),
+        0 0 15px rgba(200, 0, 0, 0.5) !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8) !important;
+}
+
+html[data-theme="klingon"] .mud-button-filled:hover {
+    background: linear-gradient(180deg, #ff0000 0%, #880000 50%, #aa0000 100%) !important;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 150, 150, 0.5),
+        0 0 25px rgba(255, 0, 0, 0.7) !important;
+}
+
+html[data-theme="klingon"] .mud-button-outlined {
+    border: 2px solid #cc0000 !important;
+    color: #ff4444 !important;
+    background: linear-gradient(180deg, rgba(100, 0, 0, 0.3) 0%, rgba(50, 0, 0, 0.4) 100%) !important;
+}
+
+
+/* ===== KLINGON APP BAR ===== */
+html[data-theme="klingon"] .mud-appbar {
+    background: linear-gradient(180deg, #200808 0%, #100202 100%) !important;
+    border-bottom: none !important;
+    position: relative;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8) !important;
+}
+
+/* Metallic ridge along bottom */
+html[data-theme="klingon"] .mud-appbar::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(180deg, #ff4444 0%, #880000 50%, #440000 100%);
+    pointer-events: none;
+}
+
+/* Triangular accent mark */
+html[data-theme="klingon"] .mud-appbar::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 12px 40px 0 40px;
+    border-color: #cc0000 transparent transparent transparent;
+    pointer-events: none;
+}
+
+
+/* ===== KLINGON DRAWER/SIDEBAR ===== */
+html[data-theme="klingon"] .mud-drawer {
+    background: linear-gradient(90deg, #100404 0%, #180808 100%) !important;
+    border-right: none !important;
+    position: relative;
+}
+
+/* Aggressive edge on drawer */
+html[data-theme="klingon"] .mud-drawer::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, #ff4444 0%, #880000 30%, #440000 70%, #880000 100%);
+    pointer-events: none;
+}
+
+
+/* ===== KLINGON NAVIGATION LINKS ===== */
+html[data-theme="klingon"] .mud-nav-link {
+    border-radius: 0 !important;
+    margin: 4px 8px !important;
+    padding: 10px 16px !important;
+    clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px) !important;
+    background: linear-gradient(90deg, rgba(100, 0, 0, 0.2) 0%, transparent 100%) !important;
+    border-left: 3px solid transparent !important;
+    transition: all 0.05s ease !important; /* Warriors don't wait */
+}
+
+html[data-theme="klingon"] .mud-nav-link:hover {
+    background: linear-gradient(90deg, rgba(200, 0, 0, 0.4) 0%, rgba(100, 0, 0, 0.2) 100%) !important;
+    border-left-color: #ff4444 !important;
+}
+
+html[data-theme="klingon"] .mud-nav-link.active {
+    background: linear-gradient(90deg, #880000 0%, #440000 100%) !important;
+    color: #fff !important;
+    border-left-color: #ffaa00 !important;
+    box-shadow: inset 0 0 10px rgba(255, 0, 0, 0.3) !important;
+}
+
+
+/* ===== KLINGON SPECIFIC DECORATIONS ===== */
+
+/* Red pulse for alerts - warriors see danger */
+@keyframes klingon-pulse {
+    0%, 100% {
+        box-shadow: 0 0 10px rgba(255, 0, 0, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(255, 0, 0, 0.6);
+    }
+}
+
+html[data-theme="klingon"] .alert-indicator {
+    animation: klingon-pulse 1s ease-in-out infinite;
+}
+
+/* Battle damage texture overlay */
+html[data-theme="klingon"] .battle-worn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: repeating-linear-gradient(
+        135deg,
+        transparent 0px,
+        transparent 10px,
+        rgba(0, 0, 0, 0.1) 10px,
+        rgba(0, 0, 0, 0.1) 11px
+    );
+    pointer-events: none;
+    opacity: 0.3;
+}
+
+/* Honor gold highlight */
+html[data-theme="klingon"] .honor-highlight {
+    border-color: #ffaa00 !important;
+    box-shadow: 0 0 15px rgba(255, 170, 0, 0.4) !important;
+}

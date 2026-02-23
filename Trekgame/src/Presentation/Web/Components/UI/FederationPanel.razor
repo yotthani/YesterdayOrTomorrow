@@ -1,0 +1,63 @@
+@namespace StarTrekGame.Web.Components.UI
+
+<div class="federation-panel @PanelClass @TextureClass" style="@Style">
+    @if (!string.IsNullOrEmpty(Title))
+    {
+        <div class="federation-header">
+            <div class="federation-header__elbow" style="background: var(--ui-@HeaderColor);"></div>
+            <div class="federation-header__bar" style="background: var(--ui-@HeaderColor);">
+                <span class="federation-header__title">@Title</span>
+            </div>
+            <div class="federation-header__cap" style="background: var(--ui-@AccentColor);"></div>
+        </div>
+    }
+    <div class="federation-panel__content" style="padding: @Padding;">
+        @ChildContent
+    </div>
+</div>
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public string HeaderColor { get; set; } = "primary";
+    [Parameter] public string AccentColor { get; set; } = "secondary";
+    [Parameter] public string Rounded { get; set; } = ""; // tl, tr, bl, br, or combinations
+    [Parameter] public string Texture { get; set; } = ""; // noise, scanlines, brushed-metal, hex-grid, circuit
+    [Parameter] public string Padding { get; set; } = "16px";
+    [Parameter] public string? Style { get; set; }
+
+    private string PanelClass
+    {
+        get
+        {
+            var classes = new List<string>();
+            if (Rounded.Contains("tl")) classes.Add("federation-panel--rounded-tl");
+            if (Rounded.Contains("tr")) classes.Add("federation-panel--rounded-tr");
+            if (Rounded.Contains("bl")) classes.Add("federation-panel--rounded-bl");
+            if (Rounded.Contains("br")) classes.Add("federation-panel--rounded-br");
+            return string.Join(" ", classes);
+        }
+    }
+
+    private string TextureClass
+    {
+        get
+        {
+            return Texture switch
+            {
+                "noise" => "texture-noise",
+                "scanlines" => "texture-scanlines",
+                "brushed-metal" => "texture-brushed-metal",
+                "hex-grid" => "texture-hex-grid",
+                "circuit" => "texture-circuit",
+                _ => ""
+            };
+        }
+    }
+}
+
+<style>
+    .federation-panel__content {
+        position: relative;
+    }
+</style>

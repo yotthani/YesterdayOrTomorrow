@@ -106,7 +106,8 @@ public class GroundCombatResolver
             TrainingLevel.Regular => 0.8,
             TrainingLevel.Veteran => 1.0,
             TrainingLevel.Elite => 1.4,
-            TrainingLevel.Legendary => 2.0  // Klingon Dahar Masters, etc.
+            TrainingLevel.Legendary => 2.0,  // Klingon Dahar Masters, etc.
+            _ => 1.0  // Default for unknown values
         };
         modifiers["Training"] = trainingMod;
         total *= trainingMod;
@@ -400,7 +401,7 @@ public class GroundCombatResolver
 public class GroundForce : Entity
 {
     public Guid EmpireId { get; private set; }
-    public string Name { get; private set; }
+    public string Name { get; private set; } = default!;
     public int Strength { get; private set; }        // Number of troops
     public TrainingLevel TrainingLevel { get; private set; }
     public int Morale { get; private set; }          // 0-100

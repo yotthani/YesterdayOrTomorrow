@@ -1,0 +1,546 @@
+/* ===========================================
+   BREEN THEME - CONFEDERACY SHIP INTERIOR
+
+   Design Philosophy: Based on Star Trek Discovery
+   Breen ship interiors feature dominant GOLD/AMBER
+   lighting with cyan/teal accent elements.
+   Industrial, angular, with vertical light pillars
+   and lit floor strips.
+
+   Visual Language:
+   - GOLD/AMBER as primary UI color (light pillars, main displays)
+   - Cyan/Teal as secondary accent (floor strips, data markers, visor)
+   - Dark industrial metallic backgrounds
+   - Angular console design
+   - Vertical illumination elements
+   - Holographic display aesthetics
+   =========================================== */
+
+/* ===== BREEN THEME VARIABLES ===== */
+html[data-theme="breen"],
+html[data-theme="breen"] .stellaris-layout,
+html[data-theme="breen"] .stellaris-app {
+    /* PRIMARY: Gold/Amber (from light pillars) */
+    --theme-primary: #FFAA33;
+    --theme-secondary: #CC8800;
+    --theme-accent: #00CCCC;
+    --theme-text: #DDCCAA;
+    --theme-text-dim: #887755;
+    --theme-bg: #080808;
+    --theme-panel-bg: rgba(10, 10, 10, 0.98);
+    --theme-border-radius: 0px;
+    --theme-btn-radius: 0px;
+    --theme-border-width: 2px;
+    --theme-corner-style: angular;
+
+    /* Breen Gold/Amber palette */
+    --breen-gold: #FFAA33;
+    --breen-gold-bright: #FFCC55;
+    --breen-gold-dim: #CC8800;
+    --breen-amber: #DD9922;
+    --breen-bronze: #996622;
+
+    /* Breen Cyan/Teal accent (secondary) */
+    --breen-cyan: #00CCCC;
+    --breen-cyan-bright: #00FFFF;
+    --breen-cyan-dim: #008888;
+    --breen-teal: #009999;
+
+    /* Dark industrial armor */
+    --breen-armor-dark: #0a0a0a;
+    --breen-armor-mid: #151515;
+    --breen-armor-light: #252525;
+    --breen-gunmetal: #333338;
+
+    --st-bg-darkest: #040404;
+    --st-bg-darker: #080808;
+    --st-bg-dark: #0c0c0c;
+    --st-bg-medium: #121212;
+    --st-bg-light: #181818;
+    --st-bg-lighter: #222222;
+
+    --st-border-dark: rgba(255, 170, 51, 0.25);
+    --st-border-medium: rgba(255, 170, 51, 0.4);
+    --st-border-light: rgba(255, 170, 51, 0.6);
+    --st-border-bright: rgba(255, 204, 85, 0.8);
+
+    --st-text-dim: #665533;
+    --st-text-muted: #887755;
+    --st-text-normal: #BBAA88;
+    --st-text-bright: #DDCCAA;
+
+    --st-gradient-header: linear-gradient(180deg, #101010 0%, #080808 100%);
+    --st-gradient-panel: linear-gradient(180deg, rgba(15, 15, 15, 0.95) 0%, rgba(8, 8, 8, 0.98) 100%);
+    --st-gradient-button: linear-gradient(180deg, #CC8800 0%, #885500 100%);
+    --st-gradient-button-hover: linear-gradient(180deg, #FFAA33 0%, #CC8800 100%);
+
+    --st-shadow-glow-gold: 0 0 30px rgba(255, 170, 51, 0.5);
+    --st-shadow-glow-cyan: 0 0 20px rgba(0, 204, 204, 0.4);
+}
+
+/* ===== BREEN PANEL STYLE ===== */
+/* Angular industrial panels with gold trim */
+html[data-theme="breen"] .mud-paper,
+html[data-theme="breen"] .mud-card {
+    background:
+        /* Subtle vertical pillar pattern */
+        repeating-linear-gradient(
+            90deg,
+            transparent 0px,
+            transparent 80px,
+            rgba(255, 170, 51, 0.03) 80px,
+            rgba(255, 170, 51, 0.03) 82px
+        ),
+        var(--st-gradient-panel) !important;
+    border: 2px solid var(--breen-armor-light) !important;
+    border-radius: 0px !important;
+    position: relative;
+    overflow: hidden;
+    clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+}
+
+/* Gold light strip at top (like vertical pillar glow) */
+html[data-theme="breen"] .mud-paper::before,
+html[data-theme="breen"] .mud-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 20px;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg,
+        var(--breen-gold-bright) 0%,
+        var(--breen-gold) 30%,
+        var(--breen-amber) 70%,
+        var(--breen-gold-dim) 100%
+    );
+    box-shadow:
+        0 0 15px var(--breen-gold),
+        0 0 30px rgba(255, 170, 51, 0.4);
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Cyan accent strip at bottom (floor lighting) */
+html[data-theme="breen"] .mud-paper::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        var(--breen-cyan-dim) 20%,
+        var(--breen-cyan) 50%,
+        var(--breen-cyan-dim) 80%,
+        transparent 100%
+    );
+    box-shadow: 0 0 10px var(--breen-cyan);
+    pointer-events: none;
+}
+
+/* ===== BREEN BUTTONS ===== */
+/* Angular gold-accented buttons */
+html[data-theme="breen"] .mud-button-root {
+    border-radius: 0px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 2px !important;
+    font-weight: 600 !important;
+    transition: all 0.15s ease !important;
+    position: relative;
+    clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
+}
+
+html[data-theme="breen"] .mud-button-filled {
+    background: var(--st-gradient-button) !important;
+    color: #000 !important;
+    border: 1px solid var(--breen-gold-dim) !important;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.2),
+        0 0 10px rgba(255, 170, 51, 0.3) !important;
+}
+
+html[data-theme="breen"] .mud-button-filled:hover {
+    background: var(--st-gradient-button-hover) !important;
+    border-color: var(--breen-gold) !important;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.3),
+        0 0 20px rgba(255, 170, 51, 0.5),
+        0 0 40px rgba(255, 170, 51, 0.2) !important;
+}
+
+html[data-theme="breen"] .mud-button-outlined {
+    border: 2px solid var(--breen-gold-dim) !important;
+    color: var(--breen-gold) !important;
+    background: transparent !important;
+}
+
+html[data-theme="breen"] .mud-button-outlined:hover {
+    border-color: var(--breen-gold) !important;
+    background: rgba(255, 170, 51, 0.1) !important;
+    box-shadow: 0 0 15px rgba(255, 170, 51, 0.3) !important;
+}
+
+/* ===== BREEN APP BAR ===== */
+html[data-theme="breen"] .mud-appbar {
+    background:
+        /* Vertical pillar lights pattern */
+        repeating-linear-gradient(
+            90deg,
+            transparent 0px,
+            transparent 100px,
+            rgba(255, 170, 51, 0.08) 100px,
+            rgba(255, 170, 51, 0.08) 104px
+        ),
+        linear-gradient(180deg, #0c0c0c 0%, #080808 100%) !important;
+    border-bottom: none !important;
+    position: relative;
+}
+
+/* Gold light bar with cyan accent */
+html[data-theme="breen"] .mud-appbar::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background:
+        linear-gradient(90deg,
+            var(--breen-armor-dark) 0%,
+            var(--breen-gold-dim) 15%,
+            var(--breen-gold) 35%,
+            var(--breen-gold-bright) 50%,
+            var(--breen-gold) 65%,
+            var(--breen-gold-dim) 85%,
+            var(--breen-armor-dark) 100%
+        );
+    box-shadow:
+        0 0 25px rgba(255, 170, 51, 0.6),
+        0 0 50px rgba(255, 170, 51, 0.3);
+}
+
+/* ===== BREEN DRAWER ===== */
+html[data-theme="breen"] .mud-drawer {
+    background:
+        /* Vertical light pillars */
+        repeating-linear-gradient(
+            90deg,
+            transparent 0px,
+            transparent 60px,
+            rgba(255, 170, 51, 0.06) 60px,
+            rgba(255, 170, 51, 0.06) 64px
+        ),
+        linear-gradient(90deg, #080808 0%, #0c0c0c 100%) !important;
+    border-right: none !important;
+    position: relative;
+}
+
+/* Gold pillar edge with cyan floor strip */
+html[data-theme="breen"] .mud-drawer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg,
+        var(--breen-gold-bright) 0%,
+        var(--breen-gold) 20%,
+        var(--breen-amber) 50%,
+        var(--breen-gold) 80%,
+        var(--breen-gold-bright) 100%
+    );
+    box-shadow:
+        0 0 20px rgba(255, 170, 51, 0.5),
+        0 0 40px rgba(255, 170, 51, 0.25);
+    z-index: 10;
+}
+
+html[data-theme="breen"] .mud-drawer::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg,
+        var(--breen-cyan) 0%,
+        var(--breen-cyan-bright) 50%,
+        var(--breen-cyan) 100%
+    );
+    box-shadow: 0 0 15px var(--breen-cyan);
+}
+
+/* ===== BREEN NAVIGATION ===== */
+html[data-theme="breen"] .mud-nav-link {
+    border-radius: 0px !important;
+    margin: 4px 8px !important;
+    padding: 10px 14px !important;
+    background: rgba(25, 25, 25, 0.6) !important;
+    border-left: 3px solid transparent !important;
+    border-bottom: 1px solid rgba(255, 170, 51, 0.1) !important;
+    transition: all 0.15s ease !important;
+    position: relative;
+}
+
+html[data-theme="breen"] .mud-nav-link:hover {
+    background: rgba(35, 35, 35, 0.8) !important;
+    border-left-color: var(--breen-gold-dim) !important;
+}
+
+html[data-theme="breen"] .mud-nav-link.active {
+    background:
+        linear-gradient(90deg, rgba(255, 170, 51, 0.2) 0%, rgba(25, 25, 25, 0.6) 100%) !important;
+    color: var(--breen-gold-bright) !important;
+    border-left-color: var(--breen-gold) !important;
+    box-shadow:
+        inset 0 0 30px rgba(255, 170, 51, 0.1),
+        0 0 15px rgba(255, 170, 51, 0.2) !important;
+}
+
+/* Gold indicator on active */
+html[data-theme="breen"] .mud-nav-link.active::after {
+    content: '';
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 8px;
+    height: 8px;
+    background: var(--breen-gold);
+    box-shadow:
+        0 0 10px var(--breen-gold),
+        0 0 20px rgba(255, 170, 51, 0.5);
+}
+
+/* ===== BREEN SPECIFIC DECORATIONS ===== */
+
+/* Vertical light pillar */
+html[data-theme="breen"] .light-pillar {
+    width: 6px;
+    background: linear-gradient(180deg,
+        var(--breen-gold-bright) 0%,
+        var(--breen-gold) 30%,
+        var(--breen-amber) 70%,
+        var(--breen-gold-dim) 100%
+    );
+    box-shadow:
+        0 0 20px var(--breen-gold),
+        0 0 40px rgba(255, 170, 51, 0.4);
+}
+
+/* Floor light strip (cyan) */
+html[data-theme="breen"] .floor-strip {
+    height: 3px;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        var(--breen-cyan-dim) 10%,
+        var(--breen-cyan) 50%,
+        var(--breen-cyan-dim) 90%,
+        transparent 100%
+    );
+    box-shadow: 0 0 15px var(--breen-cyan);
+}
+
+/* Holographic display circle (from bridge table) */
+html[data-theme="breen"] .holo-display {
+    border: 3px solid var(--breen-gold);
+    border-radius: 50%;
+    background:
+        radial-gradient(circle at center,
+            rgba(255, 170, 51, 0.15) 0%,
+            rgba(255, 170, 51, 0.05) 50%,
+            transparent 70%
+        );
+    box-shadow:
+        inset 0 0 30px rgba(255, 170, 51, 0.2),
+        0 0 20px rgba(255, 170, 51, 0.4);
+    position: relative;
+}
+
+/* Cyan data markers on holo display */
+html[data-theme="breen"] .holo-marker {
+    width: 8px;
+    height: 8px;
+    background: var(--breen-cyan);
+    border-radius: 50%;
+    box-shadow:
+        0 0 8px var(--breen-cyan),
+        0 0 16px var(--breen-cyan-dim);
+    animation: breen-marker-pulse 2s ease-in-out infinite;
+}
+
+@keyframes breen-marker-pulse {
+    0%, 100% {
+        opacity: 0.7;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.2);
+    }
+}
+
+/* Angular console panel */
+html[data-theme="breen"] .console-panel {
+    background: var(--breen-armor-mid);
+    border: 2px solid var(--breen-armor-light);
+    clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+    position: relative;
+}
+
+html[data-theme="breen"] .console-panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg,
+        var(--breen-gold-dim) 0%,
+        var(--breen-gold) 50%,
+        var(--breen-gold-dim) 100%
+    );
+}
+
+/* Status bar with gold fill */
+html[data-theme="breen"] .status-bar {
+    height: 6px;
+    background: var(--breen-armor-dark);
+    border: 1px solid var(--breen-armor-light);
+}
+
+html[data-theme="breen"] .status-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg,
+        var(--breen-gold-dim) 0%,
+        var(--breen-gold) 50%,
+        var(--breen-gold-bright) 100%
+    );
+    box-shadow: 0 0 10px var(--breen-gold);
+    transition: width 0.3s ease;
+}
+
+/* Visor-style indicator (secondary element) */
+html[data-theme="breen"] .visor-indicator {
+    width: 40px;
+    height: 8px;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        var(--breen-cyan) 20%,
+        var(--breen-cyan-bright) 50%,
+        var(--breen-cyan) 80%,
+        transparent 100%
+    );
+    border-radius: 4px;
+    box-shadow: 0 0 15px var(--breen-cyan);
+}
+
+/* Angular data readout */
+html[data-theme="breen"] .data-readout {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 11px;
+    color: var(--breen-gold);
+    background: rgba(10, 10, 10, 0.95);
+    padding: 8px 12px;
+    border-left: 3px solid var(--breen-gold);
+    border-bottom: 1px solid var(--breen-cyan-dim);
+}
+
+/* Encrypted communication - amber bars */
+@keyframes breen-comm {
+    0%, 20% { opacity: 1; }
+    25%, 45% { opacity: 0.4; }
+    50%, 70% { opacity: 0.9; }
+    75%, 95% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+html[data-theme="breen"] .comm-signal {
+    display: flex;
+    gap: 3px;
+    align-items: flex-end;
+}
+
+html[data-theme="breen"] .comm-signal-bar {
+    width: 4px;
+    background: var(--breen-gold);
+    box-shadow: 0 0 5px var(--breen-gold);
+}
+
+html[data-theme="breen"] .comm-signal-bar:nth-child(1) { height: 8px; animation: breen-comm 1.5s infinite; }
+html[data-theme="breen"] .comm-signal-bar:nth-child(2) { height: 14px; animation: breen-comm 1.5s 0.2s infinite; }
+html[data-theme="breen"] .comm-signal-bar:nth-child(3) { height: 10px; animation: breen-comm 1.5s 0.4s infinite; }
+html[data-theme="breen"] .comm-signal-bar:nth-child(4) { height: 16px; animation: breen-comm 1.5s 0.6s infinite; }
+
+/* Industrial divider with gold center */
+html[data-theme="breen"] .industrial-divider {
+    height: 2px;
+    background: linear-gradient(90deg,
+        var(--breen-armor-dark) 0%,
+        var(--breen-armor-light) 30%,
+        var(--breen-gold) 50%,
+        var(--breen-armor-light) 70%,
+        var(--breen-armor-dark) 100%
+    );
+    margin: 12px 0;
+}
+
+/* Ambient glow animation for panels */
+@keyframes breen-ambient {
+    0%, 100% {
+        box-shadow:
+            inset 0 0 20px rgba(255, 170, 51, 0.05),
+            0 0 10px rgba(255, 170, 51, 0.1);
+    }
+    50% {
+        box-shadow:
+            inset 0 0 30px rgba(255, 170, 51, 0.1),
+            0 0 20px rgba(255, 170, 51, 0.15);
+    }
+}
+
+html[data-theme="breen"] .ambient-glow {
+    animation: breen-ambient 4s ease-in-out infinite;
+}
+
+/* Targeting display - gold ring with cyan center */
+html[data-theme="breen"] .targeting-display {
+    width: 60px;
+    height: 60px;
+    border: 3px solid var(--breen-gold);
+    border-radius: 50%;
+    position: relative;
+    box-shadow: 0 0 20px rgba(255, 170, 51, 0.4);
+}
+
+html[data-theme="breen"] .targeting-display::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 16px;
+    height: 16px;
+    background: var(--breen-cyan);
+    border-radius: 50%;
+    box-shadow: 0 0 15px var(--breen-cyan);
+}
+
+html[data-theme="breen"] .targeting-display::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg,
+        var(--breen-gold) 0%,
+        transparent 40%,
+        transparent 60%,
+        var(--breen-gold) 100%
+    );
+}

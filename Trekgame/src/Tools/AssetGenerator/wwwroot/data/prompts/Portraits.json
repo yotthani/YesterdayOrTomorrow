@@ -315,25 +315,28 @@
         "mercenary": "Mismatched functional armor, visible weapons",
         "raider": "Light tactical gear for quick raids"
       },
-      "aesthetic": "Brutal, intimidating, mercenary",
+      "aesthetic": "Predator-like alien mercenary (NOT orc-like!)",
       "physicalFeatures": {
-        "height": "TALL - over 2 meters, towering over most humanoids",
-        "build": "MUSCULAR and powerful",
-        "tusks": "Prominent TUSKS protruding from LOWER JAW (KEY FEATURE!)",
-        "brow": "Heavy BROW RIDGES over deep-set eyes",
-        "skin": "Rough GRAY or BROWN skin texture",
-        "hair": "BALD or minimal coarse hair"
+        "height": "VERY TALL - over 2 meters, lean and imposing",
+        "build": "LEAN but muscular - athletic predator build, NOT bulky orc",
+        "skull": "ELONGATED HIGH-DOMED SKULL sloping backward (Predator-like)",
+        "tusks": "TWO TUSKS curving UPWARD from LOWER JAW (KEY FEATURE!)",
+        "eyes": "DEEP-SET small eyes under heavy brow ridge",
+        "cheekbones": "PROMINENT angular CHEEKBONES - gaunt face",
+        "skin": "GRAY or TAN leathery skin texture (NOT green!)",
+        "hair": "Completely BALD - no hair at all"
       },
       "features": [
-        "TUSKS from lower jaw (KEY DISTINGUISHING FEATURE!)",
-        "TALL and muscular - towers over humans",
-        "Heavy BROW RIDGES",
-        "Rough GRAY/BROWN skin",
-        "BALD or minimal hair",
-        "Brutish, intimidating expression",
-        "Battle scars common"
+        "TWO TUSKS curving UP from lower jaw (KEY FEATURE!)",
+        "ELONGATED SKULL - high forehead sloping back like Predator",
+        "VERY TALL (2m+) and LEAN - athletic not bulky",
+        "Deep-set small eyes, prominent angular cheekbones",
+        "GRAY/TAN leathery skin (NOT green, NOT orc)",
+        "Completely BALD",
+        "Menacing mercenary expression",
+        "Think: Predator movie alien meets mercenary"
       ],
-      "criticalNotes": "TUSKS are the KEY feature - prominent tusks protruding from lower jaw. Very TALL (2m+) and muscular. Bald with heavy brow ridges. Gray/brown rough skin. Brutal, mercenary aesthetic."
+      "criticalNotes": "NOT an orc! Predator-like appearance: elongated skull sloping back, prominent cheekbones, deep-set eyes. TWO TUSKS curving upward from lower jaw. GRAY/TAN skin (not green). Very tall and LEAN (not bulky). Bald. Dangerous mercenary aesthetic."
     }
   },
   "portraitTypes": [

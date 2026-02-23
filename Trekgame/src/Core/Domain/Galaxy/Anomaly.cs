@@ -7,9 +7,9 @@ namespace StarTrekGame.Domain.Galaxy;
 /// </summary>
 public class Anomaly : Entity
 {
-    public string Name { get; private set; }
+    public string Name { get; private set; } = null!;
     public AnomalyType Type { get; private set; }
-    public string Description { get; private set; }
+    public string Description { get; private set; } = null!;
     public int DangerLevel { get; private set; }        // 0-100
     public int ResearchValue { get; private set; }      // Research points when studied
     public bool IsDiscovered { get; private set; }
@@ -21,7 +21,7 @@ public class Anomaly : Entity
     public Guid SystemId { get; set; }  // The star system containing this anomaly
 
     // Potential rewards/effects stored as flexible data
-    public Resources PotentialResources { get; private set; }
+    public Resources PotentialResources { get; private set; } = null!;
     public string? SpecialEventId { get; private set; }  // Links to narrative system
 
     private Anomaly() { } // EF Core

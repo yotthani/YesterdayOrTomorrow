@@ -547,16 +547,17 @@
       "prompt": {
         "title": "NAUSICAAN CHIEFTAIN",
         "gender": "male",
-        "species": "Nausicaan - brutish mercenary species",
+        "species": "Nausicaan - Predator-like mercenary alien (NOT orc!)",
         "appearance": [
-          "TALL - towers over humans (over 2 meters)",
-          "MUSCULAR and powerful build",
-          "Prominent TUSKS protruding from LOWER JAW (KEY FEATURE!)",
-          "Heavy BROW RIDGES over deep-set menacing eyes",
-          "Rough GRAY or BROWN skin texture",
-          "BALD or minimal coarse hair",
-          "Battle scars across face and body",
-          "Brutish, intimidating expression"
+          "VERY TALL - towers over humans (over 2 meters)",
+          "LEAN but muscular athletic build (NOT bulky orc!)",
+          "ELONGATED SKULL - high domed forehead sloping backward (Predator-like)",
+          "TWO TUSKS curving UPWARD from LOWER JAW (KEY FEATURE!)",
+          "DEEP-SET small eyes under heavy brow ridge",
+          "PROMINENT angular CHEEKBONES - gaunt alien face",
+          "GRAY or TAN leathery skin (NOT green!)",
+          "Completely BALD - no hair at all",
+          "Battle scars across face"
         ],
         "clothing": [
           "Heavy LEATHER AND METAL ARMOR",
@@ -566,17 +567,19 @@
           "Dark colors: brown, gray, black",
           "Utilitarian but intimidating"
         ],
-        "expression": "Brutal, menacing, aggressive - dangerous mercenary",
-        "colorPalette": "Dark browns, grays, gunmetal, rust",
-        "keyFeatures": "TUSKS FROM LOWER JAW + TALL + MUSCULAR + BRUTAL ARMOR = Nausicaan",
+        "expression": "Menacing, predatory, calculating - dangerous mercenary",
+        "colorPalette": "Dark browns, grays, gunmetal, tan",
+        "keyFeatures": "TUSKS CURVING UP + ELONGATED SKULL + LEAN BUILD + GRAY/TAN SKIN = Nausicaan",
         "criticalNotes": [
-          "TUSKS are KEY - prominent tusks from lower jaw",
-          "Very TALL - towers over humans",
-          "Heavy brow ridges, bald",
-          "Gray/brown rough skin",
-          "Brutal mercenary/pirate aesthetic"
+          "NOT AN ORC! Predator-movie aesthetic",
+          "ELONGATED SKULL sloping back - high domed forehead",
+          "TWO TUSKS curving UPWARD from lower jaw",
+          "LEAN athletic build (not bulky)",
+          "GRAY/TAN skin (NOT green)",
+          "Deep-set eyes, prominent cheekbones",
+          "Completely BALD"
         ],
-        "reference": "Think: brutish hired muscle, dangerous mercenary, space thug-for-hire"
+        "reference": "Think: Predator movie alien as mercenary, NOT fantasy orc"
       }
     },
     {
@@ -774,13 +777,15 @@
       "prompt": {
         "title": "NAUSICAAN RAIDER CAPTAIN",
         "gender": "male",
-        "species": "Nausicaan - tall brutish humanoid species",
+        "species": "Nausicaan - Predator-like alien mercenary (NOT orc!)",
         "appearance": [
-          "TALL, muscular humanoid with rough gray/brown skin",
-          "Prominent TUSKS protruding from lower jaw",
-          "Heavy brow ridges and deep-set eyes",
-          "Bald or minimal coarse hair",
-          "Battle scars and rough, weathered features"
+          "VERY TALL lean humanoid (Predator aesthetic, NOT orc)",
+          "ELONGATED SKULL with high domed forehead sloping back",
+          "TWO TUSKS curving UPWARD from lower jaw (KEY!)",
+          "Deep-set small eyes, prominent angular cheekbones",
+          "GRAY or TAN leathery skin (NOT green)",
+          "Completely BALD",
+          "Battle scars across face"
         ],
         "clothing": [
           "Rough leather and metal armor",
@@ -788,10 +793,11 @@
           "Trophy items from past raids visible",
           "Dark colors - black, brown, gunmetal"
         ],
-        "expression": "Aggressive, intimidating, brutish",
-        "colorPalette": "Gray/brown skin, dark leather, metal armor",
-        "keyFeatures": "TUSKS + TALL + BRUTISH = Nausicaan",
-        "reference": "Think: space pirate, hired muscle, dangerous thug-for-hire"
+        "expression": "Menacing, calculating, predatory",
+        "colorPalette": "Gray/tan skin, dark leather, metal armor",
+        "keyFeatures": "TUSKS CURVING UP + ELONGATED SKULL + LEAN + GRAY/TAN = Nausicaan",
+        "criticalNotes": "NOT an orc! Predator-like appearance with elongated skull and upward-curving tusks",
+        "reference": "Think: Predator movie alien as space pirate, NOT fantasy orc"
       }
     }
   ],

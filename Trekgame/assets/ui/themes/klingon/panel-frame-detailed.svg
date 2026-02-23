@@ -1,0 +1,290 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" fill="none">
+  <!-- KLINGON PANEL V2: Aggressive, dark, battle-worn with red nebula glow -->
+  <defs>
+    <!-- Red nebula background gradient -->
+    <radialGradient id="nebulaRed" cx="50%" cy="50%" r="80%" fx="30%" fy="30%">
+      <stop offset="0%" style="stop-color:#3a0a0a"/>
+      <stop offset="40%" style="stop-color:#1a0505"/>
+      <stop offset="70%" style="stop-color:#0a0202"/>
+      <stop offset="100%" style="stop-color:#000000"/>
+    </radialGradient>
+
+    <!-- Nebula glow spots -->
+    <radialGradient id="nebulaGlow1" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#ff220088"/>
+      <stop offset="100%" style="stop-color:#ff220000"/>
+    </radialGradient>
+
+    <radialGradient id="nebulaGlow2" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#ff440066"/>
+      <stop offset="100%" style="stop-color:#ff440000"/>
+    </radialGradient>
+
+    <!-- Dark gunmetal for frame -->
+    <linearGradient id="gunmetal" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#5a5a5a"/>
+      <stop offset="8%" style="stop-color:#3d3d3d"/>
+      <stop offset="50%" style="stop-color:#1a1a1a"/>
+      <stop offset="92%" style="stop-color:#3d3d3d"/>
+      <stop offset="100%" style="stop-color:#5a5a5a"/>
+    </linearGradient>
+
+    <!-- Blood red accent -->
+    <linearGradient id="bloodRed" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#ff4444"/>
+      <stop offset="20%" style="stop-color:#cc2222"/>
+      <stop offset="50%" style="stop-color:#880000"/>
+      <stop offset="80%" style="stop-color:#cc2222"/>
+      <stop offset="100%" style="stop-color:#ff4444"/>
+    </linearGradient>
+
+    <!-- Burning orange for highlights -->
+    <linearGradient id="burningOrange" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#ff6600"/>
+      <stop offset="50%" style="stop-color:#ff3300"/>
+      <stop offset="100%" style="stop-color:#ff6600"/>
+    </linearGradient>
+
+    <!-- Dark bronze/bone color -->
+    <linearGradient id="darkBronze" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8B7355"/>
+      <stop offset="50%" style="stop-color:#5C4033"/>
+      <stop offset="100%" style="stop-color:#8B7355"/>
+    </linearGradient>
+
+    <!-- Heavy brushed metal texture -->
+    <pattern id="heavyMetal" x="0" y="0" width="60" height="8" patternUnits="userSpaceOnUse">
+      <rect width="60" height="8" fill="transparent"/>
+      <line x1="0" y1="1" x2="60" y2="1" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+      <line x1="0" y1="3" x2="60" y2="3" stroke="rgba(0,0,0,0.15)" stroke-width="1"/>
+      <line x1="0" y1="5" x2="60" y2="5" stroke="rgba(255,255,255,0.02)" stroke-width="0.5"/>
+      <line x1="0" y1="7" x2="60" y2="7" stroke="rgba(0,0,0,0.1)" stroke-width="0.5"/>
+    </pattern>
+
+    <!-- Battle damage scratches - more aggressive -->
+    <pattern id="battleScars" x="0" y="0" width="120" height="120" patternUnits="userSpaceOnUse">
+      <line x1="5" y1="10" x2="45" y2="15" stroke="rgba(80,80,80,0.4)" stroke-width="1"/>
+      <line x1="60" y1="30" x2="110" y2="38" stroke="rgba(60,60,60,0.3)" stroke-width="0.8"/>
+      <line x1="15" y1="70" x2="55" y2="78" stroke="rgba(70,70,70,0.35)" stroke-width="0.6"/>
+      <line x1="80" y1="90" x2="115" y2="95" stroke="rgba(50,50,50,0.25)" stroke-width="0.5"/>
+      <line x1="25" y1="100" x2="70" y2="110" stroke="rgba(90,90,90,0.3)" stroke-width="0.7"/>
+    </pattern>
+
+    <!-- Glow filters -->
+    <filter id="redGlowStrong" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="8" result="blur"/>
+      <feFlood flood-color="#ff2200" flood-opacity="0.7"/>
+      <feComposite in2="blur" operator="in"/>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="innerShadowDeep">
+      <feDropShadow dx="4" dy="4" stdDeviation="6" flood-color="#000" flood-opacity="0.8"/>
+    </filter>
+
+    <filter id="bevelMetal">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur"/>
+      <feOffset in="blur" dx="2" dy="2" result="offsetBlur"/>
+      <feSpecularLighting in="blur" surfaceScale="5" specularConstant="0.5" specularExponent="10" lighting-color="#ffffff" result="specOut">
+        <fePointLight x="-5000" y="-10000" z="20000"/>
+      </feSpecularLighting>
+      <feComposite in="specOut" in2="SourceAlpha" operator="in" result="specOut"/>
+      <feComposite in="SourceGraphic" in2="specOut" operator="arithmetic" k1="0" k2="1" k3="1" k4="0"/>
+    </filter>
+  </defs>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- BACKGROUND - Red nebula with glow -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <rect x="0" y="0" width="800" height="600" fill="url(#nebulaRed)"/>
+
+  <!-- Nebula glow effects -->
+  <ellipse cx="150" cy="150" rx="200" ry="150" fill="url(#nebulaGlow1)"/>
+  <ellipse cx="650" cy="450" rx="180" ry="120" fill="url(#nebulaGlow2)"/>
+  <ellipse cx="400" cy="300" rx="150" ry="100" fill="url(#nebulaGlow1)" opacity="0.3"/>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- MAIN FRAME - Heavy angular metal with spikes -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+
+  <!-- TOP FRAME - Aggressive with spike cutouts -->
+  <path d="
+    M 0 0 L 800 0 L 800 85
+    L 750 85 L 740 75 L 700 75 L 690 85
+    L 500 85 L 490 70 L 310 70 L 300 85
+    L 110 85 L 100 75 L 60 75 L 50 85
+    L 0 85 Z
+  " fill="url(#gunmetal)" filter="url(#innerShadowDeep)"/>
+  <path d="
+    M 0 0 L 800 0 L 800 85
+    L 750 85 L 740 75 L 700 75 L 690 85
+    L 500 85 L 490 70 L 310 70 L 300 85
+    L 110 85 L 100 75 L 60 75 L 50 85
+    L 0 85 Z
+  " fill="url(#heavyMetal)"/>
+  <path d="
+    M 0 0 L 800 0 L 800 85
+    L 750 85 L 740 75 L 700 75 L 690 85
+    L 500 85 L 490 70 L 310 70 L 300 85
+    L 110 85 L 100 75 L 60 75 L 50 85
+    L 0 85 Z
+  " fill="url(#battleScars)"/>
+
+  <!-- LEFT SIDEBAR - Fortress wall with angular cuts -->
+  <path d="
+    M 0 0 L 120 0 L 120 600 L 0 600 Z
+  " fill="url(#gunmetal)" filter="url(#innerShadowDeep)"/>
+  <path d="M 0 0 L 120 0 L 120 600 L 0 600 Z" fill="url(#heavyMetal)"/>
+  <path d="M 0 0 L 120 0 L 120 600 L 0 600 Z" fill="url(#battleScars)"/>
+
+  <!-- Sidebar angular indent -->
+  <path d="M 115 100 L 95 120 L 95 200 L 115 220 L 115 100" fill="#0a0a0a"/>
+  <path d="M 115 250 L 95 270 L 95 350 L 115 370 L 115 250" fill="#0a0a0a"/>
+  <path d="M 115 400 L 95 420 L 95 500 L 115 520 L 115 400" fill="#0a0a0a"/>
+
+  <!-- BOTTOM FRAME - Heavy base -->
+  <path d="
+    M 0 520 L 800 520 L 800 600 L 0 600 Z
+  " fill="url(#gunmetal)" filter="url(#innerShadowDeep)"/>
+  <path d="M 0 520 L 800 520 L 800 600 L 0 600 Z" fill="url(#heavyMetal)"/>
+  <path d="M 0 520 L 800 520 L 800 600 L 0 600 Z" fill="url(#battleScars)"/>
+
+  <!-- Bottom spike indents -->
+  <path d="M 200 520 L 220 540 L 240 520" fill="#0a0a0a"/>
+  <path d="M 380 520 L 400 545 L 420 520" fill="#0a0a0a"/>
+  <path d="M 560 520 L 580 540 L 600 520" fill="#0a0a0a"/>
+
+  <!-- RIGHT SIDEBAR - Thin vertical accent -->
+  <path d="M 760 85 L 800 85 L 800 520 L 760 520 Z" fill="url(#gunmetal)"/>
+  <path d="M 760 85 L 800 85 L 800 520 L 760 520 Z" fill="url(#heavyMetal)"/>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- BLOOD RED ACCENT STRIPES - Warrior markings -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+
+  <!-- Top red band with glow -->
+  <rect x="130" y="10" width="540" height="12" fill="url(#bloodRed)" filter="url(#redGlowStrong)"/>
+  <rect x="130" y="10" width="540" height="2" fill="#ff6666"/>
+
+  <!-- Left sidebar red stripes -->
+  <rect x="10" y="100" width="80" height="10" fill="url(#bloodRed)" filter="url(#redGlowStrong)"/>
+  <rect x="10" y="250" width="80" height="8" fill="url(#bloodRed)"/>
+  <rect x="10" y="400" width="80" height="10" fill="url(#bloodRed)" filter="url(#redGlowStrong)"/>
+
+  <!-- Bottom red band with glow -->
+  <rect x="130" y="578" width="540" height="12" fill="url(#bloodRed)" filter="url(#redGlowStrong)"/>
+  <rect x="130" y="588" width="540" height="2" fill="#ff6666"/>
+
+  <!-- Right sidebar red accent -->
+  <rect x="765" y="100" width="30" height="8" fill="url(#bloodRed)" filter="url(#redGlowStrong)"/>
+  <rect x="765" y="250" width="30" height="6" fill="url(#bloodRed)"/>
+  <rect x="765" y="400" width="30" height="8" fill="url(#bloodRed)" filter="url(#redGlowStrong)"/>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- SPIKE DECORATIONS - Klingon warrior motifs -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+
+  <!-- Top corner spikes -->
+  <path d="M 125 90 L 145 90 L 125 130 Z" fill="url(#darkBronze)"/>
+  <path d="M 128 93 L 140 93 L 128 120 Z" fill="url(#bloodRed)"/>
+
+  <path d="M 755 90 L 735 90 L 755 130 Z" fill="url(#darkBronze)"/>
+  <path d="M 752 93 L 740 93 L 752 120 Z" fill="url(#bloodRed)"/>
+
+  <!-- Bottom corner spikes -->
+  <path d="M 125 515 L 145 515 L 125 475 Z" fill="url(#darkBronze)"/>
+  <path d="M 128 512 L 140 512 L 128 485 Z" fill="url(#bloodRed)"/>
+
+  <path d="M 755 515 L 735 515 L 755 475 Z" fill="url(#darkBronze)"/>
+  <path d="M 752 512 L 740 512 L 752 485 Z" fill="url(#bloodRed)"/>
+
+  <!-- Sidebar bone/spike decorations -->
+  <path d="M 10 150 L 25 165 L 10 180 L 5 165 Z" fill="url(#darkBronze)"/>
+  <path d="M 10 300 L 25 320 L 10 340 L 5 320 Z" fill="url(#darkBronze)"/>
+  <path d="M 10 450 L 25 470 L 10 490 L 5 470 Z" fill="url(#darkBronze)"/>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- RIVETS - Industrial warrior look -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+
+  <!-- Top rivets -->
+  <g>
+    <circle cx="150" cy="45" r="5" fill="#1a1a1a"/>
+    <circle cx="150" cy="45" r="3" fill="#444"/>
+    <circle cx="150" cy="44" r="1" fill="#666"/>
+  </g>
+  <g>
+    <circle cx="300" cy="45" r="5" fill="#1a1a1a"/>
+    <circle cx="300" cy="45" r="3" fill="#444"/>
+    <circle cx="300" cy="44" r="1" fill="#666"/>
+  </g>
+  <g>
+    <circle cx="500" cy="45" r="5" fill="#1a1a1a"/>
+    <circle cx="500" cy="45" r="3" fill="#444"/>
+    <circle cx="500" cy="44" r="1" fill="#666"/>
+  </g>
+  <g>
+    <circle cx="650" cy="45" r="5" fill="#1a1a1a"/>
+    <circle cx="650" cy="45" r="3" fill="#444"/>
+    <circle cx="650" cy="44" r="1" fill="#666"/>
+  </g>
+
+  <!-- Sidebar rivets -->
+  <g>
+    <circle cx="60" cy="130" r="4" fill="#1a1a1a"/>
+    <circle cx="60" cy="130" r="2.5" fill="#444"/>
+  </g>
+  <g>
+    <circle cx="60" cy="230" r="4" fill="#1a1a1a"/>
+    <circle cx="60" cy="230" r="2.5" fill="#444"/>
+  </g>
+  <g>
+    <circle cx="60" cy="380" r="4" fill="#1a1a1a"/>
+    <circle cx="60" cy="380" r="2.5" fill="#444"/>
+  </g>
+  <g>
+    <circle cx="60" cy="480" r="4" fill="#1a1a1a"/>
+    <circle cx="60" cy="480" r="2.5" fill="#444"/>
+  </g>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- KLINGON TREFOIL EMBLEM - Sidebar center -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+
+  <!-- Emblem background plate -->
+  <path d="
+    M 20 280 L 100 280 L 105 290 L 105 340 L 100 350 L 20 350 L 15 340 L 15 290 Z
+  " fill="#1a1a1a" stroke="url(#bloodRed)" stroke-width="2"/>
+
+  <!-- Trefoil shape -->
+  <path d="
+    M 60 295
+    L 85 330 L 60 340 L 35 330 Z
+  " fill="url(#bloodRed)" filter="url(#redGlowStrong)"/>
+  <circle cx="60" cy="318" r="10" fill="url(#darkBronze)"/>
+  <circle cx="60" cy="318" r="6" fill="url(#bloodRed)"/>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- CONTENT AREA - Dark viewport with red tint -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+
+  <rect x="130" y="95" width="620" height="415" fill="rgba(10,5,5,0.95)"/>
+
+  <!-- Subtle red scanlines -->
+  <pattern id="klingonScan" x="0" y="0" width="4" height="4" patternUnits="userSpaceOnUse">
+    <rect width="4" height="2" fill="rgba(100,0,0,0.04)"/>
+  </pattern>
+  <rect x="130" y="95" width="620" height="415" fill="url(#klingonScan)"/>
+
+  <!-- Corner warning indicators -->
+  <circle cx="145" cy="110" r="5" fill="#ff3333" filter="url(#redGlowStrong)"/>
+  <circle cx="735" cy="110" r="5" fill="#ff3333" filter="url(#redGlowStrong)"/>
+  <circle cx="145" cy="495" r="5" fill="#ff3333" filter="url(#redGlowStrong)"/>
+  <circle cx="735" cy="495" r="5" fill="#ff3333" filter="url(#redGlowStrong)"/>
+
+  <!-- Inner frame border glow -->
+  <rect x="130" y="95" width="620" height="415" fill="none" stroke="url(#bloodRed)" stroke-width="2" opacity="0.5"/>
+</svg>

@@ -11,10 +11,23 @@ public class PromptBuilderService
     private readonly BuildingManifestService _buildingManifestService;
     private bool _jsonDataLoaded = false;
 
+    /// <summary>
+    /// Constructor for HTTP-based loading (Blazor WebAssembly)
+    /// </summary>
     public PromptBuilderService(HttpClient httpClient)
     {
         _factionProfiles = InitializeFactionProfiles();
         _promptData = new PromptDataService(httpClient);
+        _buildingManifestService = new BuildingManifestService();
+    }
+
+    /// <summary>
+    /// Constructor for file system loading (Blazor Server)
+    /// </summary>
+    public PromptBuilderService(string wwwrootPath)
+    {
+        _factionProfiles = InitializeFactionProfiles();
+        _promptData = new PromptDataService(wwwrootPath);
         _buildingManifestService = new BuildingManifestService();
     }
 
@@ -1589,6 +1602,7 @@ CRITICAL: Character must be clearly recognizable as {profile.Name}. Species feat
             Faction.Dominion => GetDominionUniform(variantLower),
             Faction.Breen => GetBreenSuit(),
             Faction.Gorn => GetGornAttire(variantLower),
+            Faction.Hirogen => GetHirogenAttire(variantLower),
             Faction.Vulcan => GetVulcanAttire(variantLower, isMilitary, isCivilian),
             Faction.Andorian => GetAndorianAttire(variantLower, isMilitary),
             Faction.Trill => GetTrillAttire(variantLower, isMilitary),
@@ -1903,7 +1917,60 @@ CRITICAL: Character must be clearly recognizable as {profile.Name}. Species feat
 - Weapon: Heavy disruptor or melee weapon
 - Cold-blooded predator needs no protection from cold";
     }
-    
+
+    private string GetHirogenAttire(string variant)
+    {
+        if (variant.Contains("alpha") || variant.Contains("commander") || variant.Contains("leader"))
+        {
+            return @"HIROGEN ALPHA HUNTER ARMOR:
+- FULL SILVER-BLUE METALLIC ARMOR with color-shifting sheen
+- Heavy segmented chest plate with angular predatory design
+- Massive pauldrons showing ALPHA STATUS SYMBOLS
+- TROPHY DECORATIONS prominently displayed - bones, teeth, skulls from prey
+- Integrated sensor equipment on forearms and shoulders
+- Utility belt with hunting tools, blades, scanning devices
+- Battle-worn finish with scratches and dents from hunts
+- HELMET (if helmeted): Angular predatory shape, narrow amber visor, respirator grille
+- Colors: Silver-blue metallic primary, amber/orange visor glow, bone-white trophies";
+        }
+
+        if (variant.Contains("tracker") || variant.Contains("scout") || variant.Contains("infiltrator"))
+        {
+            return @"HIROGEN TRACKER/SCOUT GEAR:
+- LIGHTER armor than Alpha - mobility focused
+- Dark olive/bronze stealth-oriented plating
+- Advanced SENSOR ARRAY mounted on shoulder or helmet
+- Minimal trophy display - focused on function
+- Cloaking-compatible dark matte finish
+- Wrist-mounted scanning and tracking equipment
+- Low-profile respirator mask or half-mask
+- Muted colors: Dark olive, matte bronze, charcoal black";
+        }
+
+        if (variant.Contains("elder") || variant.Contains("sage") || variant.Contains("historian"))
+        {
+            return @"HIROGEN ELDER ATTIRE:
+- Weathered BRONZE hunting armor, ceremonial version
+- EXTENSIVE TROPHY COLLECTION across chest and shoulders
+- Each trophy tells a story of a legendary hunt
+- Older, more ornate armor design with clan markings
+- Heavy ceremonial cloak or cape in dark olive
+- Staff or ceremonial weapon
+- Colors: Aged bronze, dark olive, bone-white trophy accents";
+        }
+
+        // Default: standard hunter
+        return @"HIROGEN HUNTER ARMOR:
+- Heavy BRONZE/OLIVE HUNTING ARMOR matching skin tones
+- Segmented chest and shoulder plates for mobility
+- TROPHY DECORATIONS - bones, teeth from kills
+- Integrated sensor equipment for tracking prey
+- Utility belt with hunting tools and weapons
+- RESPIRATOR MASK or half-mask (silver-blue metallic)
+- Battle-worn finish showing experience
+- Colors: Bronze, olive green, dark brown, bone-white trophy accents";
+    }
+
     private string GetVulcanAttire(string variant, bool isMilitary, bool isCivilian)
     {
         if (variant.Contains("priest") || variant.Contains("kolinahr") || variant.Contains("elder"))
@@ -4156,35 +4223,71 @@ Subject: {profile.Name} UI element - {elementName}
     private string BuildLCARSPrompt(string elementName)
     {
         var lowerName = elementName.ToLower();
-        var elementType = GetLCARSElementType(lowerName);
-        
-        return $@"STAR TREK LCARS INTERFACE ELEMENT
+        var (shape, color, details) = GetLCARSShapeDetails(lowerName);
 
-CRITICAL REFERENCE: This must look EXACTLY like the LCARS computer interface from Star Trek: The Next Generation, Deep Space Nine, and Voyager.
+        // LCARS style: solid shapes, NO borders, NO frames, NO inner details
+        return $@"Minimalist geometric shape on pure black background.
 
-LCARS DESIGN RULES (MUST FOLLOW):
-1. COLORS: Orange (#FF9900), Periwinkle Blue (#9999FF), Lavender (#CC99CC), Tan/Beige (#FFCC99), Pale Blue (#99CCFF)
-2. SHAPES: Simple geometric - rounded rectangles, pill shapes (capsules), quarter-circle elbows
-3. STYLE: FLAT solid colors - NO gradients inside shapes, NO 3D shading, NO bevels
-4. EDGES: Rounded corners ONLY - no sharp 90-degree corners anywhere
-5. BACKGROUND: Black background, elements appear backlit/glowing
+SHAPE: {shape}
+{details}
 
-{elementType}
+CRITICAL STYLE RULES:
+- SOLID {color} color fill - completely filled, not hollow
+- NO border, NO outline, NO frame around the shape
+- NO inner details, NO icons inside, NO text
+- Just ONE solid colored geometric shape
+- Soft {color} glow/bloom effect OUTSIDE the shape edges
+- Like a backlit colored plastic panel
 
-VIEW: Perfectly FLAT, 2D, front-on view - like a screenshot from a Star Trek computer screen
-LOOK: Clean vector-graphic style, solid flat colors, slight outer glow suggesting backlit display
+Think: solid colored geometric shape, like a piece of colored glass or acrylic, glowing softly against pure black.
 
-CRITICAL - WHAT LCARS IS NOT:
-- NOT 3D rendered buttons with depth
-- NOT glossy/shiny surfaces
-- NOT complex multi-layered frames
-- NOT realistic metal or plastic
-- LCARS is FLAT, SIMPLE, GRAPHIC
-
-**LCARS interface element, flat 2D vector style, solid colors, backlit appearance, Star Trek TNG style**
---no 3D, no depth, no gradients inside shapes, no realistic materials, no complex frames, no bevels, no shadows on element";
+**solid {color} {shape}, flat geometric shape, solid color fill, no border, no frame, soft outer glow, black background, minimalist design**
+--no border, no outline, no frame, no icon inside, no details inside, no text, no 3D, no depth, no app icon, no button with frame, no hollow shape";
     }
-    
+
+    private (string shape, string color, string details) GetLCARSShapeDetails(string lowerName)
+    {
+        // Determine color
+        var color = "orange";
+        if (lowerName.Contains("blue")) color = "blue";
+        else if (lowerName.Contains("purple") || lowerName.Contains("lavender")) color = "purple";
+        else if (lowerName.Contains("tan") || lowerName.Contains("beige")) color = "tan";
+        else if (lowerName.Contains("red")) color = "red";
+
+        // Determine shape - emphasize SOLID FILLED, NO BORDER
+        if (lowerName.Contains("pill") || lowerName.Contains("capsule"))
+            return ("solid pill shape", color,
+                "- Horizontal elongated pill/capsule/lozenge\n- Rectangle with semicircular caps on both ends\n- COMPLETELY SOLID FILLED with color\n- Aspect ratio 4:1 width to height\n- Like a medication pill or vitamin shape");
+
+        if (lowerName.Contains("elbow") || lowerName.Contains("corner"))
+        {
+            var direction = lowerName.Contains("left") ? "bends from vertical to horizontal going left" : "bends from vertical to horizontal going right";
+            return ("solid L-shaped elbow", color,
+                $"- Solid filled L-shape that {direction}\n- Like a bent pipe or corner bracket\n- Outer corner is rounded (quarter circle curve)\n- Both ends have rounded caps\n- COMPLETELY SOLID - no hollow parts");
+        }
+
+        if (lowerName.Contains("bar") || lowerName.Contains("track"))
+        {
+            if (lowerName.Contains("empty") || lowerName.Contains("track"))
+                return ("pill-shaped outline", color,
+                    "- Horizontal pill shape OUTLINE only\n- Empty/hollow inside (black interior)\n- Thin colored border around the edge\n- Like an empty progress bar container");
+            return ("solid horizontal bar", color,
+                "- Long horizontal pill shape\n- COMPLETELY SOLID FILLED\n- Rounded ends\n- Aspect ratio about 8:1");
+        }
+
+        if (lowerName.Contains("circle") || lowerName.Contains("dot"))
+            return ("solid circle", color,
+                "- Perfect circle shape\n- COMPLETELY SOLID FILLED with color\n- Soft glow around edges\n- Like a glowing LED indicator");
+
+        if (lowerName.Contains("bracket") || lowerName.Contains("frame"))
+            return ("solid bracket shape", color,
+                "- Angular bracket shape\n- SOLID FILLED, not outline\n- Rounded corners and ends\n- Like a decorative corner piece");
+
+        // Default: solid rounded rectangle
+        return ("solid rounded rectangle", color,
+            "- Simple rectangle with rounded corners\n- COMPLETELY SOLID FILLED with color\n- All four corners equally rounded\n- No border, no frame - just the solid shape");
+    }
+
     private string GetLCARSElementType(string lowerName)
     {
         if (lowerName.Contains("button") && lowerName.Contains("pill"))

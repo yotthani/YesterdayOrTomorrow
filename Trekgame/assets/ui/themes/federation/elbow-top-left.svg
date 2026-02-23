@@ -1,0 +1,43 @@
+<<<<<<< HEAD
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100" preserveAspectRatio="none">
+  <defs>
+    <linearGradient id="grad-orange" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#FF9900;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#FFB84D;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FF9900;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <!-- Thick LCARS Elbow -->
+  <path d="M 100,100 V 60 A 40,40 0 0 1 140,20 H 200 V 0 H 60 A 60,60 0 0 0 0,60 V 100 Z" fill="url(#grad-orange)" />
+</svg>
+=======
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <!-- LCARS Elbow Top-Left: Vertical bar on left, horizontal bar on top, rounded inner corner -->
+  <defs>
+    <linearGradient id="lcarsOrange" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF9966"/>
+      <stop offset="100%" style="stop-color:#CC6633"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Main elbow shape -->
+  <path d="
+    M 0 0
+    L 200 0
+    L 200 40
+    L 80 40
+    Q 40 40 40 80
+    L 40 200
+    L 0 200
+    Z
+  " fill="url(#lcarsOrange)"/>
+
+  <!-- Inner rounded corner cutout (transparent) -->
+  <path d="
+    M 40 40
+    L 80 40
+    Q 40 40 40 80
+    Z
+  " fill="black" fill-opacity="0"/>
+</svg>
+>>>>>>> 6517e6b7e23f9d726ac463cc784aa41fd481cafd

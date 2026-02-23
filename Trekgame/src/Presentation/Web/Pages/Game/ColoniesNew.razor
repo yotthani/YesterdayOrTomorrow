@@ -8,130 +8,95 @@
 @inject IGameApiClient Api
 @inject NavigationManager Navigation
 @inject ILocalStorageService LocalStorage
+@inject AssetService AssetService
+@inject ISnackbar Snackbar
 
 <PageTitle>Colonies - Galactic Strategy</PageTitle>
 
-<div class="stellaris-layout">
-    @* TOP BAR *@
-    <header class="st-topbar">
-        <div class="st-empire-badge">
-            <div class="st-empire-flag">🌐</div>
-            <div class="st-empire-info">
-                <span class="st-empire-name">@(_faction?.Name ?? "United Federation")</span>
-                <span class="st-empire-type">Democratic Republic</span>
+<div class="colonies-content">
+    @* Header *@
+    <div class="colonies-header">
+        <h1>PLANETARY MANAGEMENT</h1>
+        <div class="colonies-stats">
+            <div class="stat-box">
+                <span class="stat-value">@_colonies.Count</span>
+                <span class="stat-label">Colonies</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-value">@_totalPopulation.ToString("N0")</span>
+                <span class="stat-label">Population</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-value">@_totalProduction</span>
+                <span class="stat-label">Production</span>
             </div>
         </div>
-        <div class="st-resources">
-            <div class="st-resource"><span class="st-resource-icon">⚡</span><div class="st-resource-values"><span class="st-resource-current">1,250</span><span class="st-resource-income positive">+45</span></div></div>
-            <div class="st-resource"><span class="st-resource-icon">💎</span><div class="st-resource-values"><span class="st-resource-current">890</span><span class="st-resource-income positive">+32</span></div></div>
-            <div class="st-resource"><span class="st-resource-icon">🌾</span><div class="st-resource-values"><span class="st-resource-current">120</span></div></div>
-            <div class="st-resource"><span class="st-resource-icon">🔩</span><div class="st-resource-values"><span class="st-resource-current">340</span></div></div>
-            <div class="st-resource"><span class="st-resource-icon">🔬</span><div class="st-resource-values"><span class="st-resource-current">85</span></div></div>
+        <div class="colonies-filters">
+            <input type="text" class="st-input" placeholder="Search colonies..." @bind="_searchText" @bind:event="oninput" style="width: 200px;" />
+            <select class="st-input st-select" @bind="_sortBy" style="width: 150px;">
+                <option value="name">Sort by Name</option>
+                <option value="population">Sort by Population</option>
+                <option value="production">Sort by Production</option>
+            </select>
         </div>
-        <div class="st-game-controls">
-            <div class="st-date-display">
-                <span class="st-date-label">STARDATE</span>
-                <span class="st-date-value">24.56</span>
-            </div>
-            <button class="st-end-turn-btn">END TURN</button>
-        </div>
-    </header>
+    </div>
 
-    <div class="st-main">
-        @* LEFT SIDEBAR *@
-        <aside class="st-sidebar-left">
-            <nav class="st-nav">
-                <a href="/game/galaxy" class="st-nav-btn"><span class="st-nav-icon">🌌</span><span class="st-nav-label">Galaxy</span></a>
-                <a href="/game/contacts" class="st-nav-btn"><span class="st-nav-icon">👥</span><span class="st-nav-label">Contacts</span></a>
-                <a href="/game/research" class="st-nav-btn"><span class="st-nav-icon">🔬</span><span class="st-nav-label">Research</span></a>
-                <a href="/game/fleets" class="st-nav-btn"><span class="st-nav-icon">🚀</span><span class="st-nav-label">Fleets</span></a>
-                <a href="/game/planets" class="st-nav-btn active"><span class="st-nav-icon">🏠</span><span class="st-nav-label">Planets</span></a>
-            </nav>
-        </aside>
-
-        @* MAIN CONTENT *@
-        <div class="colonies-content">
-            @* Header *@
-            <div class="colonies-header">
-                <h1>PLANETARY MANAGEMENT</h1>
-                <div class="colonies-stats">
-                    <div class="stat-box">
-                        <span class="stat-value">@_colonies.Count</span>
-                        <span class="stat-label">Colonies</span>
+    @* Main area with Grid + Sidebar *@
+    <div class="colonies-main">
+        @* Colony Grid *@
+        <div class="colonies-grid">
+            @foreach (var colony in FilteredColonies)
+            {
+                <div class="colony-card @(_selectedColony?.Id == colony.Id ? "selected" : "")" @onclick="() => SelectColony(colony)">
+                    <div class="colony-image">
+                        <div class="planet-visual">
+                            <div class="planet-sphere" style="@GetColonyPlanetStyle(colony, 80)"></div>
+                            <div class="planet-atmosphere"></div>
+                        </div>
+                        <div class="colony-status @(colony.IsCapital ? "capital" : "")">
+                            @if (colony.IsCapital) { <span>★ CAPITAL</span> }
+                        </div>
                     </div>
-                    <div class="stat-box">
-                        <span class="stat-value">@_totalPopulation.ToString("N0")</span>
-                        <span class="stat-label">Population</span>
+                    <div class="colony-info">
+                        <h3 class="colony-name">@colony.Name</h3>
+                        <div class="colony-class">@(colony.PlanetType ?? "Class M") • @colony.SystemName</div>
+                        
+                        <div class="colony-stats-row">
+                            <div class="colony-stat">
+                                <span class="stat-icon">👥</span>
+                                <span class="stat-val">@colony.Population.ToString("N0")</span>
+                            </div>
+                            <div class="colony-stat">
+                                <span class="stat-icon">🏭</span>
+                                <span class="stat-val">@colony.ProductionCapacity</span>
+                            </div>
+                            <div class="colony-stat">
+                                <span class="stat-icon">🔬</span>
+                                <span class="stat-val">@colony.ResearchOutput</span>
+                            </div>
+                        </div>
+                        
+                        <div class="colony-bars">
+                            <div class="bar-row">
+                                <span class="bar-label">Growth</span>
+                                <div class="st-progress"><div class="st-progress-fill success" style="width: @(colony.GrowthRate)%"></div></div>
+                            </div>
+                            <div class="bar-row">
+                                <span class="bar-label">Morale</span>
+                                <div class="st-progress"><div class="st-progress-fill @GetMoraleClass(colony.Morale)" style="width: @colony.Morale%"></div></div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="stat-box">
-                        <span class="stat-value">@_totalProduction</span>
-                        <span class="stat-label">Production</span>
+                    <div class="colony-actions">
+                        <button class="st-btn sm" @onclick:stopPropagation="true" @onclick="() => OpenBuildShipDialog(colony)">BUILD SHIP</button>
+                        <button class="st-btn sm" @onclick:stopPropagation="true" @onclick="() => ViewColony(colony)">MANAGE</button>
                     </div>
                 </div>
-                <div class="colonies-filters">
-                    <input type="text" class="st-input" placeholder="Search colonies..." @bind="_searchText" @bind:event="oninput" style="width: 200px;" />
-                    <select class="st-input st-select" @bind="_sortBy" style="width: 150px;">
-                        <option value="name">Sort by Name</option>
-                        <option value="population">Sort by Population</option>
-                        <option value="production">Sort by Production</option>
-                    </select>
-                </div>
-            </div>
-
-            @* Colony Grid *@
-            <div class="colonies-grid">
-                @foreach (var colony in FilteredColonies)
-                {
-                    <div class="colony-card @(_selectedColony?.Id == colony.Id ? "selected" : "")" @onclick="() => SelectColony(colony)">
-                        <div class="colony-image">
-                            <div class="planet-visual @GetPlanetClass(colony)">
-                                <div class="planet-sphere"></div>
-                                <div class="planet-atmosphere"></div>
-                            </div>
-                            <div class="colony-status @(colony.IsCapital ? "capital" : "")">
-                                @if (colony.IsCapital) { <span>★ CAPITAL</span> }
-                            </div>
-                        </div>
-                        <div class="colony-info">
-                            <h3 class="colony-name">@colony.Name</h3>
-                            <div class="colony-class">@(colony.PlanetType ?? "Class M") • @colony.SystemName</div>
-                            
-                            <div class="colony-stats-row">
-                                <div class="colony-stat">
-                                    <span class="stat-icon">👥</span>
-                                    <span class="stat-val">@colony.Population.ToString("N0")</span>
-                                </div>
-                                <div class="colony-stat">
-                                    <span class="stat-icon">🏭</span>
-                                    <span class="stat-val">@colony.ProductionCapacity</span>
-                                </div>
-                                <div class="colony-stat">
-                                    <span class="stat-icon">🔬</span>
-                                    <span class="stat-val">@colony.ResearchOutput</span>
-                                </div>
-                            </div>
-                            
-                            <div class="colony-bars">
-                                <div class="bar-row">
-                                    <span class="bar-label">Growth</span>
-                                    <div class="st-progress"><div class="st-progress-fill success" style="width: @(colony.GrowthRate)%"></div></div>
-                                </div>
-                                <div class="bar-row">
-                                    <span class="bar-label">Morale</span>
-                                    <div class="st-progress"><div class="st-progress-fill @GetMoraleClass(colony.Morale)" style="width: @colony.Morale%"></div></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="colony-actions">
-                            <button class="st-btn sm" @onclick:stopPropagation="true" @onclick="() => ViewColony(colony)">MANAGE</button>
-                        </div>
-                    </div>
-                }
-            </div>
+            }
         </div>
 
-        @* RIGHT SIDEBAR - Selected Colony Details *@
-        <aside class="st-sidebar-right">
+    @* RIGHT SIDEBAR - Selected Colony Details *@
+    <aside class="st-sidebar-right">
             <div class="st-outliner">
                 <div class="st-outliner-header">
                     <span class="st-outliner-title">COLONY DETAILS</span>
@@ -141,8 +106,8 @@
                 {
                     <div class="colony-detail-panel">
                         <div class="detail-header">
-                            <div class="planet-preview @GetPlanetClass(_selectedColony)">
-                                <div class="planet-sphere large"></div>
+                            <div class="planet-preview">
+                                <div class="planet-sphere large" style="@GetColonyPlanetStyle(_selectedColony, 64)"></div>
                             </div>
                             <div class="detail-title">
                                 <h2>@_selectedColony.Name</h2>
@@ -218,17 +183,36 @@
             </div>
         </aside>
     </div>
-
-    @* BOTTOM BAR *@
-    <footer class="st-bottombar">
-        <div class="st-notifications">
-            <div class="st-notification success">✓ Colony production complete on Earth</div>
-        </div>
-        <div class="st-bottom-actions">
-            <button class="st-btn sm" @onclick="GoToMenu">☰ MENU</button>
-        </div>
-    </footer>
 </div>
+
+@* Ship Build Dialog *@
+@if (_showBuildShipDialog && _buildShipColony != null)
+{
+    <div class="modal-overlay" @onclick="() => _showBuildShipDialog = false">
+        <div class="build-ship-modal" @onclick:stopPropagation="true">
+            <div class="modal-header"><h3>BUILD SHIP</h3><span class="modal-sub">Colony: @_buildShipColony.Name</span></div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Ship Class</label>
+                    <select class="st-input st-select" @bind="_selectedShipClass" style="width:100%">
+                        @foreach (var sc in _availableShipClasses)
+                        {
+                            <option value="@sc">@sc</option>
+                        }
+                    </select>
+                </div>
+                <div class="form-group" style="margin-top:12px">
+                    <label class="form-label">Quantity</label>
+                    <input type="number" class="st-input" @bind="_shipQuantity" min="1" max="10" style="width:100%" />
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="st-btn" @onclick="() => _showBuildShipDialog = false">CANCEL</button>
+                <button class="st-btn primary" @onclick="BuildShip" disabled="@_isBuildingShip">@(_isBuildingShip ? "BUILDING..." : "BUILD")</button>
+            </div>
+        </div>
+    </div>
+}
 
 <style>
     .colonies-content {
@@ -237,6 +221,12 @@
         flex-direction: column;
         overflow: hidden;
         background: linear-gradient(180deg, #080c14 0%, #040608 100%);
+    }
+    
+    .colonies-main {
+        flex: 1;
+        display: flex;
+        overflow: hidden;
     }
     
     .colonies-header {
@@ -336,19 +326,15 @@
         width: 80px;
         height: 80px;
     }
-    
+
+    /* Planet styles are now set dynamically via AssetService.GetPlanetStyle() */
+    /* This mixes generated spritesheet assets with sourced individual assets */
     .planet-sphere {
         position: absolute;
-        width: 100%;
-        height: 100%;
         border-radius: 50%;
-        background: linear-gradient(135deg, #4a8866 0%, #2a5544 50%, #1a3322 100%);
-        box-shadow: 
-            inset -15px -10px 20px rgba(0, 0, 0, 0.5),
-            inset 10px 10px 15px rgba(255, 255, 255, 0.1),
-            0 0 30px rgba(74, 136, 102, 0.3);
+        box-shadow: 0 0 30px rgba(74, 136, 102, 0.3);
     }
-    
+
     .planet-atmosphere {
         position: absolute;
         width: 110%;
@@ -358,12 +344,7 @@
         border-radius: 50%;
         background: radial-gradient(circle, transparent 45%, rgba(100, 180, 255, 0.1) 50%, transparent 55%);
     }
-    
-    .planet-visual.desert .planet-sphere { background: linear-gradient(135deg, #c4a060 0%, #8a6a40 50%, #5a4020 100%); }
-    .planet-visual.arctic .planet-sphere { background: linear-gradient(135deg, #e8f0ff 0%, #a0c0e0 50%, #6090c0 100%); }
-    .planet-visual.oceanic .planet-sphere { background: linear-gradient(135deg, #4080c0 0%, #2060a0 50%, #104080 100%); }
-    .planet-visual.volcanic .planet-sphere { background: linear-gradient(135deg, #c04020 0%, #802010 50%, #400808 100%); }
-    
+
     .colony-status {
         position: absolute;
         top: 8px;
@@ -468,12 +449,13 @@
         width: 64px;
         height: 64px;
     }
-    
+
+    /* Planet sphere styles set dynamically via inline style from AssetService */
     .planet-preview .planet-sphere.large {
         width: 64px;
         height: 64px;
     }
-    
+
     .detail-title h2 {
         font-family: var(--st-font-display);
         font-size: 16px;
@@ -573,6 +555,13 @@
         color: var(--st-text-dim);
         margin-top: 12px;
     }
+
+    .modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);display:flex;align-items:center;justify-content:center;z-index:1000}
+    .build-ship-modal{background:var(--st-bg-dark,#0a0f18);border:1px solid var(--st-border-medium,#2a3a4a);border-radius:12px;width:380px;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.6)}
+    .modal-header{padding:16px 20px;border-bottom:1px solid var(--st-border-dark)}.modal-header h3{margin:0;font-family:var(--st-font-display);font-size:16px;color:var(--st-text-white);letter-spacing:1px}.modal-sub{font-size:11px;color:var(--st-text-dim)}
+    .modal-body{padding:16px 20px}
+    .modal-actions{padding:12px 20px;border-top:1px solid var(--st-border-dark);display:flex;gap:8px;justify-content:flex-end}
+    .form-group{}.form-label{display:block;font-size:11px;color:var(--st-text-muted);letter-spacing:1px;margin-bottom:6px}
 </style>
 
 @code {
@@ -582,10 +571,12 @@
     private string _searchText = "";
     private string _sortBy = "name";
     private Guid? _factionId;
-    
+    private Guid? _gameId;
+    private Dictionary<Guid, PlanetAsset?> _colonyAssets = new();
+
     private int _totalPopulation => _colonies.Sum(c => c.Population);
     private int _totalProduction => _colonies.Sum(c => c.ProductionCapacity);
-    
+
     private IEnumerable<ColonyData> FilteredColonies => _colonies
         .Where(c => string.IsNullOrEmpty(_searchText) || c.Name.Contains(_searchText, StringComparison.OrdinalIgnoreCase))
         .OrderBy(c => _sortBy switch {
@@ -594,11 +585,53 @@
             _ => 0
         })
         .ThenBy(c => c.Name);
-    
+
     protected override async Task OnInitializedAsync()
     {
+        await AssetService.InitializeAsync();
         _factionId = await LocalStorage.GetItemAsync<Guid?>("currentFactionId");
+        try
+        {
+            var games = await Api.GetGamesAsync();
+            var game = games.FirstOrDefault();
+            if (game != null) _gameId = game.Id;
+        }
+        catch { }
         await LoadData();
+    }
+
+    private string GetColonyPlanetStyle(ColonyData colony, int size)
+    {
+        if (_colonyAssets.TryGetValue(colony.Id, out var asset) && asset != null)
+        {
+            return AssetService.GetPlanetStyle(asset, size);
+        }
+        // Fallback style
+        return GetFallbackPlanetStyle(GetPlanetClass(colony), size);
+    }
+
+    private string GetFallbackPlanetStyle(string planetClass, int size)
+    {
+        var (row, col) = planetClass switch
+        {
+            "terran" => (0, 0),
+            "oceanic" => (0, 1),
+            "jungle" => (0, 2),
+            "arctic" => (0, 3),
+            "desert" => (0, 4),
+            "gasgiant" => (1, 0),
+            "barren" => (2, 0),
+            "volcanic" => (2, 2),
+            _ => (0, 0)
+        };
+        var scale = size / 360.0;
+        var bgSize = (int)(2160 * scale);
+        var x = (int)(col * 360 * scale);
+        var y = (int)(row * 360 * scale);
+        return $"background-image: url('/assets/universal/planets_spritesheet.png'); " +
+               $"background-size: {bgSize}px {bgSize}px; " +
+               $"background-position: -{x}px -{y}px; " +
+               $"width: {size}px; height: {size}px; border-radius: 50%;";
     }
     
     private async Task LoadData()
@@ -636,14 +669,54 @@
                 new() { Id = Guid.NewGuid(), Name = "Alpha Centauri III", SystemName = "Alpha Centauri", PlanetType = "Terran", Population = 1500000, ProductionCapacity = 60, ResearchOutput = 30, GrowthRate = 5, Morale = 70, BuildingCount = 3, MaxBuildings = 10 },
             };
         }
-        
+
+        // Cache planet assets for mixed rendering
+        _colonyAssets.Clear();
+        foreach (var colony in _colonies)
+        {
+            var planetType = GetPlanetClass(colony);
+            _colonyAssets[colony.Id] = AssetService.GetPlanetForIdentifier(planetType, colony.Name);
+        }
+
         _selectedColony = _colonies.FirstOrDefault();
     }
     
+    // Ship building state
+    private bool _showBuildShipDialog;
+    private ColonyData? _buildShipColony;
+    private string _selectedShipClass = "Constitution";
+    private int _shipQuantity = 1;
+    private bool _isBuildingShip;
+    private List<string> _availableShipClasses = new() { "Constitution", "Miranda", "Excelsior", "Galaxy", "Defiant", "Intrepid", "Akira", "Nova", "Oberth", "Nebula" };
+
     private void SelectColony(ColonyData colony) => _selectedColony = colony;
     private void ViewColony(ColonyData colony) => Navigation.NavigateTo($"/game/colony/{colony.Id}");
-    private void GoToMenu() => Navigation.NavigateTo("/");
-    
+
+    private void OpenBuildShipDialog(ColonyData colony)
+    {
+        _buildShipColony = colony;
+        _selectedShipClass = "Constitution";
+        _shipQuantity = 1;
+        _showBuildShipDialog = true;
+    }
+
+    private async Task BuildShip()
+    {
+        if (_buildShipColony == null || string.IsNullOrEmpty(_selectedShipClass)) return;
+        _isBuildingShip = true;
+        try
+        {
+            await Api.QueueShipAsync(_buildShipColony.Id, _selectedShipClass, _shipQuantity);
+            Snackbar.Add($"Queued {_shipQuantity}x {_selectedShipClass} at {_buildShipColony.Name}", MudBlazor.Severity.Success);
+            _showBuildShipDialog = false;
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Failed to build ship: {ex.Message}", MudBlazor.Severity.Error);
+        }
+        _isBuildingShip = false;
+    }
+
     private string GetPlanetClass(ColonyData colony) => (colony.PlanetType?.ToLower()) switch
     {
         "desert" => "desert",

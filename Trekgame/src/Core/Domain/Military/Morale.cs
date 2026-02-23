@@ -242,7 +242,7 @@ public class MoraleModifier
 /// </summary>
 public class RaceMoraleProfile
 {
-    public string RaceName { get; init; }
+    public string RaceName { get; init; } = default!;
     public int BaseMoraleModifier { get; init; }
     public bool FearlessInCombat { get; init; }
     public bool LogicalMindset { get; init; }

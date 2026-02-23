@@ -1,0 +1,419 @@
+/* ===========================================
+   GALACTIC STRATEGY - FEDERATION DESIGN SYSTEM
+   Shared CSS Variables & Common Styles
+   =========================================== */
+
+/* ===== CSS CUSTOM PROPERTIES ===== */
+:root {
+    /* FEDERATION Color Palette */
+    --federation-orange: #ff9900;
+    --federation-gold: #ffcc00;
+    --federation-blue: #99ccff;
+    --federation-purple: #cc99ff;
+    --federation-red: #ff4444;
+    --federation-green: #66ff99;
+    --federation-cyan: #4488ff;
+    
+    /* Background Colors */
+    --bg-dark: #000000;
+    --bg-panel: #0a0a18;
+    --bg-surface: #1a1a2e;
+    --bg-card: rgba(30, 30, 60, 0.5);
+    --bg-overlay: rgba(0, 0, 20, 0.9);
+    
+    /* Text Colors */
+    --text-primary: #ffffff;
+    --text-secondary: #aaaacc;
+    --text-muted: #666688;
+    --text-highlight: #ffcc00;
+    
+    /* Border Colors */
+    --border-default: #334455;
+    --border-active: #4a9eff;
+    --border-success: #66ff99;
+    --border-error: #ff4444;
+    
+    /* Faction Colors */
+    --faction-federation: #4488ff;
+    --faction-klingon: #ff4444;
+    --faction-romulan: #44ff44;
+    --faction-cardassian: #ffaa00;
+    --faction-ferengi: #ffcc00;
+    --faction-borg: #00ffaa;
+    
+    /* Star Colors */
+    --star-yellow: #ffff88;
+    --star-red: #ff8866;
+    --star-blue: #88ccff;
+    --star-white: #ffffff;
+    --star-orange: #ffaa44;
+    
+    /* Spacing */
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 16px;
+    --space-lg: 24px;
+    --space-xl: 32px;
+    
+    /* Border Radius */
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 20px;
+    
+    /* Shadows */
+    --shadow-glow: 0 0 10px rgba(255, 153, 0, 0.5);
+    --shadow-panel: 0 4px 20px rgba(0, 0, 0, 0.5);
+    
+    /* Transitions */
+    --transition-fast: 0.15s ease;
+    --transition-normal: 0.25s ease;
+    --transition-slow: 0.4s ease;
+    
+    /* Typography */
+    --font-display: 'Orbitron', 'Segoe UI', sans-serif;
+    --font-body: 'Roboto', 'Segoe UI', sans-serif;
+    --font-mono: 'Roboto Mono', 'Consolas', monospace;
+}
+
+/* ===== FEDERATION LAYOUT COMPONENTS ===== */
+
+/* Page Wrapper */
+.federation-page {
+    min-height: 100vh;
+    background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-panel) 100%);
+    color: var(--text-primary);
+}
+
+/* Header */
+.federation-header {
+    height: 60px;
+    background: linear-gradient(180deg, var(--bg-surface) 0%, var(--bg-panel) 100%);
+    border-bottom: 3px solid var(--federation-orange);
+    display: flex;
+    align-items: center;
+    padding: 0 var(--space-lg);
+    gap: var(--space-lg);
+}
+
+.federation-header .page-title {
+    color: var(--federation-gold);
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    margin: 0;
+}
+
+.federation-header .back-link {
+    color: var(--federation-orange);
+    text-decoration: none;
+    font-weight: 600;
+    padding: var(--space-sm) var(--space-md);
+    border: 1px solid var(--federation-orange);
+    border-radius: var(--radius-sm);
+    transition: var(--transition-fast);
+}
+
+.federation-header .back-link:hover {
+    background: var(--federation-orange);
+    color: var(--bg-dark);
+}
+
+/* Panel */
+.federation-panel {
+    background: var(--bg-card);
+    border: 2px solid var(--border-default);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.federation-panel-header {
+    background: linear-gradient(90deg, var(--federation-orange), var(--federation-gold));
+    color: var(--bg-dark);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    padding: var(--space-sm) var(--space-md);
+}
+
+.federation-panel-content {
+    padding: var(--space-md);
+}
+
+/* Cards */
+.federation-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    padding: var(--space-md);
+    transition: var(--transition-fast);
+}
+
+.federation-card:hover {
+    border-color: var(--federation-orange);
+}
+
+.federation-card.selected {
+    border-color: var(--federation-gold);
+    background: rgba(255, 200, 0, 0.1);
+}
+
+/* ===== BUTTONS ===== */
+
+.federation-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    border: 2px solid var(--federation-orange);
+    border-radius: var(--radius-md);
+    background: transparent;
+    color: var(--federation-orange);
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+.federation-btn:hover:not(:disabled) {
+    background: var(--federation-orange);
+    color: var(--bg-dark);
+}
+
+.federation-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.federation-btn.primary {
+    background: var(--federation-orange);
+    color: var(--bg-dark);
+}
+
+.federation-btn.primary:hover:not(:disabled) {
+    background: var(--federation-gold);
+}
+
+.federation-btn.danger {
+    border-color: var(--federation-red);
+    color: var(--federation-red);
+}
+
+.federation-btn.danger:hover:not(:disabled) {
+    background: var(--federation-red);
+    color: var(--text-primary);
+}
+
+.federation-btn.success {
+    border-color: var(--federation-green);
+    color: var(--federation-green);
+}
+
+.federation-btn.success:hover:not(:disabled) {
+    background: var(--federation-green);
+    color: var(--bg-dark);
+}
+
+/* ===== FORM ELEMENTS ===== */
+
+.federation-input {
+    background: rgba(20, 20, 40, 0.8);
+    border: 2px solid var(--border-default);
+    border-radius: var(--radius-sm);
+    padding: var(--space-sm) var(--space-md);
+    color: var(--text-primary);
+    transition: var(--transition-fast);
+}
+
+.federation-input:focus {
+    outline: none;
+    border-color: var(--federation-orange);
+    box-shadow: var(--shadow-glow);
+}
+
+.federation-select {
+    background: rgba(20, 20, 40, 0.8);
+    border: 2px solid var(--border-default);
+    border-radius: var(--radius-sm);
+    padding: var(--space-sm) var(--space-md);
+    color: var(--text-primary);
+}
+
+/* ===== DATA DISPLAY ===== */
+
+.federation-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.federation-table th {
+    background: rgba(255, 153, 0, 0.2);
+    color: var(--federation-gold);
+    text-align: left;
+    padding: var(--space-sm) var(--space-md);
+    border-bottom: 2px solid var(--federation-orange);
+    font-size: 12px;
+    letter-spacing: 1px;
+}
+
+.federation-table td {
+    padding: var(--space-sm) var(--space-md);
+    border-bottom: 1px solid var(--border-default);
+    color: var(--federation-blue);
+}
+
+.federation-table tr:hover td {
+    background: rgba(255, 153, 0, 0.1);
+}
+
+/* Progress Bars */
+.federation-progress {
+    height: 8px;
+    background: var(--bg-panel);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+}
+
+.federation-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--federation-orange), var(--federation-gold));
+    transition: width var(--transition-normal);
+}
+
+.federation-progress-fill.health {
+    background: linear-gradient(90deg, var(--federation-green), #88ff88);
+}
+
+.federation-progress-fill.shields {
+    background: linear-gradient(90deg, var(--federation-cyan), var(--federation-blue));
+}
+
+.federation-progress-fill.danger {
+    background: linear-gradient(90deg, var(--federation-red), #ff6666);
+}
+
+/* ===== STATS & BADGES ===== */
+
+.federation-stat {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.federation-stat-icon {
+    font-size: 20px;
+}
+
+.federation-stat-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--federation-gold);
+}
+
+.federation-stat-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.federation-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-sm);
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.federation-badge.info {
+    background: rgba(68, 136, 255, 0.2);
+    color: var(--federation-cyan);
+    border: 1px solid var(--federation-cyan);
+}
+
+.federation-badge.success {
+    background: rgba(102, 255, 153, 0.2);
+    color: var(--federation-green);
+    border: 1px solid var(--federation-green);
+}
+
+.federation-badge.warning {
+    background: rgba(255, 153, 0, 0.2);
+    color: var(--federation-orange);
+    border: 1px solid var(--federation-orange);
+}
+
+.federation-badge.danger {
+    background: rgba(255, 68, 68, 0.2);
+    color: var(--federation-red);
+    border: 1px solid var(--federation-red);
+}
+
+/* ===== ANIMATIONS ===== */
+
+@keyframes federation-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+@keyframes federation-glow {
+    0%, 100% { box-shadow: 0 0 5px var(--federation-orange); }
+    50% { box-shadow: 0 0 20px var(--federation-orange); }
+}
+
+@keyframes federation-scan {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+.federation-pulse {
+    animation: federation-pulse 2s ease-in-out infinite;
+}
+
+.federation-glow {
+    animation: federation-glow 2s ease-in-out infinite;
+}
+
+/* ===== RESPONSIVE ===== */
+
+@media (max-width: 768px) {
+    .federation-header {
+        padding: 0 var(--space-md);
+        gap: var(--space-md);
+    }
+    
+    .federation-header .page-title {
+        font-size: 16px;
+        letter-spacing: 2px;
+    }
+}
+
+/* ===== UTILITY CLASSES ===== */
+
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.text-gold { color: var(--federation-gold); }
+.text-blue { color: var(--federation-blue); }
+.text-orange { color: var(--federation-orange); }
+.text-red { color: var(--federation-red); }
+.text-green { color: var(--federation-green); }
+.text-muted { color: var(--text-muted); }
+
+.mt-1 { margin-top: var(--space-sm); }
+.mt-2 { margin-top: var(--space-md); }
+.mt-3 { margin-top: var(--space-lg); }
+.mb-1 { margin-bottom: var(--space-sm); }
+.mb-2 { margin-bottom: var(--space-md); }
+.mb-3 { margin-bottom: var(--space-lg); }
+
+.gap-1 { gap: var(--space-sm); }
+.gap-2 { gap: var(--space-md); }
+.gap-3 { gap: var(--space-lg); }
+
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.justify-center { justify-content: center; }

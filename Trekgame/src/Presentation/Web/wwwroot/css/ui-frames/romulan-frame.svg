@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" preserveAspectRatio="none">
+  <defs>
+    <!-- Romulan Bronze/Gold Gradient -->
+    <linearGradient id="rom-bronze" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#c9a050"/>
+      <stop offset="25%" style="stop-color:#8b6914"/>
+      <stop offset="50%" style="stop-color:#c9a050"/>
+      <stop offset="75%" style="stop-color:#6b4f0f"/>
+      <stop offset="100%" style="stop-color:#c9a050"/>
+    </linearGradient>
+    <linearGradient id="rom-green" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#00aa66"/>
+      <stop offset="50%" style="stop-color:#006633"/>
+      <stop offset="100%" style="stop-color:#003322"/>
+    </linearGradient>
+    <!-- Green nebula background -->
+    <radialGradient id="green-nebula" cx="30%" cy="40%" r="80%">
+      <stop offset="0%" style="stop-color:#003322"/>
+      <stop offset="40%" style="stop-color:#001a11"/>
+      <stop offset="100%" style="stop-color:#000a06"/>
+    </radialGradient>
+    <filter id="bronze-glow">
+      <feGaussianBlur stdDeviation="1.5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect x="0" y="0" width="800" height="500" fill="url(#green-nebula)"/>
+
+  <!-- Main Elegant Frame -->
+  <!-- Top Wing Shape -->
+  <path d="M400,10
+           Q350,10 300,25 L200,25 Q150,25 120,40 L80,55 Q60,60 50,75 L50,85
+           L750,85 L750,75 Q740,60 720,55 L680,40 Q650,25 600,25 L500,25 Q450,10 400,10 Z"
+        fill="url(#rom-bronze)" stroke="#00aa66" stroke-width="1" filter="url(#bronze-glow)"/>
+
+  <!-- Center Top Eagle Emblem Space -->
+  <ellipse cx="400" cy="35" rx="50" ry="25" fill="#001a11" stroke="url(#rom-bronze)" stroke-width="2"/>
+
+  <!-- Left Side Frame -->
+  <path d="M45,90 L55,90 Q65,90 70,100 L70,400 Q65,410 55,410 L45,410
+           Q30,410 25,395 L25,105 Q30,90 45,90 Z"
+        fill="url(#rom-bronze)" stroke="#00aa66" stroke-width="1"/>
+
+  <!-- Left Wing Extension -->
+  <path d="M20,150 L0,120 L0,180 Z" fill="url(#rom-bronze)"/>
+  <path d="M20,350 L0,320 L0,380 Z" fill="url(#rom-bronze)"/>
+
+  <!-- Right Side Frame -->
+  <path d="M755,90 L745,90 Q735,90 730,100 L730,400 Q735,410 745,410 L755,410
+           Q770,410 775,395 L775,105 Q770,90 755,90 Z"
+        fill="url(#rom-bronze)" stroke="#00aa66" stroke-width="1"/>
+
+  <!-- Right Wing Extension -->
+  <path d="M780,150 L800,120 L800,180 Z" fill="url(#rom-bronze)"/>
+  <path d="M780,350 L800,320 L800,380 Z" fill="url(#rom-bronze)"/>
+
+  <!-- Bottom Frame -->
+  <path d="M50,415 L750,415 L750,425 Q740,440 720,445 L680,460 Q650,475 600,475 L500,475
+           Q450,490 400,490 Q350,490 300,475 L200,475 Q150,475 120,460 L80,445 Q60,440 50,425 Z"
+        fill="url(#rom-bronze)" stroke="#00aa66" stroke-width="1" filter="url(#bronze-glow)"/>
+
+  <!-- Bottom Center Emblem Space -->
+  <ellipse cx="400" cy="465" rx="40" ry="20" fill="#001a11" stroke="url(#rom-bronze)" stroke-width="2"/>
+
+  <!-- Corner Gems -->
+  <ellipse cx="60" cy="95" rx="8" ry="8" fill="#00ff88" filter="url(#bronze-glow)"/>
+  <ellipse cx="740" cy="95" rx="8" ry="8" fill="#00ff88" filter="url(#bronze-glow)"/>
+  <ellipse cx="60" cy="405" rx="8" ry="8" fill="#00ff88" filter="url(#bronze-glow)"/>
+  <ellipse cx="740" cy="405" rx="8" ry="8" fill="#00ff88" filter="url(#bronze-glow)"/>
+
+  <!-- Inner Border Glow -->
+  <rect x="75" y="95" width="650" height="315" rx="10" ry="10"
+        fill="none" stroke="#00aa66" stroke-width="2" stroke-opacity="0.5"/>
+
+  <!-- Inner Content Area -->
+  <rect x="80" y="100" width="640" height="305" rx="8" ry="8" fill="#000a06" fill-opacity="0.9"/>
+</svg>

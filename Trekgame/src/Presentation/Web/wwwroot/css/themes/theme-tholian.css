@@ -1,0 +1,203 @@
+/* ===========================================
+   THOLIAN THEME - CRYSTALLINE WEB INTERFACE
+
+   Design Philosophy: Alien, geometric, heat-based.
+   The Tholians are mysterious crystalline beings
+   who spin energy webs and require extreme heat.
+
+   Visual Language:
+   - Amber/Orange primary colors
+   - Crystalline hexagonal shapes
+   - Web-like connecting patterns
+   - Heat indicators and thermal gradients
+   - Faceted, geometric aesthetic
+   =========================================== */
+
+/* ===== THOLIAN THEME VARIABLES ===== */
+html[data-theme="tholian"],
+html[data-theme="tholian"] .stellaris-layout,
+html[data-theme="tholian"] .stellaris-app {
+    --theme-primary: #FF8800;
+    --theme-secondary: #FFAA33;
+    --theme-accent: #FFDD00;
+    --theme-text: #FFDDAA;
+    --theme-text-dim: #AA8855;
+    --theme-bg: #0a0500;
+    --theme-panel-bg: rgba(15, 8, 0, 0.98);
+    --theme-border-radius: 0;
+    --theme-btn-radius: 0;
+    --theme-border-width: 2px;
+    --theme-corner-style: crystalline;
+
+    --st-accent-blue: #FF8800;
+    --st-accent-cyan: #FFAA33;
+    --st-accent-gold: #FFDD00;
+    --st-accent-orange: #FF6600;
+    --st-accent-green: #AAAA33;
+    --st-accent-red: #FF4400;
+    --st-accent-purple: #CC6600;
+
+    --st-bg-darkest: #050300;
+    --st-bg-darker: #0a0500;
+    --st-bg-dark: #150a00;
+    --st-bg-medium: #201000;
+    --st-bg-light: #2a1500;
+    --st-bg-lighter: #351a00;
+
+    --st-border-dark: rgba(255, 136, 0, 0.3);
+    --st-border-medium: rgba(255, 136, 0, 0.5);
+    --st-border-light: rgba(255, 170, 51, 0.6);
+    --st-border-bright: rgba(255, 221, 0, 0.8);
+
+    --st-text-dim: #775533;
+    --st-text-muted: #AA8855;
+    --st-text-normal: #CCAA77;
+    --st-text-bright: #FFDDAA;
+
+    --st-gradient-header: linear-gradient(180deg, #150a00 0%, #0a0500 100%);
+    --st-gradient-panel: linear-gradient(180deg, rgba(15, 8, 0, 0.95) 0%, rgba(5, 3, 0, 0.98) 100%);
+    --st-gradient-button: linear-gradient(180deg, #FF8800 0%, #CC6600 100%);
+    --st-gradient-button-hover: linear-gradient(180deg, #FFAA33 0%, #FF8800 100%);
+
+    --st-shadow-glow-amber: 0 0 25px rgba(255, 136, 0, 0.4);
+    --st-shadow-glow-gold: 0 0 20px rgba(255, 221, 0, 0.4);
+}
+
+/* ===== THOLIAN PANEL STYLE ===== */
+html[data-theme="tholian"] .mud-paper,
+html[data-theme="tholian"] .mud-card {
+    background: var(--st-gradient-panel) !important;
+    border: 2px solid rgba(255, 136, 0, 0.4) !important;
+    clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0 calc(100% - 10px), 0 10px);
+    position: relative;
+}
+
+/* Web pattern overlay */
+html[data-theme="tholian"] .mud-paper::before,
+html[data-theme="tholian"] .mud-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #FF8800, #FFDD00, #FF8800);
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* ===== THOLIAN BUTTONS ===== */
+html[data-theme="tholian"] .mud-button-root {
+    clip-path: polygon(15% 0%, 85% 0%, 100% 30%, 100% 70%, 85% 100%, 15% 100%, 0% 70%, 0% 30%);
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    font-weight: 600 !important;
+    transition: all 0.2s ease !important;
+}
+
+html[data-theme="tholian"] .mud-button-filled {
+    background: linear-gradient(180deg, #FF8800 0%, #CC6600 100%) !important;
+    color: #000 !important;
+    border: none !important;
+    box-shadow: 0 0 15px rgba(255, 136, 0, 0.3) !important;
+}
+
+html[data-theme="tholian"] .mud-button-filled:hover {
+    background: linear-gradient(180deg, #FFAA33 0%, #FF8800 100%) !important;
+    box-shadow: 0 0 25px rgba(255, 136, 0, 0.5) !important;
+}
+
+/* ===== THOLIAN APP BAR ===== */
+html[data-theme="tholian"] .mud-appbar {
+    background: linear-gradient(180deg, #150a00 0%, #0a0500 100%) !important;
+    border-bottom: none !important;
+    position: relative;
+}
+
+html[data-theme="tholian"] .mud-appbar::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg,
+        transparent 5%,
+        #FF8800 20%,
+        #FFDD00 50%,
+        #FF8800 80%,
+        transparent 95%
+    );
+    box-shadow: 0 0 15px rgba(255, 136, 0, 0.4);
+}
+
+/* ===== THOLIAN DRAWER ===== */
+html[data-theme="tholian"] .mud-drawer {
+    background: linear-gradient(90deg, #0a0500 0%, #150a00 100%) !important;
+    border-right: none !important;
+    position: relative;
+}
+
+html[data-theme="tholian"] .mud-drawer::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 3px;
+    height: 100%;
+    background: linear-gradient(180deg,
+        transparent 0%,
+        #FF8800 20%,
+        #FFDD00 50%,
+        #FF8800 80%,
+        transparent 100%
+    );
+    box-shadow: 0 0 15px rgba(255, 136, 0, 0.4);
+}
+
+/* ===== THOLIAN NAVIGATION ===== */
+html[data-theme="tholian"] .mud-nav-link {
+    clip-path: polygon(5px 0, calc(100% - 5px) 0, 100% 50%, calc(100% - 5px) 100%, 5px 100%, 0 50%);
+    margin: 4px 8px !important;
+    padding: 10px 14px !important;
+    background: rgba(255, 136, 0, 0.08) !important;
+    transition: all 0.2s ease !important;
+}
+
+html[data-theme="tholian"] .mud-nav-link:hover {
+    background: rgba(255, 136, 0, 0.2) !important;
+}
+
+html[data-theme="tholian"] .mud-nav-link.active {
+    background: linear-gradient(90deg, rgba(255, 136, 0, 0.3) 0%, transparent 100%) !important;
+    color: #FFDDAA !important;
+    box-shadow: 0 0 10px rgba(255, 136, 0, 0.2) !important;
+}
+
+/* ===== THOLIAN SPECIFIC DECORATIONS ===== */
+@keyframes tholian-heat-pulse {
+    0%, 100% {
+        box-shadow: 0 0 10px rgba(255, 136, 0, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 25px rgba(255, 136, 0, 0.6), 0 0 40px rgba(255, 221, 0, 0.3);
+    }
+}
+
+html[data-theme="tholian"] .heat-pulse {
+    animation: tholian-heat-pulse 2s ease-in-out infinite;
+}
+
+/* Crystal facet element */
+html[data-theme="tholian"] .crystal-facet {
+    clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+    background: linear-gradient(135deg, rgba(255, 170, 51, 0.3) 0%, rgba(255, 136, 0, 0.1) 100%);
+    border: 1px solid rgba(255, 136, 0, 0.5);
+}
+
+/* Web pattern */
+html[data-theme="tholian"] .web-pattern {
+    background:
+        repeating-linear-gradient(60deg, rgba(255, 136, 0, 0.1) 0px, transparent 1px, transparent 20px),
+        repeating-linear-gradient(-60deg, rgba(255, 136, 0, 0.1) 0px, transparent 1px, transparent 20px);
+}

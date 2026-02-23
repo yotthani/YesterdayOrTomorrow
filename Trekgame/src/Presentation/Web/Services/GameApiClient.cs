@@ -67,6 +67,23 @@ public interface IGameApiClient
     Task<SystemDetailDto?> GetSystemDetailAsync(Guid systemId);
     Task ColonizePlanetAsync(Guid fleetId, Guid planetId, string colonyName);
     
+    // Policies
+    Task SetPolicyAsync(Guid factionId, string category, string value);
+    Task<Dictionary<string, string>> GetPoliciesAsync(Guid factionId);
+
+    // Intelligence
+    Task<List<IntelOperationDto>> GetIntelOperationsAsync(Guid factionId);
+    Task<IntelOperationDto> LaunchIntelOperationAsync(Guid factionId, LaunchIntelRequest request);
+    Task AbortIntelOperationAsync(Guid operationId);
+    Task<List<IntelAgentDto>> GetIntelAgentsAsync(Guid factionId);
+    Task<IntelAgentDto> RecruitAgentAsync(Guid factionId);
+
+    // Economy / Trade
+    Task ExecuteTradeAsync(Guid factionId, string resourceType, int amount, bool isBuying);
+    Task<List<TradeRouteDto>> GetTradeRoutesAsync(Guid factionId);
+    Task CancelTradeRouteAsync(Guid routeId);
+    Task<TradeRouteDto> CreateTradeRouteAsync(Guid factionId, Guid sourceSystemId, Guid destSystemId, string resourceType);
+
     // Save/Load
     Task<GameSaveData?> ExportGameAsync(Guid gameId);
     Task<GameDetailDto?> ImportGameAsync(GameSaveData saveData);
@@ -371,6 +388,77 @@ public class GameApiClient : IGameApiClient
     public async Task<List<SaveSlotInfo>> GetSaveSlotsAsync()
     {
         return await GetFromJsonSafeAsync<List<SaveSlotInfo>>("api/games/saves") ?? new();
+    }
+
+    // Policies
+    public async Task SetPolicyAsync(Guid factionId, string category, string value)
+    {
+        var response = await _http.PostAsJsonAsync($"api/factions/{factionId}/policies", new { Category = category, Value = value });
+        response.EnsureSuccessStatusCode();
+    }
+
+    public async Task<Dictionary<string, string>> GetPoliciesAsync(Guid factionId)
+    {
+        return await GetFromJsonSafeAsync<Dictionary<string, string>>($"api/factions/{factionId}/policies") ?? new();
+    }
+
+    // Intelligence
+    public async Task<List<IntelOperationDto>> GetIntelOperationsAsync(Guid factionId)
+    {
+        return await GetFromJsonSafeAsync<List<IntelOperationDto>>($"api/intelligence/{factionId}/operations") ?? [];
+    }
+
+    public async Task<IntelOperationDto> LaunchIntelOperationAsync(Guid factionId, LaunchIntelRequest request)
+    {
+        var response = await _http.PostAsJsonAsync($"api/intelligence/{factionId}/operations", request);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<IntelOperationDto>()
+            ?? throw new Exception("Failed to launch operation");
+    }
+
+    public async Task AbortIntelOperationAsync(Guid operationId)
+    {
+        var response = await _http.DeleteAsync($"api/intelligence/operations/{operationId}");
+        response.EnsureSuccessStatusCode();
+    }
+
+    public async Task<List<IntelAgentDto>> GetIntelAgentsAsync(Guid factionId)
+    {
+        return await GetFromJsonSafeAsync<List<IntelAgentDto>>($"api/intelligence/{factionId}/agents") ?? [];
+    }
+
+    public async Task<IntelAgentDto> RecruitAgentAsync(Guid factionId)
+    {
+        var response = await _http.PostAsync($"api/intelligence/{factionId}/agents/recruit", null);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<IntelAgentDto>()
+            ?? throw new Exception("Failed to recruit agent");
+    }
+
+    // Economy / Trade
+    public async Task ExecuteTradeAsync(Guid factionId, string resourceType, int amount, bool isBuying)
+    {
+        var response = await _http.PostAsJsonAsync($"api/economy/{factionId}/trade", new { ResourceType = resourceType, Amount = amount, IsBuying = isBuying });
+        response.EnsureSuccessStatusCode();
+    }
+
+    public async Task<List<TradeRouteDto>> GetTradeRoutesAsync(Guid factionId)
+    {
+        return await GetFromJsonSafeAsync<List<TradeRouteDto>>($"api/economy/{factionId}/trade-routes") ?? [];
+    }
+
+    public async Task CancelTradeRouteAsync(Guid routeId)
+    {
+        var response = await _http.DeleteAsync($"api/economy/trade-routes/{routeId}");
+        response.EnsureSuccessStatusCode();
+    }
+
+    public async Task<TradeRouteDto> CreateTradeRouteAsync(Guid factionId, Guid sourceSystemId, Guid destSystemId, string resourceType)
+    {
+        var response = await _http.PostAsJsonAsync($"api/economy/{factionId}/trade-routes", new { SourceSystemId = sourceSystemId, DestinationSystemId = destSystemId, ResourceType = resourceType });
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<TradeRouteDto>()
+            ?? throw new Exception("Failed to create trade route");
     }
 }
 
@@ -760,4 +848,47 @@ public record HyperlaneDto(
     Guid FromSystemId,
     Guid ToSystemId,
     int TravelTime
+);
+
+// Intelligence DTOs
+public record IntelOperationDto(
+    Guid Id,
+    string Name,
+    string MissionType,
+    Guid TargetFactionId,
+    string TargetFactionName,
+    string Status,
+    int Progress,
+    int TurnsRemaining,
+    int SuccessChance,
+    int DetectionRisk
+);
+
+public record LaunchIntelRequest(
+    string MissionType,
+    Guid TargetFactionId,
+    Guid AgentId
+);
+
+public record IntelAgentDto(
+    Guid Id,
+    string Name,
+    int Level,
+    string Specialty,
+    string Status,
+    string? AssignedTo,
+    int Infiltration,
+    int Sabotage,
+    int TechTheft
+);
+
+// Trade DTOs
+public record TradeRouteDto(
+    Guid Id,
+    string SourceSystem,
+    string DestinationSystem,
+    string ResourceType,
+    string Status,
+    int TradeValue,
+    int ProtectionLevel
 );

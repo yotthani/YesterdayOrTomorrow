@@ -1,0 +1,167 @@
+@using StarTrekGame.Web.Services
+@inject ThemeService ThemeService
+
+@* Faction-aware sidebar navigation with completely different structure per theme *@
+
+@switch (ThemeService.CurrentTheme)
+{
+    case "federation":
+        <aside class="faction-sidebar lcars-sidebar">
+            <div class="lcars-vertical-bar">
+                <div class="lcars-cap top orange"></div>
+                <div class="lcars-segment orange"></div>
+                <div class="lcars-segment tan"></div>
+                <div class="lcars-segment purple"></div>
+                <div class="lcars-segment blue"></div>
+                <div class="lcars-cap bottom purple"></div>
+            </div>
+            <nav class="lcars-nav">
+                @foreach (var item in NavItems)
+                {
+                    <button class="lcars-nav-pill @(item.IsActive ? "active" : "")" @onclick="() => OnNavClick.InvokeAsync(item.Id)">
+                        <span class="lcars-pill-end left"></span>
+                        <span class="lcars-pill-label">@item.Label</span>
+                        <span class="lcars-pill-end right"></span>
+                    </button>
+                }
+            </nav>
+            <div class="lcars-elbow-corner"></div>
+        </aside>
+        break;
+
+    case "klingon":
+        <aside class="faction-sidebar klingon-sidebar">
+            <div class="klingon-trefoil-emblem"></div>
+            <div class="klingon-metal-frame">
+                <div class="klingon-spike-top"></div>
+                <nav class="klingon-nav">
+                    @foreach (var item in NavItems)
+                    {
+                        <button class="klingon-nav-blade @(item.IsActive ? "active" : "")" @onclick="() => OnNavClick.InvokeAsync(item.Id)">
+                            <span class="blade-icon">@item.Icon</span>
+                            <span class="blade-text">@item.Label</span>
+                            <span class="blade-edge"></span>
+                        </button>
+                    }
+                </nav>
+                <div class="klingon-spike-bottom"></div>
+            </div>
+            <div class="klingon-battle-scar"></div>
+        </aside>
+        break;
+
+    case "romulan":
+        <aside class="faction-sidebar romulan-sidebar">
+            <div class="romulan-bird-emblem"></div>
+            <div class="romulan-curved-frame">
+                <div class="romulan-bronze-top"></div>
+                <nav class="romulan-nav">
+                    @foreach (var item in NavItems)
+                    {
+                        <button class="romulan-nav-lens @(item.IsActive ? "active" : "")" @onclick="() => OnNavClick.InvokeAsync(item.Id)">
+                            <span class="lens-glow"></span>
+                            <span class="lens-icon">@item.Icon</span>
+                            <span class="lens-label">@item.Label</span>
+                        </button>
+                    }
+                </nav>
+                <div class="romulan-bronze-bottom"></div>
+            </div>
+        </aside>
+        break;
+
+    case "borg":
+        <aside class="faction-sidebar borg-sidebar">
+            <div class="borg-collective-node"></div>
+            <div class="borg-hex-grid">
+                <nav class="borg-nav">
+                    @{ int index = 0; }
+                    @foreach (var item in NavItems)
+                    {
+                        <button class="borg-nav-hex @(item.IsActive ? "active" : "")"
+                                style="--hex-index: @index"
+                                @onclick="() => OnNavClick.InvokeAsync(item.Id)">
+                            <span class="hex-outer"></span>
+                            <span class="hex-inner">
+                                <span class="hex-designation">@(index + 1)</span>
+                                <span class="hex-label">@item.Label</span>
+                            </span>
+                            <span class="hex-pulse"></span>
+                        </button>
+                        index++;
+                    }
+                </nav>
+            </div>
+            <div class="borg-data-conduit"></div>
+        </aside>
+        break;
+
+    case "cardassian":
+        <aside class="faction-sidebar cardassian-sidebar">
+            <div class="cardassian-emblem"></div>
+            <div class="cardassian-geometric-frame">
+                <div class="cardassian-status-bar"></div>
+                <nav class="cardassian-nav">
+                    @foreach (var item in NavItems)
+                    {
+                        <button class="cardassian-nav-block @(item.IsActive ? "active" : "")" @onclick="() => OnNavClick.InvokeAsync(item.Id)">
+                            <span class="block-indicator"></span>
+                            <span class="block-icon">@item.Icon</span>
+                            <span class="block-label">@item.Label</span>
+                            <span class="block-notch"></span>
+                        </button>
+                    }
+                </nav>
+                <div class="cardassian-scan-line"></div>
+            </div>
+        </aside>
+        break;
+
+    case "dominion":
+        <aside class="faction-sidebar dominion-sidebar">
+            <div class="dominion-founder-emblem"></div>
+            <div class="dominion-imperial-frame">
+                <div class="dominion-diamond-header"></div>
+                <nav class="dominion-nav">
+                    @foreach (var item in NavItems)
+                    {
+                        <button class="dominion-nav-gem @(item.IsActive ? "active" : "")" @onclick="() => OnNavClick.InvokeAsync(item.Id)">
+                            <span class="gem-facet"></span>
+                            <span class="gem-icon">@item.Icon</span>
+                            <span class="gem-label">@item.Label</span>
+                            <span class="gem-shimmer"></span>
+                        </button>
+                    }
+                </nav>
+                <div class="dominion-ketracel-indicator"></div>
+            </div>
+        </aside>
+        break;
+
+    default:
+        <aside class="faction-sidebar default-sidebar">
+            <nav class="default-nav">
+                @foreach (var item in NavItems)
+                {
+                    <button class="default-nav-item @(item.IsActive ? "active" : "")" @onclick="() => OnNavClick.InvokeAsync(item.Id)">
+                        <span class="nav-icon">@item.Icon</span>
+                        <span class="nav-label">@item.Label</span>
+                    </button>
+                }
+            </nav>
+        </aside>
+        break;
+}
+
+@code {
+    [Parameter] public List<NavItem> NavItems { get; set; } = new();
+    [Parameter] public EventCallback<string> OnNavClick { get; set; }
+
+    public class NavItem
+    {
+        public string Id { get; set; } = "";
+        public string Label { get; set; } = "";
+        public string Icon { get; set; } = "";
+        public bool IsActive { get; set; }
+    }
+}

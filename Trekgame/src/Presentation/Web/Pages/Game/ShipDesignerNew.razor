@@ -2,13 +2,16 @@
 @page "/game/ship-designer"
 @page "/game/designer"
 @layout StellarisLayout
+@using MudBlazor
+@using StarTrekGame.Web.Services
+@using Blazored.LocalStorage
+@inject IGameApiClient Api
+@inject ILocalStorageService LocalStorage
+@inject ISnackbar Snackbar
+@inject NavigationManager Navigation
 <PageTitle>Ship Designer - Galactic Strategy</PageTitle>
-<div class="stellaris-layout">
-    <header class="st-topbar"><div class="st-empire-badge"><div class="st-empire-flag">🌐</div><div class="st-empire-info"><span class="st-empire-name">Starfleet Engineering</span><span class="st-empire-type">Ship Design Bureau</span></div></div><div class="st-resources"><div class="st-resource"><span class="st-resource-icon">🔩</span><div class="st-resource-values"><span class="st-resource-current">340</span></div></div><div class="st-resource"><span class="st-resource-icon">⚡</span><div class="st-resource-values"><span class="st-resource-current">1,250</span></div></div></div><div class="st-game-controls"><button class="st-end-turn-btn">END TURN</button></div></header>
-    <div class="st-main">
-        <aside class="st-sidebar-left"><nav class="st-nav"><a href="/game/galaxy" class="st-nav-btn"><span class="st-nav-icon">🌌</span><span class="st-nav-label">Galaxy</span></a><a href="/game/military" class="st-nav-btn"><span class="st-nav-icon">🚀</span><span class="st-nav-label">Fleets</span></a><a href="/game/designer" class="st-nav-btn active"><span class="st-nav-icon">🔧</span><span class="st-nav-label">Designer</span></a></nav></aside>
-        <div class="designer-content">
-            <div class="designer-header"><h1>SHIP DESIGNER</h1><div class="header-actions"><button class="st-btn" @onclick="NewDesign">+ NEW DESIGN</button><button class="st-btn">SAVE</button></div></div>
+<div class="designer-content">
+            <div class="designer-header"><h1>SHIP DESIGNER</h1><div class="header-actions"><button class="st-btn" @onclick="NewDesign">+ NEW DESIGN</button><button class="st-btn" @onclick="SaveDesign" disabled="@_isSaving">@(_isSaving ? "SAVING..." : "SAVE")</button><button class="st-btn danger" @onclick="DeleteDesign" disabled="@(_selected == null)">DELETE</button></div></div>
             <div class="designer-layout">
                 <div class="designs-panel">
                     <div class="panel-header">SHIP DESIGNS (@_designs.Count)</div>
@@ -31,15 +34,13 @@
                 </div>
                 <div class="components-panel">
                     <div class="panel-header">COMPONENTS</div>
-                    <div class="component-tabs"><button class="tab-btn active">WEAPONS</button><button class="tab-btn">DEFENSE</button><button class="tab-btn">UTILITY</button></div>
+                    <div class="component-tabs"><button class="tab-btn @(_activeTab == "weapons" ? "active" : "")" @onclick='() => SwitchTab("weapons")'>WEAPONS</button><button class="tab-btn @(_activeTab == "defense" ? "active" : "")" @onclick='() => SwitchTab("defense")'>DEFENSE</button><button class="tab-btn @(_activeTab == "utility" ? "active" : "")" @onclick='() => SwitchTab("utility")'>UTILITY</button></div>
                     <div class="components-grid">
-                        @foreach(var c in _components){<div class="component-card" @onclick="()=>AddComponent(c)"><div class="comp-icon">@c.Icon</div><div class="comp-name">@c.Name</div><div class="comp-stats">@c.StatBonus</div></div>}
+                        @foreach(var c in FilteredComponents){<div class="component-card" @onclick="()=>AddComponent(c)"><div class="comp-icon">@c.Icon</div><div class="comp-name">@c.Name</div><div class="comp-stats">@c.StatBonus</div></div>}
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
 <style>
 .designer-content{flex:1;display:flex;flex-direction:column;background:linear-gradient(180deg,#080c14,#040608)}
 .designer-header{padding:16px 24px;background:rgba(10,15,25,0.9);border-bottom:1px solid var(--st-border-dark);display:flex;align-items:center;justify-content:space-between}
@@ -51,8 +52,13 @@
 .designs-list{flex:1;overflow-y:auto;padding:8px}
 .design-item{display:flex;gap:10px;padding:10px;margin-bottom:6px;background:var(--st-bg-medium);border-radius:6px;cursor:pointer;border-left:3px solid transparent;transition:all 0.15s}
 .design-item:hover{background:var(--st-bg-light)}.design-item.selected{border-left-color:var(--st-accent-blue);background:rgba(74,158,255,0.15)}
-.design-icon{width:40px;height:40px;background:var(--st-bg-darker);border-radius:6px;display:flex;align-items:center;justify-content:center}
-.design-icon.frigate{background:linear-gradient(135deg,#2a4a6a,#1a2a3a)}.design-icon.cruiser{background:linear-gradient(135deg,#4a3a6a,#2a1a3a)}.design-icon.battleship{background:linear-gradient(135deg,#6a4a3a,#3a2a1a)}
+/* Ship design icons - using spritesheets */
+/* 6x6 grid, 360px cells, 2160x2160px total, display 40x40 = scale 40/360 = 0.111 */
+/* background-size = 2160 * 0.111 = 240px, position = col * 40 */
+.design-icon{width:40px;height:40px;background-image:url('/assets/factions/federation/federation_militaryships_spritesheet.png');background-size:240px 240px;background-repeat:no-repeat;border-radius:6px;background-position:0 0}
+.design-icon.frigate{background-position:-120px 0}   /* col 3 = Defiant */
+.design-icon.cruiser{background-position:0 0}        /* col 0 = Constitution */
+.design-icon.battleship{background-position:-40px 0} /* col 1 = Galaxy */
 .design-info{flex:1}.design-name{display:block;font-size:12px;font-weight:500;color:var(--st-text-white)}.design-class{font-size:10px;color:var(--st-text-dim)}
 .design-stats{font-size:10px;color:var(--st-text-muted)}
 .ship-preview{flex:1;background:var(--st-gradient-panel);border:1px solid var(--st-border-dark);border-radius:8px;display:flex;flex-direction:column}
@@ -84,13 +90,145 @@
 </style>
 @code{
     List<ShipDesign> _designs=new();ShipDesign? _selected;List<Component> _components=new();
-    protected override void OnInitialized(){
-        _designs=new(){new(){Id=1,Name="Constitution",Hull="Cruiser",Firepower=450,HullPoints=800,Shields=400,Speed=6,Cost=180},new(){Id=2,Name="Defiant",Hull="Frigate",Firepower=600,HullPoints=400,Shields=300,Speed=8,Cost=120},new(){Id=3,Name="Galaxy",Hull="Battleship",Firepower=700,HullPoints=1500,Shields=800,Speed=5,Cost=350}};
-        _components=new(){new(){Icon="🔫",Name="Phaser Array",StatBonus="+50 Attack"},new(){Icon="💥",Name="Torpedo Bay",StatBonus="+80 Attack"},new(){Icon="🛡",Name="Shield Gen",StatBonus="+100 Shield"},new(){Icon="🔋",Name="Aux Power",StatBonus="+50 Shield"},new(){Icon="⚡",Name="Impulse Engine",StatBonus="+1 Speed"},new(){Icon="🌀",Name="Warp Core",StatBonus="+2 Speed"}};
+    string _activeTab = "weapons";
+    private Guid? _factionId;
+    private bool _isSaving;
+
+    IEnumerable<Component> FilteredComponents => _components.Where(c => c.Category == _activeTab);
+
+    protected override async Task OnInitializedAsync(){
+        _factionId = await LocalStorage.GetItemAsync<Guid?>("currentFactionId");
+        InitComponents();
+
+        if (_factionId.HasValue)
+        {
+            await LoadDesignsFromApi();
+        }
+
+        // Fallback to mock if no API designs loaded
+        if (!_designs.Any())
+        {
+            _designs=new(){new(){Name="Constitution",Hull="Cruiser",Firepower=450,HullPoints=800,Shields=400,Speed=6,Cost=180},new(){Name="Defiant",Hull="Frigate",Firepower=600,HullPoints=400,Shields=300,Speed=8,Cost=120},new(){Name="Galaxy",Hull="Battleship",Firepower=700,HullPoints=1500,Shields=800,Speed=5,Cost=350}};
+        }
         _selected=_designs.FirstOrDefault();
     }
-    void NewDesign()=>_designs.Add(new(){Id=_designs.Count+1,Name="New Design",Hull="Frigate",Firepower=100,HullPoints=200,Shields=100,Speed=5,Cost=80});
-    void AddComponent(Component c){}
-    class ShipDesign{public int Id;public string Name="";public string Hull="";public int Firepower;public int HullPoints;public int Shields;public int Speed;public int Cost;}
-    class Component{public string Icon="";public string Name="";public string StatBonus="";}
+
+    private async Task LoadDesignsFromApi()
+    {
+        try
+        {
+            var apiDesigns = await Api.GetShipDesignsAsync(_factionId!.Value);
+            if (apiDesigns.Any())
+            {
+                _designs = apiDesigns.Select(d => new ShipDesign
+                {
+                    ApiId = d.Id,
+                    Name = d.Name,
+                    Hull = d.ShipClass,
+                    Firepower = d.Firepower,
+                    HullPoints = d.HullPoints,
+                    Shields = d.ShieldCapacity,
+                    Speed = d.Speed,
+                    Cost = d.ProductionCost,
+                    InstalledWeapons = d.InstalledComponents?.Where(c => _components.Any(comp => comp.Category == "weapons" && comp.Id == c)).ToList() ?? new(),
+                    InstalledDefense = d.InstalledComponents?.Where(c => _components.Any(comp => comp.Category == "defense" && comp.Id == c)).ToList() ?? new(),
+                    InstalledSystems = d.InstalledComponents?.Where(c => _components.Any(comp => comp.Category == "utility" && comp.Id == c)).ToList() ?? new(),
+                    IsFromApi = true
+                }).ToList();
+            }
+        }
+        catch { /* Fall back to mock data */ }
+    }
+
+    private void InitComponents()
+    {
+        _components=new(){
+            new(){Id="phaser_array",Icon="🔫",Name="Phaser Array",StatBonus="+50 Attack",Category="weapons",AttackBonus=50},
+            new(){Id="torpedo_bay",Icon="💥",Name="Torpedo Bay",StatBonus="+80 Attack",Category="weapons",AttackBonus=80},
+            new(){Id="disruptor",Icon="🎯",Name="Disruptor",StatBonus="+60 Attack",Category="weapons",AttackBonus=60},
+            new(){Id="shield_gen",Icon="🛡",Name="Shield Gen",StatBonus="+100 Shield",Category="defense",ShieldBonus=100},
+            new(){Id="aux_power",Icon="🔋",Name="Aux Power",StatBonus="+50 Shield",Category="defense",ShieldBonus=50},
+            new(){Id="ablative_armor",Icon="🧱",Name="Ablative Armor",StatBonus="+80 Hull",Category="defense",HullBonus=80},
+            new(){Id="impulse_engine",Icon="⚡",Name="Impulse Engine",StatBonus="+1 Speed",Category="utility",SpeedBonus=1},
+            new(){Id="warp_core",Icon="🌀",Name="Warp Core",StatBonus="+2 Speed",Category="utility",SpeedBonus=2},
+            new(){Id="sensor_array",Icon="📡",Name="Sensor Array",StatBonus="+Range",Category="utility"}
+        };
+    }
+
+    void NewDesign(){
+        var d = new ShipDesign{Name="New Design",Hull="Frigate",Firepower=100,HullPoints=200,Shields=100,Speed=5,Cost=80};
+        _designs.Add(d);
+        _selected = d;
+    }
+
+    void AddComponent(Component c){
+        if(_selected==null) return;
+        _selected.Firepower += c.AttackBonus;
+        _selected.Shields += c.ShieldBonus;
+        _selected.HullPoints += c.HullBonus;
+        _selected.Speed += c.SpeedBonus;
+        _selected.Cost += 20;
+        // Track installed components
+        if (c.Category == "weapons") _selected.InstalledWeapons.Add(c.Id);
+        else if (c.Category == "defense") _selected.InstalledDefense.Add(c.Id);
+        else _selected.InstalledSystems.Add(c.Id);
+        Snackbar.Add($"{c.Name} installed", MudBlazor.Severity.Success);
+    }
+
+    async Task SaveDesign(){
+        if(_selected==null || !_factionId.HasValue) return;
+        _isSaving = true;
+        try
+        {
+            var request = new CreateShipDesignRequest(
+                _selected.Name,
+                _selected.Hull,
+                _selected.InstalledWeapons,
+                _selected.InstalledDefense,
+                _selected.InstalledSystems
+            );
+            var result = await Api.CreateShipDesignAsync(_factionId.Value, request);
+            _selected.ApiId = result.Id;
+            _selected.IsFromApi = true;
+            Snackbar.Add($"Design '{_selected.Name}' saved to server", MudBlazor.Severity.Success);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Failed to save design: {ex.Message}", MudBlazor.Severity.Error);
+        }
+        _isSaving = false;
+    }
+
+    async Task DeleteDesign(){
+        if(_selected==null) return;
+        if (_selected.IsFromApi && _selected.ApiId.HasValue)
+        {
+            try
+            {
+                await Api.DeleteShipDesignAsync(_selected.ApiId.Value);
+                Snackbar.Add($"Design '{_selected.Name}' deleted", MudBlazor.Severity.Info);
+            }
+            catch (Exception ex)
+            {
+                Snackbar.Add($"Failed to delete design: {ex.Message}", MudBlazor.Severity.Error);
+                return;
+            }
+        }
+        _designs.Remove(_selected);
+        _selected = _designs.FirstOrDefault();
+    }
+
+    void SwitchTab(string tab) => _activeTab = tab;
+
+    class ShipDesign{
+        public Guid? ApiId;
+        public string Name="";public string Hull="";public int Firepower;public int HullPoints;public int Shields;public int Speed;public int Cost;
+        public bool IsFromApi;
+        public List<string> InstalledWeapons = new();
+        public List<string> InstalledDefense = new();
+        public List<string> InstalledSystems = new();
+        // Generated Id for UI keying
+        public int Id => ApiId?.GetHashCode() ?? Name.GetHashCode();
+    }
+    class Component{public string Id="";public string Icon="";public string Name="";public string StatBonus="";public string Category="weapons";public int AttackBonus;public int ShieldBonus;public int HullBonus;public int SpeedBonus;}
 }

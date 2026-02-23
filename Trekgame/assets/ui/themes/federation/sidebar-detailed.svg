@@ -1,0 +1,171 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 800" fill="none">
+  <!-- LCARS Detailed Sidebar: Full left navigation with multiple colored segments -->
+  <defs>
+    <!-- Color gradients with metallic shine -->
+    <linearGradient id="sidebarOrange" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#FFAA66"/>
+      <stop offset="25%" style="stop-color:#FF8833"/>
+      <stop offset="75%" style="stop-color:#FF8833"/>
+      <stop offset="100%" style="stop-color:#FFAA66"/>
+    </linearGradient>
+
+    <linearGradient id="sidebarViolet" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#CC99DD"/>
+      <stop offset="25%" style="stop-color:#9966BB"/>
+      <stop offset="75%" style="stop-color:#9966BB"/>
+      <stop offset="100%" style="stop-color:#CC99DD"/>
+    </linearGradient>
+
+    <linearGradient id="sidebarTan" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#EECCAA"/>
+      <stop offset="25%" style="stop-color:#CC9966"/>
+      <stop offset="75%" style="stop-color:#CC9966"/>
+      <stop offset="100%" style="stop-color:#EECCAA"/>
+    </linearGradient>
+
+    <linearGradient id="sidebarPink" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#FFAACC"/>
+      <stop offset="25%" style="stop-color:#DD7799"/>
+      <stop offset="75%" style="stop-color:#DD7799"/>
+      <stop offset="100%" style="stop-color:#FFAACC"/>
+    </linearGradient>
+
+    <linearGradient id="sidebarBlue" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#99CCFF"/>
+      <stop offset="25%" style="stop-color:#5588CC"/>
+      <stop offset="75%" style="stop-color:#5588CC"/>
+      <stop offset="100%" style="stop-color:#99CCFF"/>
+    </linearGradient>
+
+    <!-- Glow filter -->
+    <filter id="segmentGlow" x="-10%" y="-10%" width="120%" height="120%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Texture pattern -->
+    <pattern id="sidebarNoise" x="0" y="0" width="60" height="60" patternUnits="userSpaceOnUse">
+      <rect width="60" height="60" fill="rgba(255,255,255,0.02)"/>
+      <circle cx="10" cy="15" r="0.5" fill="rgba(255,255,255,0.12)"/>
+      <circle cx="30" cy="40" r="0.4" fill="rgba(255,255,255,0.1)"/>
+      <circle cx="50" cy="10" r="0.5" fill="rgba(255,255,255,0.08)"/>
+    </pattern>
+  </defs>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- TOP ELBOW - Rounded corner cap -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <path d="
+    M 0 0
+    L 120 0
+    L 120 80
+    L 100 80
+    L 100 60
+    Q 100 20 60 20
+    L 0 20
+    Z
+  " fill="url(#sidebarOrange)" filter="url(#segmentGlow)"/>
+  <path d="
+    M 0 0
+    L 120 0
+    L 120 80
+    L 100 80
+    L 100 60
+    Q 100 20 60 20
+    L 0 20
+    Z
+  " fill="url(#sidebarNoise)"/>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- MAIN SIDEBAR SEGMENTS -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+
+  <!-- Segment 1: Tan/Beige - Main -->
+  <rect x="0" y="30" width="95" height="120" fill="url(#sidebarTan)"/>
+  <rect x="0" y="30" width="95" height="120" fill="url(#sidebarNoise)"/>
+
+  <!-- Segment divider -->
+  <rect x="0" y="150" width="95" height="4" fill="#000"/>
+
+  <!-- Segment 2: Pink -->
+  <rect x="0" y="158" width="95" height="80" fill="url(#sidebarPink)"/>
+  <rect x="0" y="158" width="95" height="80" fill="url(#sidebarNoise)"/>
+
+  <!-- Segment divider -->
+  <rect x="0" y="238" width="95" height="4" fill="#000"/>
+
+  <!-- Segment 3: Blue -->
+  <rect x="0" y="246" width="95" height="100" fill="url(#sidebarBlue)"/>
+  <rect x="0" y="246" width="95" height="100" fill="url(#sidebarNoise)"/>
+
+  <!-- Segment divider -->
+  <rect x="0" y="346" width="95" height="4" fill="#000"/>
+
+  <!-- Segment 4: Orange -->
+  <rect x="0" y="354" width="95" height="90" fill="url(#sidebarOrange)"/>
+  <rect x="0" y="354" width="95" height="90" fill="url(#sidebarNoise)"/>
+
+  <!-- Segment divider -->
+  <rect x="0" y="444" width="95" height="4" fill="#000"/>
+
+  <!-- Segment 5: Violet -->
+  <rect x="0" y="452" width="95" height="110" fill="url(#sidebarViolet)"/>
+  <rect x="0" y="452" width="95" height="110" fill="url(#sidebarNoise)"/>
+
+  <!-- Segment divider -->
+  <rect x="0" y="562" width="95" height="4" fill="#000"/>
+
+  <!-- Segment 6: Tan -->
+  <rect x="0" y="570" width="95" height="80" fill="url(#sidebarTan)"/>
+  <rect x="0" y="570" width="95" height="80" fill="url(#sidebarNoise)"/>
+
+  <!-- Segment divider -->
+  <rect x="0" y="650" width="95" height="4" fill="#000"/>
+
+  <!-- Segment 7: Pink -->
+  <rect x="0" y="658" width="95" height="62" fill="url(#sidebarPink)"/>
+  <rect x="0" y="658" width="95" height="62" fill="url(#sidebarNoise)"/>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- BOTTOM ELBOW - Rounded corner cap -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <path d="
+    M 0 780
+    L 60 780
+    Q 100 780 100 740
+    L 100 720
+    L 120 720
+    L 120 800
+    L 0 800
+    Z
+  " fill="url(#sidebarViolet)" filter="url(#segmentGlow)"/>
+  <path d="
+    M 0 780
+    L 60 780
+    Q 100 780 100 740
+    L 100 720
+    L 120 720
+    L 120 800
+    L 0 800
+    Z
+  " fill="url(#sidebarNoise)"/>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- VERTICAL EDGE STRIP -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <rect x="95" y="80" width="5" height="640" fill="#000"/>
+
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- INTERACTIVE INDICATORS - Small pill buttons -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <rect x="5" y="60" width="85" height="30" rx="15" fill="rgba(0,0,0,0.3)"/>
+  <rect x="5" y="180" width="85" height="30" rx="15" fill="rgba(0,0,0,0.3)"/>
+  <rect x="5" y="275" width="85" height="30" rx="15" fill="rgba(0,0,0,0.3)"/>
+  <rect x="5" y="380" width="85" height="30" rx="15" fill="rgba(0,0,0,0.3)"/>
+  <rect x="5" y="480" width="85" height="30" rx="15" fill="rgba(0,0,0,0.3)"/>
+  <rect x="5" y="595" width="85" height="30" rx="15" fill="rgba(0,0,0,0.3)"/>
+  <rect x="5" y="680" width="85" height="30" rx="15" fill="rgba(0,0,0,0.3)"/>
+</svg>

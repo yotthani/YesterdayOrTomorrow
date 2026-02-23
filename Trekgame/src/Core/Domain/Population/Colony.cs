@@ -10,7 +10,7 @@ namespace StarTrekGame.Domain.Population;
 /// </summary>
 public class Colony : AggregateRoot
 {
-    public string Name { get; private set; }
+    public string Name { get; private set; } = default!;
     public Guid PlanetId { get; private set; }
     public Guid StarSystemId { get; private set; }
     public Guid OwnerEmpireId { get; private set; }
@@ -51,7 +51,7 @@ public class Colony : AggregateRoot
     public int DefenseLevel { get; private set; }          // 0-10
     
     // Resources
-    public ColonyResources Resources { get; private set; }
+    public ColonyResources Resources { get; private set; } = default!;
     
     // Events
     private readonly List<ColonyEvent> _recentEvents = new();

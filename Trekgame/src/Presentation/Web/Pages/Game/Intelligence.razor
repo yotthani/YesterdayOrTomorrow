@@ -1,4 +1,5 @@
 @page "/game/intelligence"
+@layout StellarisLayout
 @using MudBlazor
 @using StarTrekGame.Web.Services
 @using Blazored.LocalStorage
@@ -10,8 +11,7 @@
 <PageTitle>Intelligence Operations - Galactic Strategy</PageTitle>
 
 <div class="intel-wrapper">
-    <header class="intel-header">
-        <a href="/game/map" class="back-btn">◄ GALAXY MAP</a>
+    <div class="intel-page-header">
         <h1>INTELLIGENCE OPERATIONS</h1>
         <div class="header-stats">
             <div class="stat-item">
@@ -36,7 +36,7 @@
                 </div>
             </div>
         </div>
-    </header>
+    </div>
 
     <div class="intel-content">
         @* Left Panel - Active Operations *@
@@ -366,46 +366,29 @@
 <style>
 /* Intelligence Operations Styling */
 .intel-wrapper {
-    position: fixed;
-    inset: 0;
-    background: linear-gradient(135deg, #050810 0%, #0a0f18 50%, #060912 100%);
+    flex: 1;
     display: flex;
     flex-direction: column;
     font-family: 'Segoe UI', system-ui, sans-serif;
     color: #c8d4e8;
 }
 
-.intel-header {
-    height: 70px;
+.intel-page-header {
+    padding: 12px 24px;
     background: linear-gradient(180deg, rgba(20, 15, 30, 0.98) 0%, rgba(12, 10, 20, 0.99) 100%);
     border-bottom: 1px solid rgba(139, 92, 246, 0.4);
     display: flex;
     align-items: center;
-    padding: 0 24px;
     gap: 24px;
 }
 
-.intel-header h1 {
-    font-size: 20px;
+.intel-page-header h1 {
+    font-size: 18px;
     font-weight: 600;
     color: #a78bfa;
     letter-spacing: 2px;
     margin: 0;
 }
-
-.back-btn {
-    padding: 8px 14px;
-    background: rgba(139, 92, 246, 0.2);
-    border: 1px solid rgba(139, 92, 246, 0.4);
-    border-radius: 4px;
-    color: #a78bfa;
-    text-decoration: none;
-    font-size: 12px;
-    font-weight: 600;
-    transition: all 0.2s;
-}
-
-.back-btn:hover { background: rgba(139, 92, 246, 0.4); color: #fff; }
 
 .header-stats {
     margin-left: auto;
@@ -1011,10 +994,63 @@
     private List<MissionType> _availableMissions = new();
     private List<string> _recentSuccesses = new();
 
-    protected override void OnInitialized()
+    private Guid? _factionGuid;
+
+    protected override async Task OnInitializedAsync()
     {
-        LoadIntelData();
+        _factionGuid = await LocalStorage.GetItemAsync<Guid?>("currentFactionId");
+        if (_factionGuid.HasValue)
+        {
+            await LoadFromApi();
+        }
+        // Fallback to mock if API didn't load anything
+        if (!_agents.Any())
+        {
+            LoadIntelData();
+        }
     }
+
+    private async Task LoadFromApi()
+    {
+        try
+        {
+            var operations = await Api.GetIntelOperationsAsync(_factionGuid!.Value);
+            _activeOperations = operations.Select(o => new ActiveOperation
+            {
+                Id = o.Id, Name = o.Name, Type = o.MissionType, TargetName = o.TargetFactionName,
+                Status = o.Status, Progress = o.Progress, TurnsRemaining = o.TurnsRemaining,
+                SuccessChance = o.SuccessChance, DetectionRisk = o.DetectionRisk
+            }).ToList();
+
+            var agents = await Api.GetIntelAgentsAsync(_factionGuid.Value);
+            _agents = agents.Select(a => new AgentData
+            {
+                Id = a.Id, Name = a.Name, Level = a.Level, Specialty = a.Specialty,
+                Status = a.Status, AssignedTo = a.AssignedTo,
+                Infiltration = a.Infiltration, Sabotage = a.Sabotage, TechTheft = a.TechTheft
+            }).ToList();
+            _totalAgents = _agents.Count;
+
+            // Load faction intel from diplomacy relations
+            var relations = await Api.GetDiplomaticRelationsAsync(_factionGuid.Value);
+            _factions = relations.Select(r => new FactionIntel
+            {
+                Id = r.FactionId, Name = r.FactionName, Emblem = GetFactionEmblem(r.RaceId),
+                Color = r.Color, Relation = r.Status, IntelLevel = Math.Max(0, r.RelationValue + 50),
+                KnownFleets = r.MilitaryStrength / 100, KnownColonies = r.SystemCount,
+                MilitaryStrength = r.MilitaryPower > 500 ? "Strong" : r.MilitaryPower > 200 ? "Moderate" : "Weak",
+                IsHostile = r.Status == "War" || r.RelationValue < -50
+            }).ToList();
+        }
+        catch { /* Fall through to mock data */ }
+    }
+
+    private string GetFactionEmblem(string? raceId) => raceId?.ToLower() switch
+    {
+        "klingon" => "⚔️", "romulan" => "🦅", "cardassian" => "🔱",
+        "ferengi" => "💰", "borg" => "🔲", "vulcan" => "🖖",
+        _ => "🏛️"
+    };
 
     private void LoadIntelData()
     {
@@ -1077,29 +1113,49 @@
     private async Task LaunchMission()
     {
         if (_selectedMission == null || !_selectedAgentId.HasValue || !_selectedFactionId.HasValue) return;
-        
+
         var faction = _factions.FirstOrDefault(f => f.Id == _selectedFactionId);
         var agent = _agents.FirstOrDefault(a => a.Id == _selectedAgentId);
-        
+
         if (faction != null && agent != null)
         {
-            _activeOperations.Add(new ActiveOperation
+            if (_factionGuid.HasValue)
             {
-                Id = Guid.NewGuid(),
-                Name = $"{_selectedMission.Name} - {faction.Name}",
-                Type = _selectedMission.Type,
-                TargetName = faction.Name,
-                Status = "In Progress",
-                Progress = 0,
-                TurnsRemaining = _selectedMission.Duration,
-                SuccessChance = CalculateSuccess(_selectedMission, agent),
-                DetectionRisk = CalculateRisk(_selectedMission, agent)
-            });
-            
-            agent.Status = "Deployed";
-            agent.AssignedTo = faction.Name;
-            
-            Snackbar.Add($"Operation launched against {faction.Name}", Severity.Success);
+                try
+                {
+                    var request = new LaunchIntelRequest(_selectedMission.Type, faction.Id, agent.Id);
+                    var result = await Api.LaunchIntelOperationAsync(_factionGuid.Value, request);
+                    _activeOperations.Add(new ActiveOperation
+                    {
+                        Id = result.Id, Name = result.Name, Type = result.MissionType,
+                        TargetName = result.TargetFactionName, Status = result.Status,
+                        Progress = result.Progress, TurnsRemaining = result.TurnsRemaining,
+                        SuccessChance = result.SuccessChance, DetectionRisk = result.DetectionRisk
+                    });
+                    agent.Status = "Deployed";
+                    agent.AssignedTo = faction.Name;
+                    Snackbar.Add($"Operation launched against {faction.Name}", Severity.Success);
+                }
+                catch (Exception ex)
+                {
+                    Snackbar.Add($"Failed to launch operation: {ex.Message}", Severity.Error);
+                }
+            }
+            else
+            {
+                // Fallback: local mock operation
+                _activeOperations.Add(new ActiveOperation
+                {
+                    Id = Guid.NewGuid(), Name = $"{_selectedMission.Name} - {faction.Name}",
+                    Type = _selectedMission.Type, TargetName = faction.Name, Status = "In Progress",
+                    Progress = 0, TurnsRemaining = _selectedMission.Duration,
+                    SuccessChance = CalculateSuccess(_selectedMission, agent),
+                    DetectionRisk = CalculateRisk(_selectedMission, agent)
+                });
+                agent.Status = "Deployed";
+                agent.AssignedTo = faction.Name;
+                Snackbar.Add($"Operation launched against {faction.Name}", Severity.Success);
+            }
             _selectedMission = null;
             _selectedAgentId = null;
         }
@@ -1110,6 +1166,18 @@
         var op = _activeOperations.FirstOrDefault(o => o.Id == opId);
         if (op != null)
         {
+            if (_factionGuid.HasValue)
+            {
+                try
+                {
+                    await Api.AbortIntelOperationAsync(opId);
+                }
+                catch (Exception ex)
+                {
+                    Snackbar.Add($"Failed to abort: {ex.Message}", Severity.Error);
+                    return;
+                }
+            }
             _activeOperations.Remove(op);
             Snackbar.Add("Operation aborted", Severity.Warning);
         }
@@ -1119,19 +1187,35 @@
     {
         if (_totalAgents < _maxAgents)
         {
-            _totalAgents++;
-            _agents.Add(new AgentData
+            if (_factionGuid.HasValue)
             {
-                Id = Guid.NewGuid(),
-                Name = $"Agent {_agents.Count + 1}",
-                Level = 1,
-                Specialty = "Trainee",
-                Status = "Available",
-                Infiltration = 40,
-                Sabotage = 35,
-                TechTheft = 40
-            });
-            Snackbar.Add("New agent recruited", Severity.Success);
+                try
+                {
+                    var newAgent = await Api.RecruitAgentAsync(_factionGuid.Value);
+                    _agents.Add(new AgentData
+                    {
+                        Id = newAgent.Id, Name = newAgent.Name, Level = newAgent.Level,
+                        Specialty = newAgent.Specialty, Status = newAgent.Status,
+                        Infiltration = newAgent.Infiltration, Sabotage = newAgent.Sabotage, TechTheft = newAgent.TechTheft
+                    });
+                    _totalAgents = _agents.Count;
+                    Snackbar.Add("New agent recruited", Severity.Success);
+                }
+                catch (Exception ex)
+                {
+                    Snackbar.Add($"Failed to recruit: {ex.Message}", Severity.Error);
+                }
+            }
+            else
+            {
+                _totalAgents++;
+                _agents.Add(new AgentData
+                {
+                    Id = Guid.NewGuid(), Name = $"Agent {_agents.Count + 1}", Level = 1,
+                    Specialty = "Trainee", Status = "Available", Infiltration = 40, Sabotage = 35, TechTheft = 40
+                });
+                Snackbar.Add("New agent recruited", Severity.Success);
+            }
         }
     }
 

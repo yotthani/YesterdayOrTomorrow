@@ -92,7 +92,9 @@
     private double MapHeight => MaxY - MinY;
     private string ViewBox => $"{MinX} {MinY} {MapWidth} {MapHeight}";
     
+    #pragma warning disable CS0414
     private bool _isDragging = false;
+    #pragma warning restore CS0414
     
     private async Task OnMinimapClick(MouseEventArgs e)
     {

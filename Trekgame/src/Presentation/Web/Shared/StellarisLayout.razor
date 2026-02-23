@@ -1,18 +1,251 @@
 @inherits LayoutComponentBase
 @using MudBlazor
+@using StarTrekGame.Web.Services
+@using Blazored.LocalStorage
+@inject ThemeService ThemeService
+@inject IGameApiClient Api
+@inject NavigationManager Navigation
+@inject ILocalStorageService LocalStorage
+@inject ISnackbar Snackbar
 
 <MudThemeProvider IsDarkMode="true" />
 <MudPopoverProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
 
-<div class="stellaris-app">
-    @Body
+<CascadingValue Name="GameState" Value="@_gameState">
+<div class="stellaris-app" data-theme="@ThemeService.CurrentTheme">
+    <div class="stellaris-layout">
+        @* ═══════════════════════════════════════════════════════════════════
+           TOP BAR - Empire Badge, Resources, Game Controls
+           ═══════════════════════════════════════════════════════════════════ *@
+        <header class="st-topbar">
+            <div class="st-empire-badge">
+                <div class="st-empire-flag">🌐</div>
+                <div class="st-empire-info">
+                    <span class="st-empire-name">@_gameState.FactionName</span>
+                    <span class="st-empire-type">@_gameState.GovernmentType</span>
+                </div>
+            </div>
+
+            <div class="st-resources">
+                <div class="st-resource"><span class="st-resource-icon">⚡</span><div class="st-resource-values"><span class="st-resource-current">@_gameState.Energy.ToString("N0")</span>@if(_gameState.EnergyIncome!=0){<span class="st-resource-income @(_gameState.EnergyIncome>0?"positive":"negative")">@FormatIncome(_gameState.EnergyIncome)</span>}</div></div>
+                <div class="st-resource"><span class="st-resource-icon">💎</span><div class="st-resource-values"><span class="st-resource-current">@_gameState.Minerals.ToString("N0")</span></div></div>
+                <div class="st-resource"><span class="st-resource-icon">🌾</span><div class="st-resource-values"><span class="st-resource-current">@_gameState.Food.ToString("N0")</span></div></div>
+                <div class="st-resource"><span class="st-resource-icon">🔩</span><div class="st-resource-values"><span class="st-resource-current">@_gameState.Alloys.ToString("N0")</span></div></div>
+                <div class="st-resource"><span class="st-resource-icon">🔬</span><div class="st-resource-values"><span class="st-resource-current">@_gameState.Research.ToString("N0")</span></div></div>
+            </div>
+
+            <div class="st-game-controls">
+                <div class="st-date-display">
+                    <span class="st-date-label">STARDATE</span>
+                    <span class="st-date-value">@_gameState.Stardate</span>
+                </div>
+                <button class="st-end-turn-btn" @onclick="EndTurn" disabled="@_processingTurn">END TURN</button>
+                <a href="/game/settings" class="st-btn sm settings-btn" title="Settings">⚙</a>
+                @if (_gameState.IsAdmin)
+                {
+                    <button class="admin-force-btn" @onclick="ForceProcessTurn" disabled="@_processingTurn" title="Admin: Force process turn immediately">⚡ FORCE</button>
+                }
+            </div>
+        </header>
+
+        @* ═══════════════════════════════════════════════════════════════════
+           MAIN AREA - Sidebar + Content
+           ═══════════════════════════════════════════════════════════════════ *@
+        <div class="st-main">
+            <aside class="st-sidebar-left">
+                <nav class="st-nav">
+                    <a href="/game/galaxy" class="st-nav-btn @IsActive("/game/galaxy","/game/map")"><span class="st-nav-icon">🌌</span><span class="st-nav-label">Galaxy</span></a>
+                    <a href="/game/planets" class="st-nav-btn @IsActive("/game/planets","/game/colonies")"><span class="st-nav-icon">🏠</span><span class="st-nav-label">Planets</span></a>
+                    <a href="/game/fleets" class="st-nav-btn @IsActive("/game/fleets","/game/military")"><span class="st-nav-icon">🚀</span><span class="st-nav-label">Fleets</span></a>
+                    <a href="/game/research" class="st-nav-btn @IsActive("/game/research","/game/tech")"><span class="st-nav-icon">🔬</span><span class="st-nav-label">Research</span></a>
+                    <a href="/game/contacts" class="st-nav-btn @IsActive("/game/contacts","/game/diplomacy")"><span class="st-nav-icon">👥</span><span class="st-nav-label">Diplomacy</span></a>
+                    <a href="/game/economy" class="st-nav-btn @IsActive("/game/economy")"><span class="st-nav-icon">💰</span><span class="st-nav-label">Economy</span></a>
+                    <a href="/game/intelligence" class="st-nav-btn @IsActive("/game/intelligence")"><span class="st-nav-icon">👁</span><span class="st-nav-label">Intel</span></a>
+                    <a href="/game/ship-designer" class="st-nav-btn @IsActive("/game/ship-designer","/game/designer")"><span class="st-nav-icon">🔧</span><span class="st-nav-label">Designer</span></a>
+                    <a href="/game/policies" class="st-nav-btn @IsActive("/game/policies")"><span class="st-nav-icon">📜</span><span class="st-nav-label">Policies</span></a>
+                    <a href="/game/victory-status" class="st-nav-btn @IsActive("/game/victory-status","/game/victory")"><span class="st-nav-icon">🏆</span><span class="st-nav-label">Victory</span></a>
+                </nav>
+            </aside>
+
+            <div class="st-page-wrapper">
+                @Body
+            </div>
+        </div>
+
+        @* ═══════════════════════════════════════════════════════════════════
+           BOTTOM BAR
+           ═══════════════════════════════════════════════════════════════════ *@
+        <footer class="st-bottombar">
+            <div class="st-notifications"></div>
+            <div class="st-bottom-actions">
+                <button class="st-btn sm" @onclick='() => Navigation.NavigateTo("/")'>☰ MENU</button>
+            </div>
+        </footer>
+    </div>
 </div>
+</CascadingValue>
 
 <style>
     .stellaris-app {
         min-height: 100vh;
-        background: #040608;
+        background: var(--st-bg-darkest, #040608);
+    }
+
+    .admin-force-btn {
+        padding: 6px 12px;
+        background: linear-gradient(180deg, #cc6600 0%, #993300 100%);
+        border: 1px solid #ff8800;
+        border-radius: 4px;
+        color: #fff;
+        font-size: 11px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.15s;
+        letter-spacing: 1px;
+    }
+    .admin-force-btn:hover {
+        background: linear-gradient(180deg, #ff8800 0%, #cc6600 100%);
+        box-shadow: 0 0 12px rgba(255, 136, 0, 0.4);
+    }
+    .admin-force-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
     }
 </style>
+
+@code {
+    private GameLayoutState _gameState = new();
+    private bool _processingTurn;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ThemeService.InitializeAsync();
+        await LoadGameState();
+        Navigation.LocationChanged += OnLocationChanged;
+    }
+
+    private async Task LoadGameState()
+    {
+        try
+        {
+            _gameState.FactionId = await LocalStorage.GetItemAsync<Guid?>("currentFactionId");
+            _gameState.IsAdmin = await LocalStorage.GetItemAsync<bool>("isAdmin");
+
+            var games = await Api.GetGamesAsync();
+            var game = games.FirstOrDefault();
+            if (game != null)
+            {
+                _gameState.GameId = game.Id;
+                _gameState.CurrentTurn = game.Turn;
+                _gameState.Stardate = $"{game.Turn / 10}.{game.Turn % 10:D2}";
+
+                if (_gameState.FactionId.HasValue)
+                {
+                    var faction = await Api.GetMyFactionAsync(game.Id, _gameState.FactionId.Value);
+                    if (faction != null)
+                    {
+                        _gameState.FactionName = faction.Name ?? "United Federation";
+                        _gameState.RaceId = faction.RaceId?.ToLower() ?? "federation";
+                        _gameState.GovernmentType = "Starfleet Command";
+
+                        // Load resources from faction treasury
+                        if (faction.Treasury != null)
+                        {
+                            _gameState.Energy = faction.Treasury.Credits;
+                            _gameState.Minerals = faction.Treasury.Duranium;
+                            _gameState.Food = faction.Treasury.Deuterium;
+                            _gameState.Alloys = faction.Treasury.Dilithium;
+                        }
+
+                        // Apply theme for faction
+                        await ThemeService.SetThemeForRaceAsync(_gameState.RaceId);
+                    }
+                }
+            }
+        }
+        catch
+        {
+            // Fallback to demo mode - keep defaults
+        }
+    }
+
+    private async Task EndTurn()
+    {
+        if (_processingTurn) return;
+        _processingTurn = true;
+        StateHasChanged();
+        try
+        {
+            if (_gameState.FactionId.HasValue && _gameState.GameId.HasValue)
+            {
+                await Api.EndTurnAsync(_gameState.GameId.Value, _gameState.FactionId.Value);
+                Snackbar.Add("Orders submitted!", Severity.Success);
+            }
+            else
+            {
+                Snackbar.Add("Orders submitted (demo mode)", Severity.Info);
+            }
+        }
+        catch (Exception ex) { Snackbar.Add($"Error: {ex.Message}", Severity.Error); }
+        finally { _processingTurn = false; StateHasChanged(); }
+    }
+
+    private async Task ForceProcessTurn()
+    {
+        if (_processingTurn || !_gameState.GameId.HasValue) return;
+        _processingTurn = true;
+        StateHasChanged();
+        try
+        {
+            var result = await Api.ProcessTurnAsync(_gameState.GameId.Value);
+            _gameState.CurrentTurn = result.NewTurn;
+            _gameState.Stardate = $"{result.NewTurn / 10}.{result.NewTurn % 10:D2}";
+            Snackbar.Add($"Turn processed! Now turn {result.NewTurn}.", Severity.Success);
+        }
+        catch (Exception ex) { Snackbar.Add($"Force turn error: {ex.Message}", Severity.Error); }
+        finally { _processingTurn = false; StateHasChanged(); }
+    }
+
+    private string IsActive(params string[] routes)
+    {
+        var currentPath = new Uri(Navigation.Uri).AbsolutePath;
+        return routes.Any(r => currentPath.StartsWith(r, StringComparison.OrdinalIgnoreCase)) ? "active" : "";
+    }
+
+    private string FormatIncome(int income) => income > 0 ? $"+{income}" : income.ToString();
+
+    private void OnLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        Navigation.LocationChanged -= OnLocationChanged;
+    }
+
+    /// <summary>
+    /// Game state shared via CascadingValue to all child pages
+    /// </summary>
+    public class GameLayoutState
+    {
+        public Guid? GameId { get; set; }
+        public Guid? FactionId { get; set; }
+        public bool IsAdmin { get; set; }
+        public string FactionName { get; set; } = "United Federation";
+        public string RaceId { get; set; } = "federation";
+        public string GovernmentType { get; set; } = "Starfleet Command";
+        public int CurrentTurn { get; set; }
+        public string Stardate { get; set; } = "24.56";
+
+        // Resources
+        public int Energy { get; set; } = 1250;
+        public int EnergyIncome { get; set; } = 45;
+        public int Minerals { get; set; } = 890;
+        public int Food { get; set; } = 120;
+        public int Alloys { get; set; } = 340;
+        public int Research { get; set; } = 85;
+    }
+}

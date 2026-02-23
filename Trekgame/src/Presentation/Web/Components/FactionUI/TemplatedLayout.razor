@@ -1,0 +1,171 @@
+@using StarTrekGame.Web.Services
+@inject FactionTemplateService TemplateService
+@inject ThemeService ThemeService
+
+@* Data-driven layout that arranges UI areas based on template definition *@
+
+@{
+    var template = TemplateService.GetTemplate(ThemeService.CurrentTheme);
+    var layout = template.Layout;
+    var layoutStyle = BuildLayoutStyle(layout);
+}
+
+<div class="templated-layout @GetLayoutClass(template.Id) @Class" style="@layoutStyle">
+    @* Header area - always present *@
+    @if (layout.Areas.Contains("header"))
+    {
+        <div class="layout-area area-header">
+            @HeaderContent
+        </div>
+    }
+
+    @* Left sidebar area *@
+    @if (layout.Areas.Contains("sidebar") || layout.Areas.Contains("sidebar-l") || layout.Areas.Contains("info-l"))
+    {
+        <div class="layout-area area-sidebar-left">
+            @SidebarLeftContent
+        </div>
+    }
+
+    @* Main content area - always present *@
+    @if (layout.Areas.Contains("main"))
+    {
+        <div class="layout-area area-main">
+            @MainContent
+        </div>
+    }
+
+    @* Right sidebar/context area *@
+    @if (layout.Areas.Contains("context") || layout.Areas.Contains("sidebar-r") || layout.Areas.Contains("info-r"))
+    {
+        <div class="layout-area area-sidebar-right">
+            @SidebarRightContent
+        </div>
+    }
+
+    @* Command bar (Dominion style) *@
+    @if (layout.Areas.Contains("command"))
+    {
+        <div class="layout-area area-command">
+            @CommandContent
+        </div>
+    }
+
+    @* Footer/status bar *@
+    @if (layout.Areas.Contains("footer") || layout.Areas.Contains("status") || layout.Areas.Contains("subjects"))
+    {
+        <div class="layout-area area-footer">
+            @FooterContent
+        </div>
+    }
+
+    @* Layout-specific decorations *@
+    @foreach (var feature in layout.Features)
+    {
+        <div class="layout-decoration @feature"></div>
+    }
+
+    @* Klingon-specific edge navigation *@
+    @if (layout.Features.Contains("edge-nav") && EdgeNavItems != null)
+    {
+        <div class="edge-nav-container">
+            @foreach (var item in EdgeNavItems)
+            {
+                <button class="edge-nav-btn @(item.IsActive ? "active" : "")" @onclick="item.OnClick">
+                    @item.Label
+                </button>
+            }
+        </div>
+    }
+
+    @if (layout.Features.Contains("edge-status") && EdgeStatusItems != null)
+    {
+        <div class="edge-status-container">
+            @foreach (var item in EdgeStatusItems)
+            {
+                <button class="edge-status-btn" @onclick="item.OnClick">
+                    @item.Label
+                </button>
+            }
+        </div>
+    }
+
+    @if (layout.Features.Contains("edge-teeth") && EdgeToothItems != null)
+    {
+        <div class="edge-bottom-container">
+            @foreach (var item in EdgeToothItems)
+            {
+                <button class="edge-tooth-btn @(item.IsPrimary ? "primary" : "")" @onclick="item.OnClick">
+                    @item.Icon
+                </button>
+            }
+        </div>
+    }
+
+    @if (layout.Features.Contains("corner-accents"))
+    {
+        <div class="corner-accent-tl"></div>
+        <div class="corner-accent-tr"></div>
+        <div class="corner-accent-bl"></div>
+        <div class="corner-accent-br"></div>
+    }
+
+    @if (layout.Features.Contains("top-title") && !string.IsNullOrEmpty(Title))
+    {
+        <div class="edge-top-title">
+            <h1>@Title</h1>
+        </div>
+    }
+
+    @if (layout.Features.Contains("central-emblem") && !string.IsNullOrEmpty(Emblem))
+    {
+        <div class="klingon-emblem">@Emblem</div>
+    }
+</div>
+
+@code {
+    [Parameter] public RenderFragment? HeaderContent { get; set; }
+    [Parameter] public RenderFragment? SidebarLeftContent { get; set; }
+    [Parameter] public RenderFragment? MainContent { get; set; }
+    [Parameter] public RenderFragment? SidebarRightContent { get; set; }
+    [Parameter] public RenderFragment? CommandContent { get; set; }
+    [Parameter] public RenderFragment? FooterContent { get; set; }
+    [Parameter] public string Class { get; set; } = "";
+
+    // Klingon edge-hugging navigation
+    [Parameter] public List<EdgeNavItem>? EdgeNavItems { get; set; }
+    [Parameter] public List<EdgeNavItem>? EdgeStatusItems { get; set; }
+    [Parameter] public List<EdgeToothItem>? EdgeToothItems { get; set; }
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public string? Emblem { get; set; }
+
+    public class EdgeNavItem
+    {
+        public string Label { get; set; } = "";
+        public bool IsActive { get; set; }
+        public EventCallback OnClick { get; set; }
+    }
+
+    public class EdgeToothItem
+    {
+        public string Icon { get; set; } = "";
+        public bool IsPrimary { get; set; }
+        public EventCallback OnClick { get; set; }
+    }
+
+    private string BuildLayoutStyle(LayoutTemplate layout)
+    {
+        var styles = new List<string>
+        {
+            $"grid-template-areas: {layout.GridAreas}",
+            $"grid-template-columns: {layout.GridColumns}",
+            $"grid-template-rows: {layout.GridRows}"
+        };
+        return string.Join("; ", styles);
+    }
+
+    private string GetLayoutClass(string factionId)
+    {
+        return $"layout-{factionId}";
+    }
+}

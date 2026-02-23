@@ -1,0 +1,274 @@
+/* ===========================================
+   FERENGI THEME - COMMERCE ALLIANCE INTERFACE
+
+   Design Philosophy: Business-first, profit-focused,
+   yet elegant commercial interface. Every element
+   should feel like a profitable investment.
+
+   Visual Language:
+   - Cyan/Blue as primary with Pink/Magenta accents
+   - Hexagonal elements (Ferengi head shape)
+   - Circular white-framed displays
+   - Pie chart/wedge data visualizations
+   - Gold profit indicators
+   - Clean business typography
+   =========================================== */
+
+/* ===== FERENGI THEME VARIABLES ===== */
+html[data-theme="ferengi"],
+html[data-theme="ferengi"] .stellaris-layout,
+html[data-theme="ferengi"] .stellaris-app {
+    --theme-primary: #00CCFF;
+    --theme-secondary: #FF66CC;
+    --theme-accent: #FFD700;
+    --theme-text: #CCFFFF;
+    --theme-text-dim: #669999;
+    --theme-bg: #0a0812;
+    --theme-panel-bg: rgba(10, 8, 18, 0.98);
+    --theme-border-radius: 4px;
+    --theme-btn-radius: 4px;
+    --theme-border-width: 2px;
+    --theme-corner-style: hexagonal;
+
+    --st-accent-blue: #00CCFF;
+    --st-accent-cyan: #33DDFF;
+    --st-accent-gold: #FFD700;
+    --st-accent-orange: #FFAA33;
+    --st-accent-green: #33CC66;
+    --st-accent-red: #FF3366;
+    --st-accent-purple: #CC33AA;
+
+    --st-bg-darkest: #050408;
+    --st-bg-darker: #0a0812;
+    --st-bg-dark: #100c1a;
+    --st-bg-medium: #181222;
+    --st-bg-light: #201830;
+    --st-bg-lighter: #281e40;
+
+    --st-border-dark: rgba(0, 204, 255, 0.3);
+    --st-border-medium: rgba(0, 204, 255, 0.5);
+    --st-border-light: rgba(51, 221, 255, 0.6);
+    --st-border-bright: rgba(255, 102, 204, 0.8);
+
+    --st-text-dim: #446666;
+    --st-text-muted: #669999;
+    --st-text-normal: #99CCCC;
+    --st-text-bright: #CCFFFF;
+
+    --st-gradient-header: linear-gradient(180deg, #100c1a 0%, #0a0812 100%);
+    --st-gradient-panel: linear-gradient(180deg, rgba(10, 8, 18, 0.95) 0%, rgba(5, 4, 8, 0.98) 100%);
+    --st-gradient-button: linear-gradient(180deg, #00CCFF 0%, #0099CC 100%);
+    --st-gradient-button-hover: linear-gradient(180deg, #33DDFF 0%, #00CCFF 100%);
+
+    --st-shadow-glow-blue: 0 0 25px rgba(0, 204, 255, 0.4);
+    --st-shadow-glow-pink: 0 0 25px rgba(255, 102, 204, 0.4);
+    --st-shadow-glow-gold: 0 0 20px rgba(255, 215, 0, 0.4);
+}
+
+
+/* ===== FERENGI PANEL STYLE ===== */
+/* Business/Commerce style with hexagonal hints */
+html[data-theme="ferengi"] .mud-paper,
+html[data-theme="ferengi"] .mud-card {
+    background: var(--st-gradient-panel) !important;
+    border: 2px solid rgba(0, 204, 255, 0.4) !important;
+    border-radius: 4px !important;
+    position: relative;
+}
+
+/* Cyan-pink gradient accent at top */
+html[data-theme="ferengi"] .mud-paper::before,
+html[data-theme="ferengi"] .mud-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #00CCFF, #FF66CC, #00CCFF);
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Subtle glow */
+html[data-theme="ferengi"] .mud-paper {
+    box-shadow: 0 0 15px rgba(0, 204, 255, 0.15) !important;
+}
+
+
+/* ===== FERENGI BUTTONS ===== */
+/* Clean business style with hexagonal clip-path option */
+html[data-theme="ferengi"] .mud-button-root {
+    border-radius: 4px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    font-weight: 600 !important;
+    transition: all 0.2s ease !important;
+}
+
+html[data-theme="ferengi"] .mud-button-filled {
+    background: linear-gradient(180deg, #00CCFF 0%, #0099BB 100%) !important;
+    color: #000 !important;
+    border: 1px solid #33DDFF !important;
+    box-shadow: 0 0 15px rgba(0, 204, 255, 0.3) !important;
+}
+
+html[data-theme="ferengi"] .mud-button-filled:hover {
+    background: linear-gradient(180deg, #33DDFF 0%, #00CCFF 100%) !important;
+    box-shadow: 0 0 25px rgba(0, 204, 255, 0.5), 0 0 15px rgba(255, 102, 204, 0.3) !important;
+}
+
+html[data-theme="ferengi"] .mud-button-outlined {
+    border: 2px solid #00CCFF !important;
+    color: #00CCFF !important;
+    background: rgba(0, 204, 255, 0.1) !important;
+}
+
+/* Pink accent button */
+html[data-theme="ferengi"] .mud-button-filled.accent,
+html[data-theme="ferengi"] .mud-button-filled-secondary {
+    background: linear-gradient(180deg, #FF66CC 0%, #CC33AA 100%) !important;
+    border-color: #FF99DD !important;
+}
+
+
+/* ===== FERENGI APP BAR ===== */
+html[data-theme="ferengi"] .mud-appbar {
+    background: linear-gradient(180deg, #100c1a 0%, #0a0812 100%) !important;
+    border-bottom: none !important;
+    position: relative;
+}
+
+/* Cyan-Pink gradient border */
+html[data-theme="ferengi"] .mud-appbar::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg,
+        transparent 5%,
+        #00CCFF 20%,
+        #FF66CC 50%,
+        #00CCFF 80%,
+        transparent 95%
+    );
+    box-shadow: 0 0 15px rgba(0, 204, 255, 0.4);
+    pointer-events: none;
+}
+
+
+/* ===== FERENGI DRAWER/SIDEBAR ===== */
+html[data-theme="ferengi"] .mud-drawer {
+    background: linear-gradient(90deg, #0a0812 0%, #100c1a 100%) !important;
+    border-right: none !important;
+    position: relative;
+}
+
+/* Cyan edge with pink accent */
+html[data-theme="ferengi"] .mud-drawer::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 3px;
+    height: 100%;
+    background: linear-gradient(180deg,
+        transparent 0%,
+        #00CCFF 20%,
+        #FF66CC 50%,
+        #00CCFF 80%,
+        transparent 100%
+    );
+    box-shadow: 0 0 15px rgba(0, 204, 255, 0.4);
+    pointer-events: none;
+}
+
+
+/* ===== FERENGI NAVIGATION LINKS ===== */
+html[data-theme="ferengi"] .mud-nav-link {
+    border-radius: 4px !important;
+    margin: 4px 8px !important;
+    padding: 10px 14px !important;
+    background: rgba(0, 204, 255, 0.05) !important;
+    border-left: 3px solid transparent !important;
+    transition: all 0.2s ease !important;
+}
+
+html[data-theme="ferengi"] .mud-nav-link:hover {
+    background: rgba(0, 204, 255, 0.15) !important;
+    border-left-color: #33DDFF !important;
+}
+
+html[data-theme="ferengi"] .mud-nav-link.active {
+    background: linear-gradient(90deg, rgba(0, 204, 255, 0.25) 0%, transparent 100%) !important;
+    color: #CCFFFF !important;
+    border-left-color: #FF66CC !important;
+    box-shadow: 0 0 10px rgba(0, 204, 255, 0.2) !important;
+}
+
+
+/* ===== FERENGI SPECIFIC DECORATIONS ===== */
+
+/* Profit pulse animation */
+@keyframes ferengi-profit-pulse {
+    0%, 100% {
+        box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(255, 215, 0, 0.6), 0 0 30px rgba(0, 204, 255, 0.2);
+    }
+}
+
+html[data-theme="ferengi"] .profit-pulse {
+    animation: ferengi-profit-pulse 2s ease-in-out infinite;
+}
+
+/* Hexagonal element */
+html[data-theme="ferengi"] .hex-element {
+    clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+    background: linear-gradient(180deg, #00CCFF 0%, #0099BB 100%);
+}
+
+/* Circular display frame */
+html[data-theme="ferengi"] .circular-frame {
+    border: 3px solid #FFFFFF;
+    border-radius: 50%;
+    background: rgba(0, 204, 255, 0.1);
+    box-shadow:
+        0 0 15px rgba(0, 204, 255, 0.3),
+        inset 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+/* Profit indicator badge */
+html[data-theme="ferengi"] .profit-indicator {
+    background: linear-gradient(180deg, #FFD700, #CC9900);
+    color: #000;
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+}
+
+/* Pie chart display */
+html[data-theme="ferengi"] .pie-display {
+    border-radius: 50%;
+    background: conic-gradient(
+        #00CCFF 0deg 120deg,
+        #FF66CC 120deg 200deg,
+        #FFD700 200deg 280deg,
+        #33CC66 280deg 360deg
+    );
+    position: relative;
+}
+
+html[data-theme="ferengi"] .pie-display::after {
+    content: '';
+    position: absolute;
+    inset: 20%;
+    border-radius: 50%;
+    background: var(--st-bg-dark);
+}

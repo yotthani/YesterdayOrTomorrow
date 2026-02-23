@@ -167,7 +167,7 @@ public class GameStateService : IGameStateService
                 var factionInfo = game?.Factions.FirstOrDefault(f => f.Id == CurrentFactionId);
                 
                 CurrentFaction = new FactionStateDto(
-                    Id: CurrentFactionId.Value,
+                    Id: CurrentFactionId!.Value,
                     Name: factionInfo?.Name ?? "Unknown",
                     RaceId: factionInfo?.RaceId ?? "Unknown",
                     HasSubmittedOrders: factionInfo?.HasSubmittedOrders ?? false,

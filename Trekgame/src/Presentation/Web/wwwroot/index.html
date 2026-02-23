@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="federation">
+<html lang="en" data-theme="default">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <meta name="description" content="Galactic Strategy - A Star Trek-inspired 4X space strategy game" />
-    <meta name="theme-color" content="#ff9900" />
+    <meta name="theme-color" content="#4a9eff" />
     
     <title>Galactic Strategy</title>
     <base href="/" />
@@ -18,13 +18,40 @@
     <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
     
     <!-- Game CSS (order matters) -->
-    <link href="css/lcars-design-system.css" rel="stylesheet" />
+    <link href="css/federation-design-system.css" rel="stylesheet" />
     <link href="css/faction-themes.css" rel="stylesheet" />
     <link href="css/galaxy-visuals.css" rel="stylesheet" />
     <link href="css/system-visuals.css" rel="stylesheet" />
     <link href="css/game-ui-panels.css" rel="stylesheet" />
     <link href="css/app.css" rel="stylesheet" />
-    
+    <!-- Faction themes MUST load LAST to override all base styles -->
+    <link href="css/faction-themes.css" rel="stylesheet" />
+    <!-- SVG-based faction themes for dramatic visual changes -->
+    <link href="css/faction-themes-svg.css" rel="stylesheet" />
+
+    <!-- Faction UI Component Styles (structural differences per faction) -->
+    <link href="css/faction-ui-components.css" rel="stylesheet" />
+
+    <!-- Main Menu UI Component Styles (neutral, menu-only screens) -->
+    <link href="css/main-menu-components.css" rel="stylesheet" />
+
+    <!-- Individual faction theme files (new modular system) -->
+    <link href="css/themes/_base.css" rel="stylesheet" />
+    <link href="css/themes/theme-federation.css" rel="stylesheet" />
+    <link href="css/themes/theme-klingon.css" rel="stylesheet" />
+    <link href="css/themes/theme-romulan.css" rel="stylesheet" />
+    <link href="css/themes/theme-borg.css" rel="stylesheet" />
+    <link href="css/themes/theme-cardassian.css" rel="stylesheet" />
+    <link href="css/themes/theme-dominion.css" rel="stylesheet" />
+    <link href="css/themes/theme-ferengi.css" rel="stylesheet" />
+    <link href="css/themes/theme-bajoran.css" rel="stylesheet" />
+    <link href="css/themes/theme-tholian.css" rel="stylesheet" />
+    <link href="css/themes/theme-gorn.css" rel="stylesheet" />
+    <link href="css/themes/theme-breen.css" rel="stylesheet" />
+    <link href="css/themes/theme-orion.css" rel="stylesheet" />
+    <link href="css/themes/theme-kazon.css" rel="stylesheet" />
+    <link href="css/themes/theme-hirogen.css" rel="stylesheet" />
+
     <!-- 3D Theme & Assets -->
     <link href="css/theme-3d.css" rel="stylesheet" />
     <link href="css/race-portraits-v2.css" rel="stylesheet" />
@@ -37,6 +64,8 @@
     <link href="css/ferengi-ships.css" rel="stylesheet" />
     <link href="css/borg-ships.css" rel="stylesheet" />
     <link href="css/dominion-ships.css" rel="stylesheet" />
+    <link href="css/gorn-ships.css" rel="stylesheet" />
+    <link href="css/breen-ships.css" rel="stylesheet" />
     
     <style>
         /* Initial loading screen styles */
@@ -54,9 +83,9 @@
             font-family: 'Orbitron', sans-serif;
             font-size: 2.5rem;
             font-weight: 700;
-            color: #ff9900;
+            color: #4a9eff;
             letter-spacing: 0.3em;
-            text-shadow: 0 0 30px rgba(255, 153, 0, 0.5);
+            text-shadow: 0 0 30px rgba(74, 158, 255, 0.5);
             animation: logo-pulse 2s ease-in-out infinite;
         }
         
@@ -72,15 +101,15 @@
             margin-top: 40px;
             width: 300px;
             height: 4px;
-            background: rgba(255, 153, 0, 0.2);
+            background: rgba(74, 158, 255, 0.2);
             border-radius: 2px;
             overflow: hidden;
         }
-        
+
         .loading-bar {
             height: 100%;
             width: 30%;
-            background: linear-gradient(90deg, #ff9900, #ffcc00);
+            background: linear-gradient(90deg, #4a9eff, #00d4ff);
             border-radius: 2px;
             animation: loading-slide 1.5s ease-in-out infinite;
         }
@@ -93,8 +122,8 @@
         }
         
         @keyframes logo-pulse {
-            0%, 100% { opacity: 1; text-shadow: 0 0 30px rgba(255, 153, 0, 0.5); }
-            50% { opacity: 0.8; text-shadow: 0 0 50px rgba(255, 153, 0, 0.8); }
+            0%, 100% { opacity: 1; text-shadow: 0 0 30px rgba(74, 158, 255, 0.5); }
+            50% { opacity: 0.8; text-shadow: 0 0 50px rgba(74, 158, 255, 0.8); }
         }
         
         @keyframes loading-slide {
@@ -103,7 +132,6 @@
             100% { transform: translateX(-100%); }
         }
     </style>
-    <link href="css/stellaris-ui.css" rel="stylesheet" />
 </head>
 
 <body>
@@ -131,8 +159,8 @@
             <pre id="blazor-error-details" style="color: #ff9999; font-size: 11px; text-align: left; 
                  background: #111; padding: 12px; border-radius: 4px; margin: 16px 0; 
                  max-height: 200px; overflow: auto; display: none;"></pre>
-            <button onclick="location.reload()" 
-                    style="background: linear-gradient(90deg, #ff9900, #ffcc00); color: #000; border: none; 
+            <button onclick="location.reload()"
+                    style="background: linear-gradient(90deg, #4a9eff, #00d4ff); color: #fff; border: none;
                            padding: 14px 32px; border-radius: 8px; cursor: pointer; font-weight: 700;
                            font-family: 'Orbitron', sans-serif; letter-spacing: 1px;
                            transition: transform 0.2s, box-shadow 0.2s;">
@@ -164,26 +192,39 @@
     <!-- Theme management -->
     <script>
         // Global theme switching function (called from Blazor)
+        // Only applies theme if explicitly set by user in settings
         window.setGameTheme = function(theme) {
-            document.documentElement.setAttribute('data-theme', theme);
-            // Also update body class for additional styling hooks
-            document.body.className = document.body.className.replace(/theme-\w+/g, '');
-            document.body.classList.add('theme-' + theme);
-            console.log('Theme set to:', theme);
-        };
-        
-        // Apply stored theme on page load (before Blazor initializes)
-        (function() {
-            try {
-                var theme = localStorage.getItem('ui-theme');
-                if (theme) {
-                    // Remove quotes if stored as JSON string
-                    theme = theme.replace(/"/g, '');
-                    window.setGameTheme(theme);
-                }
-            } catch (e) {
-                console.log('Could not load theme from storage');
+            console.log('🎨 setGameTheme called with:', theme);
+            if (theme && theme !== 'default' && theme !== 'none') {
+                document.documentElement.setAttribute('data-theme', theme);
+                document.body.className = document.body.className.replace(/theme-\w+/g, '');
+                document.body.classList.add('theme-' + theme);
+                console.log('🎨 Theme APPLIED! data-theme=', document.documentElement.getAttribute('data-theme'));
+
+                // Force a repaint to ensure CSS is applied
+                document.body.offsetHeight;
+            } else {
+                // Set default theme - uniform stellaris blue UI
+                document.documentElement.setAttribute('data-theme', 'default');
+                document.body.className = document.body.className.replace(/theme-\w+/g, '');
+                console.log('🎨 Theme set to default - using uniform UI');
             }
+        };
+
+        // Clear any stored theme to apply on page load
+        // User must explicitly select a theme in settings
+        window.clearGameTheme = function() {
+            document.documentElement.setAttribute('data-theme', 'default');
+            document.body.className = document.body.className.replace(/theme-\w+/g, '');
+        };
+
+        // Theme initialization is now handled by Blazor ThemeService
+        // Main menu pages will set 'default' theme, game pages will restore user's theme
+        // We no longer auto-apply theme on page load - let Blazor control it
+        (function() {
+            // Start with default theme - Blazor will apply user's theme when appropriate
+            document.documentElement.setAttribute('data-theme', 'default');
+            console.log('🎨 Initial theme: default (waiting for Blazor)');
         })();
     </script>
     

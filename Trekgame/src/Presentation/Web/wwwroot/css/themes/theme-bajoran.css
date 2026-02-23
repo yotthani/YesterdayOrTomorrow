@@ -1,0 +1,313 @@
+/* ===========================================
+   BAJORAN THEME - TEMPLE/SPIRITUAL INTERFACE
+
+   Design Philosophy: Spiritual warmth meets practical
+   resilience. The UI of a people who endured occupation
+   and found strength through faith.
+
+   Visual Language:
+   - Cyan/Teal primary with orange/gold accents
+   - Circular orb motifs (Prophets' Orbs)
+   - Warm earthy undertones
+   - Flowing, gentle curves
+   - Temple-inspired architectural elements
+   - Soft glows representing spiritual light
+   =========================================== */
+
+/* ===== BAJORAN THEME VARIABLES ===== */
+html[data-theme="bajoran"],
+html[data-theme="bajoran"] .stellaris-layout,
+html[data-theme="bajoran"] .stellaris-app {
+    --theme-primary: #00BBCC;
+    --theme-secondary: #FF8833;
+    --theme-accent: #DDAA33;
+    --theme-text: #DDEEFF;
+    --theme-text-dim: #778899;
+    --theme-bg: #0a0c12;
+    --theme-panel-bg: rgba(12, 15, 22, 0.98);
+    --theme-border-radius: 8px;
+    --theme-btn-radius: 20px;
+    --theme-border-width: 2px;
+    --theme-corner-style: rounded;
+
+    --st-accent-blue: #00BBCC;
+    --st-accent-cyan: #33DDEE;
+    --st-accent-gold: #DDAA33;
+    --st-accent-orange: #FF8833;
+    --st-accent-green: #44BB66;
+    --st-accent-red: #DD4444;
+    --st-accent-purple: #8866AA;
+
+    --st-bg-darkest: #050608;
+    --st-bg-darker: #0a0c12;
+    --st-bg-dark: #10141c;
+    --st-bg-medium: #181e28;
+    --st-bg-light: #202838;
+    --st-bg-lighter: #283448;
+
+    --st-border-dark: rgba(0, 187, 204, 0.3);
+    --st-border-medium: rgba(0, 187, 204, 0.5);
+    --st-border-light: rgba(51, 221, 238, 0.6);
+    --st-border-bright: rgba(255, 136, 51, 0.8);
+
+    --st-text-dim: #556677;
+    --st-text-muted: #778899;
+    --st-text-normal: #99AABB;
+    --st-text-bright: #DDEEFF;
+
+    --st-gradient-header: linear-gradient(180deg, #10141c 0%, #0a0c12 100%);
+    --st-gradient-panel: linear-gradient(180deg, rgba(15, 18, 26, 0.95) 0%, rgba(8, 10, 15, 0.98) 100%);
+    --st-gradient-button: linear-gradient(180deg, #00BBCC 0%, #008899 100%);
+    --st-gradient-button-hover: linear-gradient(180deg, #33DDEE 0%, #00BBCC 100%);
+
+    --st-shadow-glow-blue: 0 0 20px rgba(0, 187, 204, 0.4);
+    --st-shadow-glow-gold: 0 0 20px rgba(221, 170, 51, 0.4);
+    --st-shadow-glow-orange: 0 0 20px rgba(255, 136, 51, 0.4);
+}
+
+
+/* ===== BAJORAN PANEL STYLE ===== */
+/* Rounded panels with warm accent border */
+html[data-theme="bajoran"] .mud-paper,
+html[data-theme="bajoran"] .mud-card {
+    background: var(--st-gradient-panel) !important;
+    border: 2px solid rgba(0, 187, 204, 0.4) !important;
+    border-radius: 12px !important;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Orange-cyan gradient top bar (temple motif) */
+html[data-theme="bajoran"] .mud-paper::before,
+html[data-theme="bajoran"] .mud-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg,
+        #FF8833 0%,
+        #DDAA33 25%,
+        #00BBCC 50%,
+        #DDAA33 75%,
+        #FF8833 100%
+    );
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Subtle warm inner glow */
+html[data-theme="bajoran"] .mud-paper::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 12px;
+    background: radial-gradient(ellipse at top center, rgba(255, 136, 51, 0.05) 0%, transparent 60%);
+    pointer-events: none;
+}
+
+
+/* ===== BAJORAN BUTTONS ===== */
+/* Rounded, warm styling */
+html[data-theme="bajoran"] .mud-button-root {
+    border-radius: 20px !important;
+    text-transform: none !important;
+    letter-spacing: 0.5px !important;
+    font-weight: 500 !important;
+    transition: all 0.3s ease !important;
+}
+
+html[data-theme="bajoran"] .mud-button-filled {
+    background: linear-gradient(180deg, #00CCDD 0%, #009AAA 100%) !important;
+    color: #000 !important;
+    border: 1px solid rgba(51, 221, 238, 0.6) !important;
+    box-shadow: 0 0 15px rgba(0, 187, 204, 0.3) !important;
+}
+
+html[data-theme="bajoran"] .mud-button-filled:hover {
+    background: linear-gradient(180deg, #33DDEE 0%, #00CCDD 100%) !important;
+    box-shadow: 0 0 25px rgba(0, 187, 204, 0.5), 0 0 10px rgba(255, 136, 51, 0.3) !important;
+}
+
+html[data-theme="bajoran"] .mud-button-outlined {
+    border: 2px solid #00BBCC !important;
+    color: #00DDEE !important;
+    background: rgba(0, 187, 204, 0.1) !important;
+    border-radius: 20px !important;
+}
+
+/* Orange accent button for special actions */
+html[data-theme="bajoran"] .mud-button-filled.accent,
+html[data-theme="bajoran"] .mud-button-filled-secondary {
+    background: linear-gradient(180deg, #FF9944 0%, #DD7722 100%) !important;
+    border-color: #FFAA55 !important;
+    box-shadow: 0 0 15px rgba(255, 136, 51, 0.4) !important;
+}
+
+
+/* ===== BAJORAN APP BAR ===== */
+html[data-theme="bajoran"] .mud-appbar {
+    background: linear-gradient(180deg, #10141c 0%, #0a0c12 100%) !important;
+    border-bottom: none !important;
+    position: relative;
+}
+
+/* Flowing gradient border */
+html[data-theme="bajoran"] .mud-appbar::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        #FF8833 15%,
+        #DDAA33 30%,
+        #00BBCC 50%,
+        #DDAA33 70%,
+        #FF8833 85%,
+        transparent 100%
+    );
+    box-shadow: 0 0 15px rgba(0, 187, 204, 0.4);
+    pointer-events: none;
+}
+
+
+/* ===== BAJORAN DRAWER/SIDEBAR ===== */
+html[data-theme="bajoran"] .mud-drawer {
+    background: linear-gradient(90deg, #0a0c12 0%, #10141c 100%) !important;
+    border-right: none !important;
+    position: relative;
+}
+
+/* Glowing edge with warm transition */
+html[data-theme="bajoran"] .mud-drawer::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 3px;
+    height: 100%;
+    background: linear-gradient(180deg,
+        transparent 0%,
+        #FF8833 10%,
+        #DDAA33 25%,
+        #00BBCC 50%,
+        #DDAA33 75%,
+        #FF8833 90%,
+        transparent 100%
+    );
+    box-shadow: 0 0 15px rgba(0, 187, 204, 0.4);
+    pointer-events: none;
+}
+
+
+/* ===== BAJORAN NAVIGATION LINKS ===== */
+html[data-theme="bajoran"] .mud-nav-link {
+    border-radius: 8px !important;
+    margin: 4px 8px !important;
+    padding: 10px 16px !important;
+    background: rgba(0, 187, 204, 0.08) !important;
+    border-left: 3px solid transparent !important;
+    transition: all 0.3s ease !important;
+}
+
+html[data-theme="bajoran"] .mud-nav-link:hover {
+    background: rgba(0, 187, 204, 0.18) !important;
+    border-left-color: #33DDEE !important;
+}
+
+html[data-theme="bajoran"] .mud-nav-link.active {
+    background: linear-gradient(90deg, rgba(0, 187, 204, 0.25) 0%, transparent 100%) !important;
+    color: #DDEEFF !important;
+    border-left-color: #FF8833 !important;
+    box-shadow: inset 0 0 15px rgba(0, 187, 204, 0.1) !important;
+}
+
+
+/* ===== BAJORAN SPECIFIC DECORATIONS ===== */
+
+/* Orb glow animation (Prophets' Orbs) */
+@keyframes bajoran-orb-pulse {
+    0%, 100% {
+        box-shadow: 0 0 15px rgba(0, 187, 204, 0.3), 0 0 5px rgba(255, 136, 51, 0.2);
+    }
+    50% {
+        box-shadow: 0 0 30px rgba(0, 187, 204, 0.5), 0 0 15px rgba(255, 136, 51, 0.4);
+    }
+}
+
+html[data-theme="bajoran"] .orb-glow {
+    animation: bajoran-orb-pulse 4s ease-in-out infinite;
+}
+
+/* Spiritual light effect */
+@keyframes bajoran-spiritual-light {
+    0%, 100% {
+        opacity: 0.7;
+        filter: brightness(1);
+    }
+    50% {
+        opacity: 1;
+        filter: brightness(1.2);
+    }
+}
+
+html[data-theme="bajoran"] .spiritual-glow {
+    animation: bajoran-spiritual-light 6s ease-in-out infinite;
+}
+
+/* Circular orb display element */
+html[data-theme="bajoran"] .orb-display {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%,
+        rgba(51, 221, 238, 0.4) 0%,
+        rgba(0, 187, 204, 0.2) 50%,
+        rgba(0, 136, 153, 0.1) 100%
+    );
+    border: 2px solid rgba(0, 187, 204, 0.5);
+    box-shadow:
+        0 0 20px rgba(0, 187, 204, 0.3),
+        inset 0 0 15px rgba(255, 255, 255, 0.1);
+}
+
+/* Temple arch motif */
+html[data-theme="bajoran"] .temple-arch {
+    position: relative;
+    padding-top: 30px;
+}
+
+html[data-theme="bajoran"] .temple-arch::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 25px;
+    border-radius: 0 0 50% 50% / 0 0 100% 100%;
+    background: linear-gradient(180deg, rgba(0, 187, 204, 0.15), transparent);
+    border-bottom: 2px solid rgba(0, 187, 204, 0.3);
+}
+
+/* Warm highlight for important elements */
+html[data-theme="bajoran"] .faith-highlight {
+    border-color: #FF8833 !important;
+    box-shadow: 0 0 20px rgba(255, 136, 51, 0.4) !important;
+}
+
+/* Resistance badge style */
+html[data-theme="bajoran"] .resistance-badge {
+    background: linear-gradient(135deg, #DD7722, #FF9944);
+    color: #000;
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}

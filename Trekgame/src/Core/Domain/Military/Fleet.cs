@@ -10,10 +10,10 @@ public class Fleet : AggregateRoot
 {
     private readonly List<Ship> _ships = new();
 
-    public string Name { get; private set; }
+    public string Name { get; private set; } = null!;
     public Guid EmpireId { get; private set; }
     public Guid? CommanderId { get; private set; }
-    public GalacticCoordinates Position { get; private set; }
+    public GalacticCoordinates Position { get; private set; } = null!;
     public Guid? CurrentSystemId { get; private set; }
     public FleetStance Stance { get; private set; }
     public FleetStatus Status { get; private set; }

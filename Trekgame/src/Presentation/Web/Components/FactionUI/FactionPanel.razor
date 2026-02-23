@@ -1,0 +1,150 @@
+@using StarTrekGame.Web.Services
+@inject ThemeService ThemeService
+
+@* Faction-aware panel/card that renders with different frame structure per theme *@
+
+@switch (ThemeService.CurrentTheme)
+{
+    case "federation":
+        <div class="faction-panel lcars-panel @Class">
+            <div class="lcars-sidebar-strip">
+                <div class="lcars-color-block orange"></div>
+                <div class="lcars-color-block tan"></div>
+                <div class="lcars-color-block purple"></div>
+            </div>
+            <div class="lcars-panel-content">
+                @if (!string.IsNullOrEmpty(Title))
+                {
+                    <div class="lcars-panel-header">
+                        <span class="lcars-header-bar"></span>
+                        <span class="lcars-header-text">@Title</span>
+                    </div>
+                }
+                <div class="lcars-panel-body">
+                    @ChildContent
+                </div>
+            </div>
+            <div class="lcars-elbow-bottom"></div>
+        </div>
+        break;
+
+    case "klingon":
+        <div class="faction-panel klingon-panel @Class">
+            <div class="klingon-corner-accent tl"></div>
+            <div class="klingon-corner-accent tr"></div>
+            @if (!string.IsNullOrEmpty(Title))
+            {
+                <div class="klingon-panel-header">
+                    <span class="klingon-spike left"></span>
+                    <span class="klingon-header-text">@Title</span>
+                    <span class="klingon-spike right"></span>
+                </div>
+            }
+            <div class="klingon-panel-body">
+                @ChildContent
+            </div>
+            <div class="klingon-corner-accent bl"></div>
+            <div class="klingon-corner-accent br"></div>
+            <div class="klingon-rivet tl"></div>
+            <div class="klingon-rivet tr"></div>
+            <div class="klingon-rivet bl"></div>
+            <div class="klingon-rivet br"></div>
+        </div>
+        break;
+
+    case "romulan":
+        <div class="faction-panel romulan-panel @Class">
+            <div class="romulan-wing-top"></div>
+            @if (!string.IsNullOrEmpty(Title))
+            {
+                <div class="romulan-panel-header">
+                    <span class="romulan-bronze-accent"></span>
+                    <span class="romulan-header-text">@Title</span>
+                    <span class="romulan-bronze-accent"></span>
+                </div>
+            }
+            <div class="romulan-panel-body">
+                @ChildContent
+            </div>
+            <div class="romulan-curve-bottom"></div>
+        </div>
+        break;
+
+    case "borg":
+        <div class="faction-panel borg-panel @Class">
+            <div class="borg-hex-corner tl"></div>
+            <div class="borg-hex-corner tr"></div>
+            @if (!string.IsNullOrEmpty(Title))
+            {
+                <div class="borg-panel-header">
+                    <span class="borg-designation">@Title</span>
+                    <span class="borg-node-indicator"></span>
+                </div>
+            }
+            <div class="borg-panel-body">
+                <div class="borg-scanlines"></div>
+                <div class="borg-content">
+                    @ChildContent
+                </div>
+            </div>
+            <div class="borg-hex-corner bl"></div>
+            <div class="borg-hex-corner br"></div>
+            <div class="borg-data-stream"></div>
+        </div>
+        break;
+
+    case "cardassian":
+        <div class="faction-panel cardassian-panel @Class">
+            <div class="cardassian-notch tl"></div>
+            <div class="cardassian-notch tr"></div>
+            @if (!string.IsNullOrEmpty(Title))
+            {
+                <div class="cardassian-panel-header">
+                    <span class="cardassian-status-light"></span>
+                    <span class="cardassian-header-text">@Title</span>
+                    <span class="cardassian-hierarchy-badge"></span>
+                </div>
+            }
+            <div class="cardassian-panel-body">
+                @ChildContent
+            </div>
+            <div class="cardassian-notch bl"></div>
+            <div class="cardassian-notch br"></div>
+        </div>
+        break;
+
+    case "dominion":
+        <div class="faction-panel dominion-panel @Class">
+            <div class="dominion-diamond-accent top"></div>
+            @if (!string.IsNullOrEmpty(Title))
+            {
+                <div class="dominion-panel-header">
+                    <span class="dominion-founder-symbol"></span>
+                    <span class="dominion-header-text">@Title</span>
+                </div>
+            }
+            <div class="dominion-panel-body">
+                @ChildContent
+            </div>
+            <div class="dominion-shimmer-overlay"></div>
+        </div>
+        break;
+
+    default:
+        <div class="faction-panel default-panel @Class">
+            @if (!string.IsNullOrEmpty(Title))
+            {
+                <div class="default-panel-header">@Title</div>
+            }
+            <div class="default-panel-body">
+                @ChildContent
+            </div>
+        </div>
+        break;
+}
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public string Title { get; set; } = "";
+    [Parameter] public string Class { get; set; } = "";
+}

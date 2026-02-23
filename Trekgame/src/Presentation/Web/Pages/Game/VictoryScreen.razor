@@ -1,11 +1,14 @@
 @page "/game/victory"
-@inject HttpClient Http
+@layout StellarisLayout
+@using StarTrekGame.Web.Services
+@using Blazored.LocalStorage
+@inject IGameApiClient Api
+@inject ILocalStorageService LocalStorage
 @inject NavigationManager Nav
 
 <div class="victory-screen @GetFactionClass()">
-    <div class="victory-header">
+    <div class="victory-page-header">
         <h1>🏆 Victory Conditions</h1>
-        <button class="btn-back" @onclick="GoBack">← Back</button>
     </div>
 
     @if (_loading)
@@ -152,20 +155,19 @@
 
 <style>
     .victory-screen {
-        min-height: 100vh;
+        flex: 1;
         padding: 20px;
-        background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3a 100%);
         color: white;
+        overflow-y: auto;
     }
 
-    .victory-header {
+    .victory-page-header {
         display: flex;
-        justify-content: space-between;
         align-items: center;
         margin-bottom: 25px;
     }
 
-    .victory-header h1 { margin: 0; }
+    .victory-page-header h1 { margin: 0; }
 
     .victory-content {
         display: grid;
@@ -460,15 +462,6 @@
         color: #e74c3c;
     }
 
-    .btn-back {
-        padding: 10px 20px;
-        background: rgba(255,255,255,0.1);
-        border: 1px solid rgba(255,255,255,0.2);
-        border-radius: 5px;
-        color: white;
-        cursor: pointer;
-    }
-
     .loading {
         text-align: center;
         padding: 50px;
@@ -500,9 +493,11 @@
     private bool _crisisActive = false;
     private CrisisReportDisplay? _crisisReport;
     private string _factionId = "federation";
+    private Guid? _factionGuid;
 
     protected override async Task OnInitializedAsync()
     {
+        _factionGuid = await LocalStorage.GetItemAsync<Guid?>("currentFactionId");
         await LoadData();
     }
 
@@ -511,15 +506,86 @@
         _loading = true;
         try
         {
-            // Mock data
-            _gameStatus = new GameStatusDisplay
+            // Try to load real game data
+            if (_factionGuid.HasValue)
             {
-                CurrentTurn = 47,
-                TotalScore = 12450,
-                Rank = 1
-            };
+                await LoadFromApi();
+            }
+        }
+        catch { /* Fall through to mock data */ }
 
-            _victoryConditions = new List<VictoryConditionDisplay>
+        // Fallback to mock data if API didn't populate
+        if (_gameStatus == null)
+        {
+            LoadMockData();
+        }
+        _loading = false;
+    }
+
+    private async Task LoadFromApi()
+    {
+        var games = await Api.GetGamesAsync();
+        var game = games.FirstOrDefault();
+        if (game != null)
+        {
+            var gameDetail = await Api.GetGameAsync(game.Id);
+            if (gameDetail != null)
+            {
+                _gameStatus = new GameStatusDisplay
+                {
+                    CurrentTurn = gameDetail.Turn,
+                    TotalScore = 0,
+                    Rank = 1
+                };
+
+                // Build faction scores from game data
+                int rank = 1;
+                _factionScores = gameDetail.Factions
+                    .OrderByDescending(f => f.IsDefeated ? 0 : 1)
+                    .Select(f => new FactionScoreDisplay
+                    {
+                        Rank = rank++,
+                        Name = f.Name,
+                        Score = f.IsDefeated ? 0 : 1000,
+                        ScorePercent = f.IsDefeated ? 0 : 100,
+                        IsPlayer = f.Id == _factionGuid,
+                        IsDefeated = f.IsDefeated
+                    }).ToList();
+
+                // Try to get colony/fleet data for score
+                var colonies = await Api.GetColoniesAsync(_factionGuid!.Value);
+                var fleets = await Api.GetFleetsAsync(_factionGuid.Value);
+                var research = await Api.GetResearchStatusAsync(_factionGuid.Value);
+
+                int colonyScore = colonies.Count * 400;
+                int popScore = (int)(colonies.Sum(c => c.Population) / 1000);
+                int techScore = research.CompletedTechnologies.Count * 350;
+                int militaryScore = fleets.Sum(f => f.CombatStrength);
+                int totalScore = colonyScore + popScore + techScore + militaryScore;
+
+                _gameStatus.TotalScore = totalScore;
+
+                _scoreBreakdown = new List<ScoreCategoryDisplay>
+                {
+                    new() { Icon = "🌍", Name = "Colonies", Score = colonyScore, Percentage = totalScore > 0 ? colonyScore * 100 / totalScore : 0 },
+                    new() { Icon = "👥", Name = "Population", Score = popScore, Percentage = totalScore > 0 ? popScore * 100 / totalScore : 0 },
+                    new() { Icon = "🔬", Name = "Technology", Score = techScore, Percentage = totalScore > 0 ? techScore * 100 / totalScore : 0 },
+                    new() { Icon = "⚔️", Name = "Military", Score = militaryScore, Percentage = totalScore > 0 ? militaryScore * 100 / totalScore : 0 },
+                };
+            }
+        }
+    }
+
+    private void LoadMockData()
+    {
+        _gameStatus = new GameStatusDisplay
+        {
+            CurrentTurn = 47,
+            TotalScore = 12450,
+            Rank = 1
+        };
+
+        _victoryConditions = new List<VictoryConditionDisplay>
             {
                 new()
                 {
@@ -622,15 +688,8 @@
                 EnemyFleets = 8,
                 SystemsLost = 3
             };
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error: {ex.Message}");
-        }
-        _loading = false;
     }
 
-    private void GoBack() => Nav.NavigateTo("/game/galaxy");
     private string GetFactionClass() => _factionId.ToLower();
 
     private string GetConditionIcon(string type) => type switch

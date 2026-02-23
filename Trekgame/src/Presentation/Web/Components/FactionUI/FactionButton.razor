@@ -1,0 +1,65 @@
+@using StarTrekGame.Web.Services
+@inject ThemeService ThemeService
+
+@* Faction-aware button that renders differently per theme *@
+
+@switch (ThemeService.CurrentTheme)
+{
+    case "federation":
+        <button class="faction-btn lcars-btn @Class" @onclick="OnClick" disabled="@Disabled">
+            <span class="lcars-btn-inner">@ChildContent</span>
+        </button>
+        break;
+
+    case "klingon":
+        <button class="faction-btn klingon-btn @Class" @onclick="OnClick" disabled="@Disabled">
+            <span class="klingon-corner-tl"></span>
+            <span class="klingon-btn-text">@ChildContent</span>
+            <span class="klingon-corner-br"></span>
+        </button>
+        break;
+
+    case "romulan":
+        <button class="faction-btn romulan-btn @Class" @onclick="OnClick" disabled="@Disabled">
+            <span class="romulan-wing-left"></span>
+            <span class="romulan-btn-text">@ChildContent</span>
+            <span class="romulan-wing-right"></span>
+        </button>
+        break;
+
+    case "borg":
+        <button class="faction-btn borg-btn @Class" @onclick="OnClick" disabled="@Disabled">
+            <span class="borg-hex-frame">
+                <span class="borg-btn-text">@ChildContent</span>
+            </span>
+        </button>
+        break;
+
+    case "cardassian":
+        <button class="faction-btn cardassian-btn @Class" @onclick="OnClick" disabled="@Disabled">
+            <span class="cardassian-notch-tl"></span>
+            <span class="cardassian-btn-text">@ChildContent</span>
+            <span class="cardassian-notch-br"></span>
+        </button>
+        break;
+
+    case "dominion":
+        <button class="faction-btn dominion-btn @Class" @onclick="OnClick" disabled="@Disabled">
+            <span class="dominion-diamond"></span>
+            <span class="dominion-btn-text">@ChildContent</span>
+        </button>
+        break;
+
+    default:
+        <button class="faction-btn default-btn @Class" @onclick="OnClick" disabled="@Disabled">
+            @ChildContent
+        </button>
+        break;
+}
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public string Class { get; set; } = "";
+    [Parameter] public bool Disabled { get; set; } = false;
+    [Parameter] public EventCallback<MouseEventArgs> OnClick { get; set; }
+}

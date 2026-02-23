@@ -61,7 +61,7 @@ public class AuthService : IAuthService
             {
                 // Create new user
                 user = User.Create(
-                    userInfo.DisplayName,
+                    userInfo.DisplayName ?? "User",
                     userInfo.Email,
                     provider,
                     userInfo.ExternalId);
@@ -612,7 +612,7 @@ public class JwtTokenService : ITokenService
         {
             new(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new(ClaimTypes.Email, user.Email),
-            new(ClaimTypes.Name, user.DisplayName),
+            new(ClaimTypes.Name, user.DisplayName ?? ""),
             new("role", user.GlobalRole.ToString())
         };
 

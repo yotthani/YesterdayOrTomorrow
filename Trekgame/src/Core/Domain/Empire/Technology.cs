@@ -8,8 +8,8 @@ namespace StarTrekGame.Domain.Empire;
 /// </summary>
 public class Technology : Entity
 {
-    public string Name { get; private set; }
-    public string Description { get; private set; }
+    public string Name { get; private set; } = null!;
+    public string Description { get; private set; } = null!;
     public TechCategory Category { get; private set; }
     public int Tier { get; private set; }  // 1-5, higher = more advanced
     public int ResearchCost { get; private set; }
@@ -19,7 +19,7 @@ public class Technology : Entity
     public IReadOnlyList<Guid> PrerequisiteIds => _prerequisiteIds.AsReadOnly();
 
     // Effects when researched
-    public TechEffects Effects { get; private set; }
+    public TechEffects Effects { get; private set; } = null!;
 
     // Race-specific techs
     public Guid? RequiredRaceId { get; private set; }

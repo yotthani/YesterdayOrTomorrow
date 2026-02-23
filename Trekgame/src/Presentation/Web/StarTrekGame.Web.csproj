@@ -5,6 +5,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <RootNamespace>StarTrekGame.Web</RootNamespace>
+    <!-- Suppress MudBlazor analyzer false positives -->
+    <NoWarn>$(NoWarn);MUD0002</NoWarn>
     <!-- Path to shared assets folder (relative to this project) -->
     <SharedAssetsPath>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)\..\..\..\assets'))</SharedAssetsPath>
   </PropertyGroup>

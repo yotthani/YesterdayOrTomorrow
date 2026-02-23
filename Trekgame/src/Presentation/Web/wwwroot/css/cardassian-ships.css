@@ -29,7 +29,7 @@
    ============================================== */
 
 .ship-card.cardassian.military {
-    background-image: url('/images/ships/cardassian/military_ships.png');
+    background-image: url('/assets/factions/cardassian/cardassian_militaryships_spritesheet.png');
 }
 
 /* Row 1 */
@@ -67,7 +67,7 @@
    ============================================== */
 
 .ship-card.cardassian.civilian {
-    background-image: url('/images/ships/cardassian/civilian_ships.png');
+    background-image: url('/assets/factions/cardassian/cardassian_civilianships_spritesheet.png');
 }
 
 /* Row 1 */

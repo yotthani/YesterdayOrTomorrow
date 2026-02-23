@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using StarTrekGame.Server.Data;
 using StarTrekGame.Server.Data.Entities;
+using StarTrekGame.Server.Data.Definitions;
 
 namespace StarTrekGame.Server.Services;
 
@@ -43,8 +44,16 @@ public class DiplomacyService : IDiplomacyService
             return false;
         }
 
-        // Check opinion requirements
-        var minOpinion = treaty switch
+        // Get faction info for faction-specific logic
+        var faction = await _db.Factions.FindAsync(factionId);
+        var targetFaction = await _db.Factions.FindAsync(targetId);
+
+        // Try to get treaty definition from DiplomacyDefinitions
+        var treatyId = treaty.ToString().ToLower();
+        var treatyDef = DiplomacyDefinitions.GetTreaty(treatyId);
+
+        // Get requirements from definitions or use defaults
+        var minOpinion = treatyDef?.OpinionRequired ?? treaty switch
         {
             TreatyType.NonAggression => -20,
             TreatyType.OpenBorders => 0,
@@ -55,21 +64,41 @@ public class DiplomacyService : IDiplomacyService
             _ => 0
         };
 
-        if (relation.Opinion < minOpinion)
-        {
-            _logger.LogWarning("Opinion too low for {Treaty}: {Opinion} < {Required}", 
-                treaty, relation.Opinion, minOpinion);
-            return false;
-        }
-
-        // Check trust requirements
-        var minTrust = treaty switch
+        var minTrust = treatyDef?.TrustRequired ?? treaty switch
         {
             TreatyType.DefensivePact => 30,
             TreatyType.Alliance => 50,
             TreatyType.Federation => 75,
             _ => 0
         };
+
+        // Check faction restrictions
+        if (treatyDef?.RestrictedFactions != null)
+        {
+            var targetRace = targetFaction?.RaceId?.ToLower() ?? "";
+            if (treatyDef.RestrictedFactions.Any(r => r.ToLower() == targetRace))
+            {
+                _logger.LogWarning("Treaty {Treaty} restricted for faction {Faction}", treaty, targetRace);
+                return false;
+            }
+        }
+
+        // Borg special handling - they can't do normal diplomacy
+        if (faction?.RaceId?.ToLower() == "borg" || targetFaction?.RaceId?.ToLower() == "borg")
+        {
+            if (treaty != TreatyType.NonAggression)
+            {
+                _logger.LogWarning("Borg cannot form treaties beyond non-aggression");
+                return false;
+            }
+        }
+
+        if (relation.Opinion < minOpinion)
+        {
+            _logger.LogWarning("Opinion too low for {Treaty}: {Opinion} < {Required}",
+                treaty, relation.Opinion, minOpinion);
+            return false;
+        }
 
         if (relation.Trust < minTrust)
         {
@@ -79,7 +108,7 @@ public class DiplomacyService : IDiplomacyService
 
         // Add pending treaty (AI will accept/reject based on their opinion of us)
         var reverseRelation = await GetOrCreateRelationAsync(targetId, factionId);
-        
+
         // For simplicity, auto-accept if conditions met
         if (reverseRelation != null && reverseRelation.Opinion >= minOpinion && reverseRelation.Trust >= minTrust)
         {
@@ -95,11 +124,14 @@ public class DiplomacyService : IDiplomacyService
                 reverseRelation.Status = newStatus;
             }
 
-            // Boost opinion and trust
-            relation.Opinion = Math.Min(100, relation.Opinion + 10);
-            relation.Trust = Math.Min(100, relation.Trust + 15);
-            reverseRelation.Opinion = Math.Min(100, reverseRelation.Opinion + 10);
-            reverseRelation.Trust = Math.Min(100, reverseRelation.Trust + 15);
+            // Apply treaty effects from definition
+            var opinionBoost = treatyDef?.OpinionBonus ?? 10;
+            var trustBoost = treatyDef?.TrustBonus ?? 15;
+
+            relation.Opinion = Math.Min(100, relation.Opinion + opinionBoost);
+            relation.Trust = Math.Min(100, relation.Trust + trustBoost);
+            reverseRelation.Opinion = Math.Min(100, reverseRelation.Opinion + opinionBoost);
+            reverseRelation.Trust = Math.Min(100, reverseRelation.Trust + trustBoost);
 
             await _db.SaveChangesAsync();
             _logger.LogInformation("Treaty {Treaty} established between factions", treaty);
@@ -183,11 +215,11 @@ public class DiplomacyService : IDiplomacyService
         // End war
         relation.AtWar = false;
         relation.Status = DiplomaticStatus.Neutral;
-        relation.CasusBelli = null;
-        
+        relation.CasusBelli = "";
+
         reverseRelation.AtWar = false;
         reverseRelation.Status = DiplomaticStatus.Neutral;
-        reverseRelation.CasusBelli = null;
+        reverseRelation.CasusBelli = "";
 
         // Apply terms
         await ApplyPeaceTermsAsync(factionId, targetId, terms);
@@ -204,12 +236,18 @@ public class DiplomacyService : IDiplomacyService
     public async Task ProcessDiplomacyAsync(Guid gameId)
     {
         var relations = await _db.DiplomaticRelations
+            .Include(r => r.Faction)
+            .Include(r => r.OtherFaction)
             .Where(r => r.Faction.GameId == gameId)
             .ToListAsync();
 
         foreach (var relation in relations)
         {
-            // Opinion drift towards 0
+            // Apply faction-specific opinion modifiers from DiplomacyDefinitions
+            var opinionChange = CalculateOpinionModifiers(relation);
+            relation.Opinion = Math.Clamp(relation.Opinion + opinionChange, -100, 100);
+
+            // Opinion drift towards 0 (natural decay)
             if (relation.Opinion > 0)
                 relation.Opinion = Math.Max(0, relation.Opinion - 1);
             else if (relation.Opinion < 0)
@@ -234,6 +272,53 @@ public class DiplomacyService : IDiplomacyService
         }
 
         await _db.SaveChangesAsync();
+    }
+
+    private int CalculateOpinionModifiers(DiplomaticRelationEntity relation)
+    {
+        var totalModifier = 0;
+        var factionRace = relation.Faction?.RaceId?.ToLower() ?? "";
+        var targetRace = relation.OtherFaction?.RaceId?.ToLower() ?? "";
+
+        // Apply species-specific modifiers from OpinionModifiers
+        foreach (var modifier in DiplomacyDefinitions.GetOpinionModifiersFor(factionRace, targetRace))
+        {
+            // Apply decay for temporary modifiers
+            if (!modifier.IsPermanent)
+                totalModifier += modifier.Value / 10;  // Apply fractionally per turn
+            else
+                totalModifier += modifier.Value / 100; // Permanent modifiers apply very slowly
+        }
+
+        // Klingon/Federation rivalry
+        if ((factionRace.Contains("klingon") && targetRace.Contains("federation")) ||
+            (factionRace.Contains("federation") && targetRace.Contains("klingon")))
+        {
+            // Unless they have treaties, mild distrust
+            if (relation.ActiveTreaties.Length <= 2)
+                totalModifier -= 1;
+        }
+
+        // Romulan distrust of everyone
+        if (factionRace.Contains("romulan") || targetRace.Contains("romulan"))
+        {
+            if (relation.ActiveTreaties.Length <= 2)
+                totalModifier -= 1;
+        }
+
+        // Borg are universally feared
+        if (targetRace.Contains("borg") && !factionRace.Contains("borg"))
+        {
+            totalModifier -= 5;
+        }
+
+        // Same species bonus
+        if (factionRace == targetRace)
+        {
+            totalModifier += 2;
+        }
+
+        return totalModifier;
     }
 
     public async Task<DiplomacyReport> GetDiplomacyReportAsync(Guid factionId)
@@ -322,17 +407,50 @@ public class DiplomacyService : IDiplomacyService
 
     private async Task<bool> ValidateCasusBelliAsync(Guid factionId, Guid targetId, CasusBelli cb)
     {
+        var cbId = cb.ToString().ToLower();
+        var cbDef = DiplomacyDefinitions.GetCasusBelli(cbId);
+
+        // Get faction info for special conditions
+        var faction = await _db.Factions.FindAsync(factionId);
+        var targetFaction = await _db.Factions.FindAsync(targetId);
+
+        // Check faction requirements if defined
+        if (cbDef?.RequiresFaction != null && faction != null)
+        {
+            if (!cbDef.RequiresFaction.Any(f => f.ToLower() == faction.RaceId?.ToLower()))
+                return false;
+        }
+
+        // Check threat level if defined
+        if (cbDef?.RequiresThreatLevel == true)
+        {
+            var relation = await GetRelationAsync(factionId, targetId);
+            if (relation == null || relation.Opinion > -cbDef.MinThreatLevel)
+                return false;
+        }
+
         return cb switch
         {
             CasusBelli.Aggression => true, // Always valid but costly
             CasusBelli.BorderViolation => await CheckBorderViolationAsync(factionId, targetId),
             CasusBelli.TreatyViolation => await CheckTreatyViolationAsync(factionId, targetId),
-            CasusBelli.Ideology => true, // Check government type difference
+            CasusBelli.Ideology => await CheckIdeologyConflictAsync(factionId, targetId),
             CasusBelli.Conquest => true, // Claims on their systems
             CasusBelli.Liberation => true, // Liberating a species
             CasusBelli.Defense => await CheckDefensiveWarAsync(factionId, targetId),
             _ => false
         };
+    }
+
+    private async Task<bool> CheckIdeologyConflictAsync(Guid factionId, Guid targetId)
+    {
+        var faction = await _db.Factions.FindAsync(factionId);
+        var target = await _db.Factions.FindAsync(targetId);
+
+        if (faction == null || target == null) return false;
+
+        // Different government types create ideology conflict
+        return faction.Government != target.Government;
     }
 
     private async Task<bool> CheckBorderViolationAsync(Guid factionId, Guid targetId)

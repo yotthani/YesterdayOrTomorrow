@@ -8,27 +8,11 @@
 @inject IGameApiClient Api
 @inject NavigationManager Navigation
 @inject ILocalStorageService LocalStorage
+@inject ISnackbar Snackbar
 
 <PageTitle>Research - Galactic Strategy</PageTitle>
 
-<div class="stellaris-layout">
-    <header class="st-topbar">
-        <div class="st-empire-badge"><div class="st-empire-flag">🌐</div><div class="st-empire-info"><span class="st-empire-name">Science Council</span><span class="st-empire-type">Research Division</span></div></div>
-        <div class="st-resources">
-            <div class="st-resource highlight"><span class="st-resource-icon">🔬</span><div class="st-resource-values"><span class="st-resource-current">@_totalResearch</span><span class="st-resource-income positive">+@_researchPerTurn/turn</span></div></div>
-        </div>
-        <div class="st-game-controls"><button class="st-end-turn-btn">END TURN</button></div>
-    </header>
-
-    <div class="st-main">
-        <aside class="st-sidebar-left">
-            <nav class="st-nav">
-                <a href="/game/galaxy" class="st-nav-btn"><span class="st-nav-icon">🌌</span><span class="st-nav-label">Galaxy</span></a>
-                <a href="/game/tech" class="st-nav-btn active"><span class="st-nav-icon">🔬</span><span class="st-nav-label">Research</span></a>
-            </nav>
-        </aside>
-
-        <div class="research-content">
+<div class="research-content">
             <div class="research-header">
                 <h1>RESEARCH & DEVELOPMENT</h1>
                 <div class="research-categories">
@@ -109,8 +93,6 @@
                 }
             </div>
         </aside>
-    </div>
-</div>
 
 <style>
 .research-content{flex:1;display:flex;flex-direction:column;background:linear-gradient(180deg,#080c14,#040608)}
