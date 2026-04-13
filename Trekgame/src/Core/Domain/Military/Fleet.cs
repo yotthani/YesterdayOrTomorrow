@@ -25,7 +25,14 @@ public class Fleet : AggregateRoot
     // Combat modifiers from commander, experience, etc.
     public int TacticalBonus { get; private set; }
     public int MoraleBonus { get; private set; }
-    
+
+    // Action Points — reset each round, spent on actions (move, attack, scan, etc.)
+    public int ActionPoints { get; private set; }
+    public int MaxActionPoints { get; private set; } = 3;
+
+    // Flagship — the lead ship whose class symbol appears on the galaxy map
+    public Guid? FlagshipId { get; private set; }
+
     // Computed properties for CombatEngine compatibility
     public int Morale => Ships.Any() ? (int)Ships.Average(s => s.CrewMorale) : 75;
 
@@ -43,6 +50,7 @@ public class Fleet : AggregateRoot
         Status = FleetStatus.Idle;
         TacticalBonus = 0;
         MoraleBonus = 0;
+        ActionPoints = MaxActionPoints;
     }
 
     /// <summary>
@@ -58,6 +66,7 @@ public class Fleet : AggregateRoot
         Status = FleetStatus.Idle;
         TacticalBonus = 0;
         MoraleBonus = 0;
+        ActionPoints = MaxActionPoints;
     }
 
     /// <summary>
@@ -140,6 +149,32 @@ public class Fleet : AggregateRoot
     public void SetStance(FleetStance stance)
     {
         Stance = stance;
+        IncrementVersion();
+    }
+
+    public bool SpendActionPoints(int cost)
+    {
+        if (cost < 0) throw new ArgumentOutOfRangeException(nameof(cost));
+        if (ActionPoints < cost) return false;
+        ActionPoints -= cost;
+        IncrementVersion();
+        return true;
+    }
+
+    public void ResetActionPoints()
+    {
+        ActionPoints = MaxActionPoints;
+        IncrementVersion();
+    }
+
+    public void SetFlagship(Guid? shipId)
+    {
+        FlagshipId = shipId;
+        if (shipId.HasValue)
+        {
+            var ship = _ships.FirstOrDefault(s => s.Id == shipId.Value);
+            if (ship != null) ship.IsFlagship = true;
+        }
         IncrementVersion();
     }
 

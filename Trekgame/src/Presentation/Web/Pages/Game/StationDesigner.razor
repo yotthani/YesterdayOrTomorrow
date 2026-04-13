@@ -1,0 +1,407 @@
+@page "/game/station-designer/{StationId:guid}"
+@layout StellarisLayout
+@using MudBlazor
+@using StarTrekGame.Web.Services
+@using Blazored.LocalStorage
+@inject IGameApiClient Api
+@inject NavigationManager Navigation
+@inject ILocalStorageService LocalStorage
+@inject ISnackbar Snackbar
+@implements IDisposable
+
+<PageTitle>Station Designer - Galactic Strategy</PageTitle>
+
+<div class="designer-content">
+    @if (_station != null)
+    {
+        @* ── TOP SECTION: Left Panel + Module Grid ── *@
+        <div class="designer-top">
+            @* ── LEFT: Station Overview ── *@
+            <div class="station-overview">
+                <div class="station-header">
+                    <span class="station-icon">&#x2693;</span>
+                    <div class="station-title">
+                        <h2>@_station.Name</h2>
+                        <span class="station-location">&#x1F4CD; @_station.SystemName</span>
+                    </div>
+                    @if (!_station.IsOperational)
+                    {
+                        <span class="construction-badge">UNDER CONSTRUCTION (@_station.ConstructionProgress%) - @_station.ConstructionTurnsLeft turns left</span>
+                    }
+                </div>
+
+                <div class="stat-bars">
+                    <div class="stat-bar-group">
+                        <div class="stat-bar-label"><span class="stat-bar-icon">&#x2764;&#xFE0F;</span> Hull</div>
+                        <div class="stat-bar-track"><div class="stat-bar-fill hull" style="width: @HullPercent%"></div></div>
+                        <span class="stat-bar-value">@_station.HullPoints / @_station.MaxHullPoints</span>
+                    </div>
+                    <div class="stat-bar-group">
+                        <div class="stat-bar-label"><span class="stat-bar-icon">&#x1F6E1;&#xFE0F;</span> Shields</div>
+                        <div class="stat-bar-track"><div class="stat-bar-fill shields" style="width: @ShieldPercent%"></div></div>
+                        <span class="stat-bar-value">@_station.ShieldPoints / @_station.MaxShieldPoints</span>
+                    </div>
+                </div>
+
+                <div class="station-quick-stats">
+                    <div class="quick-stat">
+                        <span class="quick-stat-icon">&#x1F4E1;</span>
+                        <span class="quick-stat-label">Sensor Range</span>
+                        <span class="quick-stat-value">@_station.SensorRange ly</span>
+                    </div>
+                    <div class="quick-stat">
+                        <span class="quick-stat-icon">&#x1F52B;</span>
+                        <span class="quick-stat-label">Firepower</span>
+                        <span class="quick-stat-value">@_station.Firepower</span>
+                    </div>
+                </div>
+            </div>
+
+            @* ── CENTER: Module Grid ── *@
+            <div class="modules-panel">
+                <div class="panel-header"><span>INSTALLED MODULES (@_station.Modules.Count / @_station.ModuleSlots)</span></div>
+                <div class="modules-grid">
+                    @foreach (var module in _station.Modules)
+                    {
+                        <div class="module-card @(module.IsOnline ? "" : "offline") @(module.IsUnderConstruction ? "building" : "") @(_selectedModule?.Id == module.Id ? "selected" : "")"
+                             @onclick="() => SelectModule(module)">
+                            <div class="module-icon">@GetModuleEmoji(module.ModuleType)</div>
+                            <div class="module-info">
+                                <span class="module-name">@module.Name</span>
+                                <span class="module-level">@(string.Concat(Enumerable.Repeat("\u2605", module.Level)))@(string.Concat(Enumerable.Repeat("\u2606", 3 - module.Level)))</span>
+                            </div>
+                            <div class="module-status">
+                                @if (module.IsUnderConstruction)
+                                {
+                                    <span class="module-badge constructing">&#x1F6A7; @module.ConstructionTurnsLeft turns</span>
+                                }
+                                else if (module.IsOnline)
+                                {
+                                    <span class="module-badge online">ONLINE</span>
+                                }
+                                else
+                                {
+                                    <span class="module-badge offline-badge">OFFLINE</span>
+                                }
+                            </div>
+                        </div>
+                    }
+                    @for (int i = _station.Modules.Count; i < _station.ModuleSlots; i++)
+                    {
+                        <div class="module-card empty-slot">
+                            <div class="module-icon empty-icon">+</div>
+                            <span class="empty-label">EMPTY SLOT</span>
+                        </div>
+                    }
+                </div>
+
+                @* Module actions (when a module is selected) *@
+                @if (_selectedModule != null && !_selectedModule.IsUnderConstruction)
+                {
+                    <div class="module-actions">
+                        <span class="actions-label">@_selectedModule.Name</span>
+                        <div class="actions-buttons">
+                            @if (_selectedModule.Level < 3)
+                            {
+                                <button class="st-btn sm" @onclick="UpgradeModule" disabled="@_isProcessing">&#x2B06;&#xFE0F; UPGRADE (Lv@(_selectedModule.Level + 1))</button>
+                            }
+                            <button class="st-btn sm" @onclick="ToggleModule" disabled="@_isProcessing">
+                                @if (_selectedModule.IsOnline) { <text>&#x23F8;&#xFE0F; TAKE OFFLINE</text> } else { <text>&#x25B6;&#xFE0F; BRING ONLINE</text> }
+                            </button>
+                            <button class="st-btn sm danger" @onclick="RemoveModule" disabled="@_isProcessing">&#x1F5D1;&#xFE0F; REMOVE</button>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        @* ── BOTTOM SECTION: Available Modules + Stats Summary ── *@
+        <div class="designer-bottom">
+            @* ── BOTTOM-LEFT: Available Modules ── *@
+            <div class="available-panel">
+                <div class="panel-header"><span>AVAILABLE MODULES</span></div>
+                <div class="available-list">
+                    @foreach (var mt in _allModuleTypes)
+                    {
+                        <div class="available-row">
+                            <span class="avail-icon">@GetModuleEmoji(mt.ToString())</span>
+                            <div class="avail-info">
+                                <span class="avail-name">@FormatModuleName(mt.ToString())</span>
+                                <span class="avail-desc">@GetModuleDescription(mt)</span>
+                            </div>
+                            <button class="st-btn sm" @onclick="() => AddModule(mt)"
+                                    disabled="@(_station.Modules.Count >= _station.ModuleSlots || _isProcessing)">ADD</button>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            @* ── BOTTOM-RIGHT: Stats Summary ── *@
+            <div class="stats-panel">
+                <div class="panel-header"><span>STATION STATISTICS</span></div>
+                <div class="stats-grid">
+                    <div class="stats-row"><span class="stats-icon">&#x26A1;</span><span class="stats-label">Maintenance</span><span class="stats-value energy">@_station.TotalMaintenanceEnergy &#x26A1;</span></div>
+                    <div class="stats-row"><span class="stats-icon">&#x1F52B;</span><span class="stats-label">Firepower</span><span class="stats-value">@_station.Firepower</span></div>
+                    <div class="stats-row"><span class="stats-icon">&#x1F4E1;</span><span class="stats-label">Sensor Range</span><span class="stats-value">@_station.SensorRange ly</span></div>
+                    <div class="stats-row"><span class="stats-icon">&#x1F6E1;&#xFE0F;</span><span class="stats-label">Max Shields</span><span class="stats-value">@_station.MaxShieldPoints</span></div>
+                    <div class="stats-row"><span class="stats-icon">&#x2764;&#xFE0F;</span><span class="stats-label">Max Hull</span><span class="stats-value">@_station.MaxHullPoints</span></div>
+                    <div class="stats-row"><span class="stats-icon">&#x1F4E6;</span><span class="stats-label">Slots</span><span class="stats-value">@_station.Modules.Count / @_station.ModuleSlots</span></div>
+                </div>
+            </div>
+        </div>
+    }
+    else if (_loading)
+    {
+        <div class="loading-state"><span class="loading-spinner">&#x2693;</span><p>Loading station data...</p></div>
+    }
+    else
+    {
+        <div class="error-state"><span class="error-icon">&#x26A0;&#xFE0F;</span><p>Station not found.</p><button class="st-btn" @onclick='() => Navigation.NavigateTo("/game/stations")'>BACK TO STATIONS</button></div>
+    }
+</div>
+
+<style>
+.designer-content{flex:1;display:flex;flex-direction:column;background:linear-gradient(180deg,#080c14 0%,#040608 100%);overflow-y:auto}
+.designer-top{display:flex;gap:16px;padding:16px;min-height:0}
+.designer-bottom{display:flex;gap:16px;padding:0 16px 16px;min-height:0;flex:1}
+
+/* ── Station Overview (Left) ── */
+.station-overview{width:320px;background:var(--st-gradient-panel);border:1px solid var(--st-border-dark);border-radius:8px;padding:20px;display:flex;flex-direction:column;gap:16px;flex-shrink:0}
+.station-header{display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.station-icon{font-size:32px;color:var(--st-accent-gold)}
+.station-title{flex:1}.station-title h2{margin:0;font-family:var(--st-font-display);font-size:18px;color:var(--st-text-white);letter-spacing:1px}
+.station-location{font-size:11px;color:var(--st-text-dim)}
+.construction-badge{font-size:10px;padding:4px 10px;background:rgba(255,200,68,0.15);color:var(--st-accent-gold);border-radius:4px;font-weight:600}
+
+.stat-bars{display:flex;flex-direction:column;gap:10px}
+.stat-bar-group{display:flex;align-items:center;gap:8px}
+.stat-bar-label{display:flex;align-items:center;gap:4px;width:80px;font-size:11px;color:var(--st-text-dim)}
+.stat-bar-icon{font-size:14px}
+.stat-bar-track{flex:1;height:10px;background:rgba(0,0,0,0.4);border:1px solid var(--st-border-dark);border-radius:5px;overflow:hidden}
+.stat-bar-fill{height:100%;border-radius:5px;transition:width 0.3s}
+.stat-bar-fill.hull{background:linear-gradient(90deg,#cc3333,#ff5555)}
+.stat-bar-fill.shields{background:linear-gradient(90deg,#3366cc,#66aaff)}
+.stat-bar-value{font-size:10px;color:var(--st-text-muted);width:80px;text-align:right;font-family:var(--st-font-display)}
+
+.station-quick-stats{display:flex;gap:12px}
+.quick-stat{flex:1;background:var(--st-bg-medium);border:1px solid var(--st-border-dark);border-radius:6px;padding:10px;text-align:center;display:flex;flex-direction:column;gap:2px}
+.quick-stat-icon{font-size:20px}
+.quick-stat-label{font-size:9px;color:var(--st-text-dim);letter-spacing:0.5px;text-transform:uppercase}
+.quick-stat-value{font-family:var(--st-font-display);font-size:16px;color:var(--st-accent-cyan)}
+
+/* ── Module Grid (Center/Right) ── */
+.modules-panel{flex:1;background:var(--st-gradient-panel);border:1px solid var(--st-border-dark);border-radius:8px;display:flex;flex-direction:column;overflow:hidden}
+.panel-header{padding:12px 16px;background:rgba(0,0,0,0.2);border-bottom:1px solid var(--st-border-dark);font-size:12px;color:var(--st-text-muted);font-weight:600;letter-spacing:1px}
+.modules-grid{flex:1;display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;padding:12px;overflow-y:auto;align-content:start}
+.module-card{background:var(--st-bg-medium);border:1px solid var(--st-border-dark);border-radius:8px;padding:12px;cursor:pointer;transition:all 0.15s;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
+.module-card:hover{border-color:var(--st-border-light);background:var(--st-bg-light)}
+.module-card.selected{border-color:var(--st-accent-blue);background:rgba(74,158,255,0.1);box-shadow:0 0 12px rgba(74,158,255,0.15)}
+.module-card.offline{opacity:0.6}.module-card.building{border-color:var(--st-accent-gold);border-style:dashed}
+.module-icon{font-size:28px;line-height:1}
+.module-info{display:flex;flex-direction:column;gap:2px}
+.module-name{font-size:11px;font-weight:500;color:var(--st-text-bright)}
+.module-level{font-size:12px;color:var(--st-accent-gold);letter-spacing:2px}
+.module-badge{font-size:9px;padding:2px 8px;border-radius:3px;font-weight:600;letter-spacing:0.5px}
+.module-badge.online{background:rgba(68,255,136,0.15);color:#44ff88}
+.module-badge.offline-badge{background:rgba(255,68,85,0.15);color:#ff4455}
+.module-badge.constructing{background:rgba(255,200,68,0.15);color:var(--st-accent-gold)}
+.empty-slot{border-style:dashed;opacity:0.4;cursor:default}.empty-slot:hover{border-color:var(--st-border-dark);background:var(--st-bg-medium)}
+.empty-icon{font-size:24px;color:var(--st-text-dim)}.empty-label{font-size:10px;color:var(--st-text-dim)}
+.module-actions{padding:12px 16px;border-top:1px solid var(--st-border-dark);background:rgba(0,0,0,0.2);display:flex;align-items:center;gap:12px}
+.actions-label{font-size:12px;color:var(--st-text-bright);font-weight:500;flex:1}
+.actions-buttons{display:flex;gap:8px}
+.st-btn.danger{border-color:rgba(255,68,85,0.4);color:#ff6677}.st-btn.danger:hover{background:rgba(255,68,85,0.15);border-color:#ff4455}
+
+/* ── Available Modules (Bottom-Left) ── */
+.available-panel{flex:1;background:var(--st-gradient-panel);border:1px solid var(--st-border-dark);border-radius:8px;display:flex;flex-direction:column;overflow:hidden}
+.available-list{flex:1;overflow-y:auto;padding:8px}
+.available-row{display:flex;align-items:center;gap:12px;padding:10px 12px;background:var(--st-bg-medium);border-radius:6px;margin-bottom:4px;transition:background 0.15s}
+.available-row:hover{background:var(--st-bg-light)}
+.avail-icon{font-size:22px;width:32px;text-align:center}
+.avail-info{flex:1;display:flex;flex-direction:column;gap:2px}
+.avail-name{font-size:12px;font-weight:500;color:var(--st-text-bright)}
+.avail-desc{font-size:10px;color:var(--st-text-dim)}
+
+/* ── Stats Summary (Bottom-Right) ── */
+.stats-panel{width:300px;background:var(--st-gradient-panel);border:1px solid var(--st-border-dark);border-radius:8px;display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}
+.stats-grid{padding:12px;display:flex;flex-direction:column;gap:6px}
+.stats-row{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--st-bg-medium);border-radius:6px}
+.stats-icon{font-size:16px;width:24px;text-align:center}
+.stats-label{flex:1;font-size:12px;color:var(--st-text-dim)}
+.stats-value{font-family:var(--st-font-display);font-size:14px;color:var(--st-text-bright)}.stats-value.energy{color:var(--st-accent-gold)}
+
+/* ── Loading / Error ── */
+.loading-state,.error-state{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;color:var(--st-text-dim)}
+.loading-spinner{font-size:48px;animation:spin 2s linear infinite}
+.error-icon{font-size:48px;opacity:0.3}
+@@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+</style>
+
+@code {
+    [Parameter] public Guid StationId { get; set; }
+    [CascadingParameter(Name = "GameState")] public StellarisLayout.GameLayoutState? GameState { get; set; }
+
+    private StationDetailDto? _station;
+    private StationModuleDto? _selectedModule;
+    private bool _loading = true;
+    private bool _isProcessing;
+
+    private readonly StationModuleType[] _allModuleTypes = Enum.GetValues<StationModuleType>();
+
+    private int HullPercent => _station?.MaxHullPoints > 0 ? (int)((double)_station.HullPoints / _station.MaxHullPoints * 100) : 0;
+    private int ShieldPercent => _station?.MaxShieldPoints > 0 ? (int)((double)_station.ShieldPoints / _station.MaxShieldPoints * 100) : 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        GameState?.SetTopbarOverride("\u2693", "STATION DESIGNER", "Module Configuration", showEndTurn: false);
+        await LoadStation();
+    }
+
+    private async Task LoadStation()
+    {
+        _loading = true;
+        try
+        {
+            _station = await Api.GetStationAsync(StationId);
+        }
+        catch
+        {
+            _station = null;
+        }
+        _loading = false;
+    }
+
+    private void SelectModule(StationModuleDto module)
+    {
+        _selectedModule = _selectedModule?.Id == module.Id ? null : module;
+    }
+
+    private async Task AddModule(StationModuleType moduleType)
+    {
+        if (_station == null || _station.Modules.Count >= _station.ModuleSlots) return;
+        _isProcessing = true;
+        try
+        {
+            var result = await Api.AddStationModuleAsync(StationId, moduleType);
+            if (result != null)
+            {
+                Snackbar.Add($"Module added: {result.Name}", Severity.Success);
+                await LoadStation();
+            }
+            else
+            {
+                Snackbar.Add("Failed to add module", Severity.Error);
+            }
+        }
+        catch (Exception ex) { Snackbar.Add($"Error: {ex.Message}", Severity.Error); }
+        _isProcessing = false;
+    }
+
+    private async Task UpgradeModule()
+    {
+        if (_selectedModule == null) return;
+        _isProcessing = true;
+        try
+        {
+            var success = await Api.UpgradeStationModuleAsync(_selectedModule.Id);
+            if (success)
+            {
+                Snackbar.Add($"Upgrading {_selectedModule.Name}", Severity.Success);
+                await LoadStation();
+                _selectedModule = _station?.Modules.FirstOrDefault(m => m.Id == _selectedModule.Id);
+            }
+            else { Snackbar.Add("Upgrade failed", Severity.Error); }
+        }
+        catch (Exception ex) { Snackbar.Add($"Error: {ex.Message}", Severity.Error); }
+        _isProcessing = false;
+    }
+
+    private async Task RemoveModule()
+    {
+        if (_selectedModule == null) return;
+        _isProcessing = true;
+        try
+        {
+            var success = await Api.RemoveStationModuleAsync(_selectedModule.Id);
+            if (success)
+            {
+                Snackbar.Add($"Module removed", Severity.Info);
+                _selectedModule = null;
+                await LoadStation();
+            }
+            else { Snackbar.Add("Remove failed", Severity.Error); }
+        }
+        catch (Exception ex) { Snackbar.Add($"Error: {ex.Message}", Severity.Error); }
+        _isProcessing = false;
+    }
+
+    private async Task ToggleModule()
+    {
+        if (_selectedModule == null) return;
+        _isProcessing = true;
+        try
+        {
+            var success = await Api.ToggleStationModuleAsync(_selectedModule.Id);
+            if (success)
+            {
+                var state = _selectedModule.IsOnline ? "offline" : "online";
+                Snackbar.Add($"{_selectedModule.Name} is now {state}", Severity.Info);
+                await LoadStation();
+                _selectedModule = _station?.Modules.FirstOrDefault(m => m.Id == _selectedModule.Id);
+            }
+            else { Snackbar.Add("Toggle failed", Severity.Error); }
+        }
+        catch (Exception ex) { Snackbar.Add($"Error: {ex.Message}", Severity.Error); }
+        _isProcessing = false;
+    }
+
+    private string GetModuleEmoji(string moduleType) => moduleType switch
+    {
+        "SensorArray" => "\U0001F4E1",
+        "WeaponsPlatform" => "\U0001F52B",
+        "ShieldGenerator" => "\U0001F6E1\uFE0F",
+        "Shipyard" => "\U0001F3ED",
+        "TradingHub" => "\U0001F4B1",
+        "ResearchLab" => "\U0001F52C",
+        "Drydock" => "\U0001F527",
+        "HabitatRing" => "\U0001F3E0",
+        "SubspaceComm" => "\U0001F4FB",
+        "StructuralExpansion" => "\U0001F3D7\uFE0F",
+        _ => "\u2753"
+    };
+
+    private string FormatModuleName(string moduleType) => moduleType switch
+    {
+        "SensorArray" => "Sensor Array",
+        "WeaponsPlatform" => "Weapons Platform",
+        "ShieldGenerator" => "Shield Generator",
+        "Shipyard" => "Shipyard",
+        "TradingHub" => "Trading Hub",
+        "ResearchLab" => "Research Lab",
+        "Drydock" => "Drydock",
+        "HabitatRing" => "Habitat Ring",
+        "SubspaceComm" => "Subspace Comm",
+        "StructuralExpansion" => "Structural Expansion",
+        _ => moduleType
+    };
+
+    private string GetModuleDescription(StationModuleType mt) => mt switch
+    {
+        StationModuleType.SensorArray => "Extends detection range",
+        StationModuleType.WeaponsPlatform => "Adds defensive firepower",
+        StationModuleType.ShieldGenerator => "Increases shield capacity",
+        StationModuleType.Shipyard => "Enables ship construction",
+        StationModuleType.TradingHub => "Boosts trade income",
+        StationModuleType.ResearchLab => "Generates research points",
+        StationModuleType.Drydock => "Repairs docked ships",
+        StationModuleType.HabitatRing => "Increases population capacity",
+        StationModuleType.SubspaceComm => "Extends communication range",
+        StationModuleType.StructuralExpansion => "Adds module slots",
+        _ => ""
+    };
+
+    public void Dispose()
+    {
+        GameState?.ResetTopbar();
+    }
+}

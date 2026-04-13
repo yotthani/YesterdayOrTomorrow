@@ -906,6 +906,107 @@ public static class BuildingDefinitions
             BaseProduction = new() { Engineering = 6 },
             FactionExclusive = "hirogen",
             TechRequired = "advanced_tracking"
+        },
+
+        // ═══════════════════════════════════════════════════════════════════
+        // GROUND COMBAT — MILITARY BUILDINGS
+        // ═══════════════════════════════════════════════════════════════════
+
+        ["ground_barracks"] = new BuildingDef
+        {
+            Id = "ground_barracks",
+            Name = "Ground Force Barracks",
+            Description = "Training facility for ground forces",
+            Category = BuildingCategory.Military,
+            SlotsRequired = 1,
+            BaseCost = new() { Minerals = 100 },
+            Upkeep = new() { Energy = 2 },
+            Jobs = new[] { ("soldier", 2) },
+            DefenseArmies = 1
+        },
+
+        ["advanced_military_academy"] = new BuildingDef
+        {
+            Id = "advanced_military_academy",
+            Name = "Advanced Military Academy",
+            Description = "Produces veteran-grade troops and enables advanced army types",
+            Category = BuildingCategory.Military,
+            SlotsRequired = 2,
+            BaseCost = new() { Minerals = 200, Alloys = 50 },
+            Upkeep = new() { Energy = 3 },
+            Jobs = new[] { ("soldier", 3) },
+            DefenseArmies = 2,
+            ArmyDamageBonus = 15,
+            ArmyMoraleBonus = 10,
+            RequiresBuilding = "ground_barracks"
+        },
+
+        ["planetary_fortress"] = new BuildingDef
+        {
+            Id = "planetary_fortress",
+            Name = "Planetary Fortress",
+            Description = "Massive defensive installation",
+            Category = BuildingCategory.Military,
+            SlotsRequired = 2,
+            BaseCost = new() { Minerals = 300, Alloys = 100 },
+            Upkeep = new() { Energy = 4 },
+            Jobs = new[] { ("soldier", 4) },
+            FortificationLevel = 2,
+            DefenseArmies = 3
+        },
+
+        ["underground_complex"] = new BuildingDef
+        {
+            Id = "underground_complex",
+            Name = "Underground Complex",
+            Description = "Hardened bunker network reducing orbital bombardment effectiveness",
+            Category = BuildingCategory.Military,
+            SlotsRequired = 1,
+            BaseCost = new() { Minerals = 200, Alloys = 50 },
+            Upkeep = new() { Energy = 2 },
+            FortificationLevel = 1,
+            DefenseArmies = 1
+        },
+
+        ["shield_generator"] = new BuildingDef
+        {
+            Id = "shield_generator",
+            Name = "Planetary Shield Generator",
+            Description = "Planetary-scale deflector shield",
+            Category = BuildingCategory.Military,
+            SlotsRequired = 2,
+            BaseCost = new() { Minerals = 200, Alloys = 100 },
+            Upkeep = new() { Energy = 5 },
+            Jobs = new[] { ("technician", 2) },
+            ShieldStrength = 500
+        },
+
+        ["planetary_orbital_defense"] = new BuildingDef
+        {
+            Id = "planetary_orbital_defense",
+            Name = "Orbital Defense Grid",
+            Description = "Weapons platforms targeting invading fleets",
+            Category = BuildingCategory.Military,
+            SlotsRequired = 2,
+            BaseCost = new() { Alloys = 300 },
+            Upkeep = new() { Energy = 4 },
+            Jobs = new[] { ("technician", 2) },
+            OrbitalDefensePower = 150
+        },
+
+        ["planetary_defense_platform"] = new BuildingDef
+        {
+            Id = "planetary_defense_platform",
+            Name = "Planetary Defense Platform",
+            Description = "Combined ground and orbital defense system",
+            Category = BuildingCategory.Military,
+            SlotsRequired = 3,
+            BaseCost = new() { Alloys = 400 },
+            Upkeep = new() { Energy = 6 },
+            Jobs = new[] { ("soldier", 2), ("technician", 2) },
+            FortificationLevel = 1,
+            OrbitalDefensePower = 200,
+            DefenseArmies = 2
         }
     };
     
@@ -982,6 +1083,7 @@ public class ResourceCost
     public int Food { get; init; }
     public int ConsumerGoods { get; init; }
     public int Dilithium { get; init; }
+    public int Alloys { get; init; }
 }
 
 public class ResourceProduction

@@ -1,0 +1,390 @@
+@page "/game/crisis"
+@layout StellarisLayout
+@using StarTrekGame.Web.Services
+@using Blazored.LocalStorage
+@using MudBlazor
+@inject IGameApiClient Api
+@inject ILocalStorageService LocalStorage
+@inject ISnackbar Snackbar
+
+<PageTitle>Crisis Monitor - Galactic Strategy</PageTitle>
+
+<div class="crisis-page">
+    @if (_loading)
+    {
+        <div class="loading-indicator">Scanning for galactic threats...</div>
+    }
+    else if (_crisis != null)
+    {
+        <!-- ═══ ACTIVE CRISIS ═══ -->
+        <div class="crisis-active">
+            <div class="crisis-alert-banner severity-@GetSeverityClass()">
+                <span class="alert-icon">🚨</span>
+                <span class="alert-text">GALACTIC THREAT DETECTED</span>
+                <span class="alert-level">THREAT LEVEL @_crisis.ThreatLevel</span>
+            </div>
+
+            <div class="crisis-header">
+                <div class="crisis-icon-container">
+                    <span class="crisis-icon">@GetCrisisIcon()</span>
+                    <div class="threat-ring threat-@_crisis.ThreatLevel"></div>
+                </div>
+                <div class="crisis-title">
+                    <h1>@_crisis.Name</h1>
+                    <p class="crisis-type">@_crisis.Type Crisis &mdash; Phase @_crisis.Phase</p>
+                    <p class="crisis-desc">@_crisis.Description</p>
+                </div>
+                <div class="crisis-timer">
+                    <div class="timer-value">@_crisis.TurnsSinceStart</div>
+                    <div class="timer-label">TURNS ACTIVE</div>
+                </div>
+            </div>
+
+            <!-- Threat Level Gauge -->
+            <div class="threat-gauge-section">
+                <h3>THREAT ASSESSMENT</h3>
+                <div class="threat-gauge">
+                    @for (int i = 1; i <= 5; i++)
+                    {
+                        var level = i;
+                        <div class="threat-segment @(level <= _crisis.ThreatLevel ? "active" : "") threat-color-@level">
+                            <span class="segment-label">@GetThreatLabel(level)</span>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Current Escalation -->
+            <div class="escalation-panel">
+                <div class="escalation-header">
+                    <h3>CURRENT PHASE</h3>
+                    <span class="phase-badge">Phase @_crisis.Phase of 4</span>
+                </div>
+                <div class="escalation-text">@_crisis.CurrentEscalation</div>
+                <div class="escalation-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: @(_crisis.Phase * 25)%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Crisis Stats -->
+            <div class="crisis-stats-grid">
+                <div class="stat-card enemy-fleets">
+                    <span class="stat-icon">🚀</span>
+                    <div class="stat-value">@_crisis.EnemyFleets</div>
+                    <div class="stat-label">HOSTILE FLEETS</div>
+                </div>
+                <div class="stat-card systems-lost">
+                    <span class="stat-icon">💀</span>
+                    <div class="stat-value">@_crisis.SystemsLost</div>
+                    <div class="stat-label">SYSTEMS LOST</div>
+                </div>
+                <div class="stat-card threat-level">
+                    <span class="stat-icon">⚠️</span>
+                    <div class="stat-value">@_crisis.ThreatLevel</div>
+                    <div class="stat-label">THREAT LEVEL</div>
+                </div>
+                <div class="stat-card duration">
+                    <span class="stat-icon">⏱️</span>
+                    <div class="stat-value">@_crisis.TurnsSinceStart</div>
+                    <div class="stat-label">TURNS ELAPSED</div>
+                </div>
+            </div>
+
+            <!-- Victory / Defeat Conditions -->
+            <div class="conditions-grid">
+                <div class="condition-card victory">
+                    <h3><span class="condition-icon">✅</span> VICTORY CONDITION</h3>
+                    <p>@FormatCondition(_crisis.VictoryCondition)</p>
+                </div>
+                <div class="condition-card defeat">
+                    <h3><span class="condition-icon">❌</span> DEFEAT CONDITION</h3>
+                    <p>@FormatCondition(_crisis.DefeatCondition)</p>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- ═══ NO ACTIVE CRISIS ═══ -->
+        <div class="crisis-peaceful">
+            <div class="peaceful-banner">
+                <span class="peaceful-icon">🌌</span>
+                <h1>ALL CLEAR</h1>
+                <p class="peaceful-subtitle">No galactic threats detected. The galaxy is... relatively peaceful.</p>
+            </div>
+
+            <div class="known-threats-section">
+                <h2>POTENTIAL THREATS</h2>
+                <p class="section-desc">Intelligence reports suggest the following threats could emerge:</p>
+
+                <div class="threats-grid">
+                    <div class="threat-card borg">
+                        <span class="threat-icon">🔲</span>
+                        <div class="threat-info">
+                            <span class="threat-name">Borg Invasion</span>
+                            <span class="threat-severity catastrophic">CATASTROPHIC</span>
+                            <p>The Collective turns its gaze toward the Alpha Quadrant.</p>
+                        </div>
+                    </div>
+                    <div class="threat-card dominion">
+                        <span class="threat-icon">⚔️</span>
+                        <div class="threat-info">
+                            <span class="threat-name">Dominion War</span>
+                            <span class="threat-severity catastrophic">CATASTROPHIC</span>
+                            <p>The Founders seek to bring order to the Alpha Quadrant.</p>
+                        </div>
+                    </div>
+                    <div class="threat-card temporal">
+                        <span class="threat-icon">⏳</span>
+                        <div class="threat-info">
+                            <span class="threat-name">Temporal Incursion</span>
+                            <span class="threat-severity severe">SEVERE</span>
+                            <p>Temporal rifts threaten to unravel the timeline.</p>
+                        </div>
+                    </div>
+                    <div class="threat-card synth">
+                        <span class="threat-icon">🤖</span>
+                        <div class="threat-info">
+                            <span class="threat-name">Synthetic Uprising</span>
+                            <span class="threat-severity catastrophic">CATASTROPHIC</span>
+                            <p>Artificial life across the galaxy achieves consciousness.</p>
+                        </div>
+                    </div>
+                    <div class="threat-card kelvan">
+                        <span class="threat-icon">🌀</span>
+                        <div class="threat-info">
+                            <span class="threat-name">Kelvan Return</span>
+                            <span class="threat-severity extinction">EXTINCTION</span>
+                            <p>The Kelvan Empire from Andromeda invades our galaxy.</p>
+                        </div>
+                    </div>
+                    <div class="threat-card species">
+                        <span class="threat-icon">👾</span>
+                        <div class="threat-info">
+                            <span class="threat-name">Species 8472</span>
+                            <span class="threat-severity extinction">EXTINCTION</span>
+                            <p>Beings from fluidic space seek to purify our dimension.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="readiness-panel">
+                <h2>CRISIS READINESS</h2>
+                <div class="readiness-tips">
+                    <div class="tip">
+                        <span class="tip-icon">🔬</span>
+                        <div><strong>Research</strong> — Advance military and defensive technologies.</div>
+                    </div>
+                    <div class="tip">
+                        <span class="tip-icon">🚀</span>
+                        <div><strong>Fleet Buildup</strong> — Maintain a strong defensive fleet.</div>
+                    </div>
+                    <div class="tip">
+                        <span class="tip-icon">🤝</span>
+                        <div><strong>Alliances</strong> — Forge defensive pacts with neighboring factions.</div>
+                    </div>
+                    <div class="tip">
+                        <span class="tip-icon">👁</span>
+                        <div><strong>Intelligence</strong> — Keep agents active to detect threats early.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+.crisis-page { flex: 1; padding: 24px; background: linear-gradient(180deg, #080c14, #040608); overflow-y: auto; color: #c8d4e8; }
+.loading-indicator { text-align: center; padding: 80px; color: #667788; font-size: 14px; }
+
+/* ═══ Alert Banner ═══ */
+.crisis-alert-banner { display: flex; align-items: center; justify-content: center; gap: 16px; padding: 12px 24px; border-radius: 8px; margin-bottom: 24px; animation: pulse-alert 2s infinite; }
+.severity-low { background: rgba(241, 196, 15, 0.15); border: 1px solid #f1c40f; }
+.severity-moderate { background: rgba(230, 126, 34, 0.15); border: 1px solid #e67e22; }
+.severity-high { background: rgba(231, 76, 60, 0.2); border: 1px solid #e74c3c; }
+.severity-critical { background: rgba(192, 57, 43, 0.25); border: 1px solid #c0392b; }
+.severity-extinction { background: rgba(142, 68, 173, 0.2); border: 1px solid #8e44ad; animation: pulse-extinction 1.5s infinite; }
+.alert-icon { font-size: 24px; }
+.alert-text { font-size: 16px; font-weight: bold; letter-spacing: 3px; color: #ff6b6b; }
+.alert-level { font-size: 12px; letter-spacing: 2px; color: #ffaa66; background: rgba(255, 170, 102, 0.15); padding: 4px 12px; border-radius: 12px; }
+
+@@keyframes pulse-alert { 0%, 100% { opacity: 1; } 50% { opacity: 0.85; } }
+@@keyframes pulse-extinction { 0%, 100% { opacity: 1; box-shadow: 0 0 20px rgba(142, 68, 173, 0.3); } 50% { opacity: 0.9; box-shadow: 0 0 40px rgba(142, 68, 173, 0.6); } }
+
+/* ═══ Crisis Header ═══ */
+.crisis-header { display: flex; align-items: center; gap: 24px; margin-bottom: 24px; padding: 20px; background: rgba(15, 22, 35, 0.9); border: 1px solid rgba(231, 76, 60, 0.3); border-radius: 10px; }
+.crisis-icon-container { position: relative; width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; }
+.crisis-icon { font-size: 48px; z-index: 1; position: relative; }
+.threat-ring { position: absolute; inset: 0; border-radius: 50%; border: 3px solid transparent; animation: spin-ring 4s linear infinite; }
+.threat-ring.threat-1 { border-color: #f1c40f; }
+.threat-ring.threat-2 { border-color: #e67e22; }
+.threat-ring.threat-3 { border-color: #e74c3c; }
+.threat-ring.threat-4 { border-color: #c0392b; box-shadow: 0 0 15px rgba(192, 57, 43, 0.4); }
+.threat-ring.threat-5 { border-color: #8e44ad; box-shadow: 0 0 20px rgba(142, 68, 173, 0.5); }
+@@keyframes spin-ring { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+.crisis-title { flex: 1; }
+.crisis-title h1 { margin: 0; font-size: 28px; color: #ff6b6b; font-family: var(--st-font-display); letter-spacing: 2px; }
+.crisis-type { font-size: 12px; color: #88aacc; margin: 4px 0; letter-spacing: 1px; }
+.crisis-desc { font-size: 13px; color: #a8b8cc; margin: 8px 0 0; line-height: 1.5; }
+
+.crisis-timer { text-align: center; min-width: 80px; padding: 12px; background: rgba(231, 76, 60, 0.1); border: 1px solid rgba(231, 76, 60, 0.3); border-radius: 8px; }
+.timer-value { font-size: 32px; font-weight: bold; color: #ff9900; font-family: var(--st-font-mono); }
+.timer-label { font-size: 9px; letter-spacing: 2px; color: #667788; margin-top: 4px; }
+
+/* ═══ Threat Gauge ═══ */
+.threat-gauge-section { margin-bottom: 20px; }
+.threat-gauge-section h3 { font-size: 11px; color: #667788; letter-spacing: 2px; margin: 0 0 8px; }
+.threat-gauge { display: flex; gap: 4px; }
+.threat-segment { flex: 1; padding: 10px; text-align: center; background: rgba(30, 40, 55, 0.6); border: 1px solid rgba(60, 90, 130, 0.2); border-radius: 4px; transition: all 0.3s; }
+.threat-segment.active.threat-color-1 { background: rgba(241, 196, 15, 0.2); border-color: #f1c40f; color: #f1c40f; }
+.threat-segment.active.threat-color-2 { background: rgba(230, 126, 34, 0.2); border-color: #e67e22; color: #e67e22; }
+.threat-segment.active.threat-color-3 { background: rgba(231, 76, 60, 0.2); border-color: #e74c3c; color: #e74c3c; }
+.threat-segment.active.threat-color-4 { background: rgba(192, 57, 43, 0.25); border-color: #c0392b; color: #c0392b; }
+.threat-segment.active.threat-color-5 { background: rgba(142, 68, 173, 0.25); border-color: #8e44ad; color: #8e44ad; }
+.segment-label { font-size: 10px; font-weight: bold; letter-spacing: 1px; }
+
+/* ═══ Escalation Panel ═══ */
+.escalation-panel { background: rgba(15, 22, 35, 0.9); border: 1px solid rgba(60, 90, 130, 0.4); border-radius: 10px; padding: 16px 20px; margin-bottom: 20px; }
+.escalation-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.escalation-header h3 { font-size: 11px; color: #667788; letter-spacing: 2px; margin: 0; }
+.phase-badge { font-size: 10px; padding: 3px 10px; background: rgba(231, 76, 60, 0.2); border: 1px solid rgba(231, 76, 60, 0.4); border-radius: 10px; color: #ff8866; }
+.escalation-text { font-size: 14px; color: #e8ecf0; margin-bottom: 12px; line-height: 1.6; }
+.progress-bar { height: 4px; background: rgba(255,255,255,0.06); border-radius: 2px; overflow: hidden; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, #e74c3c, #c0392b); border-radius: 2px; transition: width 0.5s; }
+
+/* ═══ Stats Grid ═══ */
+.crisis-stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+.stat-card { background: rgba(15, 22, 35, 0.9); border: 1px solid rgba(60, 90, 130, 0.3); border-radius: 10px; padding: 16px; text-align: center; }
+.stat-card .stat-icon { font-size: 24px; display: block; margin-bottom: 8px; }
+.stat-card .stat-value { font-size: 28px; font-weight: bold; color: #e8ecf0; font-family: var(--st-font-mono); }
+.stat-card .stat-label { font-size: 9px; letter-spacing: 2px; color: #667788; margin-top: 4px; }
+.stat-card.enemy-fleets { border-color: rgba(231, 76, 60, 0.4); }
+.stat-card.enemy-fleets .stat-value { color: #e74c3c; }
+.stat-card.systems-lost { border-color: rgba(192, 57, 43, 0.4); }
+.stat-card.systems-lost .stat-value { color: #c0392b; }
+.stat-card.threat-level { border-color: rgba(230, 126, 34, 0.4); }
+.stat-card.threat-level .stat-value { color: #e67e22; }
+
+/* ═══ Conditions ═══ */
+.conditions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.condition-card { background: rgba(15, 22, 35, 0.9); border: 1px solid rgba(60, 90, 130, 0.3); border-radius: 10px; padding: 16px 20px; }
+.condition-card h3 { font-size: 12px; color: #667788; letter-spacing: 1px; margin: 0 0 8px; display: flex; align-items: center; gap: 6px; }
+.condition-card p { font-size: 13px; color: #c8d4e8; margin: 0; line-height: 1.5; }
+.condition-card.victory { border-color: rgba(46, 204, 113, 0.3); }
+.condition-card.victory h3 { color: #2ecc71; }
+.condition-card.defeat { border-color: rgba(231, 76, 60, 0.3); }
+.condition-card.defeat h3 { color: #e74c3c; }
+
+/* ═══ Peaceful State ═══ */
+.crisis-peaceful { }
+.peaceful-banner { text-align: center; padding: 60px 20px 40px; }
+.peaceful-icon { font-size: 64px; display: block; margin-bottom: 16px; opacity: 0.7; }
+.peaceful-banner h1 { font-family: var(--st-font-display); font-size: 28px; color: #2ecc71; letter-spacing: 4px; margin: 0 0 8px; }
+.peaceful-subtitle { color: #88aacc; font-size: 14px; margin: 0; }
+
+.known-threats-section { margin-top: 32px; }
+.known-threats-section h2 { font-size: 14px; color: #ff9900; letter-spacing: 2px; margin: 0 0 6px; }
+.section-desc { font-size: 12px; color: #667788; margin: 0 0 16px; }
+
+.threats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 10px; margin-bottom: 32px; }
+.threat-card { display: flex; gap: 14px; padding: 14px; background: rgba(15, 22, 35, 0.9); border: 1px solid rgba(60, 90, 130, 0.3); border-radius: 8px; transition: all 0.2s; }
+.threat-card:hover { border-color: rgba(74, 158, 255, 0.4); }
+.threat-card .threat-icon { font-size: 28px; min-width: 36px; text-align: center; }
+.threat-info { flex: 1; }
+.threat-name { font-weight: bold; font-size: 14px; color: #e8ecf0; display: block; }
+.threat-severity { font-size: 9px; letter-spacing: 2px; padding: 2px 8px; border-radius: 8px; display: inline-block; margin: 4px 0; }
+.threat-severity.catastrophic { background: rgba(231, 76, 60, 0.2); color: #e74c3c; }
+.threat-severity.severe { background: rgba(230, 126, 34, 0.2); color: #e67e22; }
+.threat-severity.extinction { background: rgba(142, 68, 173, 0.2); color: #8e44ad; }
+.threat-info p { font-size: 11px; color: #88aacc; margin: 4px 0 0; }
+
+.threat-card.borg { border-left: 3px solid #2ecc71; }
+.threat-card.dominion { border-left: 3px solid #9b59b6; }
+.threat-card.temporal { border-left: 3px solid #3498db; }
+.threat-card.synth { border-left: 3px solid #e67e22; }
+.threat-card.kelvan { border-left: 3px solid #1abc9c; }
+.threat-card.species { border-left: 3px solid #e74c3c; }
+
+/* ═══ Readiness ═══ */
+.readiness-panel h2 { font-size: 14px; color: #ff9900; letter-spacing: 2px; margin: 0 0 12px; }
+.readiness-tips { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px; }
+.tip { display: flex; gap: 10px; padding: 12px 14px; background: rgba(15, 22, 35, 0.9); border: 1px solid rgba(60, 90, 130, 0.25); border-radius: 8px; font-size: 12px; color: #a8b8cc; }
+.tip-icon { font-size: 20px; }
+.tip strong { color: #e8ecf0; display: block; margin-bottom: 2px; }
+
+@@media (max-width: 900px) {
+    .crisis-header { flex-direction: column; text-align: center; }
+    .crisis-stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .conditions-grid { grid-template-columns: 1fr; }
+    .threat-gauge { flex-direction: column; }
+}
+</style>
+
+@code {
+    private Guid? _gameId;
+    private bool _loading = true;
+    private CrisisReportDto? _crisis;
+
+    [CascadingParameter(Name = "GameState")]
+    private StellarisLayout.GameLayoutState? GameState { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _gameId = GameState?.GameId;
+        if (_gameId == null)
+            _gameId = await LocalStorage.GetItemAsync<Guid?>("currentGameId");
+
+        await LoadCrisis();
+    }
+
+    private async Task LoadCrisis()
+    {
+        _loading = true;
+        if (_gameId.HasValue)
+        {
+            try
+            {
+                _crisis = await Api.GetActiveCrisisAsync(_gameId.Value);
+            }
+            catch { _crisis = null; }
+        }
+        _loading = false;
+    }
+
+    private string GetCrisisIcon() => _crisis?.Type switch
+    {
+        "BorgInvasion" => "🔲",
+        "DominionWar" => "⚔️",
+        "TemporalAnomaly" => "⏳",
+        "SynthRebellion" => "🤖",
+        "ExtragalacticInvasion" => "🌀",
+        _ => "🚨"
+    };
+
+    private string GetSeverityClass() => _crisis?.ThreatLevel switch
+    {
+        1 => "low",
+        2 => "moderate",
+        3 => "high",
+        4 => "critical",
+        5 => "extinction",
+        _ => "moderate"
+    };
+
+    private string GetThreatLabel(int level) => level switch
+    {
+        1 => "GUARDED",
+        2 => "ELEVATED",
+        3 => "HIGH",
+        4 => "SEVERE",
+        5 => "CRITICAL",
+        _ => "UNKNOWN"
+    };
+
+    private string FormatCondition(string condition) =>
+        condition.Replace("_", " ").Replace("  ", " ");
+}

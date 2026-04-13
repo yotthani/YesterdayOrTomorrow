@@ -1,0 +1,862 @@
+@page "/game/species"
+@layout StellarisLayout
+@using StarTrekGame.Web.Services
+@using Blazored.LocalStorage
+@using MudBlazor
+@inject IGameApiClient Api
+@inject ILocalStorageService LocalStorage
+@inject ISnackbar Snackbar
+
+<PageTitle>Species - Galactic Strategy</PageTitle>
+
+<div class="species-page">
+    <div class="species-header">
+        <h1>SPECIES DATABASE</h1>
+        <p>Encyclopedia, demographics, and genetic modification.</p>
+        <div class="tab-bar">
+            <button class="tab-btn @(_activeTab == "database" ? "active" : "")" @onclick='() => _activeTab = "database"'>Database</button>
+            <button class="tab-btn @(_activeTab == "demographics" ? "active" : "")" @onclick='() => _activeTab = "demographics"'>Demographics</button>
+            <button class="tab-btn @(_activeTab == "genemod" ? "active" : "")" @onclick='() => _activeTab = "genemod"'>Gene Modification</button>
+        </div>
+    </div>
+
+    @if (_loading)
+    {
+        <div class="loading-indicator">Scanning xenobiological records...</div>
+    }
+    else
+    {
+        @* ═══════════════════════════════════════════════════════════════ *@
+        @* TAB 1: DATABASE (Encyclopedia)                                  *@
+        @* ═══════════════════════════════════════════════════════════════ *@
+        @if (_activeTab == "database")
+        {
+            <div class="database-layout">
+                <!-- Left: Species Card Grid -->
+                <div class="species-list-panel">
+                    <div class="search-bar">
+                        <input type="text" class="search-input" placeholder="Search species..."
+                               @bind="_searchText" @bind:event="oninput" />
+                    </div>
+                    <div class="quadrant-filters">
+                        @foreach (var q in _quadrantLabels)
+                        {
+                            <button class="quadrant-btn @(_filterQuadrant == q ? "active" : "")"
+                                    @onclick="() => _filterQuadrant = q">@q</button>
+                        }
+                    </div>
+                    <div class="species-grid">
+                        @if (FilteredSpecies.Count == 0)
+                        {
+                            <div class="empty-state">
+                                <span class="empty-icon">🧬</span>
+                                <p>No species match your search criteria.</p>
+                            </div>
+                        }
+                        @foreach (var sp in FilteredSpecies)
+                        {
+                            <div class="species-card @(_selectedSpecies?.Id == sp.Id ? "selected" : "")"
+                                 @onclick="() => SelectSpecies(sp)">
+                                <span class="sp-icon">@sp.Icon</span>
+                                <div class="sp-info">
+                                    <div class="sp-name">@sp.Name</div>
+                                    <div class="sp-homeworld">@sp.HomeWorld &mdash; @sp.IdealClimate</div>
+                                    <div class="sp-traits-preview">
+                                        @foreach (var t in sp.TraitNames.Take(3))
+                                        {
+                                            <span class="trait-tag">@t</span>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Right: Detail Panel -->
+                <div class="species-detail-panel @(_selectedSpecies != null ? "visible" : "")">
+                    @if (_selectedSpecies != null)
+                    {
+                        var s = _selectedSpecies;
+                        <div class="detail-header">
+                            <span class="detail-icon">@s.Icon</span>
+                            <div>
+                                <h2>@s.Name</h2>
+                                <span class="detail-subtitle" style="color: @s.Color">@s.HomeWorld &bull; @s.IdealClimate</span>
+                            </div>
+                        </div>
+                        <p class="detail-desc">@s.Description</p>
+
+                        <!-- Modifier Bars -->
+                        <div class="section-header">SPECIES MODIFIERS</div>
+                        <div class="modifier-bars">
+                            @foreach (var mod in GetModifiers(s))
+                            {
+                                var pct = Math.Clamp((mod.Value / 2.0) * 100, 0, 100);
+                                var barColor = mod.Value > 1.0 ? "#2ecc71" : mod.Value < 1.0 ? "#e74c3c" : "#667788";
+                                <div class="mod-row">
+                                    <span class="mod-label">@mod.Label</span>
+                                    <div class="mod-bar-track">
+                                        <div class="mod-bar-fill" style="width: @(pct.ToString("F0", System.Globalization.CultureInfo.InvariantCulture))%; background: @barColor;"></div>
+                                    </div>
+                                    <span class="mod-value" style="color: @barColor;">@(mod.Value.ToString("F2"))x</span>
+                                </div>
+                            }
+                        </div>
+
+                        <!-- Upkeep -->
+                        <div class="section-header">UPKEEP</div>
+                        <div class="upkeep-row">
+                            <span class="upkeep-item">🍖 Food: @s.FoodUpkeep.ToString("F1")</span>
+                            <span class="upkeep-item">📦 Consumer Goods: @s.ConsumerGoodsUpkeep.ToString("F1")</span>
+                        </div>
+
+                        <!-- Habitability -->
+                        <div class="section-header">HABITABILITY</div>
+                        <div class="habitability-pills">
+                            @foreach (var hab in s.HabitabilityModifiers)
+                            {
+                                <span class="hab-pill" style="background: @GetHabColor(hab.Value);">
+                                    @hab.Key @((hab.Value * 100).ToString("F0"))%
+                                </span>
+                            }
+                        </div>
+
+                        <!-- Traits -->
+                        <div class="section-header">TRAITS</div>
+                        <div class="trait-cards">
+                            @foreach (var tid in s.TraitIds)
+                            {
+                                var trait = _traits.FirstOrDefault(t => t.Id == tid);
+                                if (trait != null)
+                                {
+                                    <div class="trait-card-detail">
+                                        <div class="trait-card-head">
+                                            <span class="trait-cat-badge @trait.Category.ToLower()">@trait.Category</span>
+                                            <span class="trait-cost">@(trait.Cost > 0 ? $"+{trait.Cost}" : trait.Cost.ToString()) pts</span>
+                                        </div>
+                                        <div class="trait-card-name">@trait.Name</div>
+                                        <div class="trait-card-desc">@trait.Description</div>
+                                    </div>
+                                }
+                            }
+                        </div>
+
+                        <!-- Special Flags -->
+                        <div class="section-header">SPECIAL</div>
+                        <div class="special-flags">
+                            <span class="flag-pill">Lifespan: @s.Lifespan yrs</span>
+                            @if (s.CanBeAssimilated) { <span class="flag-pill assimilable">Can Be Assimilated</span> }
+                            @if (!s.CanBeAssimilated) { <span class="flag-pill immune">Immune to Assimilation</span> }
+                            @if (s.RequiresKetracelWhite) { <span class="flag-pill ketracel">Requires Ketracel-White</span> }
+                            @if (s.RequiresOrgans) { <span class="flag-pill organs">Requires Organs</span> }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="no-selection">
+                            <span class="no-sel-icon">🔬</span>
+                            <p>Select a species to view details.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
+        @* ═══════════════════════════════════════════════════════════════ *@
+        @* TAB 2: DEMOGRAPHICS                                            *@
+        @* ═══════════════════════════════════════════════════════════════ *@
+        @if (_activeTab == "demographics")
+        {
+            @if (!_factionId.HasValue)
+            {
+                <div class="empty-state"><p>No faction selected. Start a game first.</p></div>
+            }
+            else if (_demographics == null)
+            {
+                <div class="empty-state"><p>No demographic data available.</p></div>
+            }
+            else
+            {
+                <div class="demographics-section">
+                    <!-- Empire-wide stats -->
+                    <div class="demo-header-card">
+                        <span class="demo-stat-big">@_demographics.TotalPops.ToString("N0")</span>
+                        <span class="demo-stat-label">million citizens across @_demographics.Colonies.Count colonies</span>
+                    </div>
+
+                    <!-- Species Breakdown -->
+                    <div class="section-header">EMPIRE SPECIES BREAKDOWN</div>
+                    <div class="breakdown-chart">
+                        @foreach (var sp in _demographics.SpeciesBreakdown.OrderByDescending(x => x.Count))
+                        {
+                            <div class="breakdown-row">
+                                <span class="br-icon">@sp.Icon</span>
+                                <span class="br-name">@sp.Name</span>
+                                <div class="br-bar-track">
+                                    <div class="br-bar-fill" style="width: @(sp.Percentage.ToString("F1", System.Globalization.CultureInfo.InvariantCulture))%"></div>
+                                </div>
+                                <span class="br-count">@sp.Count.ToString("N0")</span>
+                                <span class="br-pct">@(sp.Percentage.ToString("F1"))%</span>
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Per-Colony Expandable Sections -->
+                    <div class="section-header">PER-COLONY DEMOGRAPHICS</div>
+                    <div class="colony-demographics">
+                        @foreach (var col in _demographics.Colonies)
+                        {
+                            var colKey = col.ColonyId.ToString();
+                            var isExpanded = _expandedColonies.ContainsKey(colKey) && _expandedColonies[colKey];
+                            <div class="colony-demo-block">
+                                <div class="colony-demo-header" @onclick="() => ToggleColony(colKey)">
+                                    <span class="expand-icon">@(isExpanded ? "▼" : "▶")</span>
+                                    <span class="col-name">@col.ColonyName</span>
+                                    <span class="col-pop-count">@col.Species.Sum(x => x.Count).ToString("N0") pops</span>
+                                </div>
+                                @if (isExpanded)
+                                {
+                                    <div class="colony-demo-body">
+                                        @foreach (var sp in col.Species.OrderByDescending(x => x.Count))
+                                        {
+                                            <div class="breakdown-row compact">
+                                                <span class="br-icon">@sp.Icon</span>
+                                                <span class="br-name">@sp.Name</span>
+                                                <div class="br-bar-track">
+                                                    <div class="br-bar-fill" style="width: @(sp.Percentage.ToString("F1", System.Globalization.CultureInfo.InvariantCulture))%"></div>
+                                                </div>
+                                                <span class="br-count">@sp.Count.ToString("N0")</span>
+                                                <span class="br-pct">@(sp.Percentage.ToString("F1"))%</span>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Species Rights -->
+                    <div class="section-header">SPECIES RIGHTS</div>
+                    <div class="rights-panel">
+                        @foreach (var sp in _demographics.SpeciesBreakdown)
+                        {
+                            var rights = GetRightsEdit(sp.SpeciesId, sp.Rights);
+                            <div class="rights-row">
+                                <div class="rights-species">
+                                    <span class="br-icon">@sp.Icon</span>
+                                    <span class="rights-sp-name">@sp.Name</span>
+                                </div>
+                                <div class="rights-selects">
+                                    <div class="rights-field">
+                                        <label>Citizenship</label>
+                                        <select value="@rights.Cit"
+                                                @onchange="e => UpdateRight(sp.SpeciesId, cit: e.Value?.ToString())">
+                                            <option value="Full">Full</option>
+                                            <option value="Resident">Resident</option>
+                                            <option value="Slave">Slave</option>
+                                            <option value="Undesirable">Undesirable</option>
+                                        </select>
+                                    </div>
+                                    <div class="rights-field">
+                                        <label>Military</label>
+                                        <select value="@rights.Mil"
+                                                @onchange="e => UpdateRight(sp.SpeciesId, mil: e.Value?.ToString())">
+                                            <option value="Full">Full</option>
+                                            <option value="Limited">Limited</option>
+                                            <option value="None">None</option>
+                                        </select>
+                                    </div>
+                                    <div class="rights-field">
+                                        <label>Living Standard</label>
+                                        <select value="@rights.Liv"
+                                                @onchange="e => UpdateRight(sp.SpeciesId, liv: e.Value?.ToString())">
+                                            <option value="Academic">Academic</option>
+                                            <option value="Normal">Normal</option>
+                                            <option value="Basic">Basic</option>
+                                            <option value="Subsistence">Subsistence</option>
+                                        </select>
+                                    </div>
+                                    <button class="btn-apply-rights" @onclick="() => ApplyRights(sp.SpeciesId)">Apply</button>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        }
+
+        @* ═══════════════════════════════════════════════════════════════ *@
+        @* TAB 3: GENE MODIFICATION                                        *@
+        @* ═══════════════════════════════════════════════════════════════ *@
+        @if (_activeTab == "genemod")
+        {
+            @if (!_hasGeneticTech)
+            {
+                <div class="lock-message">
+                    <span class="lock-icon">🔒</span>
+                    <p>Research <strong>Genetic Engineering</strong> to unlock gene modification.</p>
+                </div>
+            }
+            else if (!_factionId.HasValue)
+            {
+                <div class="empty-state"><p>No faction selected. Start a game first.</p></div>
+            }
+            else
+            {
+                <div class="genemod-section">
+                    <!-- Species Selector -->
+                    <div class="genemod-selector">
+                        <label>Target Species:</label>
+                        <select class="genemod-select" value="@_geneModSpeciesId"
+                                @onchange="OnGeneModSpeciesChanged">
+                            <option value="">-- Select Species --</option>
+                            @if (_demographics != null)
+                            {
+                                @foreach (var sp in _demographics.SpeciesBreakdown)
+                                {
+                                    <option value="@sp.SpeciesId">@sp.Icon @sp.Name (@sp.Count pops)</option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(_geneModSpeciesId))
+                    {
+                        <div class="genemod-columns">
+                            <!-- Left: Current Traits -->
+                            <div class="genemod-col">
+                                <div class="genemod-col-header">Current Traits</div>
+                                <div class="genemod-trait-list">
+                                    @foreach (var tid in _currentGeneTraits)
+                                    {
+                                        var trait = _traits.FirstOrDefault(t => t.Id == tid);
+                                        var isPendingRemove = _pendingRemoveTraits.Contains(tid);
+                                        if (trait != null)
+                                        {
+                                            <div class="genemod-trait-card @(isPendingRemove ? "removing" : "")">
+                                                <div class="gm-trait-info">
+                                                    <span class="trait-cat-badge @trait.Category.ToLower()">@trait.Category</span>
+                                                    <span class="gm-trait-name">@trait.Name</span>
+                                                    <span class="gm-trait-cost">@(trait.Cost > 0 ? $"+{trait.Cost}" : trait.Cost.ToString()) pts</span>
+                                                </div>
+                                                @if (!isPendingRemove)
+                                                {
+                                                    <button class="btn-remove-trait" @onclick="() => MarkRemoveTrait(tid)">✕</button>
+                                                }
+                                                else
+                                                {
+                                                    <button class="btn-undo-trait" @onclick="() => UnmarkRemoveTrait(tid)">↩</button>
+                                                }
+                                            </div>
+                                        }
+                                    }
+                                    @if (_currentGeneTraits.Count == 0)
+                                    {
+                                        <p class="no-traits-msg">No current traits.</p>
+                                    }
+                                </div>
+                            </div>
+
+                            <!-- Right: Available Traits -->
+                            <div class="genemod-col">
+                                <div class="genemod-col-header">Available Traits</div>
+                                <div class="trait-category-tabs">
+                                    @foreach (var cat in _traitCategories)
+                                    {
+                                        <button class="trait-cat-tab @(_traitFilterCategory == cat ? "active" : "")"
+                                                @onclick="() => _traitFilterCategory = cat">@cat</button>
+                                    }
+                                </div>
+                                <div class="genemod-trait-list">
+                                    @foreach (var trait in FilteredAvailableTraits)
+                                    {
+                                        var isAdded = _pendingAddTraits.Contains(trait.Id);
+                                        <div class="genemod-trait-card available @(isAdded ? "added" : "")"
+                                             @onclick="() => ToggleAddTrait(trait.Id)">
+                                            <div class="gm-trait-info">
+                                                <span class="trait-cat-badge @trait.Category.ToLower()">@trait.Category</span>
+                                                <span class="gm-trait-name">@trait.Name</span>
+                                                <span class="gm-trait-cost">@(trait.Cost > 0 ? $"+{trait.Cost}" : trait.Cost.ToString()) pts</span>
+                                            </div>
+                                            <div class="gm-trait-desc">@trait.Description</div>
+                                            @if (isAdded)
+                                            {
+                                                <span class="added-badge">ADDED</span>
+                                            }
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Summary Bar -->
+                        <div class="genemod-summary">
+                            <div class="gm-summary-stats">
+                                <span>Points: <strong>@GeneModPointsUsed / @GeneModBudget</strong></span>
+                                <span>Adding: <strong>@_pendingAddTraits.Count</strong> traits</span>
+                                <span>Removing: <strong>@_pendingRemoveTraits.Count</strong> traits</span>
+                            </div>
+                            <button class="btn-apply-genemod @(CanApplyGeneMod ? "" : "disabled")"
+                                    disabled="@(!CanApplyGeneMod)"
+                                    @onclick="ApplyGeneMod">
+                                Apply Modifications
+                            </button>
+                        </div>
+                    }
+                </div>
+            }
+        }
+    }
+</div>
+
+@code {
+    private Guid? _factionId;
+    private bool _loading = true;
+    private string _activeTab = "database";
+
+    // Tab 1: Database
+    private List<SpeciesDto> _species = [];
+    private List<TraitDto> _traits = [];
+    private SpeciesDto? _selectedSpecies;
+    private string _searchText = "";
+    private string _filterQuadrant = "All";
+
+    // Tab 2: Demographics
+    private DemographicsDto? _demographics;
+    private Dictionary<string, bool> _expandedColonies = new();
+    private Dictionary<string, (string Cit, string Mil, string Liv)> _rightsEdits = new();
+
+    // Tab 3: Gene Modification
+    private string? _geneModSpeciesId;
+    private List<string> _currentGeneTraits = [];
+    private List<string> _pendingAddTraits = [];
+    private List<string> _pendingRemoveTraits = [];
+    private string _traitFilterCategory = "All";
+    private bool _hasGeneticTech = true; // TODO: wire to actual tech check
+
+    // Modifier helpers
+    private record ModInfo(string Label, double Value);
+    private static ModInfo[] GetModifiers(SpeciesDto s) =>
+    [
+        new("Growth Rate", s.GrowthRate), new("Research", s.Research), new("Military", s.Military),
+        new("Trade", s.Trade), new("Diplomacy", s.Diplomacy), new("Mining", s.Mining),
+        new("Engineering", s.Engineering), new("Stability", s.Stability), new("Espionage", s.Spy)
+    ];
+
+    // Constants
+    private static readonly string[] _quadrantLabels = ["All", "Alpha", "Beta", "Gamma", "Delta", "Borg", "Xindi"];
+    private static readonly string[] _traitCategories = ["All", "Physical", "Biological", "Mental", "Psychic", "Social", "Special"];
+
+    private static readonly Dictionary<string, string[]> _quadrantSpecies = new()
+    {
+        ["Alpha"] = ["human", "vulcan", "klingon", "romulan", "cardassian", "ferengi", "andorian", "tellarite", "betazoid", "bajoran", "trill"],
+        ["Beta"] = ["orion", "nausicaan", "denobulan", "bolian", "benzite", "pakled", "reman", "el_aurian"],
+        ["Gamma"] = ["jem_hadar", "vorta", "changeling"],
+        ["Delta"] = ["hirogen", "kazon", "vidiian", "talaxian", "ocampa"],
+        ["Borg"] = ["borg", "species_8472"],
+        ["Xindi"] = ["xindi_reptilian", "xindi_insectoid", "xindi_aquatic", "xindi_primate", "xindi_arboreal"]
+    };
+
+    private List<SpeciesDto> FilteredSpecies
+    {
+        get
+        {
+            var list = _species.AsEnumerable();
+            if (!string.IsNullOrWhiteSpace(_searchText))
+            {
+                var q = _searchText.Trim().ToLowerInvariant();
+                list = list.Where(s =>
+                    s.Name.Contains(q, StringComparison.OrdinalIgnoreCase) ||
+                    s.HomeWorld.Contains(q, StringComparison.OrdinalIgnoreCase) ||
+                    s.IdealClimate.Contains(q, StringComparison.OrdinalIgnoreCase));
+            }
+            if (_filterQuadrant != "All" && _quadrantSpecies.TryGetValue(_filterQuadrant, out var ids))
+            {
+                list = list.Where(s => ids.Contains(s.Id.ToLowerInvariant()));
+            }
+            return list.ToList();
+        }
+    }
+
+    private List<TraitDto> FilteredAvailableTraits
+    {
+        get
+        {
+            var list = _traits.AsEnumerable();
+            if (_traitFilterCategory != "All")
+                list = list.Where(t => t.Category.Equals(_traitFilterCategory, StringComparison.OrdinalIgnoreCase));
+            // Exclude already current traits (unless pending remove) and already added
+            list = list.Where(t =>
+                !_currentGeneTraits.Contains(t.Id) || _pendingRemoveTraits.Contains(t.Id));
+            list = list.Where(t => !_pendingAddTraits.Contains(t.Id));
+            return list.ToList();
+        }
+    }
+
+    private int GeneModBudget => 5;
+    private int GeneModPointsUsed
+    {
+        get
+        {
+            int pts = 0;
+            foreach (var tid in _pendingAddTraits)
+            {
+                var t = _traits.FirstOrDefault(x => x.Id == tid);
+                if (t != null) pts += Math.Abs(t.Cost);
+            }
+            return pts;
+        }
+    }
+    private bool CanApplyGeneMod => (_pendingAddTraits.Count > 0 || _pendingRemoveTraits.Count > 0)
+                                     && GeneModPointsUsed <= GeneModBudget
+                                     && !string.IsNullOrEmpty(_geneModSpeciesId);
+
+    protected override async Task OnInitializedAsync()
+    {
+        _factionId = await LocalStorage.GetItemAsync<Guid?>("currentFactionId");
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        _loading = true;
+        try
+        {
+            _species = await Api.GetAllSpeciesAsync();
+            _traits = await Api.GetAllTraitsAsync();
+            if (_factionId.HasValue)
+                _demographics = await Api.GetDemographicsAsync(_factionId.Value);
+        }
+        catch
+        {
+            _species = [];
+            _traits = [];
+        }
+        _loading = false;
+    }
+
+    // ── Tab 1 ──
+    private void SelectSpecies(SpeciesDto sp)
+    {
+        _selectedSpecies = _selectedSpecies?.Id == sp.Id ? null : sp;
+    }
+
+    private string GetHabColor(double val)
+    {
+        if (val >= 0.8) return "rgba(46, 204, 113, 0.25)";
+        if (val >= 0.5) return "rgba(241, 196, 15, 0.25)";
+        if (val >= 0.2) return "rgba(230, 126, 34, 0.25)";
+        return "rgba(231, 76, 60, 0.25)";
+    }
+
+    // ── Tab 2 ──
+    private void ToggleColony(string colKey)
+    {
+        if (_expandedColonies.ContainsKey(colKey))
+            _expandedColonies[colKey] = !_expandedColonies[colKey];
+        else
+            _expandedColonies[colKey] = true;
+    }
+
+    private (string Cit, string Mil, string Liv) GetRightsEdit(string speciesId, SpeciesRightsData? existing)
+    {
+        if (_rightsEdits.TryGetValue(speciesId, out var edit))
+            return edit;
+        var cit = existing?.Citizenship ?? "Full";
+        var mil = existing?.MilitaryService ?? "Full";
+        var liv = existing?.LivingStandard ?? "Normal";
+        var val = (cit, mil, liv);
+        _rightsEdits[speciesId] = val;
+        return val;
+    }
+
+    private void UpdateRight(string speciesId, string? cit = null, string? mil = null, string? liv = null)
+    {
+        var current = GetRightsEdit(speciesId, null);
+        _rightsEdits[speciesId] = (
+            cit ?? current.Cit,
+            mil ?? current.Mil,
+            liv ?? current.Liv
+        );
+    }
+
+    private async Task ApplyRights(string speciesId)
+    {
+        if (!_factionId.HasValue) return;
+        var r = GetRightsEdit(speciesId, null);
+        try
+        {
+            await Api.SetSpeciesRightsAsync(_factionId.Value,
+                new SetSpeciesRightsRequest(speciesId, r.Cit, r.Mil, r.Liv));
+            Snackbar.Add($"Rights updated for {speciesId}", Severity.Success);
+            _demographics = await Api.GetDemographicsAsync(_factionId.Value);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Failed: {ex.Message}", Severity.Error);
+        }
+    }
+
+    // ── Tab 3 ──
+    private void OnGeneModSpeciesChanged(ChangeEventArgs e)
+    {
+        _geneModSpeciesId = e.Value?.ToString();
+        _pendingAddTraits.Clear();
+        _pendingRemoveTraits.Clear();
+        _currentGeneTraits.Clear();
+
+        if (!string.IsNullOrEmpty(_geneModSpeciesId))
+        {
+            var sp = _species.FirstOrDefault(s => s.Id == _geneModSpeciesId);
+            if (sp != null)
+                _currentGeneTraits = sp.TraitIds.ToList();
+        }
+    }
+
+    private void MarkRemoveTrait(string traitId)
+    {
+        if (!_pendingRemoveTraits.Contains(traitId))
+            _pendingRemoveTraits.Add(traitId);
+    }
+
+    private void UnmarkRemoveTrait(string traitId)
+    {
+        _pendingRemoveTraits.Remove(traitId);
+    }
+
+    private void ToggleAddTrait(string traitId)
+    {
+        if (_pendingAddTraits.Contains(traitId))
+            _pendingAddTraits.Remove(traitId);
+        else
+            _pendingAddTraits.Add(traitId);
+    }
+
+    private async Task ApplyGeneMod()
+    {
+        if (!_factionId.HasValue || string.IsNullOrEmpty(_geneModSpeciesId)) return;
+        try
+        {
+            var req = new GeneModRequest(
+                _geneModSpeciesId,
+                _pendingAddTraits.Count > 0 ? _pendingAddTraits.ToArray() : null,
+                _pendingRemoveTraits.Count > 0 ? _pendingRemoveTraits.ToArray() : null
+            );
+            var ok = await Api.ModifyGenesAsync(_factionId.Value, req);
+            if (ok)
+            {
+                Snackbar.Add("Gene modification applied successfully!", Severity.Success);
+                _pendingAddTraits.Clear();
+                _pendingRemoveTraits.Clear();
+                await LoadData();
+                // Refresh current traits
+                var sp = _species.FirstOrDefault(s => s.Id == _geneModSpeciesId);
+                if (sp != null)
+                    _currentGeneTraits = sp.TraitIds.ToList();
+            }
+            else
+            {
+                Snackbar.Add("Gene modification failed.", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error: {ex.Message}", Severity.Error);
+        }
+    }
+}
+
+<style>
+/* ═══════════════════════════════════ PAGE ═══════════════════════════════ */
+.species-page { flex: 1; padding: 24px; background: linear-gradient(180deg, rgba(8,12,21,0.97), rgba(15,22,35,0.95)); overflow-y: auto; color: #c8d4e8; font-family: 'Segoe UI', sans-serif; }
+.species-header { display: flex; align-items: center; gap: 20px; margin-bottom: 20px; flex-wrap: wrap; }
+.species-header h1 { font-family: var(--st-font-display); font-size: 24px; color: #ff9900; letter-spacing: 3px; margin: 0; }
+.species-header p { color: #a8c0d8; margin: 0; flex: 1; }
+
+/* Tab Bar */
+.tab-bar { display: flex; gap: 4px; }
+.tab-btn { padding: 8px 18px; background: transparent; border: 1px solid rgba(60, 90, 130, 0.3); border-radius: 6px; color: #88aacc; cursor: pointer; font-size: 12px; letter-spacing: 1px; transition: all 0.2s; }
+.tab-btn:hover { border-color: rgba(74, 158, 255, 0.4); color: #aaccee; }
+.tab-btn.active { background: rgba(74, 158, 255, 0.15); border-color: #4a9eff; color: #4a9eff; }
+
+.loading-indicator { text-align: center; padding: 60px; color: #667788; font-size: 14px; }
+.empty-state { grid-column: 1 / -1; text-align: center; padding: 60px 20px; }
+.empty-icon { font-size: 48px; display: block; margin-bottom: 16px; opacity: 0.5; }
+.empty-state p { color: #667788; max-width: 400px; margin: 0 auto; }
+
+.section-header { font-size: 11px; color: #667788; text-transform: uppercase; letter-spacing: 2px; margin: 16px 0 10px; padding-bottom: 4px; border-bottom: 1px solid rgba(60, 90, 130, 0.2); }
+
+/* ═══════════════════════════════ TAB 1: DATABASE ═════════════════════════ */
+.database-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; min-height: 500px; }
+
+/* Left Panel - Species List */
+.species-list-panel { display: flex; flex-direction: column; gap: 10px; }
+.search-bar { display: flex; }
+.search-input { flex: 1; padding: 8px 14px; background: rgba(20, 30, 45, 0.9); border: 1px solid rgba(60, 90, 130, 0.4); border-radius: 6px; color: #c8d4e8; font-size: 13px; outline: none; }
+.search-input:focus { border-color: #4a9eff; }
+.search-input::placeholder { color: #556677; }
+
+.quadrant-filters { display: flex; gap: 4px; flex-wrap: wrap; }
+.quadrant-btn { padding: 4px 10px; background: transparent; border: 1px solid rgba(60, 90, 130, 0.3); border-radius: 12px; color: #88aacc; cursor: pointer; font-size: 10px; letter-spacing: 0.5px; transition: all 0.2s; }
+.quadrant-btn:hover { border-color: rgba(74, 158, 255, 0.4); }
+.quadrant-btn.active { background: rgba(74, 158, 255, 0.15); border-color: #4a9eff; color: #4a9eff; }
+
+.species-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 8px; overflow-y: auto; max-height: calc(100vh - 240px); padding-right: 4px; }
+.species-card { background: rgba(20, 30, 45, 0.9); border: 1px solid rgba(60, 90, 130, 0.3); border-radius: 8px; padding: 10px 12px; display: flex; gap: 10px; cursor: pointer; transition: all 0.2s; align-items: center; }
+.species-card:hover { border-color: rgba(74, 158, 255, 0.5); background: rgba(25, 40, 60, 0.9); }
+.species-card.selected { border-color: #4a9eff; box-shadow: 0 0 12px rgba(74, 158, 255, 0.2); }
+.sp-icon { font-size: 26px; min-width: 34px; text-align: center; }
+.sp-info { flex: 1; min-width: 0; }
+.sp-name { font-weight: bold; font-size: 13px; color: #e8ecf0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sp-homeworld { font-size: 10px; color: #667788; margin-bottom: 4px; }
+.sp-traits-preview { display: flex; gap: 3px; flex-wrap: wrap; }
+.trait-tag { font-size: 9px; padding: 1px 6px; background: rgba(74, 158, 255, 0.12); border: 1px solid rgba(74, 158, 255, 0.25); border-radius: 6px; color: #88bbff; }
+
+/* Right Panel - Detail */
+.species-detail-panel { background: rgba(15, 22, 35, 0.95); border: 1px solid rgba(60, 90, 130, 0.4); border-radius: 10px; padding: 20px; overflow-y: auto; max-height: calc(100vh - 200px); opacity: 0; transform: translateX(10px); transition: opacity 0.3s, transform 0.3s; }
+.species-detail-panel.visible { opacity: 1; transform: translateX(0); }
+.detail-header { display: flex; align-items: center; gap: 14px; margin-bottom: 10px; }
+.detail-icon { font-size: 42px; }
+.detail-header h2 { margin: 0; font-size: 20px; color: #e8ecf0; }
+.detail-subtitle { font-size: 12px; display: block; }
+.detail-desc { font-size: 12px; color: #a8c0d8; margin: 0 0 10px; line-height: 1.5; }
+
+/* Modifier Bars */
+.modifier-bars { display: flex; flex-direction: column; gap: 5px; }
+.mod-row { display: flex; align-items: center; gap: 8px; }
+.mod-label { font-size: 11px; color: #88aacc; min-width: 80px; }
+.mod-bar-track { flex: 1; height: 6px; background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden; }
+.mod-bar-fill { height: 100%; border-radius: 3px; transition: width 0.3s; }
+.mod-value { font-size: 11px; min-width: 40px; text-align: right; font-weight: bold; }
+
+/* Upkeep */
+.upkeep-row { display: flex; gap: 20px; }
+.upkeep-item { font-size: 12px; color: #a8c0d8; }
+
+/* Habitability Pills */
+.habitability-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+.hab-pill { font-size: 10px; padding: 3px 10px; border-radius: 10px; color: #e8ecf0; border: 1px solid rgba(255,255,255,0.1); }
+
+/* Trait Detail Cards */
+.trait-cards { display: flex; flex-direction: column; gap: 6px; }
+.trait-card-detail { background: rgba(20, 30, 45, 0.8); border: 1px solid rgba(60, 90, 130, 0.3); border-radius: 6px; padding: 8px 12px; }
+.trait-card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+.trait-cat-badge { font-size: 9px; padding: 1px 8px; border-radius: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+.trait-cat-badge.physical { background: rgba(231, 76, 60, 0.2); color: #e74c3c; }
+.trait-cat-badge.biological { background: rgba(46, 204, 113, 0.2); color: #2ecc71; }
+.trait-cat-badge.mental { background: rgba(52, 152, 219, 0.2); color: #3498db; }
+.trait-cat-badge.psychic { background: rgba(155, 89, 182, 0.2); color: #9b59b6; }
+.trait-cat-badge.social { background: rgba(241, 196, 15, 0.2); color: #f1c40f; }
+.trait-cat-badge.special { background: rgba(230, 126, 34, 0.2); color: #e67e22; }
+.trait-cost { font-size: 10px; color: #667788; }
+.trait-card-name { font-size: 13px; font-weight: bold; color: #e8ecf0; }
+.trait-card-desc { font-size: 11px; color: #88aacc; margin-top: 2px; }
+
+/* Special Flags */
+.special-flags { display: flex; gap: 6px; flex-wrap: wrap; }
+.flag-pill { font-size: 10px; padding: 3px 10px; border-radius: 10px; background: rgba(60, 90, 130, 0.2); border: 1px solid rgba(60, 90, 130, 0.3); color: #a8c0d8; }
+.flag-pill.assimilable { border-color: rgba(46, 204, 113, 0.4); color: #2ecc71; }
+.flag-pill.immune { border-color: rgba(231, 76, 60, 0.4); color: #e74c3c; }
+.flag-pill.ketracel { border-color: rgba(155, 89, 182, 0.4); color: #9b59b6; }
+.flag-pill.organs { border-color: rgba(230, 126, 34, 0.4); color: #e67e22; }
+
+.no-selection { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: #556677; }
+.no-sel-icon { font-size: 48px; opacity: 0.3; margin-bottom: 12px; }
+.no-selection p { margin: 0; }
+
+/* ═══════════════════════════════ TAB 2: DEMOGRAPHICS ═════════════════════ */
+.demographics-section { max-width: 900px; }
+.demo-header-card { background: rgba(20, 30, 45, 0.9); border: 1px solid rgba(74, 158, 255, 0.3); border-radius: 10px; padding: 20px 24px; display: flex; align-items: baseline; gap: 10px; margin-bottom: 16px; }
+.demo-stat-big { font-size: 28px; font-weight: bold; color: #4a9eff; }
+.demo-stat-label { font-size: 14px; color: #88aacc; }
+
+/* Breakdown Bar Chart */
+.breakdown-chart { display: flex; flex-direction: column; gap: 6px; }
+.breakdown-row { display: flex; align-items: center; gap: 8px; padding: 6px 0; }
+.breakdown-row.compact { padding: 3px 0; }
+.br-icon { font-size: 18px; min-width: 24px; text-align: center; }
+.br-name { font-size: 12px; color: #c8d4e8; min-width: 110px; }
+.br-bar-track { flex: 1; height: 8px; background: rgba(255,255,255,0.06); border-radius: 4px; overflow: hidden; }
+.br-bar-fill { height: 100%; background: linear-gradient(90deg, #4a9eff, #6ab8ff); border-radius: 4px; transition: width 0.4s; min-width: 2px; }
+.br-count { font-size: 11px; color: #a8c0d8; min-width: 50px; text-align: right; }
+.br-pct { font-size: 11px; color: #667788; min-width: 40px; text-align: right; }
+
+/* Colony Demographics */
+.colony-demographics { display: flex; flex-direction: column; gap: 4px; }
+.colony-demo-block { background: rgba(20, 30, 45, 0.7); border: 1px solid rgba(60, 90, 130, 0.25); border-radius: 6px; overflow: hidden; }
+.colony-demo-header { display: flex; align-items: center; gap: 10px; padding: 10px 14px; cursor: pointer; transition: background 0.2s; }
+.colony-demo-header:hover { background: rgba(74, 158, 255, 0.05); }
+.expand-icon { font-size: 10px; color: #667788; min-width: 14px; }
+.col-name { font-size: 13px; color: #e8ecf0; font-weight: bold; flex: 1; }
+.col-pop-count { font-size: 11px; color: #667788; }
+.colony-demo-body { padding: 4px 14px 10px; border-top: 1px solid rgba(60, 90, 130, 0.15); }
+
+/* Species Rights */
+.rights-panel { display: flex; flex-direction: column; gap: 8px; }
+.rights-row { background: rgba(20, 30, 45, 0.8); border: 1px solid rgba(60, 90, 130, 0.25); border-radius: 8px; padding: 12px 14px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.rights-species { display: flex; align-items: center; gap: 8px; min-width: 140px; }
+.rights-sp-name { font-size: 13px; color: #e8ecf0; font-weight: bold; }
+.rights-selects { display: flex; gap: 10px; flex: 1; align-items: flex-end; flex-wrap: wrap; }
+.rights-field { display: flex; flex-direction: column; gap: 2px; }
+.rights-field label { font-size: 9px; color: #667788; text-transform: uppercase; letter-spacing: 0.5px; }
+.rights-field select { padding: 5px 8px; background: rgba(15, 22, 35, 0.9); border: 1px solid rgba(60, 90, 130, 0.4); border-radius: 4px; color: #c8d4e8; font-size: 12px; outline: none; cursor: pointer; }
+.rights-field select:focus { border-color: #4a9eff; }
+.btn-apply-rights { padding: 6px 14px; background: linear-gradient(135deg, #1a6b3a, #0d4d26); border: 1px solid #2a8b4a; border-radius: 4px; color: #7cfc7c; font-size: 11px; cursor: pointer; letter-spacing: 0.5px; align-self: flex-end; }
+.btn-apply-rights:hover { background: linear-gradient(135deg, #228b42, #1a6b3a); }
+
+/* ═══════════════════════════════ TAB 3: GENE MOD ═════════════════════════ */
+.lock-message { text-align: center; padding: 80px 20px; }
+.lock-icon { font-size: 48px; display: block; margin-bottom: 16px; opacity: 0.4; }
+.lock-message p { color: #667788; font-size: 14px; }
+
+.genemod-section { max-width: 1100px; }
+.genemod-selector { margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+.genemod-selector label { font-size: 13px; color: #88aacc; }
+.genemod-select { padding: 8px 12px; background: rgba(20, 30, 45, 0.9); border: 1px solid rgba(60, 90, 130, 0.4); border-radius: 6px; color: #c8d4e8; font-size: 13px; min-width: 280px; outline: none; cursor: pointer; }
+.genemod-select:focus { border-color: #4a9eff; }
+
+.genemod-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.genemod-col { background: rgba(15, 22, 35, 0.8); border: 1px solid rgba(60, 90, 130, 0.3); border-radius: 8px; padding: 14px; }
+.genemod-col-header { font-size: 13px; font-weight: bold; color: #ff9900; letter-spacing: 1px; margin-bottom: 12px; text-transform: uppercase; }
+
+.trait-category-tabs { display: flex; gap: 3px; flex-wrap: wrap; margin-bottom: 10px; }
+.trait-cat-tab { padding: 3px 8px; background: transparent; border: 1px solid rgba(60, 90, 130, 0.25); border-radius: 10px; color: #88aacc; cursor: pointer; font-size: 9px; letter-spacing: 0.3px; transition: all 0.15s; }
+.trait-cat-tab:hover { border-color: rgba(74, 158, 255, 0.4); }
+.trait-cat-tab.active { background: rgba(74, 158, 255, 0.15); border-color: #4a9eff; color: #4a9eff; }
+
+.genemod-trait-list { display: flex; flex-direction: column; gap: 6px; max-height: 400px; overflow-y: auto; padding-right: 4px; }
+.genemod-trait-card { background: rgba(20, 30, 45, 0.8); border: 1px solid rgba(60, 90, 130, 0.3); border-radius: 6px; padding: 8px 10px; display: flex; align-items: center; gap: 8px; transition: all 0.2s; }
+.genemod-trait-card.available { cursor: pointer; flex-direction: column; align-items: stretch; }
+.genemod-trait-card.available:hover { border-color: rgba(46, 204, 113, 0.5); }
+.genemod-trait-card.added { border-color: #2ecc71; background: rgba(46, 204, 113, 0.08); }
+.genemod-trait-card.removing { opacity: 0.4; border-color: rgba(231, 76, 60, 0.4); }
+.gm-trait-info { display: flex; align-items: center; gap: 8px; flex: 1; }
+.gm-trait-name { font-size: 12px; color: #e8ecf0; font-weight: bold; flex: 1; }
+.gm-trait-cost { font-size: 10px; color: #667788; }
+.gm-trait-desc { font-size: 10px; color: #88aacc; margin-top: 2px; }
+.added-badge { font-size: 9px; color: #2ecc71; font-weight: bold; letter-spacing: 1px; align-self: flex-end; }
+
+.btn-remove-trait { background: transparent; border: 1px solid rgba(231, 76, 60, 0.4); border-radius: 4px; color: #e74c3c; cursor: pointer; font-size: 14px; padding: 2px 8px; line-height: 1; }
+.btn-remove-trait:hover { background: rgba(231, 76, 60, 0.15); }
+.btn-undo-trait { background: transparent; border: 1px solid rgba(74, 158, 255, 0.4); border-radius: 4px; color: #4a9eff; cursor: pointer; font-size: 14px; padding: 2px 8px; line-height: 1; }
+.btn-undo-trait:hover { background: rgba(74, 158, 255, 0.15); }
+
+.no-traits-msg { font-size: 12px; color: #556677; font-style: italic; padding: 8px 0; }
+
+/* Gene Mod Summary */
+.genemod-summary { margin-top: 16px; background: rgba(20, 30, 45, 0.9); border: 1px solid rgba(60, 90, 130, 0.4); border-radius: 8px; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; }
+.gm-summary-stats { display: flex; gap: 20px; font-size: 12px; color: #a8c0d8; }
+.gm-summary-stats strong { color: #e8ecf0; }
+.btn-apply-genemod { padding: 10px 24px; background: linear-gradient(135deg, #1a6b3a, #0d4d26); border: 1px solid #2a8b4a; border-radius: 6px; color: #7cfc7c; font-size: 13px; cursor: pointer; letter-spacing: 1px; font-weight: bold; transition: all 0.2s; }
+.btn-apply-genemod:hover { background: linear-gradient(135deg, #228b42, #1a6b3a); box-shadow: 0 0 12px rgba(46, 204, 113, 0.2); }
+.btn-apply-genemod.disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ═══════════════════════════════ RESPONSIVE ═════════════════════════════ */
+@@media (max-width: 900px) {
+    .database-layout { grid-template-columns: 1fr; }
+    .genemod-columns { grid-template-columns: 1fr; }
+    .species-grid { max-height: 300px; }
+    .rights-row { flex-direction: column; align-items: stretch; }
+}
+</style>

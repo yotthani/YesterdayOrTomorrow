@@ -73,6 +73,7 @@
                                 <button class="order-btn @(_currentOrder == "patrol" ? "active" : "")" @onclick='() => IssueOrder("patrol")'><span class="order-icon">🔄</span><span class="order-text">PATROL</span></button>
                                 <button class="order-btn @(_currentOrder == "orbit" ? "active" : "")" @onclick='() => IssueOrder("orbit")'><span class="order-icon">🌍</span><span class="order-text">ORBIT</span></button>
                                 <button class="order-btn aggressive @(_currentOrder == "attack" ? "active" : "")" @onclick='() => IssueOrder("attack")'><span class="order-icon">⚔</span><span class="order-text">ATTACK</span></button>
+                                <a href="/game/combat-doctrine/@_selectedFleet?.Id" class="order-btn"><span class="order-icon">📋</span><span class="order-text">DOCTRINE</span></a>
                             </div>
                         </div>
                     }

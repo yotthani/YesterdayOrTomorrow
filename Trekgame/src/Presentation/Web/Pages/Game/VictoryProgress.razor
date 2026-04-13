@@ -124,78 +124,160 @@
 
 @code {
     private List<VictoryConditionData> _victoryConditions = new();
-    private List<FactionStanding> _factionStandings = new();
+    private List<FactionStandingDisplay> _factionStandings = new();
+    private Guid _gameId;
+    private Guid _factionId;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        LoadVictoryData();
+        _gameId = await LocalStorage.GetItemAsync<Guid>("currentGameId");
+        _factionId = await LocalStorage.GetItemAsync<Guid>("currentFactionId");
+
+        await LoadVictoryData();
     }
 
-    private void LoadVictoryData()
+    private async Task LoadVictoryData()
+    {
+        try
+        {
+            // Load victory progress from API
+            var progress = await Api.GetVictoryProgressAsync(_gameId, _factionId);
+            var standings = await Api.GetFactionStandingsAsync(_gameId);
+
+            if (progress.Any())
+            {
+                _victoryConditions = progress.Select(p => new VictoryConditionData
+                {
+                    Name = p.Name,
+                    Type = p.Type,
+                    Icon = GetVictoryIcon(p.Type),
+                    Description = GetVictoryDescription(p.Type),
+                    Percentage = p.Percentage,
+                    ProgressText = p.ProgressText,
+                    Tips = GetVictoryTip(p.Type)
+                }).ToList();
+            }
+            else
+            {
+                LoadFallbackVictoryData();
+            }
+
+            if (standings.Any())
+            {
+                var maxScore = standings.Max(s => s.Score);
+                _factionStandings = standings.Select((s, i) => new FactionStandingDisplay
+                {
+                    Rank = i + 1,
+                    Name = s.Name,
+                    Icon = GetRaceIcon(s.RaceId),
+                    Systems = s.Systems,
+                    Fleets = s.Fleets,
+                    Score = s.Score,
+                    ScorePercent = maxScore > 0 ? s.Score * 100 / maxScore : 0,
+                    Color = GetRaceColor(s.RaceId),
+                    IsPlayer = s.FactionId == _factionId,
+                    IsDefeated = s.IsDefeated
+                }).ToList();
+            }
+            else
+            {
+                LoadFallbackStandings();
+            }
+        }
+        catch
+        {
+            LoadFallbackVictoryData();
+            LoadFallbackStandings();
+        }
+    }
+
+    private void LoadFallbackVictoryData()
     {
         _victoryConditions = new List<VictoryConditionData>
         {
-            new()
-            {
-                Name = "Domination",
-                Type = "Domination",
-                Icon = "👑",
-                Description = "Control 75% of all star systems through colonization or conquest. Show the galaxy who truly rules.",
-                Percentage = 35,
-                ProgressText = "7 / 20 systems controlled",
-                Tips = "Focus on expanding to unclaimed systems first, then consider military action."
-            },
-            new()
-            {
-                Name = "Conquest",
-                Type = "Conquest",
-                Icon = "⚔️",
-                Description = "Eliminate all rival factions by destroying their fleets and colonies. Only one empire can remain.",
-                Percentage = 20,
-                ProgressText = "1 / 5 factions eliminated",
-                Tips = "Build a powerful military and target weaker opponents first."
-            },
-            new()
-            {
-                Name = "Economic",
-                Type = "Economic",
-                Icon = "💰",
-                Description = "Accumulate 50,000 credits through trade, production, and shrewd management of your empire's resources.",
-                Percentage = 48,
-                ProgressText = "24,150 / 50,000 credits",
-                Tips = "Build trade posts and establish trade agreements with other factions."
-            },
-            new()
-            {
-                Name = "Scientific",
-                Type = "Scientific",
-                Icon = "🔬",
-                Description = "Research all available technologies, proving your faction's intellectual superiority.",
-                Percentage = 60,
-                ProgressText = "12 / 20 technologies researched",
-                Tips = "Prioritize research buildings and assign scientists to laboratories."
-            },
-            new()
-            {
-                Name = "Diplomatic",
-                Type = "Diplomatic",
-                Icon = "🤝",
-                Description = "Form alliances with all surviving factions, uniting the galaxy through peace and cooperation.",
-                Percentage = 25,
-                ProgressText = "1 / 4 alliances formed",
-                Tips = "Improve relations through gifts and trade agreements before proposing alliances."
-            }
-        };
-
-        _factionStandings = new List<FactionStanding>
-        {
-            new() { Rank = 1, Name = "United Federation", Icon = "🌐", Systems = 7, Fleets = 4, Score = 2450, ScorePercent = 100, Color = "#4a9eff", IsPlayer = true },
-            new() { Rank = 2, Name = "Klingon Empire", Icon = "⚔️", Systems = 6, Fleets = 5, Score = 2100, ScorePercent = 86, Color = "#8B0000", IsPlayer = false },
-            new() { Rank = 3, Name = "Romulan Star Empire", Icon = "🦅", Systems = 5, Fleets = 3, Score = 1800, ScorePercent = 73, Color = "#006400", IsPlayer = false },
-            new() { Rank = 4, Name = "Cardassian Union", Icon = "🐍", Systems = 4, Fleets = 3, Score = 1400, ScorePercent = 57, Color = "#4a4a6a", IsPlayer = false },
-            new() { Rank = 5, Name = "Ferengi Alliance", Icon = "💰", Systems = 3, Fleets = 2, Score = 1100, ScorePercent = 45, Color = "#FFD700", IsPlayer = false },
+            new() { Name = "Domination", Type = "Domination", Icon = "\U0001f451", Description = "Control 75% of all star systems.", Percentage = 0, ProgressText = "0/0 systems", Tips = "Expand to unclaimed systems first." },
+            new() { Name = "Conquest", Type = "Conquest", Icon = "\u2694\ufe0f", Description = "Eliminate all rival factions.", Percentage = 0, ProgressText = "0/0 eliminated", Tips = "Build military and target weaker foes." },
+            new() { Name = "Economic", Type = "Economic", Icon = "\U0001f4b0", Description = "Accumulate 50,000 credits.", Percentage = 0, ProgressText = "0/50,000 credits", Tips = "Build trade posts and trade agreements." },
+            new() { Name = "Scientific", Type = "Scientific", Icon = "\U0001f52c", Description = "Research all technologies.", Percentage = 0, ProgressText = "0/0 technologies", Tips = "Prioritize research buildings." },
+            new() { Name = "Diplomatic", Type = "Diplomatic", Icon = "\U0001f91d", Description = "Form alliances with all factions.", Percentage = 0, ProgressText = "0/0 alliances", Tips = "Improve relations through gifts first." },
         };
     }
+
+    private void LoadFallbackStandings()
+    {
+        _factionStandings = new List<FactionStandingDisplay>
+        {
+            new() { Rank = 1, Name = "Your Faction", Icon = "\U0001f310", Systems = 0, Fleets = 0, Score = 0, ScorePercent = 100, Color = "#4a9eff", IsPlayer = true },
+        };
+    }
+
+    private static string GetVictoryIcon(string type) => type switch
+    {
+        "Domination" => "\U0001f451",
+        "Conquest" => "\u2694\ufe0f",
+        "Economic" => "\U0001f4b0",
+        "Scientific" => "\U0001f52c",
+        "Diplomatic" => "\U0001f91d",
+        _ => "\u2b50"
+    };
+
+    private static string GetVictoryDescription(string type) => type switch
+    {
+        "Domination" => "Control 75% of all star systems through colonization or conquest. Show the galaxy who truly rules.",
+        "Conquest" => "Eliminate all rival factions by destroying their fleets and colonies. Only one empire can remain.",
+        "Economic" => "Accumulate 50,000 credits through trade, production, and shrewd management of your empire's resources.",
+        "Scientific" => "Research all available technologies, proving your faction's intellectual superiority.",
+        "Diplomatic" => "Form alliances with all surviving factions, uniting the galaxy through peace and cooperation.",
+        _ => ""
+    };
+
+    private static string GetVictoryTip(string type) => type switch
+    {
+        "Domination" => "Focus on expanding to unclaimed systems first, then consider military action.",
+        "Conquest" => "Build a powerful military and target weaker opponents first.",
+        "Economic" => "Build trade posts and establish trade agreements with other factions.",
+        "Scientific" => "Prioritize research buildings and assign scientists to laboratories.",
+        "Diplomatic" => "Improve relations through gifts and trade agreements before proposing alliances.",
+        _ => ""
+    };
+
+    private static string GetRaceIcon(string raceId) => (raceId?.ToLower() ?? "") switch
+    {
+        "federation" => "\U0001f310",
+        "klingon" => "\u2694\ufe0f",
+        "romulan" => "\U0001f985",
+        "cardassian" => "\U0001f40d",
+        "ferengi" => "\U0001f4b0",
+        "bajoran" => "\U0001f54a\ufe0f",
+        "borg" => "\U0001f916",
+        "dominion" => "\U0001f47e",
+        "tholian" => "\U0001f48e",
+        "gorn" => "\U0001f98e",
+        "breen" => "\u2744\ufe0f",
+        "orion" => "\U0001f5e1\ufe0f",
+        "kazon" => "\U0001f525",
+        "hirogen" => "\U0001f3af",
+        _ => "\u2b50"
+    };
+
+    private static string GetRaceColor(string raceId) => (raceId?.ToLower() ?? "") switch
+    {
+        "federation" => "#4a9eff",
+        "klingon" => "#8B0000",
+        "romulan" => "#006400",
+        "cardassian" => "#4a4a6a",
+        "ferengi" => "#FFD700",
+        "bajoran" => "#DEB887",
+        "borg" => "#00ff66",
+        "dominion" => "#800080",
+        "tholian" => "#ff4500",
+        "gorn" => "#556B2F",
+        "breen" => "#87ceeb",
+        "orion" => "#228B22",
+        "kazon" => "#D2691E",
+        "hirogen" => "#708090",
+        _ => "#888888"
+    };
 
     private class VictoryConditionData
     {
@@ -208,7 +290,7 @@
         public string? Tips { get; set; }
     }
 
-    private class FactionStanding
+    private class FactionStandingDisplay
     {
         public int Rank { get; set; }
         public string Name { get; set; } = "";
@@ -219,5 +301,6 @@
         public int ScorePercent { get; set; }
         public string Color { get; set; } = "";
         public bool IsPlayer { get; set; }
+        public bool IsDefeated { get; set; }
     }
 }

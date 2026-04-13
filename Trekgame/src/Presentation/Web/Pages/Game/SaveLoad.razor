@@ -1,6 +1,6 @@
 @page "/game/save-load"
+@page "/game/saves"
 @using MudBlazor
-@layout StellarisLayout
 @using StarTrekGame.Web.Services
 @using Blazored.LocalStorage
 @using System.Text.Json
@@ -11,6 +11,7 @@
 @inject ILocalStorageService LocalStorage
 @inject ISoundService Sound
 @inject IJSRuntime JS
+@inject ThemeService ThemeService
 
 <PageTitle>Save/Load Game - Galactic Strategy</PageTitle>
 
@@ -37,15 +38,22 @@
                                             Turn @_currentGame.Turn • @_currentGame.Factions.Count Factions
                                         </MudText>
                                     </div>
-                                    <MudButton Variant="Variant.Filled" Color="Color.Success" 
-                                               StartIcon="@Icons.Material.Filled.Save"
-                                               OnClick="SaveGame" Disabled="_saving">
-                                        @if (_saving)
-                                        {
-                                            <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
-                                        }
-                                        Save to File
-                                    </MudButton>
+                                    <MudStack Row="true" Spacing="2">
+                                        <MudButton Variant="Variant.Filled" Color="Color.Success"
+                                                   StartIcon="@Icons.Material.Filled.Save"
+                                                   OnClick="SaveGame" Disabled="_saving">
+                                            @if (_saving)
+                                            {
+                                                <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
+                                            }
+                                            Save to File
+                                        </MudButton>
+                                        <MudButton Variant="Variant.Filled" Color="Color.Primary"
+                                                   StartIcon="@Icons.Material.Filled.CloudUpload"
+                                                   OnClick="SaveToServer" Disabled="_saving">
+                                            Save to Server
+                                        </MudButton>
+                                    </MudStack>
                                 </MudStack>
                             </MudCardContent>
                         </MudCard>
@@ -109,8 +117,8 @@
                     
                     <MudDivider Class="my-4" />
                     
-                    <MudText Typo="Typo.h6" Class="mb-4" Color="Color.Secondary">Recent Games</MudText>
-                    
+                    <MudText Typo="Typo.h6" Class="mb-4" Color="Color.Secondary">Saved Games & Recent Sessions</MudText>
+
                     @if (_saveSlots.Any())
                     {
                         <MudList T="SaveSlotInfo" Dense="true">
@@ -119,15 +127,35 @@
                                 <MudListItem>
                                     <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Style="width: 100%;">
                                         <div>
-                                            <MudText Typo="Typo.body1">@slot.Name</MudText>
+                                            <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+                                                <MudText Typo="Typo.body1">@slot.Name</MudText>
+                                                @if (slot.IsServerSave)
+                                                {
+                                                    <MudChip T="string" Size="Size.Small" Color="Color.Primary">☁ Server</MudChip>
+                                                }
+                                            </MudStack>
                                             <MudText Typo="Typo.caption" Color="Color.Secondary">
-                                                Turn @slot.Turn • @slot.FactionCount factions • @slot.SavedAt.ToLocalTime().ToString("g")
+                                                Turn @slot.Turn • @(slot.FactionCount > 0 ? $"{slot.FactionCount} factions • " : "")@slot.SavedAt.ToLocalTime().ToString("g")
                                             </MudText>
                                         </div>
-                                        <MudButton Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
-                                                   OnClick="async () => await LoadFromServer(slot.GameId)">
-                                            Load
-                                        </MudButton>
+                                        <MudStack Row="true" Spacing="1">
+                                            @if (slot.IsServerSave && slot.SaveId.HasValue)
+                                            {
+                                                <MudButton Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
+                                                           OnClick="async () => await LoadServerSave(slot.SaveId!.Value)">
+                                                    Load
+                                                </MudButton>
+                                                <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" Size="Size.Small"
+                                                               OnClick="async () => await DeleteServerSave(slot.SaveId!.Value)" />
+                                            }
+                                            else
+                                            {
+                                                <MudButton Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small"
+                                                           OnClick="async () => await LoadFromServer(slot.GameId)">
+                                                    Load
+                                                </MudButton>
+                                            }
+                                        </MudStack>
                                     </MudStack>
                                 </MudListItem>
                             }
@@ -135,7 +163,7 @@
                     }
                     else
                     {
-                        <MudText Color="Color.Secondary">No saved games found on server.</MudText>
+                        <MudText Color="Color.Secondary">No saved games found.</MudText>
                     }
                 </div>
             </MudTabPanel>
@@ -164,6 +192,8 @@
 
     protected override async Task OnInitializedAsync()
     {
+        // Main menu pages always use default theme
+        await ThemeService.ApplyTemporaryThemeAsync("default");
         await LoadCurrentGame();
         await LoadSaveSlots();
     }
@@ -314,6 +344,87 @@
         finally
         {
             _loading = false;
+        }
+    }
+
+    private async Task SaveToServer()
+    {
+        if (_currentGame == null) return;
+
+        _saving = true;
+        try
+        {
+            await Sound.PlaySelectAsync();
+
+            var saveName = $"{_currentGame.Name} - Turn {_currentGame.Turn}";
+            var result = await Api.SaveToServerAsync(_currentGame.Id, saveName);
+
+            if (result.Success)
+            {
+                await Sound.PlaySuccessAsync();
+                Snackbar.Add(result.Message, Severity.Success);
+                await LoadSaveSlots(); // Refresh list
+            }
+            else
+            {
+                await Sound.PlayErrorAsync();
+                Snackbar.Add(result.Message, Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            await Sound.PlayErrorAsync();
+            Snackbar.Add($"Server save failed: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _saving = false;
+        }
+    }
+
+    private async Task LoadServerSave(Guid saveId)
+    {
+        _loading = true;
+        try
+        {
+            await Sound.PlayWarpAsync();
+
+            var result = await Api.LoadFromServerAsync(saveId);
+            if (result.Success && result.GameId.HasValue)
+            {
+                await LocalStorage.SetItemAsync("currentGameId", result.GameId.Value);
+                await Sound.PlaySuccessAsync();
+                Snackbar.Add(result.Message, Severity.Success);
+                Navigation.NavigateTo("/game/overview");
+            }
+            else
+            {
+                await Sound.PlayErrorAsync();
+                Snackbar.Add(result.Message, Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            await Sound.PlayErrorAsync();
+            Snackbar.Add($"Load failed: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private async Task DeleteServerSave(Guid saveId)
+    {
+        try
+        {
+            await Api.DeleteSaveAsync(saveId);
+            Snackbar.Add("Save deleted", Severity.Info);
+            await LoadSaveSlots(); // Refresh list
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Delete failed: {ex.Message}", Severity.Error);
         }
     }
 

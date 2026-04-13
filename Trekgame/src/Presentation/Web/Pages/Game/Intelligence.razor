@@ -999,14 +999,49 @@
     protected override async Task OnInitializedAsync()
     {
         _factionGuid = await LocalStorage.GetItemAsync<Guid?>("currentFactionId");
+
+        // Always load mission definitions from API
+        await LoadMissionDefinitions();
+
         if (_factionGuid.HasValue)
         {
             await LoadFromApi();
         }
+
         // Fallback to mock if API didn't load anything
         if (!_agents.Any())
         {
             LoadIntelData();
+        }
+    }
+
+    private async Task LoadMissionDefinitions()
+    {
+        try
+        {
+            var defs = await Api.GetAvailableMissionsAsync();
+            _availableMissions = defs.Select(d => new MissionType
+            {
+                Type = d.Type, Name = d.Name, Icon = d.Icon,
+                Description = d.Description, Duration = d.Duration,
+                BaseSuccess = d.BaseSuccess, DetectionRisk = d.DetectionRisk,
+                RequiredIntel = 0
+            }).ToList();
+        }
+        catch
+        {
+            // Fallback: basic mission set
+            if (!_availableMissions.Any())
+            {
+                _availableMissions = new List<MissionType>
+                {
+                    new() { Type = "GatherIntel", Name = "Gather Intelligence", Icon = "👁️", Description = "Collect information about the target faction.", Duration = 5, BaseSuccess = 80, DetectionRisk = 10 },
+                    new() { Type = "StealTech", Name = "Steal Technology", Icon = "💾", Description = "Steal technological secrets and research data.", Duration = 10, BaseSuccess = 50, DetectionRisk = 40 },
+                    new() { Type = "Sabotage", Name = "Sabotage Infrastructure", Icon = "💥", Description = "Damage enemy buildings or production.", Duration = 8, BaseSuccess = 60, DetectionRisk = 50 },
+                    new() { Type = "Assassination", Name = "Targeted Elimination", Icon = "☠️", Description = "Eliminate key enemy personnel.", Duration = 15, BaseSuccess = 30, DetectionRisk = 70 },
+                    new() { Type = "CounterIntelligence", Name = "Counter-Intelligence", Icon = "🛡️", Description = "Hunt enemy agents in your territory.", Duration = 5, BaseSuccess = 70, DetectionRisk = 0 }
+                };
+            }
         }
     }
 
@@ -1056,8 +1091,8 @@
     {
         _activeOperations = new List<ActiveOperation>
         {
-            new() { Id = Guid.NewGuid(), Name = "Operation Shadow Net", Type = "surveillance", TargetName = "Romulan Star Empire", Status = "In Progress", Progress = 65, TurnsRemaining = 2, SuccessChance = 78, DetectionRisk = 15 },
-            new() { Id = Guid.NewGuid(), Name = "Tech Acquisition Alpha", Type = "tech_theft", TargetName = "Cardassian Union", Status = "In Progress", Progress = 30, TurnsRemaining = 4, SuccessChance = 62, DetectionRisk = 35 }
+            new() { Id = Guid.NewGuid(), Name = "Operation Shadow Net", Type = "GatherIntel", TargetName = "Romulan Star Empire", Status = "In Progress", Progress = 65, TurnsRemaining = 2, SuccessChance = 78, DetectionRisk = 15 },
+            new() { Id = Guid.NewGuid(), Name = "Tech Acquisition Alpha", Type = "StealTech", TargetName = "Cardassian Union", Status = "In Progress", Progress = 30, TurnsRemaining = 4, SuccessChance = 62, DetectionRisk = 35 }
         };
 
         _factions = new List<FactionIntel>
@@ -1085,14 +1120,19 @@
             new() { Id = Guid.NewGuid(), Name = "Agent Mirage", Level = 2, Specialty = "Rookie", Status = "Available", Infiltration = 50, Sabotage = 45, TechTheft = 55 }
         };
 
-        _availableMissions = new List<MissionType>
+        // Missions should be loaded from API via LoadMissionDefinitions()
+        // This is only reached if the API was unreachable AND no missions loaded
+        if (!_availableMissions.Any())
         {
-            new() { Type = "surveillance", Name = "Surveillance Operation", Icon = "👁️", Description = "Gather general intelligence on target faction activities and movements.", Duration = 3, BaseSuccess = 80, DetectionRisk = 10, RequiredIntel = 0 },
-            new() { Type = "infiltration", Name = "Deep Infiltration", Icon = "🕵️", Description = "Plant an agent for long-term intelligence gathering.", Duration = 5, BaseSuccess = 65, DetectionRisk = 25, RequiredIntel = 30 },
-            new() { Type = "tech_theft", Name = "Technology Acquisition", Icon = "💾", Description = "Steal technological secrets and research data.", Duration = 4, BaseSuccess = 55, DetectionRisk = 40, RequiredIntel = 50 },
-            new() { Type = "sabotage", Name = "Sabotage Mission", Icon = "💥", Description = "Disrupt enemy operations, production, or military assets.", Duration = 4, BaseSuccess = 60, DetectionRisk = 50, RequiredIntel = 60 },
-            new() { Type = "assassination", Name = "Targeted Elimination", Icon = "☠️", Description = "Eliminate key enemy personnel. High risk operation.", Duration = 6, BaseSuccess = 45, DetectionRisk = 70, RequiredIntel = 80 }
-        };
+            _availableMissions = new List<MissionType>
+            {
+                new() { Type = "GatherIntel", Name = "Gather Intelligence", Icon = "👁️", Description = "Collect information about the target faction.", Duration = 5, BaseSuccess = 80, DetectionRisk = 10, RequiredIntel = 0 },
+                new() { Type = "EstablishNetwork", Name = "Establish Network", Icon = "🕸️", Description = "Build a spy network in target territory.", Duration = 6, BaseSuccess = 75, DetectionRisk = 15, RequiredIntel = 0 },
+                new() { Type = "StealTech", Name = "Steal Technology", Icon = "💾", Description = "Steal technological secrets and research data.", Duration = 10, BaseSuccess = 50, DetectionRisk = 40, RequiredIntel = 50 },
+                new() { Type = "Sabotage", Name = "Sabotage Infrastructure", Icon = "💥", Description = "Damage enemy buildings or production.", Duration = 8, BaseSuccess = 60, DetectionRisk = 50, RequiredIntel = 60 },
+                new() { Type = "Assassination", Name = "Targeted Elimination", Icon = "☠️", Description = "Eliminate key enemy personnel.", Duration = 15, BaseSuccess = 30, DetectionRisk = 70, RequiredIntel = 80 }
+            };
+        }
 
         _recentSuccesses = new List<string>
         {
@@ -1239,11 +1279,19 @@
 
     private string GetOperationIcon(string type) => type switch
     {
+        "GatherIntel" => "👁️",
+        "EstablishNetwork" => "🕸️",
+        "StealTech" => "💾",
+        "Sabotage" or "SabotageShipyard" => "💥",
+        "Assassination" => "☠️",
+        "InciteUnrest" => "📢",
+        "CounterIntelligence" => "🛡️",
+        "SmearCampaign" => "📰",
+        "DiplomaticIncident" => "⚡",
+        // Legacy fallbacks
         "surveillance" => "👁️",
         "infiltration" => "🕵️",
         "tech_theft" => "💾",
-        "sabotage" => "💥",
-        "assassination" => "☠️",
         _ => "🎯"
     };
 

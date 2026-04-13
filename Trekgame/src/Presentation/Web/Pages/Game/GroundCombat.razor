@@ -1,0 +1,636 @@
+@page "/game/ground-combat/{ColonyId:guid}"
+@layout StellarisLayout
+@implements IDisposable
+@using MudBlazor
+@using StarTrekGame.Web.Services
+@using Blazored.LocalStorage
+@inject IGameApiClient Api
+@inject NavigationManager Navigation
+@inject ILocalStorageService LocalStorage
+@inject ISnackbar Snackbar
+
+<PageTitle>Ground Combat - Galactic Strategy</PageTitle>
+
+<div class="gc-page">
+    @if (_isLoading)
+    {
+        <div class="gc-loading"><span class="gc-spinner"></span><span>Loading ground combat data...</span></div>
+    }
+    else
+    {
+        @* ── Header ── *@
+        <div class="gc-header">
+            <h1>GROUND COMBAT</h1>
+            <div class="gc-colony-info">
+                <span class="gc-colony-name">@_colonyName</span>
+                <span class="gc-invasion-status @GetInvasionStatusClass()">@GetInvasionStatusText()</span>
+            </div>
+            <a href="/game/colonies" class="st-btn sm">← BACK TO COLONIES</a>
+        </div>
+
+        @if (!string.IsNullOrEmpty(_errorMessage))
+        {
+            <div class="gc-error">@_errorMessage</div>
+        }
+
+        @* ── Two-Panel Combat Layout ── *@
+        <div class="gc-combat-layout">
+            @* Left: Attacker / Invasion Force *@
+            <div class="gc-force-panel gc-attacker">
+                <div class="gc-panel-header attacker">
+                    <span class="gc-panel-icon">⚔</span>
+                    <span class="gc-panel-title">INVASION FORCE</span>
+                    <span class="gc-army-count">@_embarkedArmies.Count Armies</span>
+                </div>
+                <div class="gc-army-list">
+                    @if (_embarkedArmies.Any())
+                    {
+                        @foreach (var army in _embarkedArmies)
+                        {
+                            <div class="gc-army-row">
+                                <div class="gc-army-icon attacker">⚔</div>
+                                <div class="gc-army-info">
+                                    <span class="gc-army-name">@army.Name</span>
+                                    <span class="gc-army-type">@army.ArmyType</span>
+                                </div>
+                                <div class="gc-army-stats">
+                                    <div class="gc-stat"><span class="gc-stat-label">ATK</span><span class="gc-stat-value atk">@army.AttackPower</span></div>
+                                    <div class="gc-stat"><span class="gc-stat-label">DEF</span><span class="gc-stat-value def">@army.DefensePower</span></div>
+                                    <div class="gc-stat"><span class="gc-stat-label">HP</span><span class="gc-stat-value hp">@army.HitPoints/@army.MaxHitPoints</span></div>
+                                </div>
+                                <div class="gc-army-meta">
+                                    <div class="gc-morale-bar"><div class="gc-morale-fill" style="width:@army.Morale%"></div></div>
+                                    <span class="gc-experience @army.Experience.ToLower()">@army.Experience</span>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="gc-empty-list"><span class="gc-empty-icon">🚀</span><p>No armies embarked on fleet</p><p class="gc-empty-hint">Embark armies from the management section below</p></div>
+                    }
+                </div>
+                <div class="gc-panel-footer">
+                    <span>Total ATK: @_embarkedArmies.Sum(a => a.AttackPower)</span>
+                    <span>Avg Morale: @(_embarkedArmies.Any() ? _embarkedArmies.Average(a => a.Morale).ToString("F0") : "0")%</span>
+                </div>
+            </div>
+
+            @* Center: Controls *@
+            <div class="gc-center-controls">
+                <div class="gc-bombardment-section">
+                    <div class="gc-section-label">ORBITAL BOMBARDMENT</div>
+                    <div class="gc-bombardment-options">
+                        <label class="gc-radio @(_bombardmentLevel == "light" ? "selected" : "")">
+                            <input type="radio" name="bombardment" value="light" @onchange='() => _bombardmentLevel = "light"' checked="@(_bombardmentLevel == "light")" />
+                            <span class="gc-radio-mark"></span>
+                            <span class="gc-radio-label">LIGHT</span>
+                            <span class="gc-radio-desc">Low collateral</span>
+                        </label>
+                        <label class="gc-radio @(_bombardmentLevel == "standard" ? "selected" : "")">
+                            <input type="radio" name="bombardment" value="standard" @onchange='() => _bombardmentLevel = "standard"' checked="@(_bombardmentLevel == "standard")" />
+                            <span class="gc-radio-mark"></span>
+                            <span class="gc-radio-label">STANDARD</span>
+                            <span class="gc-radio-desc">Balanced approach</span>
+                        </label>
+                        <label class="gc-radio @(_bombardmentLevel == "heavy" ? "selected" : "")">
+                            <input type="radio" name="bombardment" value="heavy" @onchange='() => _bombardmentLevel = "heavy"' checked="@(_bombardmentLevel == "heavy")" />
+                            <span class="gc-radio-mark"></span>
+                            <span class="gc-radio-label">HEAVY</span>
+                            <span class="gc-radio-desc">High destruction</span>
+                        </label>
+                    </div>
+                </div>
+
+                <button class="st-btn lg gc-launch-btn"
+                        disabled="@(!CanLaunchInvasion())"
+                        @onclick="LaunchInvasion">
+                    @if (_isInvading)
+                    {
+                        <span class="gc-spinner sm"></span>
+                        <span>INVADING...</span>
+                    }
+                    else
+                    {
+                        <span>⚔ LAUNCH INVASION</span>
+                    }
+                </button>
+
+                @if (!CanLaunchInvasion() && !_isInvading && _invasionResult == null)
+                {
+                    <div class="gc-launch-hint">
+                        @if (!_fleetId.HasValue)
+                        {
+                            <span>No friendly fleet in system</span>
+                        }
+                        else if (!_embarkedArmies.Any())
+                        {
+                            <span>No armies embarked on fleet</span>
+                        }
+                    </div>
+                }
+
+                <div class="gc-versus">
+                    <div class="gc-vs-line"></div>
+                    <span class="gc-vs-text">VS</span>
+                    <div class="gc-vs-line"></div>
+                </div>
+            </div>
+
+            @* Right: Defender / Garrison *@
+            <div class="gc-force-panel gc-defender">
+                <div class="gc-panel-header defender">
+                    <span class="gc-panel-icon">🛡</span>
+                    <span class="gc-panel-title">GARRISON</span>
+                    <span class="gc-army-count">@_garrison.Count Armies</span>
+                </div>
+                <div class="gc-army-list">
+                    @if (_garrison.Any())
+                    {
+                        @foreach (var army in _garrison)
+                        {
+                            <div class="gc-army-row">
+                                <div class="gc-army-icon defender">🛡</div>
+                                <div class="gc-army-info">
+                                    <span class="gc-army-name">@army.Name</span>
+                                    <span class="gc-army-type">@army.ArmyType</span>
+                                </div>
+                                <div class="gc-army-stats">
+                                    <div class="gc-stat"><span class="gc-stat-label">ATK</span><span class="gc-stat-value atk">@army.AttackPower</span></div>
+                                    <div class="gc-stat"><span class="gc-stat-label">DEF</span><span class="gc-stat-value def">@army.DefensePower</span></div>
+                                    <div class="gc-stat"><span class="gc-stat-label">HP</span><span class="gc-stat-value hp">@army.HitPoints/@army.MaxHitPoints</span></div>
+                                </div>
+                                <div class="gc-army-meta">
+                                    <div class="gc-morale-bar"><div class="gc-morale-fill" style="width:@army.Morale%"></div></div>
+                                    <span class="gc-experience @army.Experience.ToLower()">@army.Experience</span>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="gc-empty-list"><span class="gc-empty-icon">🛡</span><p>No garrison detected</p></div>
+                    }
+                </div>
+                <div class="gc-panel-footer">
+                    <span>Total DEF: @_garrison.Sum(a => a.DefensePower)</span>
+                    <span>Avg Morale: @(_garrison.Any() ? _garrison.Average(a => a.Morale).ToString("F0") : "0")%</span>
+                </div>
+            </div>
+        </div>
+
+        @* ── Invasion Result ── *@
+        @if (_invasionResult != null)
+        {
+            var isVictory = _invasionResult.WinnerFactionId == _factionId;
+            <div class="gc-result-overlay">
+                <div class="gc-result-card @(isVictory ? "victory" : "defeat")">
+                    <h2>@(isVictory ? "VICTORY" : "DEFEAT")</h2>
+                    <p class="gc-result-subtitle">@(isVictory ? "Colony conquered!" : "Invasion repelled")</p>
+                    <div class="gc-result-stats">
+                        <div class="gc-result-stat">
+                            <span class="gc-result-label">Phase</span>
+                            <span class="gc-result-value">@_invasionResult.Phase</span>
+                        </div>
+                        <div class="gc-result-stat">
+                            <span class="gc-result-label">Bombardment Damage</span>
+                            <span class="gc-result-value">@_invasionResult.BombardmentDamageDealt</span>
+                        </div>
+                        <div class="gc-result-stat">
+                            <span class="gc-result-label">Infrastructure Damage</span>
+                            <span class="gc-result-value damage">@_invasionResult.InfrastructureDamage%</span>
+                        </div>
+                        <div class="gc-result-stat">
+                            <span class="gc-result-label">Population Losses</span>
+                            <span class="gc-result-value losses">@_invasionResult.PopulationLosses</span>
+                        </div>
+                    </div>
+                    <div class="gc-result-actions">
+                        <button class="st-btn lg" @onclick="DismissResult">ACKNOWLEDGE</button>
+                        <a href="/game/galaxy" class="st-btn">RETURN TO GALAXY</a>
+                    </div>
+                </div>
+            </div>
+        }
+
+        @* ── Army Management Section ── *@
+        <div class="gc-management">
+            <div class="gc-management-header">
+                <h2>ARMY MANAGEMENT</h2>
+            </div>
+            <div class="gc-management-layout">
+                @* Recruit *@
+                <div class="gc-management-panel">
+                    <div class="gc-section-label">RECRUIT ARMY</div>
+                    <div class="gc-recruit-row">
+                        <select class="st-input gc-select" @bind="_selectedArmyType">
+                            <option value="">-- Select Army Type --</option>
+                            <option value="infantry">Infantry</option>
+                            <option value="assault">Assault Division</option>
+                            <option value="heavy">Heavy Weapons</option>
+                            <option value="elite">Elite Guard</option>
+                            <option value="maco">MACO Team</option>
+                        </select>
+                        <button class="st-btn primary" disabled="@(string.IsNullOrEmpty(_selectedArmyType) || _isRecruiting)" @onclick="RecruitArmy">
+                            @if (_isRecruiting) { <span class="gc-spinner sm"></span> } else { <span>RECRUIT</span> }
+                        </button>
+                    </div>
+                </div>
+
+                @* Stationed Armies *@
+                <div class="gc-management-panel">
+                    <div class="gc-section-label">STATIONED ARMIES (@_stationedArmies.Count)</div>
+                    <div class="gc-management-list">
+                        @if (_stationedArmies.Any())
+                        {
+                            @foreach (var army in _stationedArmies)
+                            {
+                                <div class="gc-manage-row">
+                                    <div class="gc-army-icon stationed">⚐</div>
+                                    <div class="gc-manage-info">
+                                        <span class="gc-army-name">@army.Name</span>
+                                        <span class="gc-army-type">@army.ArmyType — ATK @army.AttackPower / DEF @army.DefensePower</span>
+                                    </div>
+                                    <button class="st-btn sm" disabled="@(!_fleetId.HasValue)" @onclick="() => EmbarkArmy(army.Id)">EMBARK</button>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="gc-empty-manage">No stationed armies at this colony</div>
+                        }
+                    </div>
+                </div>
+
+                @* Embarked Armies *@
+                <div class="gc-management-panel">
+                    <div class="gc-section-label">EMBARKED ARMIES (@_embarkedArmies.Count)</div>
+                    <div class="gc-management-list">
+                        @if (_embarkedArmies.Any())
+                        {
+                            @foreach (var army in _embarkedArmies)
+                            {
+                                <div class="gc-manage-row">
+                                    <div class="gc-army-icon embarked">🚀</div>
+                                    <div class="gc-manage-info">
+                                        <span class="gc-army-name">@army.Name</span>
+                                        <span class="gc-army-type">@army.ArmyType — ATK @army.AttackPower / DEF @army.DefensePower</span>
+                                    </div>
+                                    <button class="st-btn sm" @onclick="() => DisembarkArmy(army.Id)">DISEMBARK</button>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="gc-empty-manage">No armies embarked on fleet</div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+.gc-page{display:flex;flex-direction:column;height:100%;background:linear-gradient(180deg,#080c14 0%,#040608 100%)}
+.gc-loading{flex:1;display:flex;align-items:center;justify-content:center;gap:12px;color:var(--st-text-dim);font-size:14px}
+.gc-spinner{display:inline-block;width:20px;height:20px;border:2px solid var(--st-border-dark);border-top-color:var(--st-accent-blue);border-radius:50%;animation:gc-spin 0.8s linear infinite}
+.gc-spinner.sm{width:14px;height:14px;border-width:2px}
+@@keyframes gc-spin{to{transform:rotate(360deg)}}
+
+/* Header */
+.gc-header{display:flex;align-items:center;gap:20px;padding:16px 24px;background:rgba(10,15,25,0.9);border-bottom:1px solid var(--st-border-dark)}
+.gc-header h1{font-family:var(--st-font-display);font-size:18px;color:var(--st-text-white);letter-spacing:2px;margin:0}
+.gc-colony-info{flex:1;display:flex;align-items:center;gap:12px}
+.gc-colony-name{font-size:14px;color:var(--st-accent-gold);font-weight:600}
+.gc-invasion-status{font-size:10px;padding:3px 10px;border-radius:4px;letter-spacing:1px;font-weight:600}
+.gc-invasion-status.idle{background:rgba(100,100,100,0.2);color:var(--st-text-dim)}
+.gc-invasion-status.active{background:rgba(255,68,68,0.2);color:var(--st-accent-red);animation:gc-pulse 2s infinite}
+.gc-invasion-status.resolved{background:rgba(68,221,102,0.2);color:var(--st-accent-green)}
+@@keyframes gc-pulse{0%,100%{opacity:1}50%{opacity:0.6}}
+
+.gc-error{margin:8px 24px;padding:10px 16px;background:rgba(255,68,68,0.15);border:1px solid rgba(255,68,68,0.3);border-radius:6px;color:var(--st-accent-red);font-size:12px}
+
+/* Combat Layout */
+.gc-combat-layout{display:flex;gap:0;flex:1;overflow:hidden;min-height:0}
+.gc-force-panel{flex:1;display:flex;flex-direction:column;background:var(--st-gradient-panel);border:1px solid var(--st-border-dark)}
+.gc-panel-header{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--st-border-dark)}
+.gc-panel-header.attacker{background:linear-gradient(90deg,rgba(255,68,68,0.15),transparent)}
+.gc-panel-header.defender{background:linear-gradient(270deg,rgba(74,158,255,0.15),transparent)}
+.gc-panel-icon{font-size:20px}.gc-panel-title{flex:1;font-family:var(--st-font-display);font-size:14px;color:var(--st-text-white);letter-spacing:1px}
+.gc-army-count{font-size:11px;color:var(--st-text-dim);padding:2px 8px;background:rgba(0,0,0,0.3);border-radius:4px}
+
+.gc-army-list{flex:1;overflow-y:auto;padding:8px}
+.gc-army-row{display:flex;align-items:center;gap:10px;padding:10px;margin-bottom:6px;background:var(--st-bg-medium);border-radius:6px;transition:background 0.15s}
+.gc-army-row:hover{background:var(--st-bg-light)}
+.gc-army-icon{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:6px;font-size:18px}
+.gc-army-icon.attacker{background:rgba(255,68,68,0.2)}.gc-army-icon.defender{background:rgba(74,158,255,0.2)}
+.gc-army-icon.stationed{background:rgba(100,100,100,0.2)}.gc-army-icon.embarked{background:rgba(255,200,68,0.2)}
+.gc-army-info{flex:1;min-width:0}
+.gc-army-name{display:block;font-size:12px;font-weight:500;color:var(--st-text-white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gc-army-type{display:block;font-size:10px;color:var(--st-text-dim)}
+.gc-army-stats{display:flex;gap:8px}
+.gc-stat{text-align:center}.gc-stat-label{display:block;font-size:8px;color:var(--st-text-dim);letter-spacing:1px}
+.gc-stat-value{font-family:var(--st-font-display);font-size:12px}
+.gc-stat-value.atk{color:var(--st-accent-red)}.gc-stat-value.def{color:var(--st-accent-blue)}.gc-stat-value.hp{color:var(--st-accent-green)}
+.gc-army-meta{display:flex;flex-direction:column;align-items:flex-end;gap:4px;min-width:70px}
+.gc-morale-bar{width:60px;height:4px;background:rgba(0,0,0,0.4);border-radius:2px;overflow:hidden}
+.gc-morale-fill{height:100%;background:linear-gradient(90deg,var(--st-accent-orange),var(--st-accent-gold));transition:width 0.3s}
+.gc-experience{font-size:9px;padding:2px 6px;border-radius:3px;letter-spacing:0.5px}
+.gc-experience.green{background:rgba(68,221,102,0.2);color:var(--st-accent-green)}
+.gc-experience.regular{background:rgba(100,100,100,0.2);color:var(--st-text-dim)}
+.gc-experience.veteran{background:rgba(255,200,68,0.2);color:var(--st-accent-gold)}
+.gc-experience.elite{background:rgba(140,100,255,0.2);color:#a78bfa}
+
+.gc-panel-footer{padding:10px 16px;background:rgba(0,0,0,0.2);border-top:1px solid var(--st-border-dark);display:flex;justify-content:space-between;font-size:11px;color:var(--st-text-muted)}
+
+.gc-empty-list{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;color:var(--st-text-dim);gap:8px}
+.gc-empty-icon{font-size:32px;opacity:0.3}.gc-empty-list p{margin:0;font-size:12px}.gc-empty-hint{font-size:10px;color:var(--st-text-dim);opacity:0.6}
+
+/* Center Controls */
+.gc-center-controls{width:280px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:20px;background:rgba(10,15,25,0.6);border:1px solid var(--st-border-dark);border-left:none;border-right:none}
+.gc-bombardment-section{width:100%}
+.gc-section-label{font-size:10px;font-weight:600;color:var(--st-text-dim);letter-spacing:1.5px;margin-bottom:10px;text-align:center}
+.gc-bombardment-options{display:flex;flex-direction:column;gap:6px}
+.gc-radio{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--st-bg-medium);border:1px solid var(--st-border-dark);border-radius:6px;cursor:pointer;transition:all 0.15s}
+.gc-radio:hover{border-color:var(--st-border-light)}.gc-radio.selected{border-color:var(--st-accent-blue);background:rgba(74,158,255,0.1)}
+.gc-radio input{display:none}
+.gc-radio-mark{width:12px;height:12px;border:2px solid var(--st-border-light);border-radius:50%;position:relative}
+.gc-radio.selected .gc-radio-mark{border-color:var(--st-accent-blue)}.gc-radio.selected .gc-radio-mark::after{content:'';position:absolute;top:2px;left:2px;width:4px;height:4px;background:var(--st-accent-blue);border-radius:50%}
+.gc-radio-label{font-size:11px;font-weight:600;color:var(--st-text-bright);letter-spacing:1px;flex:1}
+.gc-radio-desc{font-size:9px;color:var(--st-text-dim)}
+
+.gc-launch-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,rgba(200,50,50,0.4),rgba(180,30,30,0.6))!important;border-color:rgba(255,68,68,0.5)!important;color:#ff8888!important;font-weight:700;letter-spacing:2px}
+.gc-launch-btn:hover:not(:disabled){background:linear-gradient(135deg,rgba(200,50,50,0.6),rgba(180,30,30,0.8))!important;border-color:rgba(255,68,68,0.8)!important;box-shadow:0 0 20px rgba(255,68,68,0.3)}
+.gc-launch-btn:disabled{opacity:0.4;cursor:not-allowed}
+.gc-launch-hint{text-align:center;font-size:10px;color:var(--st-text-dim);font-style:italic}
+
+.gc-versus{display:flex;align-items:center;gap:8px;width:100%}
+.gc-vs-line{flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--st-border-light),transparent)}
+.gc-vs-text{font-family:var(--st-font-display);font-size:20px;color:var(--st-text-dim);letter-spacing:4px}
+
+/* Result Overlay */
+.gc-result-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.9);display:flex;align-items:center;justify-content:center;z-index:100}
+.gc-result-card{text-align:center;padding:40px 60px;background:var(--st-gradient-panel);border:2px solid var(--st-border-bright);border-radius:12px;max-width:500px}
+.gc-result-card.victory{border-color:var(--st-accent-green);box-shadow:0 0 40px rgba(68,221,102,0.3)}
+.gc-result-card.defeat{border-color:var(--st-accent-red);box-shadow:0 0 40px rgba(255,68,68,0.3)}
+.gc-result-card h2{font-family:var(--st-font-display);font-size:36px;letter-spacing:4px;margin:0 0 8px}
+.gc-result-card.victory h2{color:var(--st-accent-green)}.gc-result-card.defeat h2{color:var(--st-accent-red)}
+.gc-result-subtitle{font-size:14px;color:var(--st-text-muted);margin:0 0 24px}
+.gc-result-stats{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:32px}
+.gc-result-stat{text-align:center;padding:12px;background:rgba(0,0,0,0.3);border-radius:6px}
+.gc-result-label{display:block;font-size:10px;color:var(--st-text-dim);letter-spacing:0.5px;margin-bottom:4px}
+.gc-result-value{font-family:var(--st-font-display);font-size:20px;color:var(--st-text-bright)}
+.gc-result-value.damage{color:var(--st-accent-orange)}.gc-result-value.losses{color:var(--st-accent-red)}
+.gc-result-actions{display:flex;gap:12px;justify-content:center}
+
+/* Management Section */
+.gc-management{padding:16px 24px;border-top:2px solid var(--st-border-dark);background:rgba(5,8,12,0.9)}
+.gc-management-header{margin-bottom:12px}
+.gc-management-header h2{font-family:var(--st-font-display);font-size:14px;color:var(--st-text-white);letter-spacing:2px;margin:0}
+.gc-management-layout{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.gc-management-panel{background:var(--st-gradient-panel);border:1px solid var(--st-border-dark);border-radius:8px;padding:12px}
+.gc-recruit-row{display:flex;gap:8px;align-items:center}
+.gc-select{flex:1;background:var(--st-bg-darker);border:1px solid var(--st-border-dark);border-radius:4px;color:var(--st-text-bright);padding:8px 12px;font-size:12px}
+.gc-management-list{max-height:200px;overflow-y:auto;margin-top:8px}
+.gc-manage-row{display:flex;align-items:center;gap:8px;padding:8px;margin-bottom:4px;background:var(--st-bg-medium);border-radius:4px}
+.gc-manage-info{flex:1;min-width:0}
+.gc-empty-manage{padding:16px;text-align:center;color:var(--st-text-dim);font-size:11px}
+</style>
+
+@code {
+    [Parameter] public Guid ColonyId { get; set; }
+    [CascadingParameter(Name = "GameState")] public StellarisLayout.GameLayoutState? GameState { get; set; }
+
+    private List<ArmyDto> _garrison = [];
+    private List<ArmyDto> _embarkedArmies = [];
+    private List<ArmyDto> _stationedArmies = [];
+    private GroundCombatResultDto? _invasionResult;
+    private string _bombardmentLevel = "standard";
+    private bool _isInvading;
+    private bool _isLoading = true;
+    private string? _colonyName;
+    private Guid? _fleetId;
+    private string? _errorMessage;
+    private Guid? _factionId;
+    private string _selectedArmyType = "";
+    private bool _isRecruiting;
+
+    protected override async Task OnInitializedAsync()
+    {
+        GameState?.SetTopbarOverride("⚔", "GROUND COMBAT", "",
+            cssClass: "combat-header", showResources: true, showEndTurn: false);
+
+        try
+        {
+            await LoadData();
+        }
+        catch
+        {
+            LoadMockData();
+        }
+
+        if (GameState != null)
+            GameState.SetTopbarOverride("⚔", "GROUND COMBAT", _colonyName ?? "",
+                cssClass: "combat-header", showResources: true, showEndTurn: false);
+
+        _isLoading = false;
+    }
+
+    public void Dispose()
+    {
+        GameState?.ResetTopbar();
+    }
+
+    private async Task LoadData()
+    {
+        _factionId = GameState?.FactionId;
+        if (!_factionId.HasValue)
+        {
+            _factionId = await LocalStorage.GetItemAsync<Guid?>("currentFactionId");
+        }
+
+        if (!_factionId.HasValue)
+        {
+            LoadMockData();
+            return;
+        }
+
+        // Load colony info
+        var colony = await Api.GetColonyAsync(ColonyId);
+        _colonyName = colony?.Name ?? "Unknown Colony";
+
+        // Load garrison
+        _garrison = await Api.GetGarrisonAsync(ColonyId);
+
+        // Load active invasion if any
+        _invasionResult = await Api.GetActiveInvasionAsync(ColonyId);
+
+        // Load faction armies to find stationed ones at this colony
+        var allArmies = await Api.GetFactionArmiesAsync(_factionId.Value);
+        _stationedArmies = allArmies.Where(a => a.ColonyId == ColonyId && a.FleetId == null).ToList();
+
+        // Load fleets to find one in the same system
+        var fleets = await Api.GetFleetsAsync(_factionId.Value);
+        if (colony != null)
+        {
+            // Find first fleet in same system that has the colony
+            var fleetInSystem = fleets.FirstOrDefault(f => f.CurrentSystemId == GetSystemIdFromColony(colony));
+            if (fleetInSystem != null)
+            {
+                _fleetId = fleetInSystem.Id;
+                _embarkedArmies = await Api.GetEmbarkedArmiesAsync(fleetInSystem.Id);
+            }
+        }
+    }
+
+    private Guid GetSystemIdFromColony(ColonyDetailDto colony) => colony.SystemId;
+
+    private void LoadMockData()
+    {
+        _colonyName = "Cardassia Prime";
+        _factionId = Guid.NewGuid();
+        var fid = _factionId.Value;
+        var enemyFid = Guid.NewGuid();
+        _fleetId = Guid.NewGuid();
+
+        _embarkedArmies = new()
+        {
+            new(Guid.NewGuid(), fid, "1st MACO Division", "MACO Team", 25, 15, 100, 100, 90, "Veteran", "Ready", null, _fleetId, false, 0, 2),
+            new(Guid.NewGuid(), fid, "3rd Assault Brigade", "Assault Division", 20, 12, 80, 80, 85, "Regular", "Ready", null, _fleetId, false, 0, 1),
+            new(Guid.NewGuid(), fid, "7th Infantry Regiment", "Infantry", 12, 10, 100, 100, 70, "Green", "Ready", null, _fleetId, false, 0, 1),
+        };
+
+        _garrison = new()
+        {
+            new(Guid.NewGuid(), enemyFid, "Cardassian Guard", "Heavy Weapons", 18, 22, 90, 90, 95, "Elite", "Defending", ColonyId, null, false, 0, 2),
+            new(Guid.NewGuid(), enemyFid, "Obsidian Order Ops", "Elite Guard", 22, 18, 70, 70, 80, "Veteran", "Defending", ColonyId, null, false, 0, 3),
+            new(Guid.NewGuid(), enemyFid, "Militia Detachment", "Infantry", 8, 8, 60, 60, 50, "Green", "Defending", ColonyId, null, false, 0, 1),
+        };
+
+        _stationedArmies = new()
+        {
+            new(Guid.NewGuid(), fid, "2nd Reserve Battalion", "Infantry", 12, 10, 100, 100, 75, "Regular", "Stationed", ColonyId, null, false, 0, 1),
+        };
+    }
+
+    private bool CanLaunchInvasion() => _fleetId.HasValue && _embarkedArmies.Any() && !_isInvading && _invasionResult == null;
+
+    private async Task LaunchInvasion()
+    {
+        if (!CanLaunchInvasion()) return;
+        _isInvading = true;
+        _errorMessage = null;
+        StateHasChanged();
+
+        try
+        {
+            _invasionResult = await Api.InvadeColonyAsync(_fleetId!.Value, ColonyId, _bombardmentLevel);
+            Snackbar.Add("Invasion resolved!", _invasionResult.WinnerFactionId == _factionId ? Severity.Success : Severity.Warning);
+
+            // Reload armies after battle
+            _garrison = await Api.GetGarrisonAsync(ColonyId);
+            if (_factionId.HasValue)
+            {
+                var allArmies = await Api.GetFactionArmiesAsync(_factionId.Value);
+                _stationedArmies = allArmies.Where(a => a.ColonyId == ColonyId && a.FleetId == null).ToList();
+            }
+            if (_fleetId.HasValue)
+            {
+                _embarkedArmies = await Api.GetEmbarkedArmiesAsync(_fleetId.Value);
+            }
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Invasion failed: {ex.Message}";
+            Snackbar.Add(_errorMessage, Severity.Error);
+        }
+        finally
+        {
+            _isInvading = false;
+        }
+    }
+
+    private async Task RecruitArmy()
+    {
+        if (string.IsNullOrEmpty(_selectedArmyType)) return;
+        _isRecruiting = true;
+        _errorMessage = null;
+        StateHasChanged();
+
+        try
+        {
+            var newArmy = await Api.RecruitArmyAsync(ColonyId, _selectedArmyType);
+            _stationedArmies.Add(newArmy);
+            Snackbar.Add($"Recruiting {newArmy.Name}...", Severity.Success);
+            _selectedArmyType = "";
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Recruitment failed: {ex.Message}";
+            Snackbar.Add(_errorMessage, Severity.Error);
+        }
+        finally
+        {
+            _isRecruiting = false;
+        }
+    }
+
+    private async Task EmbarkArmy(Guid armyId)
+    {
+        if (!_fleetId.HasValue) return;
+        try
+        {
+            await Api.EmbarkArmyAsync(armyId, _fleetId.Value);
+            var army = _stationedArmies.FirstOrDefault(a => a.Id == armyId);
+            if (army != null)
+            {
+                _stationedArmies.Remove(army);
+                _embarkedArmies.Add(army);
+            }
+            Snackbar.Add("Army embarked", Severity.Info);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Embark failed: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private async Task DisembarkArmy(Guid armyId)
+    {
+        try
+        {
+            await Api.DisembarkArmyAsync(armyId, ColonyId);
+            var army = _embarkedArmies.FirstOrDefault(a => a.Id == armyId);
+            if (army != null)
+            {
+                _embarkedArmies.Remove(army);
+                _stationedArmies.Add(army);
+            }
+            Snackbar.Add("Army disembarked", Severity.Info);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Disembark failed: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private void DismissResult()
+    {
+        _invasionResult = null;
+    }
+
+    private string GetInvasionStatusClass()
+    {
+        if (_invasionResult != null && _invasionResult.IsResolved) return "resolved";
+        if (_invasionResult != null) return "active";
+        return "idle";
+    }
+
+    private string GetInvasionStatusText()
+    {
+        if (_invasionResult != null && _invasionResult.IsResolved) return "RESOLVED";
+        if (_invasionResult != null) return "ACTIVE INVASION";
+        return "NO INVASION";
+    }
+}

@@ -29,9 +29,17 @@ public class GeminiImageProvider : IImageGenerationProvider
         {
             new()
             {
+                Id = "gemini-3.1-flash-image-preview",
+                DisplayName = "Gemini 3.1 Flash Image",
+                Description = "Newest model (Feb 2026). Replaces 3 Pro on Mar 9.",
+                Type = ModelType.General,
+                IsRecommended = true
+            },
+            new()
+            {
                 Id = "gemini-3-pro-image-preview",
                 DisplayName = "Gemini 3 Pro Image",
-                Description = "Newest Gemini model (Jan 2026). Best quality.",
+                Description = "Best quality. Retiring Mar 9, 2026.",
                 Type = ModelType.General,
                 IsRecommended = true
             },
@@ -39,23 +47,30 @@ public class GeminiImageProvider : IImageGenerationProvider
             {
                 Id = "gemini-2.5-flash-image",
                 DisplayName = "Gemini 2.5 Flash Image",
-                Description = "Fast production model (Oct 2025).",
+                Description = "Stable GA model. Free tier (500/day).",
                 Type = ModelType.General
             },
             new()
             {
-                Id = "gemini-2.0-flash-exp",
-                DisplayName = "Gemini 2.0 Flash (Experimental)",
-                Description = "Experimental model with image generation.",
-                Type = ModelType.General
+                Id = "imagen-4.0-generate-001",
+                DisplayName = "Imagen 4",
+                Description = "Google's latest dedicated image model.",
+                Type = ModelType.Realistic,
+                IsRecommended = true
+            },
+            new()
+            {
+                Id = "imagen-4.0-fast-generate-001",
+                DisplayName = "Imagen 4 Fast",
+                Description = "Faster, cheaper Imagen 4 variant.",
+                Type = ModelType.Realistic
             },
             new()
             {
                 Id = "imagen-3.0-generate-002",
                 DisplayName = "Imagen 3",
-                Description = "Google's dedicated image model. High quality.",
-                Type = ModelType.Realistic,
-                IsRecommended = true
+                Description = "Previous generation dedicated image model.",
+                Type = ModelType.Realistic
             }
         };
     }

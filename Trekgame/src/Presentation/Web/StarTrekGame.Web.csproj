@@ -23,6 +23,22 @@
     <PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
   </ItemGroup>
 
+  <!-- TypeScript build via Vite — runs before Blazor build -->
+  <Target Name="TypeScriptBuild" BeforeTargets="Build">
+    <Message Text="[TS] Installing npm packages..." Importance="high"
+             Condition="Exists('$(MSBuildProjectDirectory)\package-lock.json')" />
+    <Exec Command="npm ci --prefer-offline"
+          WorkingDirectory="$(MSBuildProjectDirectory)"
+          Condition="Exists('$(MSBuildProjectDirectory)\package-lock.json')" />
+    <Exec Command="npm install"
+          WorkingDirectory="$(MSBuildProjectDirectory)"
+          Condition="!Exists('$(MSBuildProjectDirectory)\package-lock.json')" />
+    <Message Text="[TS] Building TypeScript..." Importance="high" />
+    <Exec Command="npm run build"
+          WorkingDirectory="$(MSBuildProjectDirectory)" />
+    <Message Text="[TS] TypeScript build complete." Importance="high" />
+  </Target>
+
   <!-- Clean and copy shared assets to wwwroot/assets during build -->
   <Target Name="CleanSharedAssets" BeforeTargets="CopySharedAssets">
     <Message Text="Cleaning wwwroot/assets before copy..." Importance="high" />

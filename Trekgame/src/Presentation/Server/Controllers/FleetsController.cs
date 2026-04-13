@@ -70,12 +70,15 @@ public class FleetsController : ControllerBase
         var destination = await _db.StarSystems.FindAsync(request.DestinationId);
         if (destination == null) return BadRequest("Invalid destination");
 
+        if (destination.GameId != fleet.Faction.GameId)
+            return BadRequest("Destination is not part of this game");
+
         fleet.DestinationId = request.DestinationId;
         fleet.MovementProgress = 0;
 
         await _db.SaveChangesAsync();
 
-        await _hub.Clients.Group(fleet.Faction.GameId.ToString()).SendAsync("FleetUpdated", new { Id = fleet.Id, Name = fleet.Name, IsMoving = true });
+        await _hub.Clients.Group(GameGroupNames.Canonical(fleet.Faction.GameId)).SendAsync("FleetUpdated", new { Id = fleet.Id, Name = fleet.Name, IsMoving = true });
 
         return Ok(MapToFleetDetailDto(fleet));
     }
@@ -109,9 +112,21 @@ public class FleetsController : ControllerBase
         var fleet = await _db.Fleets.FindAsync(fleetId);
         if (fleet == null) return NotFound();
 
-        if (Enum.TryParse<CombatStance>(request.Stance, out var stance))
+        if (string.IsNullOrWhiteSpace(request.Stance))
+            return BadRequest("Invalid stance");
+
+        if (Enum.TryParse<CombatStance>(request.Stance, ignoreCase: true, out var stance)
+            && Enum.IsDefined(stance))
         {
-            fleet.Stance = (FleetStance)(int)stance;
+            fleet.Stance = stance switch
+            {
+                CombatStance.Aggressive => FleetStance.Aggressive,
+                CombatStance.Defensive => FleetStance.Defensive,
+                CombatStance.Evasive => FleetStance.Evasive,
+                CombatStance.Neutral => FleetStance.Passive,
+                _ => fleet.Stance
+            };
+
             await _db.SaveChangesAsync();
             return Ok(MapToFleetDetailDto(fleet));
         }
@@ -128,7 +143,10 @@ public class FleetsController : ControllerBase
         var fleet = await _db.Fleets.FindAsync(fleetId);
         if (fleet == null) return NotFound();
 
-        fleet.Name = request.Name;
+        if (string.IsNullOrWhiteSpace(request.Name))
+            return BadRequest("Fleet name must not be empty");
+
+        fleet.Name = request.Name.Trim();
         await _db.SaveChangesAsync();
 
         return Ok(MapToFleetDetailDto(fleet));
@@ -155,8 +173,11 @@ public class FleetsController : ControllerBase
         {
             Id = Guid.NewGuid(),
             FactionId = fleet.FactionId,
+            HouseId = fleet.HouseId,
             CurrentSystemId = fleet.CurrentSystemId,
-            Name = request.NewFleetName ?? $"{fleet.Name} Detachment",
+            Name = string.IsNullOrWhiteSpace(request.NewFleetName)
+                ? $"{fleet.Name} Detachment"
+                : request.NewFleetName.Trim(),
             Stance = fleet.Stance,
             Morale = fleet.Morale,
             ExperiencePoints = fleet.ExperiencePoints / 2
@@ -175,7 +196,7 @@ public class FleetsController : ControllerBase
             .Include(f => f.CurrentSystem)
             .FirstAsync(f => f.Id == newFleet.Id);
 
-        return Ok(MapToFleetDetailDto(fleet));
+        return Ok(MapToFleetDetailDto(result));
     }
 
     /// <summary>
@@ -184,6 +205,9 @@ public class FleetsController : ControllerBase
     [HttpPost("{fleetId}/merge")]
     public async Task<ActionResult> MergeFleets(Guid fleetId, [FromBody] MergeFleetRequest request)
     {
+        if (fleetId == request.SourceFleetId)
+            return BadRequest("Cannot merge a fleet with itself");
+
         var targetFleet = await _db.Fleets
             .Include(f => f.Ships)
             .FirstOrDefaultAsync(f => f.Id == fleetId);
@@ -256,7 +280,10 @@ public class FleetsController : ControllerBase
             fleet.Morale,
             fleet.ExperiencePoints,
             shipGroups,
-            CalculateCombatStrength(fleet)
+            CalculateCombatStrength(fleet),
+            fleet.ActionPoints,
+            fleet.MaxActionPoints,
+            fleet.Ships.FirstOrDefault()?.ShipClass.ToString()
         );
     }
 
@@ -291,7 +318,10 @@ public class FleetsController : ControllerBase
             fleet.Morale,
             fleet.ExperiencePoints,
             shipGroups,
-            CalculateCombatStrength(fleet)
+            CalculateCombatStrength(fleet),
+            fleet.ActionPoints,
+            fleet.MaxActionPoints,
+            fleet.Ships.FirstOrDefault()?.ShipClass.ToString()
         );
     }
 }
@@ -310,7 +340,10 @@ public record FleetDetailDto(
     int Morale,
     int ExperiencePoints,
     List<ShipGroupDto> ShipGroups,
-    int CombatStrength
+    int CombatStrength,
+    int ActionPoints = 3,
+    int MaxActionPoints = 3,
+    string? FlagshipClass = null
 )
 {
     public int Power => CombatStrength;

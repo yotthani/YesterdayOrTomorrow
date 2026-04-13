@@ -31,6 +31,7 @@ public class GameDbContext : DbContext
     // Military
     public DbSet<FleetEntity> Fleets => Set<FleetEntity>();
     public DbSet<ShipEntity> Ships => Set<ShipEntity>();
+    public DbSet<ShipDesignEntity> ShipDesigns => Set<ShipDesignEntity>();
     
     // Trade & Transport
     public DbSet<TradeRouteEntity> TradeRoutes => Set<TradeRouteEntity>();
@@ -41,6 +42,9 @@ public class GameDbContext : DbContext
     // Diplomacy
     public DbSet<DiplomaticRelationEntity> DiplomaticRelations => Set<DiplomaticRelationEntity>();
     
+    // Leaders
+    public DbSet<LeaderEntity> Leaders => Set<LeaderEntity>();
+
     // Espionage
     public DbSet<AgentEntity> Agents => Set<AgentEntity>();
     
@@ -54,6 +58,17 @@ public class GameDbContext : DbContext
     public DbSet<StarSystemEntity> StarSystems => Systems;
     // Knowledge
     public DbSet<KnownSystemEntity> KnownSystems => Set<KnownSystemEntity>();
+
+    // Tactical Combat
+    public DbSet<BattleDoctrineEntity> BattleDoctrines => Set<BattleDoctrineEntity>();
+
+    // Starbases
+    public DbSet<StationEntity> Stations => Set<StationEntity>();
+    public DbSet<StationModuleEntity> StationModules => Set<StationModuleEntity>();
+
+    // Ground Combat
+    public DbSet<ArmyEntity> Armies { get; set; }
+    public DbSet<GroundCombatEntity> GroundCombats { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -88,6 +103,7 @@ public class GameDbContext : DbContext
             e.HasMany(x => x.Technologies).WithOne(x => x.Faction).HasForeignKey(x => x.FactionId);
             e.HasMany(x => x.KnownSystems).WithOne(x => x.Faction).HasForeignKey(x => x.FactionId);
             e.HasMany(x => x.Agents).WithOne(x => x.Faction).HasForeignKey(x => x.FactionId);
+            e.HasMany(x => x.Stations).WithOne(x => x.Faction).HasForeignKey(x => x.FactionId);
         });
         
         modelBuilder.Entity<HouseEntity>(e =>
@@ -211,6 +227,69 @@ public class GameDbContext : DbContext
         {
             e.HasKey(x => x.Id);
             e.HasOne(x => x.System).WithMany().HasForeignKey(x => x.SystemId);
+        });
+
+        modelBuilder.Entity<LeaderEntity>(e =>
+        {
+            e.HasKey(x => x.Id);
+            e.HasOne(x => x.Faction).WithMany(f => f.Leaders).HasForeignKey(x => x.FactionId);
+        });
+
+        // ═══════════════════════════════════════════════════════════════════
+        // SHIP DESIGNS
+        // ═══════════════════════════════════════════════════════════════════
+
+        modelBuilder.Entity<ShipDesignEntity>(e =>
+        {
+            e.HasKey(x => x.Id);
+            e.HasOne(x => x.Faction).WithMany(f => f.ShipDesigns).HasForeignKey(x => x.FactionId);
+        });
+
+        // ═══════════════════════════════════════════════════════════════════
+        // TACTICAL COMBAT
+        // ═══════════════════════════════════════════════════════════════════
+
+        modelBuilder.Entity<BattleDoctrineEntity>(e =>
+        {
+            e.HasKey(x => x.Id);
+        });
+
+        // ═══════════════════════════════════════════════════════════════════
+        // STARBASES
+        // ═══════════════════════════════════════════════════════════════════
+
+        modelBuilder.Entity<StationEntity>(e =>
+        {
+            e.HasKey(x => x.Id);
+            e.HasMany(x => x.Modules).WithOne(x => x.Station).HasForeignKey(x => x.StationId);
+            e.HasOne(x => x.System).WithMany().HasForeignKey(x => x.SystemId);
+        });
+
+        modelBuilder.Entity<StationModuleEntity>(e =>
+        {
+            e.HasKey(x => x.Id);
+        });
+
+        // ═══════════════════════════════════════════════════════════════════
+        // GROUND COMBAT
+        // ═══════════════════════════════════════════════════════════════════
+
+        // ArmyEntity
+        modelBuilder.Entity<ArmyEntity>(e =>
+        {
+            e.HasKey(a => a.Id);
+            e.HasOne(a => a.Faction).WithMany().HasForeignKey(a => a.FactionId).OnDelete(DeleteBehavior.NoAction);
+            e.HasOne(a => a.Colony).WithMany(c => c.Armies).HasForeignKey(a => a.ColonyId).OnDelete(DeleteBehavior.NoAction);
+            e.HasOne(a => a.Fleet).WithMany(f => f.Armies).HasForeignKey(a => a.FleetId).OnDelete(DeleteBehavior.NoAction);
+        });
+
+        // GroundCombatEntity
+        modelBuilder.Entity<GroundCombatEntity>(e =>
+        {
+            e.HasKey(gc => gc.Id);
+            e.HasOne(gc => gc.Colony).WithMany().HasForeignKey(gc => gc.ColonyId).OnDelete(DeleteBehavior.NoAction);
+            e.HasOne(gc => gc.AttackerFaction).WithMany().HasForeignKey(gc => gc.AttackerFactionId).OnDelete(DeleteBehavior.NoAction);
+            e.HasOne(gc => gc.DefenderFaction).WithMany().HasForeignKey(gc => gc.DefenderFactionId).OnDelete(DeleteBehavior.NoAction);
         });
     }
 }

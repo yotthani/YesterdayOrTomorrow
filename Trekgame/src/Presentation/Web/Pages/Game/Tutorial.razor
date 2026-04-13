@@ -1,8 +1,9 @@
 @page "/game/tutorial"
 @page "/game/help"
-@layout StellarisLayout
 @using MudBlazor
+@using StarTrekGame.Web.Services
 @inject NavigationManager Navigation
+@inject ThemeService ThemeService
 
 <PageTitle>Tutorial - Galactic Strategy</PageTitle>
 
@@ -250,7 +251,196 @@
                     </div>
                 </div>
             </MudTabPanel>
-            
+
+            @* Species & Traits *@
+            <MudTabPanel Text="🧬 Species" Icon="@Icons.Material.Filled.Biotech">
+                <div class="section">
+                    <h2>Species & Traits System</h2>
+
+                    <div class="feature-block">
+                        <h3>📖 Encyclopedia</h3>
+                        <p>Browse all 38 species across 6 quadrants (Alpha, Beta, Gamma, Delta, Borg, Xindi). Each species has unique traits, habitability preferences, and modifiers that affect gameplay.</p>
+                        <ul>
+                            <li><strong>Species Traits</strong> — Each species has genetic traits that provide bonuses (+Research, +Production, etc.)</li>
+                            <li><strong>Habitability</strong> — Species thrive on different planet types (Arctic, Desert, Ocean, etc.)</li>
+                            <li><strong>Special Flags</strong> — Some species are Telepathic, Shapeshifter, Cybernetic, or have other unique abilities</li>
+                        </ul>
+                    </div>
+
+                    <div class="feature-block">
+                        <h3>👥 Demographics</h3>
+                        <p>View empire-wide species distribution and per-colony breakdown. Manage Species Rights to control how each species integrates into your empire.</p>
+                        <table class="data-table">
+                            <thead><tr><th>Right</th><th>Options</th><th>Effect</th></tr></thead>
+                            <tbody>
+                                <tr><td>Citizenship</td><td>Full / Caste / Restricted</td><td>Happiness, political power</td></tr>
+                                <tr><td>Military Service</td><td>Full / Limited / None</td><td>Army strength, fleet morale</td></tr>
+                                <tr><td>Living Standards</td><td>Utopian / Normal / Subsistence</td><td>Consumer goods cost, happiness</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="feature-block">
+                        <h3>🧪 Gene Modification</h3>
+                        <p>Add or remove genetic traits from species in your empire. Requires genetic research technology.</p>
+                        <ul>
+                            <li><strong>Point Budget</strong> — 5 base points + 2 per genetic tech level</li>
+                            <li><strong>Cost</strong> — 500 Credits per modification</li>
+                            <li><strong>Categories</strong> — Biological, Social, Intelligence, Physical, Special</li>
+                        </ul>
+                    </div>
+                </div>
+            </MudTabPanel>
+
+            @* Tactical Combat *@
+            <MudTabPanel Text="⚔️ Tactics" Icon="@Icons.Material.Filled.Shield">
+                <div class="section">
+                    <h2>Tactical Combat System</h2>
+
+                    <div class="feature-block">
+                        <h3>📋 Battle Doctrine</h3>
+                        <p>Configure per-fleet doctrine from the Fleet Management screen. Each fleet can have its own tactical profile.</p>
+                        <table class="data-table">
+                            <thead><tr><th>Setting</th><th>Options</th></tr></thead>
+                            <tbody>
+                                <tr><td>Engagement Policy</td><td>Aggressive, Defensive, Hit-and-Run, Standoff, Balanced</td></tr>
+                                <tr><td>Formation</td><td>Wedge, Sphere, Line, Dispersed, Echelon</td></tr>
+                                <tr><td>Target Priority</td><td>Highest Threat, Weakest, Capitals, Flagships, Random</td></tr>
+                                <tr><td>Retreat Threshold</td><td>0-100% fleet losses before retreat</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="feature-block">
+                        <h3>🎯 Formation Bonuses</h3>
+                        <p class="highlight-text">Formations follow a rock-paper-scissors system. Choosing the right formation against your enemy gives damage bonuses up to +20%.</p>
+                        <ul>
+                            <li><strong>Wedge</strong> — Strong vs Line, weak vs Sphere</li>
+                            <li><strong>Sphere</strong> — Strong vs Wedge, weak vs Dispersed</li>
+                            <li><strong>Line</strong> — Strong vs Echelon, weak vs Wedge</li>
+                            <li><strong>Dispersed</strong> — Strong vs Sphere, weak vs Echelon</li>
+                            <li><strong>Echelon</strong> — Strong vs Dispersed, weak vs Line</li>
+                        </ul>
+                    </div>
+
+                    <div class="feature-block">
+                        <h3>⚠️ Disorder System</h3>
+                        <p>Changing orders mid-battle causes disorder — a cumulative accuracy and morale penalty.</p>
+                        <ul>
+                            <li><strong>Base Cost</strong> — +15% disorder per order change</li>
+                            <li><strong>No Commander</strong> — +25% additional penalty</li>
+                            <li><strong>Prior Orders</strong> — +5% per previous order in this battle</li>
+                            <li><strong>Drill Level</strong> — Reduces disorder (−drillLevel × 0.2)</li>
+                            <li><strong>Conditional Orders</strong> — Pre-programmed triggers execute FREE (no disorder)</li>
+                        </ul>
+                    </div>
+                </div>
+            </MudTabPanel>
+
+            @* Leaders *@
+            <MudTabPanel Text="👤 Leaders" Icon="@Icons.Material.Filled.Person">
+                <div class="section">
+                    <h2>Leader Management</h2>
+
+                    <div class="feature-block">
+                        <h3>🎖️ Leader Classes</h3>
+                        <table class="data-table">
+                            <thead><tr><th>Class</th><th>Role</th><th>Key Skills</th></tr></thead>
+                            <tbody>
+                                <tr><td>Admiral</td><td>Fleet Commander</td><td>Tactics, Logistics, Evasion</td></tr>
+                                <tr><td>General</td><td>Ground Forces</td><td>Assault, Defense, Morale</td></tr>
+                                <tr><td>Scientist</td><td>Research Lead</td><td>Physics, Biology, Engineering</td></tr>
+                                <tr><td>Governor</td><td>Colony Manager</td><td>Administration, Infrastructure</td></tr>
+                                <tr><td>Agent</td><td>Espionage</td><td>Infiltration, Sabotage, Counter-Intel</td></tr>
+                                <tr><td>Diplomat</td><td>Foreign Relations</td><td>Negotiation, Deception, Influence</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="feature-block">
+                        <h3>📈 Recruitment & Skills</h3>
+                        <ul>
+                            <li><strong>Recruit</strong> — Hire leaders from the leader pool (costs credits)</li>
+                            <li><strong>Experience</strong> — Leaders gain XP through their assigned role</li>
+                            <li><strong>Skills</strong> — Each level unlocks skill points for specialization</li>
+                            <li><strong>Assignment</strong> — Assign leaders to fleets, armies, colonies, or research</li>
+                        </ul>
+                    </div>
+                </div>
+            </MudTabPanel>
+
+            @* Crisis & Events *@
+            <MudTabPanel Text="🔮 Crisis" Icon="@Icons.Material.Filled.Warning">
+                <div class="section">
+                    <h2>Crisis & Events</h2>
+
+                    <div class="feature-block">
+                        <h3>⚡ Late-Game Crises</h3>
+                        <p class="highlight-text">When you least expect it, the galaxy faces existential threats. Crises escalate through 4 phases, each more dangerous than the last.</p>
+                        <table class="data-table">
+                            <thead><tr><th>Crisis</th><th>Threat</th></tr></thead>
+                            <tbody>
+                                <tr><td>Borg Incursion</td><td>Assimilating faction by faction</td></tr>
+                                <tr><td>Dominion Invasion</td><td>Massive fleets from the Gamma Quadrant</td></tr>
+                                <tr><td>Temporal Anomaly</td><td>Reality tears destabilizing systems</td></tr>
+                                <tr><td>AI Rebellion</td><td>Your own technology turns against you</td></tr>
+                                <tr><td>Subspace Collapse</td><td>Warp travel becomes impossible</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="feature-block">
+                        <h3>🎲 Random Events</h3>
+                        <p>Events fire based on triggers (turn number, technology level, diplomatic state). Some events chain into multi-turn storylines with choices that affect your empire.</p>
+                        <ul>
+                            <li><strong>Positive</strong> — Resource windfalls, technology breakthroughs, diplomatic openings</li>
+                            <li><strong>Negative</strong> — Plagues, pirate raids, natural disasters</li>
+                            <li><strong>Chain Events</strong> — Multi-step storylines with branching choices</li>
+                        </ul>
+                    </div>
+                </div>
+            </MudTabPanel>
+
+            @* Economy & Policies *@
+            <MudTabPanel Text="📊 Economy" Icon="@Icons.Material.Filled.AccountBalance">
+                <div class="section">
+                    <h2>Economy & Policies</h2>
+
+                    <div class="feature-block">
+                        <h3>💰 Resources</h3>
+                        <table class="data-table">
+                            <thead><tr><th>Resource</th><th>Source</th><th>Use</th></tr></thead>
+                            <tbody>
+                                <tr><td>Credits 💰</td><td>Trade, taxation</td><td>Leaders, maintenance, diplomacy</td></tr>
+                                <tr><td>Dilithium 💎</td><td>Mining</td><td>Warp drives, advanced tech</td></tr>
+                                <tr><td>Duranium ⚙️</td><td>Mining</td><td>Ship construction, buildings</td></tr>
+                                <tr><td>Deuterium ⚡</td><td>Gas giants</td><td>Ship fuel, energy</td></tr>
+                                <tr><td>Research 🔬</td><td>Labs, scientists</td><td>Technology progress</td></tr>
+                                <tr><td>Influence 🏛️</td><td>Diplomacy</td><td>Claims, edicts, treaties</td></tr>
+                                <tr><td>Food 🌾</td><td>Agriculture</td><td>Population growth</td></tr>
+                                <tr><td>Alloys 🔧</td><td>Refineries</td><td>Advanced ship components</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="feature-block">
+                        <h3>📜 Policies</h3>
+                        <p>Policies apply empire-wide modifiers. Changing a policy reverts old modifiers and applies new ones (revert-then-apply pattern).</p>
+                        <ul>
+                            <li><strong>Military Policy</strong> — Affects fleet size, weapon damage, ship cost</li>
+                            <li><strong>Economic Policy</strong> — Trade income, production bonuses, maintenance costs</li>
+                            <li><strong>Diplomatic Policy</strong> — Relation modifiers, treaty options, influence gain</li>
+                            <li><strong>Research Policy</strong> — Focus area bonuses, research speed</li>
+                        </ul>
+                    </div>
+
+                    <div class="feature-block">
+                        <h3>🚚 Trade Routes</h3>
+                        <p>Establish trade routes between colonies for mutual economic benefit. Trade routes require Transport ships and are vulnerable to piracy.</p>
+                    </div>
+                </div>
+            </MudTabPanel>
+
         </MudTabs>
     </div>
 </div>
@@ -322,4 +512,9 @@
 </style>
 
 @code {
+    protected override async Task OnInitializedAsync()
+    {
+        // Main menu pages always use default theme
+        await ThemeService.ApplyTemporaryThemeAsync("default");
+    }
 }

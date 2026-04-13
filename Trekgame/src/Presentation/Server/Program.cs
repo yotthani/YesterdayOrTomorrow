@@ -27,6 +27,13 @@ builder.Services.AddScoped<IPopulationService, PopulationService>();
 builder.Services.AddScoped<ITransportService, TransportService>();
 builder.Services.AddScoped<ISaveGameService, SaveGameService>();
 builder.Services.AddScoped<IVisibilityService, VisibilityService>();
+builder.Services.AddScoped<ILeaderService, LeaderService>();
+builder.Services.AddScoped<IBattleDoctrineService, BattleDoctrineService>();
+builder.Services.AddScoped<IStationService, StationService>();
+builder.Services.AddScoped<IGroundCombatService, GroundCombatService>();
+
+// Game Clock (Singleton - holds tick state across app lifetime)
+builder.Services.AddSingleton<IGameClockService, GameClockService>();
 
 // SignalR for real-time updates
 builder.Services.AddSignalR(options =>

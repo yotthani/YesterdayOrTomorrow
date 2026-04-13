@@ -1,0 +1,83 @@
+{
+  "1": {
+    "class_type": "UNETLoader",
+    "inputs": {
+      "unet_name": "flux-2-klein-4b.safetensors",
+      "weight_dtype": "default"
+    }
+  },
+  "2": {
+    "class_type": "CLIPLoader",
+    "inputs": {
+      "clip_name": "qwen_3_4b.safetensors",
+      "type": "flux2"
+    }
+  },
+  "3": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "flux2-vae.safetensors"
+    }
+  },
+  "11": {
+    "class_type": "LoraLoader",
+    "inputs": {
+      "model": ["1", 0],
+      "clip": ["2", 0],
+      "lora_name": "enterpriseV2-zwxem.safetensors",
+      "strength_model": 0.6,
+      "strength_clip": 0.6
+    }
+  },
+  "5": {
+    "class_type": "EmptySD3LatentImage",
+    "inputs": {
+      "width": 1024,
+      "height": 1024,
+      "batch_size": 1
+    }
+  },
+  "6": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "text": "Studio photograph of a detailed model of the USS Enterprise NCC-1701 from Star Trek, side profile view facing right. The ship consists of four distinct sections connected in sequence: FIRST a large flat circular saucer disc at the front which is the biggest part of the ship, SECOND a thin vertical neck dropping down from the saucer, THIRD a smaller horizontal cylindrical engineering hull connected to the bottom of the neck, FOURTH two thin cylindrical warp nacelles on diagonal pylons extending up and back from the engineering hull. The nacelles are much thinner than the saucer. Red bussard collector domes glow at the front of each nacelle. Light pearl gray hull panels with thin red pinstripe accents. The ship flies horizontally left to right. Single ship, solid black background, sharp focus, studio lighting, highly detailed scale model photography",
+      "clip": ["11", 1]
+    }
+  },
+  "10": {
+    "class_type": "KSampler",
+    "inputs": {
+      "seed": 1337,
+      "steps": 28,
+      "cfg": 3.5,
+      "sampler_name": "euler",
+      "scheduler": "simple",
+      "denoise": 1.0,
+      "model": ["11", 0],
+      "positive": ["6", 0],
+      "negative": ["7", 0],
+      "latent_image": ["5", 0]
+    }
+  },
+  "7": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "text": "blurry, low quality, distorted, watermark, text, multiple ships, fleet, person, planet, modern vehicle, submarine, vertical orientation, claymation, cartoon, anime",
+      "clip": ["11", 1]
+    }
+  },
+  "8": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": ["10", 0],
+      "vae": ["3", 0]
+    }
+  },
+  "9": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "filename_prefix": "flux2_constitution_lora",
+      "images": ["8", 0]
+    }
+  }
+}

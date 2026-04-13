@@ -1,0 +1,250 @@
+@page "/game/stations"
+@layout StellarisLayout
+@using MudBlazor
+@using StarTrekGame.Web.Services
+@using Blazored.LocalStorage
+@inject IGameApiClient Api
+@inject NavigationManager Navigation
+@inject ILocalStorageService LocalStorage
+@inject ISnackbar Snackbar
+
+<PageTitle>Starbases - Galactic Strategy</PageTitle>
+
+<div class="stations-content">
+    <div class="stations-header">
+        <h1>&#x2693; STARBASES</h1>
+        <div class="station-count">@_stations.Count Stations</div>
+        <div class="header-actions">
+            <button class="st-btn" @onclick="() => _showBuildDialog = true">+ BUILD NEW STATION</button>
+        </div>
+    </div>
+
+    @if (_stations.Any())
+    {
+        <div class="stations-table-wrapper">
+            <table class="stations-table">
+                <thead>
+                    <tr>
+                        <th>NAME</th>
+                        <th>SYSTEM</th>
+                        <th>STATUS</th>
+                        <th>MODULES</th>
+                        <th>SENSOR RANGE</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var station in _stations)
+                    {
+                        <tr class="station-row" @onclick="() => NavigateToStation(station.Id)">
+                            <td class="station-name-cell">
+                                <span class="station-icon">&#x2693;</span>
+                                <span class="station-name">@station.Name</span>
+                            </td>
+                            <td class="station-system">@station.SystemName</td>
+                            <td>
+                                @if (station.IsOperational)
+                                {
+                                    <span class="status-badge operational">OPERATIONAL</span>
+                                }
+                                else
+                                {
+                                    <div class="construction-status">
+                                        <span class="status-badge building">BUILDING @station.ConstructionProgress%</span>
+                                        <div class="construction-bar"><div class="construction-fill" style="width: @station.ConstructionProgress%"></div></div>
+                                    </div>
+                                }
+                            </td>
+                            <td>
+                                <span class="module-count">@station.ModuleCount / @station.TotalSlots</span>
+                            </td>
+                            <td>
+                                <span class="sensor-range">@station.SensorRange ly</span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="empty-state">
+            <span class="empty-icon">&#x2693;</span>
+            <p>No starbases constructed yet.</p>
+            <p class="empty-hint">Build a station to extend your empire's reach and provide fleet support.</p>
+            <button class="st-btn" @onclick="() => _showBuildDialog = true">BUILD FIRST STATION</button>
+        </div>
+    }
+</div>
+
+@* Build Station Dialog *@
+@if (_showBuildDialog)
+{
+    <div class="modal-overlay" @onclick="() => _showBuildDialog = false">
+        <div class="build-modal" @onclick:stopPropagation="true">
+            <div class="modal-header">
+                <h3>BUILD NEW STARBASE</h3>
+                <span class="modal-sub">Select location and name</span>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Station Name</label>
+                    <input type="text" class="st-input" placeholder="e.g. Deep Space 9" @bind="_newStationName" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">System</label>
+                    <input type="text" class="st-input" placeholder="Search systems..." @bind="_systemSearch" @bind:event="oninput" />
+                    <div class="systems-list">
+                        @foreach (var sys in FilteredSystems)
+                        {
+                            <div class="system-option @(_selectedSystemId == sys.Id ? "selected" : "")"
+                                 @onclick="() => _selectedSystemId = sys.Id">
+                                <span class="system-name">@sys.Name</span>
+                                @if (sys.ControllingFactionId.HasValue) {<span class="system-owner">Controlled</span>}
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="st-btn" @onclick="() => _showBuildDialog = false">CANCEL</button>
+                <button class="st-btn primary" disabled="@(string.IsNullOrWhiteSpace(_newStationName) || !_selectedSystemId.HasValue || _isProcessing)" @onclick="BuildStation">BUILD</button>
+            </div>
+        </div>
+    </div>
+}
+
+<style>
+.stations-content{flex:1;display:flex;flex-direction:column;background:linear-gradient(180deg,#080c14 0%,#040608 100%)}
+.stations-header{padding:16px 24px;background:rgba(10,15,25,0.9);border-bottom:1px solid var(--st-border-dark);display:flex;align-items:center;gap:24px}
+.stations-header h1{font-family:var(--st-font-display);font-size:18px;color:var(--st-text-white);letter-spacing:2px;margin:0}
+.station-count{font-size:12px;color:var(--st-text-muted);flex:1}
+.header-actions{display:flex;gap:8px}
+.stations-table-wrapper{flex:1;padding:16px;overflow-y:auto}
+.stations-table{width:100%;border-collapse:separate;border-spacing:0 4px}
+.stations-table thead th{padding:10px 16px;text-align:left;font-size:11px;font-weight:600;color:var(--st-text-dim);letter-spacing:1px;border-bottom:1px solid var(--st-border-dark)}
+.station-row{cursor:pointer;transition:all 0.15s}
+.station-row td{padding:14px 16px;background:var(--st-bg-medium);border-top:1px solid transparent;border-bottom:1px solid transparent}
+.station-row td:first-child{border-radius:6px 0 0 6px;border-left:3px solid transparent}
+.station-row td:last-child{border-radius:0 6px 6px 0}
+.station-row:hover td{background:var(--st-bg-light)}
+.station-row:hover td:first-child{border-left-color:var(--st-accent-blue)}
+.station-name-cell{display:flex;align-items:center;gap:10px}
+.station-icon{font-size:20px;color:var(--st-accent-gold)}
+.station-name{font-size:13px;font-weight:500;color:var(--st-text-white)}
+.station-system{font-size:12px;color:var(--st-text-bright)}
+.status-badge{font-size:10px;padding:3px 10px;border-radius:4px;font-weight:600;letter-spacing:0.5px}
+.status-badge.operational{background:rgba(68,255,136,0.15);color:#44ff88}
+.status-badge.building{background:rgba(255,200,68,0.15);color:var(--st-accent-gold)}
+.construction-status{display:flex;flex-direction:column;gap:4px}
+.construction-bar{height:4px;background:rgba(0,0,0,0.3);border-radius:2px;overflow:hidden;width:100px}
+.construction-fill{height:100%;background:var(--st-accent-gold);border-radius:2px;transition:width 0.3s}
+.module-count{font-size:12px;color:var(--st-text-bright);font-family:var(--st-font-display)}
+.sensor-range{font-size:12px;color:var(--st-accent-cyan)}
+.empty-state{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--st-text-dim)}
+.empty-icon{font-size:64px;opacity:0.15;filter:grayscale(100%)}
+.empty-hint{font-size:12px;color:var(--st-text-dim);max-width:400px;text-align:center}
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);display:flex;align-items:center;justify-content:center;z-index:1000}
+.build-modal{background:var(--st-bg-dark,#0a0f18);border:1px solid var(--st-border-medium,#2a3a4a);border-radius:12px;width:460px;max-height:75vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.6)}
+.modal-header{padding:16px 20px;border-bottom:1px solid var(--st-border-dark)}.modal-header h3{margin:0;font-family:var(--st-font-display);font-size:16px;color:var(--st-text-white);letter-spacing:1px}.modal-sub{font-size:11px;color:var(--st-text-dim)}
+.modal-body{padding:16px 20px;flex:1;overflow-y:auto}
+.form-group{margin-bottom:16px}.form-label{display:block;font-size:11px;color:var(--st-text-muted);letter-spacing:1px;margin-bottom:6px;font-weight:600}
+.st-input{width:100%;padding:10px 12px;background:var(--st-bg-medium,#141c28);border:1px solid var(--st-border-dark,#1a2a3a);border-radius:6px;color:var(--st-text-bright,#e0e0e0);font-size:13px;outline:none}
+.st-input:focus{border-color:var(--st-accent-blue,#4a9eff)}
+.systems-list{max-height:220px;overflow-y:auto;display:flex;flex-direction:column;gap:4px;margin-top:8px}
+.system-option{display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--st-bg-medium,#141c28);border:1px solid transparent;border-radius:6px;cursor:pointer;transition:all 0.15s}
+.system-option:hover{background:var(--st-bg-light,#1c2838);border-color:var(--st-border-light,#3a4a5a)}
+.system-option.selected{border-color:var(--st-accent-blue,#4a9eff);background:rgba(74,158,255,0.15)}
+.system-name{flex:1;font-size:13px;color:var(--st-text-bright,#e0e0e0)}.system-owner{font-size:10px;color:var(--st-text-dim);padding:2px 6px;background:rgba(100,100,100,0.2);border-radius:3px}
+.modal-actions{padding:12px 20px;border-top:1px solid var(--st-border-dark);display:flex;gap:8px;justify-content:flex-end}
+</style>
+
+@code {
+    [CascadingParameter(Name = "GameState")] public StellarisLayout.GameLayoutState? GameState { get; set; }
+
+    private List<StationSummaryDto> _stations = new();
+    private List<StarSystemDto> _knownSystems = new();
+    private bool _showBuildDialog;
+    private bool _isProcessing;
+    private string _newStationName = "";
+    private string _systemSearch = "";
+    private Guid? _selectedSystemId;
+
+    private IEnumerable<StarSystemDto> FilteredSystems => _knownSystems
+        .Where(s => string.IsNullOrEmpty(_systemSearch) || s.Name.Contains(_systemSearch, StringComparison.OrdinalIgnoreCase))
+        .OrderBy(s => s.Name);
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (GameState?.FactionId.HasValue == true)
+        {
+            await LoadData();
+        }
+        else
+        {
+            LoadMockData();
+        }
+    }
+
+    private async Task LoadData()
+    {
+        try
+        {
+            _stations = await Api.GetStationsAsync(GameState!.FactionId!.Value);
+
+            if (GameState.GameId.HasValue)
+            {
+                _knownSystems = await Api.GetKnownSystemsAsync(GameState.GameId.Value, GameState.FactionId!.Value);
+            }
+        }
+        catch
+        {
+            LoadMockData();
+        }
+    }
+
+    private void LoadMockData()
+    {
+        _stations = new List<StationSummaryDto>
+        {
+            new(Guid.NewGuid(), "Earth Spacedock", "Sol", Guid.NewGuid(), true, 100, 6, 8, 12),
+            new(Guid.NewGuid(), "Starbase 375", "Bajor", Guid.NewGuid(), true, 100, 4, 6, 8),
+            new(Guid.NewGuid(), "Deep Space Station K-7", "Sherman's Planet", Guid.NewGuid(), false, 65, 2, 6, 5),
+        };
+    }
+
+    private void NavigateToStation(Guid stationId)
+    {
+        Navigation.NavigateTo($"/game/station-designer/{stationId}");
+    }
+
+    private async Task BuildStation()
+    {
+        if (string.IsNullOrWhiteSpace(_newStationName) || !_selectedSystemId.HasValue) return;
+        if (GameState?.GameId == null || GameState?.FactionId == null) return;
+
+        _isProcessing = true;
+        try
+        {
+            var result = await Api.BuildStationAsync(GameState.GameId.Value, GameState.FactionId.Value, _selectedSystemId.Value, _newStationName);
+            if (result != null)
+            {
+                Snackbar.Add($"Construction started: {_newStationName}", Severity.Success);
+                _showBuildDialog = false;
+                _newStationName = "";
+                _selectedSystemId = null;
+                _systemSearch = "";
+                await LoadData();
+            }
+            else
+            {
+                Snackbar.Add("Failed to build station", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error: {ex.Message}", Severity.Error);
+        }
+        _isProcessing = false;
+    }
+}

@@ -1,0 +1,102 @@
+[
+  {
+    "id": "welcome",
+    "title": "Willkommen, Commander!",
+    "icon": "\ud83c\udf0c",
+    "content": "Du \u00fcbernimmst das Kommando \u00fcber deine Fraktion und f\u00fchrst sie zur galaktischen Vorherrschaft. Erkunde neue Welten, baue m\u00e4chtige Flotten und forme dein Imperium unter den Sternen.",
+    "tips": [],
+    "position": "center",
+    "highlightSelector": null,
+    "nextRoute": null
+  },
+  {
+    "id": "galaxy-map",
+    "title": "Die Galaxie-Karte",
+    "icon": "\ud83d\uddfa\ufe0f",
+    "content": "Dies ist dein Fenster zur Galaxie. Jeder Punkt ist ein Sternensystem mit Planeten, Ressourcen und M\u00f6glichkeiten zur Expansion.",
+    "tips": ["Scrollen zum Zoomen", "Klicken und Ziehen zum Bewegen", "System anklicken f\u00fcr Details", "Doppelklick \u00f6ffnet die System-Ansicht"],
+    "position": "top-right",
+    "highlightSelector": ".galaxy-canvas-container",
+    "nextRoute": "/game/galaxy"
+  },
+  {
+    "id": "select-system",
+    "title": "Ein System ausw\u00e4hlen",
+    "icon": "\u2b50",
+    "content": "Klicke auf dein Heimatsystem um es auszuw\u00e4hlen. Systeme zeigen dir ihre Planeten, Ressourcen und stationierte Flotten.",
+    "tips": ["Gelbe Systeme haben gute Habitabilit\u00e4t", "Dein Territorium ist farblich hervorgehoben", "Feindliche Systeme zeigen deren Fraktionsfarbe"],
+    "position": "bottom-right",
+    "highlightSelector": ".system-info-panel",
+    "nextRoute": null
+  },
+  {
+    "id": "colony-overview",
+    "title": "Deine Kolonien",
+    "icon": "\ud83c\udf0d",
+    "content": "Die Kolonie\u00fcbersicht zeigt alle deine besiedelten Planeten. Jede Kolonie produziert Ressourcen und kann Schiffe und Geb\u00e4ude bauen.",
+    "tips": ["Population w\u00e4chst jede Runde", "Produktion bestimmt die Baugeschwindigkeit", "Forschung tr\u00e4gt zum Technologiefortschritt bei"],
+    "position": "top-right",
+    "highlightSelector": ".colony-list",
+    "nextRoute": "/game/planets"
+  },
+  {
+    "id": "build-queue",
+    "title": "Bauwarteschlange",
+    "icon": "\ud83c\udfd7\ufe0f",
+    "content": "W\u00e4hle eine Kolonie und \u00f6ffne ihre Bauwarteschlange. Hier baust du Schiffe f\u00fcr deine Flotten und Geb\u00e4ude zur St\u00e4rkung deiner Kolonie.",
+    "tips": ["Werften beschleunigen den Schiffbau um 50%", "Forschungslabore erh\u00f6hen die Forschungsleistung", "Orbitalverteidigungen sch\u00fctzen vor Angriffen"],
+    "position": "bottom-left",
+    "highlightSelector": ".build-queue",
+    "nextRoute": null
+  },
+  {
+    "id": "fleet-management",
+    "title": "Flottenmanagement",
+    "icon": "\ud83d\ude80",
+    "content": "Deine Flotten sind dein Werkzeug f\u00fcr Erkundung und Eroberung. Bewege sie zwischen Systemen, erkunde Unbekanntes und verteidige dein Territorium.",
+    "tips": ["Flotte ausw\u00e4hlen und Zielsystem klicken zum Bewegen", "Reisen dauert mehrere Runden", "Mehrere Schiffe bilden st\u00e4rkere Flotten", "Doktrin bestimmt die Kampftaktik"],
+    "position": "top-left",
+    "highlightSelector": ".fleet-list",
+    "nextRoute": "/game/fleets"
+  },
+  {
+    "id": "research",
+    "title": "Forschung",
+    "icon": "\ud83d\udd2c",
+    "content": "Technologischer Fortschritt ist der Schl\u00fcssel zur \u00dcberlegenheit. W\u00e4hle Forschungsprojekte um neue Schiffe, Geb\u00e4ude und F\u00e4higkeiten freizuschalten.",
+    "tips": ["Drei Forschungszweige: Physik, Gesellschaft, Ingenieurwesen", "Manche Technologien haben Voraussetzungen", "Fokussiere basierend auf deiner Strategie"],
+    "position": "top-right",
+    "highlightSelector": null,
+    "nextRoute": "/game/research"
+  },
+  {
+    "id": "diplomacy",
+    "title": "Diplomatie",
+    "icon": "\ud83e\udd1d",
+    "content": "Du bist nicht allein in der Galaxie. Andere Fraktionen konkurrieren um dieselben Ressourcen. Schlie\u00dfe Allianzen, verhandle Vertr\u00e4ge oder erkl\u00e4re den Krieg!",
+    "tips": ["Handelsabkommen bringen gegenseitige Vorteile", "Beobachte die Beziehungswerte genau", "Spionage kann feindliche Pl\u00e4ne aufdecken"],
+    "position": "center",
+    "highlightSelector": null,
+    "nextRoute": "/game/diplomacy"
+  },
+  {
+    "id": "end-turn",
+    "title": "Runde beenden",
+    "icon": "\u23f1\ufe0f",
+    "content": "Wenn du alle Befehle erteilt hast, beende deine Runde. Alle Aktionen werden ausgef\u00fchrt, KI-Fraktionen handeln, und K\u00e4mpfe werden aufgel\u00f6st.",
+    "tips": ["\u00dcberpr\u00fcfe alle offenen Befehle vor dem Rundenende", "Kampfergebnisse werden automatisch berechnet", "Neue Ereignisse k\u00f6nnen auftreten"],
+    "position": "bottom-right",
+    "highlightSelector": ".end-turn-btn",
+    "nextRoute": "/game/galaxy"
+  },
+  {
+    "id": "complete",
+    "title": "Du bist bereit!",
+    "icon": "\u2b50",
+    "content": "Du kennst jetzt die Grundlagen. Erkunde nahe Systeme, gr\u00fcnde neue Kolonien und baue deine Flotte auf. Viel Erfolg, Commander!",
+    "tips": ["Das Hilfe-Men\u00fc enth\u00e4lt detaillierte Anleitungen zu allen Spielsystemen", "Spezies, taktischer Kampf und Krisensystem warten auf dich"],
+    "position": "center",
+    "highlightSelector": null,
+    "nextRoute": null
+  }
+]

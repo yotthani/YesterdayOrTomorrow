@@ -1,0 +1,717 @@
+@page "/game/tactical-battle/{CombatId:guid}"
+@layout StellarisLayout
+@implements IAsyncDisposable
+@inject IGameApiClient Api
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+@inject ILocalStorageService LocalStorage
+@inject IJSRuntime JS
+
+<PageTitle>Tactical Battle - Galactic Strategy</PageTitle>
+
+@if (_loading)
+{
+    <div class="tactical-loading">
+        <div class="loading-spinner"></div>
+        <span>Initializing tactical display...</span>
+    </div>
+}
+else if (_state == null)
+{
+    <div class="tactical-loading">
+        <span class="error-text">Failed to load tactical state.</span>
+        <button class="st-btn" @onclick='() => Navigation.NavigateTo("/game/galaxy")'>Return to Galaxy</button>
+    </div>
+}
+else
+{
+    <div class="tactical-page">
+        @* ═══════════════════════════════════════════════════════════════
+           LEFT: CANVAS AREA (65%)
+           ═══════════════════════════════════════════════════════════════ *@
+        <div class="tactical-canvas-area">
+            <canvas id="tactical-canvas"></canvas>
+
+            <div class="canvas-bottom-bar">
+                <div class="round-counter">ROUND @_state.Round</div>
+                <div class="canvas-controls">
+                    <button class="st-btn" @onclick="ExecuteNextRound" disabled="@(_processing || _state.IsComplete || _paused)">
+                        NEXT ROUND
+                    </button>
+                    <button class="st-btn" @onclick="AutoResolve" disabled="@(_processing || _state.IsComplete)">
+                        AUTO-RESOLVE
+                    </button>
+                    <button class="st-btn @(_paused ? "active" : "")" @onclick="TogglePause" disabled="@_state.IsComplete">
+                        @(_paused ? "▶ RESUME" : "⏸ PAUSE")
+                    </button>
+                </div>
+                @if (_processing)
+                {
+                    <div class="processing-indicator">Processing...</div>
+                }
+            </div>
+
+            @if (_state.IsComplete)
+            {
+                <div class="battle-result-overlay @(_state.WinnerId == _myFactionId ? "victory" : "defeat")">
+                    <div class="result-content">
+                        <h2>@(_state.WinnerId == _myFactionId ? "VICTORY" : "DEFEAT")</h2>
+                        <div class="result-stats">
+                            <div class="stat"><span class="label">Rounds</span><span class="value">@_state.Round</span></div>
+                            <div class="stat"><span class="label">Ships Lost</span><span class="value">@(MySide?.Ships?.Count(s => s.IsDestroyed) ?? 0)</span></div>
+                            <div class="stat"><span class="label">Enemy Destroyed</span><span class="value">@(EnemySide?.Ships?.Count(s => s.IsDestroyed) ?? 0)</span></div>
+                        </div>
+                        <button class="st-btn lg" @onclick='() => Navigation.NavigateTo("/game/galaxy")'>RETURN TO GALAXY</button>
+                    </div>
+                </div>
+            }
+        </div>
+
+        @* ═══════════════════════════════════════════════════════════════
+           RIGHT: CONTROL PANEL (35%)
+           ═══════════════════════════════════════════════════════════════ *@
+        <div class="tactical-control-panel">
+
+            @* ── Disorder Meter ─────────────────────────────────────── *@
+            <div class="panel-section disorder-section">
+                <div class="section-header">FLEET DISORDER</div>
+                <div class="disorder-display">
+                    <div class="disorder-bar-container">
+                        <div class="disorder-bar-fill" style="height:@(_disorderPercent)%;background:@GetDisorderColor(_disorderPercent)"></div>
+                    </div>
+                    <div class="disorder-value" style="color:@GetDisorderColor(_disorderPercent)">@_disorderPercent.ToString("F0")%</div>
+                    <div class="disorder-labels">
+                        <span class="disorder-label-top">CHAOS</span>
+                        <span class="disorder-label-bottom">ORDER</span>
+                    </div>
+                </div>
+            </div>
+
+            @* ── Formation ──────────────────────────────────────────── *@
+            <div class="panel-section">
+                <div class="section-header">FORMATION</div>
+                <div class="formation-display">
+                    <span class="formation-name">@GetFormationEmoji(MySide?.Formation ?? "Line") @(MySide?.Formation ?? "Line")</span>
+                    <select class="formation-select" @onchange="OnFormationChanged" value="@(MySide?.Formation ?? "Line")">
+                        <option value="Line">Line</option>
+                        <option value="Wedge">Wedge</option>
+                        <option value="Echelon">Echelon</option>
+                        <option value="Screen">Screen</option>
+                        <option value="Swarm">Swarm</option>
+                    </select>
+                    <span class="disorder-cost">(+15 disorder)</span>
+                </div>
+            </div>
+
+            @* ── My Ships ───────────────────────────────────────────── *@
+            <div class="panel-section ships-section">
+                <div class="section-header">MY SHIPS (@(MySide?.Ships?.Count(s => !s.IsDestroyed) ?? 0)/@(MySide?.Ships?.Count ?? 0))</div>
+                <div class="ships-list">
+                    @if (MySide?.Ships != null)
+                    {
+                        @foreach (var ship in MySide.Ships)
+                        {
+                            <div class="ship-item @(ship.IsDestroyed ? "destroyed" : "") @(ship.ShipId == _selectedShipId ? "selected" : "")"
+                                 @onclick="() => SelectShip(ship.ShipId)">
+                                <div class="ship-item-header">
+                                    <span class="ship-item-name">@ship.Name</span>
+                                    <span class="ship-item-class">@ship.ShipClass</span>
+                                </div>
+                                <div class="ship-item-bars">
+                                    <div class="mini-bar hull-bar">
+                                        <div class="mini-bar-fill" style="width:@(ship.MaxHull > 0 ? (int)(ship.Hull * 100.0 / ship.MaxHull) : 0)%"></div>
+                                    </div>
+                                    <div class="mini-bar shield-bar">
+                                        <div class="mini-bar-fill" style="width:@(ship.MaxShields > 0 ? (int)(ship.Shields * 100.0 / ship.MaxShields) : 0)%"></div>
+                                    </div>
+                                </div>
+                                @if (ship.IsDisabled)
+                                {
+                                    <span class="ship-flag disabled">DISABLED</span>
+                                }
+                                @if (ship.IsWebbed)
+                                {
+                                    <span class="ship-flag webbed">WEBBED</span>
+                                }
+                                @if (ship.IsDestroyed)
+                                {
+                                    <span class="ship-flag destroyed">DESTROYED</span>
+                                }
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+
+            @* ── Selected Ship Detail ───────────────────────────────── *@
+            @if (SelectedShip != null)
+            {
+                <div class="panel-section">
+                    <div class="section-header">SELECTED SHIP</div>
+                    <div class="ship-detail">
+                        <div class="detail-row"><span class="detail-label">Name</span><span class="detail-value">@SelectedShip.Name</span></div>
+                        <div class="detail-row"><span class="detail-label">Class</span><span class="detail-value">@SelectedShip.ShipClass</span></div>
+                        <div class="detail-row"><span class="detail-label">Role</span><span class="detail-value">@SelectedShip.Role</span></div>
+                        <div class="detail-row">
+                            <span class="detail-label">Hull</span>
+                            <div class="detail-bar-wrap">
+                                <div class="detail-bar hull-bar"><div class="detail-bar-fill" style="width:@(SelectedShip.MaxHull > 0 ? (int)(SelectedShip.Hull * 100.0 / SelectedShip.MaxHull) : 0)%"></div></div>
+                                <span class="detail-bar-text">@SelectedShip.Hull / @SelectedShip.MaxHull</span>
+                            </div>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Shields</span>
+                            <div class="detail-bar-wrap">
+                                <div class="detail-bar shield-bar"><div class="detail-bar-fill" style="width:@(SelectedShip.MaxShields > 0 ? (int)(SelectedShip.Shields * 100.0 / SelectedShip.MaxShields) : 0)%"></div></div>
+                                <span class="detail-bar-text">@SelectedShip.Shields / @SelectedShip.MaxShields</span>
+                            </div>
+                        </div>
+                        @if (SelectedShip.IsDisabled)
+                        {
+                            <div class="status-flag disabled">SYSTEMS DISABLED</div>
+                        }
+                        @if (SelectedShip.IsWebbed)
+                        {
+                            <div class="status-flag webbed">CAUGHT IN WEB</div>
+                        }
+                    </div>
+                </div>
+            }
+
+            @* ── Target Panel ───────────────────────────────────────── *@
+            @if (TargetShip != null)
+            {
+                <div class="panel-section target-panel">
+                    <div class="section-header">TARGET</div>
+                    <div class="ship-detail">
+                        <div class="detail-row"><span class="detail-label">Name</span><span class="detail-value enemy">@TargetShip.Name</span></div>
+                        <div class="detail-row"><span class="detail-label">Class</span><span class="detail-value">@TargetShip.ShipClass</span></div>
+                        <div class="detail-row"><span class="detail-label">Role</span><span class="detail-value">@TargetShip.Role</span></div>
+                        <div class="detail-row">
+                            <span class="detail-label">Hull</span>
+                            <div class="detail-bar-wrap">
+                                <div class="detail-bar hull-bar enemy"><div class="detail-bar-fill" style="width:@(TargetShip.MaxHull > 0 ? (int)(TargetShip.Hull * 100.0 / TargetShip.MaxHull) : 0)%"></div></div>
+                                <span class="detail-bar-text">@TargetShip.Hull / @TargetShip.MaxHull</span>
+                            </div>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Shields</span>
+                            <div class="detail-bar-wrap">
+                                <div class="detail-bar shield-bar enemy"><div class="detail-bar-fill" style="width:@(TargetShip.MaxShields > 0 ? (int)(TargetShip.Shields * 100.0 / TargetShip.MaxShields) : 0)%"></div></div>
+                                <span class="detail-bar-text">@TargetShip.Shields / @TargetShip.MaxShields</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            @* ── Order Buttons ──────────────────────────────────────── *@
+            <div class="panel-section">
+                <div class="section-header">TACTICAL ORDERS</div>
+                <div class="order-buttons">
+                    <button class="order-btn" @onclick="OrderAttackTarget"
+                            disabled="@(_processing || _state.IsComplete || _targetShipId == null || _selectedShipId == null)">
+                        Attack Target <span class="disorder-cost">(+15 disorder)</span>
+                    </button>
+                    <button class="order-btn" @onclick="OrderRaiseShields"
+                            disabled="@(_processing || _state.IsComplete || _selectedShipId == null)">
+                        Raise Shields <span class="disorder-cost">(+15 disorder)</span>
+                    </button>
+                    <button class="order-btn" @onclick="OrderEvasiveManeuvers"
+                            disabled="@(_processing || _state.IsComplete || _selectedShipId == null)">
+                        Evasive Maneuvers <span class="disorder-cost">(+15 disorder)</span>
+                    </button>
+                    <button class="order-btn" @onclick="OrderChangeFormation"
+                            disabled="@(_processing || _state.IsComplete)">
+                        Change Formation <span class="disorder-cost">(+15 disorder)</span>
+                    </button>
+                    <div class="order-row">
+                        <button class="order-btn flex-1" @onclick="OrderChangeTargetPriority"
+                                disabled="@(_processing || _state.IsComplete)">
+                            Target Priority <span class="disorder-cost">(+15 disorder)</span>
+                        </button>
+                        <select class="priority-select" @bind="_selectedTargetPriority">
+                            <option value="Closest">Closest</option>
+                            <option value="Weakest">Weakest</option>
+                            <option value="Strongest">Strongest</option>
+                            <option value="Largest">Largest</option>
+                            <option value="Random">Random</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            @* ── Triggered Orders ───────────────────────────────────── *@
+            @if (_triggeredOrders.Count > 0)
+            {
+                <div class="panel-section">
+                    <div class="section-header">TRIGGERED ORDERS</div>
+                    <div class="triggered-list">
+                        @foreach (var order in _triggeredOrders)
+                        {
+                            <div class="triggered-item"><span class="trigger-check">&#x2714;</span> @order</div>
+                        }
+                    </div>
+                </div>
+            }
+
+            @* ── Battle Log ─────────────────────────────────────────── *@
+            <div class="panel-section log-section">
+                <div class="section-header">BATTLE LOG</div>
+                <div class="battle-log-list">
+                    @foreach (var entry in _battleLog.AsEnumerable().Reverse())
+                    {
+                        <div class="log-entry @GetLogClass(entry)">@entry</div>
+                    }
+                </div>
+            </div>
+
+        </div>
+    </div>
+}
+
+<style>
+/* ── Page Grid ────────────────────────────────────────────── */
+.tactical-page{display:grid;grid-template-columns:65% 35%;height:100%;overflow:hidden}
+
+/* ── Loading / Error ──────────────────────────────────────── */
+.tactical-loading{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:16px;color:var(--st-text-muted,#8899aa)}
+.loading-spinner{width:40px;height:40px;border:3px solid var(--st-border-dark,#1a2a3a);border-top-color:var(--st-accent-blue,#4a9eff);border-radius:50%;animation:spin 1s linear infinite}
+.error-text{color:var(--st-accent-red,#ff4444);font-size:14px}
+
+/* ── Canvas Area ──────────────────────────────────────────── */
+.tactical-canvas-area{position:relative;display:flex;flex-direction:column;background:#050510;overflow:hidden}
+#tactical-canvas{flex:1;width:100%;display:block}
+.canvas-bottom-bar{display:flex;align-items:center;gap:16px;padding:8px 16px;background:rgba(10,15,25,0.95);border-top:1px solid var(--st-border-dark,#1a2a3a)}
+.round-counter{font-family:var(--st-font-display,sans-serif);font-size:16px;color:var(--st-accent-gold,#ffcc44);letter-spacing:2px;min-width:100px}
+.canvas-controls{display:flex;gap:8px;flex:1}
+.canvas-controls .st-btn.active{background:var(--st-accent-blue,#4a9eff);color:#fff}
+.processing-indicator{font-size:11px;color:var(--st-accent-orange,#ffaa44);animation:blink 1s infinite}
+
+/* ── Battle Result Overlay ────────────────────────────────── */
+.battle-result-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;z-index:50}
+.battle-result-overlay .result-content{text-align:center;padding:40px;background:var(--st-gradient-panel,linear-gradient(180deg,#0d1520,#0a0f18));border:1px solid var(--st-border-bright,#2a3a4a);border-radius:12px}
+.battle-result-overlay.victory .result-content{border-color:var(--st-accent-green,#44dd66);box-shadow:0 0 40px rgba(68,221,102,0.3)}
+.battle-result-overlay.defeat .result-content{border-color:var(--st-accent-red,#ff4444);box-shadow:0 0 40px rgba(255,68,68,0.3)}
+.result-content h2{font-family:var(--st-font-display,sans-serif);font-size:36px;letter-spacing:4px;margin:0 0 24px}
+.victory h2{color:var(--st-accent-green,#44dd66)}
+.defeat h2{color:var(--st-accent-red,#ff4444)}
+.result-stats{display:flex;gap:32px;margin-bottom:32px;justify-content:center}
+.result-stats .stat{text-align:center}
+.stat .label{display:block;font-size:11px;color:var(--st-text-dim,#667788);margin-bottom:4px}
+.stat .value{font-family:var(--st-font-display,sans-serif);font-size:24px;color:var(--st-text-bright,#eef2ff)}
+
+/* ── Control Panel ────────────────────────────────────────── */
+.tactical-control-panel{display:flex;flex-direction:column;background:var(--st-gradient-panel,linear-gradient(180deg,#0d1520,#0a0f18));border-left:1px solid var(--st-border-dark,#1a2a3a);overflow-y:auto}
+
+.panel-section{padding:12px 14px;border-bottom:1px solid var(--st-border-dark,#1a2a3a)}
+.section-header{font-size:10px;font-weight:600;color:var(--st-text-dim,#667788);letter-spacing:1.5px;margin-bottom:8px}
+
+/* ── Disorder Meter ───────────────────────────────────────── */
+.disorder-section{padding:12px 14px}
+.disorder-display{display:flex;align-items:center;gap:12px}
+.disorder-bar-container{width:24px;height:100px;background:rgba(0,0,0,0.4);border:1px solid var(--st-border-dark,#1a2a3a);border-radius:4px;overflow:hidden;position:relative;display:flex;flex-direction:column-reverse}
+.disorder-bar-fill{width:100%;transition:height 0.4s ease,background 0.4s ease;border-radius:0 0 3px 3px}
+.disorder-value{font-family:var(--st-font-display,sans-serif);font-size:28px;font-weight:700}
+.disorder-labels{display:flex;flex-direction:column;justify-content:space-between;height:100px;font-size:9px;color:var(--st-text-dim,#667788);letter-spacing:1px}
+.disorder-label-top{color:var(--st-accent-red,#ff4444)}
+.disorder-label-bottom{color:var(--st-accent-green,#44dd66)}
+
+/* ── Formation ────────────────────────────────────────────── */
+.formation-display{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.formation-name{font-size:14px;color:var(--st-text-white,#eef2ff);font-weight:500}
+.formation-select{background:rgba(0,0,0,0.4);border:1px solid var(--st-border-dark,#1a2a3a);color:var(--st-text-muted,#8899aa);padding:4px 8px;border-radius:4px;font-size:11px}
+.disorder-cost{color:var(--st-accent-red,#ff4444);font-size:10px;font-weight:600}
+
+/* ── Ship List ────────────────────────────────────────────── */
+.ships-section{flex:1;min-height:0;display:flex;flex-direction:column}
+.ships-list{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:4px;max-height:200px}
+.ship-item{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:6px 8px;background:rgba(0,0,0,0.2);border:1px solid transparent;border-radius:4px;cursor:pointer;transition:all 0.15s}
+.ship-item:hover{background:rgba(74,158,255,0.08);border-color:rgba(74,158,255,0.2)}
+.ship-item.selected{background:rgba(74,158,255,0.15);border-color:var(--st-accent-blue,#4a9eff)}
+.ship-item.destroyed{opacity:0.35;pointer-events:none}
+.ship-item-header{flex:1;min-width:0;display:flex;gap:8px;align-items:baseline}
+.ship-item-name{font-size:11px;color:var(--st-text-white,#eef2ff);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ship-item-class{font-size:9px;color:var(--st-text-dim,#667788)}
+.ship-item-bars{display:flex;gap:4px;width:80px}
+.mini-bar{height:4px;flex:1;background:rgba(0,0,0,0.4);border-radius:2px;overflow:hidden}
+.mini-bar.hull-bar .mini-bar-fill{height:100%;background:linear-gradient(90deg,#44dd66,#66ff88);transition:width 0.3s}
+.mini-bar.shield-bar .mini-bar-fill{height:100%;background:linear-gradient(90deg,#4a9eff,#66bbff);transition:width 0.3s}
+.ship-flag{font-size:8px;padding:1px 5px;border-radius:3px;font-weight:600;letter-spacing:0.5px}
+.ship-flag.disabled{background:rgba(255,170,68,0.2);color:var(--st-accent-orange,#ffaa44)}
+.ship-flag.webbed{background:rgba(170,68,255,0.2);color:#bb88ff}
+.ship-flag.destroyed{background:rgba(255,68,68,0.2);color:var(--st-accent-red,#ff4444)}
+
+/* ── Ship Detail ──────────────────────────────────────────── */
+.ship-detail{display:flex;flex-direction:column;gap:6px}
+.detail-row{display:flex;align-items:center;gap:8px}
+.detail-label{font-size:10px;color:var(--st-text-dim,#667788);width:50px;flex-shrink:0}
+.detail-value{font-size:12px;color:var(--st-text-white,#eef2ff)}
+.detail-value.enemy{color:var(--st-accent-red,#ff4444)}
+.detail-bar-wrap{flex:1;display:flex;align-items:center;gap:6px}
+.detail-bar{height:8px;flex:1;background:rgba(0,0,0,0.4);border-radius:4px;overflow:hidden}
+.detail-bar.hull-bar .detail-bar-fill{height:100%;background:linear-gradient(90deg,#44dd66,#66ff88);transition:width 0.3s}
+.detail-bar.shield-bar .detail-bar-fill{height:100%;background:linear-gradient(90deg,#4a9eff,#66bbff);transition:width 0.3s}
+.detail-bar.hull-bar.enemy .detail-bar-fill{background:linear-gradient(90deg,#ff4444,#ff6666)}
+.detail-bar.shield-bar.enemy .detail-bar-fill{background:linear-gradient(90deg,#ff4444,#ff8888)}
+.detail-bar-text{font-size:10px;color:var(--st-text-muted,#8899aa);white-space:nowrap;min-width:70px}
+.status-flag{font-size:10px;padding:3px 8px;border-radius:4px;margin-top:2px;display:inline-block}
+.status-flag.disabled{background:rgba(255,170,68,0.15);color:var(--st-accent-orange,#ffaa44);border:1px solid rgba(255,170,68,0.3)}
+.status-flag.webbed{background:rgba(170,68,255,0.15);color:#bb88ff;border:1px solid rgba(170,68,255,0.3)}
+
+/* ── Target Panel ─────────────────────────────────────────── */
+.target-panel{border-left:3px solid var(--st-accent-red,#ff4444)}
+
+/* ── Order Buttons ────────────────────────────────────────── */
+.order-buttons{display:flex;flex-direction:column;gap:6px}
+.order-btn{display:flex;align-items:center;justify-content:space-between;width:100%;padding:8px 12px;background:rgba(0,0,0,0.3);border:1px solid var(--st-border-dark,#1a2a3a);border-radius:4px;color:var(--st-text-white,#eef2ff);font-size:11px;cursor:pointer;transition:all 0.15s;text-align:left}
+.order-btn:hover:not(:disabled){background:rgba(74,158,255,0.1);border-color:rgba(74,158,255,0.3)}
+.order-btn:disabled{opacity:0.35;cursor:not-allowed}
+.order-row{display:flex;gap:6px;align-items:stretch}
+.order-row .flex-1{flex:1}
+.priority-select{background:rgba(0,0,0,0.4);border:1px solid var(--st-border-dark,#1a2a3a);color:var(--st-text-muted,#8899aa);padding:4px 6px;border-radius:4px;font-size:10px;width:90px}
+
+/* ── Triggered Orders ─────────────────────────────────────── */
+.triggered-list{display:flex;flex-direction:column;gap:3px}
+.triggered-item{font-size:11px;color:var(--st-accent-green,#44dd66);display:flex;align-items:center;gap:6px}
+.trigger-check{color:var(--st-accent-green,#44dd66);font-weight:bold}
+
+/* ── Battle Log ───────────────────────────────────────────── */
+.log-section{flex:1;min-height:0;display:flex;flex-direction:column}
+.battle-log-list{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:2px;max-height:180px}
+.log-entry{font-size:10px;padding:3px 6px;border-radius:3px;color:var(--st-text-muted,#8899aa)}
+.log-entry.damage{background:rgba(255,68,68,0.08);color:var(--st-accent-red,#ff4444)}
+.log-entry.destroy{background:rgba(255,170,68,0.1);color:var(--st-accent-orange,#ffaa44)}
+.log-entry.shield{background:rgba(74,158,255,0.08);color:var(--st-accent-blue,#4a9eff)}
+.log-entry.order{background:rgba(68,221,102,0.08);color:var(--st-accent-green,#44dd66)}
+.log-entry.info{color:var(--st-text-dim,#667788)}
+
+/* ── Animations ───────────────────────────────────────────── */
+@@keyframes spin{to{transform:rotate(360deg)}}
+@@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+</style>
+
+@code {
+    [Parameter] public Guid CombatId { get; set; }
+    [CascadingParameter(Name = "GameState")] public StellarisLayout.GameLayoutState? GameState { get; set; }
+
+    private TacticalStateDto? _state;
+    private Guid? _selectedShipId;
+    private Guid? _targetShipId;
+    private double _disorderPercent;
+    private List<string> _battleLog = new();
+    private List<string> _triggeredOrders = new();
+    private bool _loading = true;
+    private bool _processing;
+    private bool _paused;
+    private Guid _myFactionId;
+    private string _selectedTargetPriority = "Closest";
+
+    private DotNetObjectReference<TacticalBattle>? _dotNetRef;
+    private bool _canvasInitialized;
+
+    // ── Computed Properties ──────────────────────────────────────
+    private TacticalSideDto? MySide => _state?.Attacker?.FactionId == _myFactionId
+        ? _state.Attacker
+        : _state?.Defender;
+
+    private TacticalSideDto? EnemySide => _state?.Attacker?.FactionId == _myFactionId
+        ? _state?.Defender
+        : _state?.Attacker;
+
+    private TacticalShipDto? SelectedShip => _selectedShipId.HasValue
+        ? MySide?.Ships?.FirstOrDefault(s => s.ShipId == _selectedShipId.Value)
+        : null;
+
+    private TacticalShipDto? TargetShip => _targetShipId.HasValue
+        ? EnemySide?.Ships?.FirstOrDefault(s => s.ShipId == _targetShipId.Value)
+        : null;
+
+    // ── Lifecycle ────────────────────────────────────────────────
+    protected override async Task OnInitializedAsync()
+    {
+        GameState?.SetTopbarOverride("⚔", "TACTICAL BATTLE", "Engagement in progress",
+            cssClass: "combat-header", showResources: true, showEndTurn: false);
+
+        // Determine player faction
+        try
+        {
+            var factionIdStr = await LocalStorage.GetItemAsStringAsync("currentFactionId");
+            if (Guid.TryParse(factionIdStr?.Trim('"'), out var fid))
+                _myFactionId = fid;
+        }
+        catch { /* non-critical */ }
+
+        try
+        {
+            _state = await Api.GetTacticalStateAsync(CombatId);
+            if (_state != null)
+            {
+                _disorderPercent = MySide?.DisorderPercent ?? 0;
+                _selectedTargetPriority = MySide?.TargetPriority ?? "Closest";
+                if (_state.RoundLog != null)
+                    _battleLog.AddRange(_state.RoundLog);
+                if (_state.TriggeredOrders != null)
+                    _triggeredOrders.AddRange(_state.TriggeredOrders);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Failed to load tactical state: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && _state != null && !_canvasInitialized)
+        {
+            _dotNetRef = DotNetObjectReference.Create(this);
+            try
+            {
+                await JS.InvokeVoidAsync("TacticalViewer.init", "tactical-canvas",
+                    _state.Attacker?.Ships, _state.Defender?.Ships, _dotNetRef);
+                _canvasInitialized = true;
+            }
+            catch
+            {
+                // TacticalViewer JS may not be loaded yet in dev; non-fatal
+            }
+        }
+    }
+
+    // ── JS Interop Callbacks ─────────────────────────────────────
+    [JSInvokable]
+    public void OnShipClicked(string shipId)
+    {
+        var friendlyShip = MySide?.Ships?.FirstOrDefault(s => s.ShipId.ToString() == shipId);
+        if (friendlyShip != null)
+        {
+            _selectedShipId = friendlyShip.ShipId;
+        }
+        else
+        {
+            _targetShipId = Guid.TryParse(shipId, out var id) ? id : null;
+        }
+        StateHasChanged();
+    }
+
+    // ── Actions ──────────────────────────────────────────────────
+    private async Task ExecuteNextRound()
+    {
+        if (_processing || _state == null || _state.IsComplete) return;
+        _processing = true;
+        try
+        {
+            var result = await Api.ExecuteTacticalRoundAsync(CombatId);
+            if (result != null)
+            {
+                _state.Round = result.Round;
+                _state.Attacker = result.Attacker;
+                _state.Defender = result.Defender;
+                _state.IsComplete = result.IsComplete;
+                _state.WinnerId = result.WinnerId;
+                _disorderPercent = MySide?.DisorderPercent ?? 0;
+
+                if (result.Events != null)
+                    _battleLog.AddRange(result.Events);
+                if (result.TriggeredOrders != null)
+                {
+                    foreach (var t in result.TriggeredOrders)
+                    {
+                        if (!_triggeredOrders.Contains(t))
+                            _triggeredOrders.Add(t);
+                    }
+                }
+
+                // Update canvas
+                if (_canvasInitialized)
+                {
+                    try { await JS.InvokeVoidAsync("TacticalViewer.updateRound", result); }
+                    catch { /* non-fatal */ }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Round execution failed: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _processing = false;
+        }
+    }
+
+    private void AutoResolve()
+    {
+        Navigation.NavigateTo($"/game/combat/{CombatId}");
+    }
+
+    private void TogglePause()
+    {
+        _paused = !_paused;
+    }
+
+    private async Task SelectShip(Guid shipId)
+    {
+        _selectedShipId = shipId;
+        if (_canvasInitialized)
+        {
+            try { await JS.InvokeVoidAsync("TacticalViewer.selectShip", shipId.ToString()); }
+            catch { /* non-fatal */ }
+        }
+    }
+
+    private async Task OnFormationChanged(ChangeEventArgs e)
+    {
+        var newFormation = e.Value?.ToString();
+        if (string.IsNullOrEmpty(newFormation) || _state == null) return;
+
+        _processing = true;
+        try
+        {
+            var result = await Api.GiveTacticalOrderAsync(CombatId,
+                new TacticalOrderRequest("ChangeFormation", newFormation, null, null));
+            if (result != null)
+            {
+                _disorderPercent = result.NewDisorderPercent;
+                if (!string.IsNullOrEmpty(result.Message))
+                    _battleLog.Add(result.Message);
+
+                if (MySide != null)
+                    _state!.Attacker!.Formation = _state.Attacker.FactionId == _myFactionId
+                        ? newFormation : _state.Attacker.Formation;
+                if (_state!.Defender != null && _state.Defender.FactionId == _myFactionId)
+                    _state.Defender.Formation = newFormation;
+
+                if (_canvasInitialized)
+                {
+                    try { await JS.InvokeVoidAsync("TacticalViewer.updateFormation", "attacker", newFormation); }
+                    catch { /* non-fatal */ }
+                }
+
+                UpdateDisorderCanvas();
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Formation change failed: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _processing = false;
+        }
+    }
+
+    // ── Order Handlers ───────────────────────────────────────────
+    private async Task OrderAttackTarget()
+    {
+        if (_selectedShipId == null || _targetShipId == null) return;
+        await SendOrder(new TacticalOrderRequest("AttackTarget", null, _targetShipId, null));
+    }
+
+    private async Task OrderRaiseShields()
+    {
+        if (_selectedShipId == null) return;
+        await SendOrder(new TacticalOrderRequest("ShipAction", null, _selectedShipId, "RaiseShields"));
+    }
+
+    private async Task OrderEvasiveManeuvers()
+    {
+        if (_selectedShipId == null) return;
+        await SendOrder(new TacticalOrderRequest("ShipAction", null, _selectedShipId, "EvasiveManeuvers"));
+    }
+
+    private async Task OrderChangeFormation()
+    {
+        // Uses the currently shown formation select value
+        var mySide = MySide;
+        if (mySide == null) return;
+        await SendOrder(new TacticalOrderRequest("ChangeFormation", mySide.Formation, null, null));
+    }
+
+    private async Task OrderChangeTargetPriority()
+    {
+        await SendOrder(new TacticalOrderRequest("ChangeTargetPriority", _selectedTargetPriority, null, null));
+    }
+
+    private async Task SendOrder(TacticalOrderRequest order)
+    {
+        if (_processing || _state == null || _state.IsComplete) return;
+        _processing = true;
+        try
+        {
+            var result = await Api.GiveTacticalOrderAsync(CombatId, order);
+            if (result != null)
+            {
+                _disorderPercent = result.NewDisorderPercent;
+                if (!string.IsNullOrEmpty(result.Message))
+                    _battleLog.Add(result.Message);
+                UpdateDisorderCanvas();
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Order failed: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _processing = false;
+        }
+    }
+
+    private void UpdateDisorderCanvas()
+    {
+        if (_canvasInitialized)
+        {
+            _ = JS.InvokeVoidAsync("TacticalViewer.setDisorder", "attacker", _disorderPercent);
+        }
+    }
+
+    // ── Helpers ───────────────────────────────────────────────────
+    private static string GetDisorderColor(double percent) => percent switch
+    {
+        >= 75 => "#ff4444",
+        >= 50 => "#ff8844",
+        >= 25 => "#ffcc44",
+        _ => "#44dd66"
+    };
+
+    private static string GetFormationEmoji(string formation) => formation switch
+    {
+        "Line" => "═",
+        "Wedge" => "▷",
+        "Echelon" => "⋰",
+        "Screen" => "◇",
+        "Swarm" => "⁂",
+        _ => "═"
+    };
+
+    private static string GetLogClass(string entry)
+    {
+        if (entry.Contains("destroy", StringComparison.OrdinalIgnoreCase) || entry.Contains("killed", StringComparison.OrdinalIgnoreCase))
+            return "destroy";
+        if (entry.Contains("dmg", StringComparison.OrdinalIgnoreCase) || entry.Contains("hits", StringComparison.OrdinalIgnoreCase) || entry.Contains("damage", StringComparison.OrdinalIgnoreCase))
+            return "damage";
+        if (entry.Contains("shield", StringComparison.OrdinalIgnoreCase))
+            return "shield";
+        if (entry.Contains("order", StringComparison.OrdinalIgnoreCase) || entry.Contains("formation", StringComparison.OrdinalIgnoreCase))
+            return "order";
+        return "info";
+    }
+
+    // ── Dispose ──────────────────────────────────────────────────
+    public async ValueTask DisposeAsync()
+    {
+        GameState?.ResetTopbar();
+        if (_canvasInitialized)
+        {
+            try { await JS.InvokeVoidAsync("TacticalViewer.dispose"); }
+            catch { /* page may already be unloaded */ }
+        }
+        _dotNetRef?.Dispose();
+    }
+}

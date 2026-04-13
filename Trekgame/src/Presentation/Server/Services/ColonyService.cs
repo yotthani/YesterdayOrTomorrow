@@ -14,7 +14,7 @@ public interface IColonyService
     Task<bool> SetColonyDesignationAsync(Guid colonyId, ColonyDesignation designation);
     Task<List<string>> GetAvailableBuildingsAsync(Guid colonyId);
     Task<ColonyDetailReport> GetColonyDetailAsync(Guid colonyId);
-    Task ProcessColonyBuildQueuesAsync(Guid gameId);
+    Task<BuildQueueResult> ProcessColonyBuildQueuesAsync(Guid gameId);
     Task<bool> AssignPopToJobAsync(Guid popId, Guid buildingId, string jobId);
     Task<List<JobSlotInfo>> GetAvailableJobsAsync(Guid colonyId);
 }
@@ -204,8 +204,11 @@ public class ColonyService : IColonyService
     /// <summary>
     /// Process all build queues
     /// </summary>
-    public async Task ProcessColonyBuildQueuesAsync(Guid gameId)
+    public async Task<BuildQueueResult> ProcessColonyBuildQueuesAsync(Guid gameId)
     {
+        var buildingsCompleted = new Dictionary<Guid, List<string>>();
+        var shipsCompleted = new Dictionary<Guid, List<string>>();
+
         var colonies = await _db.Colonies
             .Include(c => c.BuildQueue)
             .Include(c => c.Buildings)
@@ -215,13 +218,18 @@ public class ColonyService : IColonyService
 
         foreach (var colony in colonies)
         {
-            await ProcessColonyBuildQueueAsync(colony);
+            await ProcessColonyBuildQueueAsync(colony, buildingsCompleted, shipsCompleted);
         }
 
         await _db.SaveChangesAsync();
+
+        return new BuildQueueResult(buildingsCompleted, shipsCompleted);
     }
 
-    private async Task ProcessColonyBuildQueueAsync(ColonyEntity colony)
+    private async Task ProcessColonyBuildQueueAsync(
+        ColonyEntity colony,
+        Dictionary<Guid, List<string>> buildingsCompleted,
+        Dictionary<Guid, List<string>> shipsCompleted)
     {
         var currentItem = colony.BuildQueue
             .OrderBy(q => q.Position)
@@ -242,9 +250,22 @@ public class ColonyService : IColonyService
         // Check if complete
         if (currentItem.Progress >= currentItem.TotalCost)
         {
+            var factionId = colony.FactionId;
+
             if (currentItem.ItemType == "building")
             {
                 await CompleteBuildingAsync(colony, currentItem.ItemId);
+
+                var buildingName = BuildingDefinitions.Get(currentItem.ItemId)?.Name ?? currentItem.ItemId;
+                if (!buildingsCompleted.ContainsKey(factionId))
+                    buildingsCompleted[factionId] = new List<string>();
+                buildingsCompleted[factionId].Add($"{buildingName} on {colony.Name}");
+            }
+            else if (currentItem.ItemType == "ship")
+            {
+                if (!shipsCompleted.ContainsKey(factionId))
+                    shipsCompleted[factionId] = new List<string>();
+                shipsCompleted[factionId].Add(currentItem.ItemId);
             }
 
             _db.BuildQueues.Remove(currentItem);

@@ -187,6 +187,13 @@ public class GenerationRequest
     public bool SkipLoRAs { get; set; } = false;
 
     /// <summary>
+    /// If true, apply claymation style (LoRA + prompt tags).
+    /// Driven by the "2-Step Generation" or a dedicated claymation toggle in the UI.
+    /// When false, only Trek-specific LoRAs are applied without claymation.
+    /// </summary>
+    public bool UseClaymationStyle { get; set; } = false;
+
+    /// <summary>
     /// Asset category hint for optimized generation
     /// </summary>
     public string? AssetCategory { get; set; }
@@ -195,6 +202,22 @@ public class GenerationRequest
     /// Faction hint for style matching
     /// </summary>
     public string? FactionHint { get; set; }
+
+    /// <summary>
+    /// Raw ship class variant text from Ships.json (e.g., "CYLINDRICAL engineering hull, CIRCULAR saucer, TWO nacelles on ANGLED pylons")
+    /// When set, SDPromptTransformer uses this directly instead of filtering the LLM prompt.
+    /// </summary>
+    public string? ShipClassVariant { get; set; }
+
+    /// <summary>
+    /// Raw faction color scheme from Ships.json (e.g., "Light gray hull, red Bussard collectors, blue deflector dish")
+    /// </summary>
+    public string? ShipFactionColors { get; set; }
+
+    /// <summary>
+    /// Ship class name (e.g., "Constitution", "Galaxy", "Bird of Prey")
+    /// </summary>
+    public string? ShipClassName { get; set; }
 
     /// <summary>
     /// Model to use for generation (checkpoint name for ComfyUI)
@@ -221,6 +244,22 @@ public class LoRAConfig
 {
     public string Name { get; set; } = string.Empty;
     public string? FilePath { get; set; }
+
+    /// <summary>
+    /// Model strength — how much the LoRA affects image generation (textures, colors, style).
+    /// </summary>
     public double Strength { get; set; } = 0.8;
+
+    /// <summary>
+    /// CLIP strength — how much the LoRA affects text interpretation.
+    /// If null, uses same value as Strength (default behavior).
+    ///
+    /// IMPORTANT for Star Trek ships: Set this LOWER than Strength so CLIP
+    /// respects the actual geometry keywords ("circular saucer", "cylindrical hull")
+    /// instead of the LoRA remapping them to TNG-era shapes.
+    /// Example: Strength=1.0 (full visual style), ClipStrength=0.4 (CLIP respects geometry)
+    /// </summary>
+    public double? ClipStrength { get; set; }
+
     public string? Description { get; set; }
 }

@@ -67,18 +67,39 @@ public class ComfyUIApiService : IImageGenerationProvider
         }
     };
 
-    // Star Trek specific LoRAs - these are installed in D:\AI\ComfyUI\models\loras
+    // Star Trek specific LoRAs - installed in D:\AI\ComfyUI\models\loras
+    // NOTE: StarTrek_TNG_SDXL is a high-quality dim=128 LoRA trained on 1544 TNG images (characters/interiors)
+    // NOTE: Enterprise.safetensors (228MB) is trained on Enterprise-D (Galaxy class) ship exterior
     public static readonly List<LoRAConfig> RecommendedLoRAs = new()
     {
-        new LoRAConfig { Name = "StarTrek_TNG_SDXL", Strength = 0.8, Description = "Star Trek TNG ships and designs" },
+        new LoRAConfig { Name = "StarTrek_TNG_SDXL", Strength = 0.8, Description = "Star Trek TNG ships, characters, environments (dim=128, 1544 images)" },
         new LoRAConfig { Name = "trekgame_claymation_style", Strength = 0.7, Description = "Claymation/plasticine art style" }
     };
 
-    // Default LoRAs to apply for Star Trek asset generation
+    // Default LoRAs for Star Trek ship EXTERIOR generation.
+    // Enterprise.safetensors (228MB, Civitai) — SPECIFICALLY trained for starship exteriors.
+    //   Trigger word: "Enterprise". Strength 1.0 recommended by creator.
+    // StarTrek_TNG_SDXL (Jigen) — trained for characters/interiors, adds Trek aesthetic at low strength.
+    //   NOTE: Jigen's own README says ship exteriors have "little success" with this LoRA alone.
+    // Strategy: Enterprise LoRA does the heavy lifting for ship geometry,
+    //           TNG LoRA adds subtle Star Trek visual style (panel lines, lighting).
+    public static readonly List<LoRAConfig> DefaultStarTrekShipLoRAs = new()
+    {
+        new LoRAConfig { Name = "Enterprise", Strength = 1.0, ClipStrength = 1.0 },
+        new LoRAConfig { Name = "StarTrek_TNG_SDXL", Strength = 0.3, ClipStrength = 0.3 }
+    };
+
+    // Default LoRAs for non-ship Star Trek assets (portraits, buildings, etc.)
+    // Slightly lower clip strength for portraits/buildings so they match the text description
     public static readonly List<LoRAConfig> DefaultStarTrekLoRAs = new()
     {
-        new LoRAConfig { Name = "StarTrek_TNG_SDXL", Strength = 0.7 },
-        new LoRAConfig { Name = "trekgame_claymation_style", Strength = 0.8 }
+        new LoRAConfig { Name = "StarTrek_TNG_SDXL", Strength = 0.85, ClipStrength = 0.5 }
+    };
+
+    // Claymation LoRA — only added when user opts in via UI toggle
+    public static readonly LoRAConfig ClaymationLoRA = new()
+    {
+        Name = "trekgame_claymation_style", Strength = 0.8
     };
 
     public ComfyUIApiService(HttpClient httpClient)
@@ -167,17 +188,46 @@ public class ComfyUIApiService : IImageGenerationProvider
 
         try
         {
-            // Transform natural language prompts to SD-optimized format
+            // Transform prompts to SD-optimized format
             var assetType = SDPromptTransformer.DetectAssetType(request.AssetCategory);
-            var (transformedPrompt, transformedNegative) = SDPromptTransformer.Transform(
-                request.Prompt,
-                assetType,
-                addClaymationStyle: !request.SkipLoRAs // Only add claymation style if not skipping LoRAs
-            );
+            string transformedPrompt;
+            string transformedNegative;
 
-            // Log transformation for debugging
+            // For ships with raw JSON data: build compact prompt DIRECTLY from Ships.json data
+            // This bypasses the lossy LLM-prompt-filtering and gives 100% control over CLIP tokens
+            if (!string.IsNullOrEmpty(request.ShipClassVariant) && assetType == AssetType.Ship)
+            {
+                (transformedPrompt, transformedNegative) = SDPromptTransformer.BuildDirectShipPrompt(
+                    request.ShipClassVariant,
+                    request.ShipFactionColors,
+                    request.ShipClassName ?? "Unknown",
+                    addClaymationStyle: request.UseClaymationStyle
+                );
+                OnStatusMessage?.Invoke($"[SD Transform] DIRECT SHIP MODE — built from Ships.json data");
+                OnStatusMessage?.Invoke($"[SD Transform] Class: {request.ShipClassName}, Variant: {request.ShipClassVariant.Substring(0, Math.Min(80, request.ShipClassVariant.Length))}...");
+            }
+            else
+            {
+                // Fallback: filter the LLM prompt (for non-ships or ships without JSON data)
+                (transformedPrompt, transformedNegative) = SDPromptTransformer.Transform(
+                    request.Prompt,
+                    assetType,
+                    addClaymationStyle: request.UseClaymationStyle
+                );
+            }
+
+            // Log transformation for debugging — shows EXACTLY what CLIP will see
             OnStatusMessage?.Invoke($"[SD Transform] Asset type: {assetType}");
-            OnStatusMessage?.Invoke($"[SD Transform] Original prompt length: {request.Prompt.Length}, Transformed: {transformedPrompt.Length}");
+            OnStatusMessage?.Invoke($"[SD Transform] Original prompt: {request.Prompt.Length} chars → Transformed: {transformedPrompt.Length} chars");
+
+            // Count approximate tokens (CLIP tokenizes at ~1.3 tokens/word)
+            var wordCount = transformedPrompt.Split(new[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries).Length;
+            var approxTokens = (int)(wordCount * 1.3);
+            OnStatusMessage?.Invoke($"[SD Transform] POSITIVE PROMPT (~{approxTokens} tokens, CLIP max=77):");
+            OnStatusMessage?.Invoke($"[SD Transform] >>> {transformedPrompt}");
+            if (approxTokens > 77)
+                OnStatusMessage?.Invoke($"[SD Transform] ⚠️ WARNING: ~{approxTokens} tokens exceeds CLIP's 77-token limit! Last {approxTokens - 77} tokens will be ignored/weak.");
+            OnStatusMessage?.Invoke($"[SD Transform] NEGATIVE: {transformedNegative.Substring(0, Math.Min(200, transformedNegative.Length))}...");
 
             // Use transformed prompts
             var sdRequest = new GenerationRequest
@@ -196,6 +246,7 @@ public class ComfyUIApiService : IImageGenerationProvider
                 ControlNetStrength = request.ControlNetStrength,
                 LoRAs = request.LoRAs,
                 SkipLoRAs = request.SkipLoRAs,
+                UseClaymationStyle = request.UseClaymationStyle,
                 AssetCategory = request.AssetCategory,
                 FactionHint = request.FactionHint,
                 Model = request.Model
@@ -204,18 +255,30 @@ public class ComfyUIApiService : IImageGenerationProvider
             // Build the workflow based on transformed request
             var workflow = BuildWorkflow(sdRequest);
 
-            // Debug: Log what's being sent to ComfyUI
+            // Debug: Log EXACTLY what's being sent to ComfyUI CLIP nodes
+            Console.WriteLine($"[DEBUG ComfyUI] === FINAL PROMPT SENT TO COMFYUI ===");
+            if (workflow.TryGetValue("6", out var node6))
+            {
+                var node6Dict = (Dictionary<string, object>)node6;
+                var inputs6 = (Dictionary<string, object>)node6Dict["inputs"];
+                var posText = inputs6["text"]?.ToString() ?? "(null)";
+                Console.WriteLine($"[DEBUG ComfyUI] POSITIVE (node 6): {posText}");
+            }
             if (workflow.TryGetValue("7", out var node7))
             {
                 var node7Dict = (Dictionary<string, object>)node7;
                 var inputs = (Dictionary<string, object>)node7Dict["inputs"];
                 var negText = inputs["text"]?.ToString() ?? "(null)";
-                Console.WriteLine($"[DEBUG ComfyUI] Negative prompt node 7: {negText.Substring(0, Math.Min(200, negText.Length))}...");
+                Console.WriteLine($"[DEBUG ComfyUI] NEGATIVE (node 7): {negText.Substring(0, Math.Min(300, negText.Length))}...");
             }
-            else
-            {
-                Console.WriteLine($"[DEBUG ComfyUI] WARNING: No node 7 found in workflow!");
-            }
+            // Note: sdRequest.LoRAs may be empty if using default LoRAs (added in BuildStandardWorkflow)
+            var isShipAsset = IsShipAssetCategory(sdRequest.AssetCategory);
+            var defaultLoras = isShipAsset ? DefaultStarTrekShipLoRAs : DefaultStarTrekLoRAs;
+            var lorasInfo = sdRequest.LoRAs.Count > 0
+                ? string.Join(", ", sdRequest.LoRAs.Select(l => $"{l.Name} model={l.Strength} clip={l.ClipStrength ?? l.Strength}"))
+                : string.Join(", ", defaultLoras.Select(l => $"{l.Name} model={l.Strength} clip={l.ClipStrength ?? l.Strength}")) + " (defaults)";
+            Console.WriteLine($"[DEBUG ComfyUI] LoRAs: {lorasInfo}");
+            Console.WriteLine($"[DEBUG ComfyUI] ====================================");
 
             // Queue the prompt
             var queueResponse = await _httpClient.PostAsJsonAsync(
@@ -586,6 +649,7 @@ public class ComfyUIApiService : IImageGenerationProvider
         {
             var loraFilename = lora.FilePath ?? $"{lora.Name}.safetensors";
 
+            var clipStrength = lora.ClipStrength ?? lora.Strength;
             workflow[$"{nodeId}"] = new Dictionary<string, object>
             {
                 ["class_type"] = "LoraLoader",
@@ -593,7 +657,7 @@ public class ComfyUIApiService : IImageGenerationProvider
                 {
                     ["lora_name"] = loraFilename,
                     ["strength_model"] = lora.Strength,
-                    ["strength_clip"] = lora.Strength,
+                    ["strength_clip"] = clipStrength,
                     ["model"] = lastModelOutput,
                     ["clip"] = lastClipOutput
                 }
@@ -811,17 +875,36 @@ public class ComfyUIApiService : IImageGenerationProvider
 
     private Dictionary<string, object> BuildStandardWorkflow(GenerationRequest request, long seed)
     {
-        // Determine optimal settings based on model
-        var isJuggernaut = _currentModel.Contains("juggernaut", StringComparison.OrdinalIgnoreCase) ||
-                          GetCheckpointName().Contains("juggernaut", StringComparison.OrdinalIgnoreCase);
+        // Select checkpoint (respects explicit model override, defaults to configured)
+        var checkpoint = GetOptimalCheckpoint(request);
+        var isJuggernaut = checkpoint.Contains("juggernaut", StringComparison.OrdinalIgnoreCase);
 
-        // Juggernaut XL optimal: DPM++ 3M SDE GPU, 20-30 steps, CFG 3-6
-        var samplerName = isJuggernaut ? "dpmpp_3m_sde_gpu" : "euler";
-        var scheduler = isJuggernaut ? "karras" : "normal";
-        var steps = isJuggernaut ? Math.Max(request.Steps, 30) : request.Steps;
-        var cfg = isJuggernaut ? Math.Min(request.CfgScale, 5.0) : request.CfgScale;
+        // Model-specific optimal settings
+        string samplerName;
+        string scheduler;
+        int steps;
+        double cfg;
 
-        OnStatusMessage?.Invoke($"Using sampler: {samplerName}, steps: {steps}, cfg: {cfg}");
+        if (isJuggernaut)
+        {
+            // Juggernaut XL: DPM++ 3M SDE GPU, karras scheduler
+            // 50 steps minimum for good detail (manual testing showed 80 is ideal,
+            // 50 is a good balance of quality vs speed)
+            // CFG 7.5 matches what produced best results in manual ComfyUI testing
+            samplerName = "dpmpp_3m_sde_gpu";
+            scheduler = "karras";
+            steps = Math.Max(request.Steps, 50);
+            cfg = Math.Min(request.CfgScale, 7.5);
+        }
+        else
+        {
+            samplerName = "euler";
+            scheduler = "normal";
+            steps = request.Steps;
+            cfg = request.CfgScale;
+        }
+
+        OnStatusMessage?.Invoke($"Checkpoint: {checkpoint} | Sampler: {samplerName}, steps: {steps}, cfg: {cfg}");
 
         // Standard txt2img workflow for SDXL/Flux
         var workflow = new Dictionary<string, object>
@@ -848,7 +931,7 @@ public class ComfyUIApiService : IImageGenerationProvider
                 ["class_type"] = "CheckpointLoaderSimple",
                 ["inputs"] = new Dictionary<string, object>
                 {
-                    ["ckpt_name"] = GetCheckpointName()
+                    ["ckpt_name"] = checkpoint
                 }
             },
             ["5"] = new Dictionary<string, object>
@@ -901,14 +984,52 @@ public class ComfyUIApiService : IImageGenerationProvider
             }
         };
 
-        // Add LoRAs - use default Star Trek LoRAs unless explicitly skipped (for UI/2D elements)
+        // Add LoRAs - select appropriate set based on asset type + claymation preference
         if (!request.SkipLoRAs)
         {
-            var lorasToUse = request.LoRAs.Count > 0 ? request.LoRAs : DefaultStarTrekLoRAs;
+            List<LoRAConfig> lorasToUse;
+            if (request.LoRAs.Count > 0)
+            {
+                lorasToUse = request.LoRAs; // Explicitly provided LoRAs take priority
+            }
+            else
+            {
+                // Smart LoRA selection: ships use strategy-based LoRA picks
+                var isShipAsset = IsShipAssetCategory(request.AssetCategory);
+                if (isShipAsset)
+                {
+                    // Strategy pattern: Galaxy → Enterprise LoRA, all others → TNG only.
+                    // Enterprise LoRA was trained ONLY on Enterprise-D (Galaxy class).
+                    // Using it for other classes forces Galaxy shape even at low strengths.
+                    var strategy = SDPromptTransformer.GetShipLoRAStrategy(
+                        request.ShipClassName ?? "Unknown");
+
+                    lorasToUse = new List<LoRAConfig>();
+                    if (strategy.UseEnterpriseLora)
+                    {
+                        lorasToUse.Add(new LoRAConfig { Name = "Enterprise", Strength = strategy.EnterpriseModel, ClipStrength = strategy.EnterpriseClip });
+                    }
+                    lorasToUse.Add(new LoRAConfig { Name = "StarTrek_TNG_SDXL", Strength = strategy.TngModel, ClipStrength = strategy.TngClip });
+
+                    var loraNames = string.Join("+", lorasToUse.Select(l => $"{l.Name}({l.Strength}/{l.ClipStrength})"));
+                    OnStatusMessage?.Invoke($"[LoRA] {loraNames} for {request.ShipClassName ?? "Unknown"} class (Enterprise LoRA: {(strategy.UseEnterpriseLora ? "ON" : "OFF")})");
+                }
+                else
+                {
+                    lorasToUse = new List<LoRAConfig>(DefaultStarTrekLoRAs);
+                }
+
+                // Only add claymation LoRA when user has opted in
+                if (request.UseClaymationStyle)
+                {
+                    lorasToUse.Add(ClaymationLoRA);
+                    OnStatusMessage?.Invoke("Claymation style LoRA enabled by user");
+                }
+            }
 
             if (lorasToUse.Count > 0)
             {
-                OnStatusMessage?.Invoke($"Applying LoRAs: {string.Join(", ", lorasToUse.Select(l => $"{l.Name}@{l.Strength}"))}");
+                OnStatusMessage?.Invoke($"Applying LoRAs: {string.Join(", ", lorasToUse.Select(l => $"{l.Name} model={l.Strength} clip={l.ClipStrength ?? l.Strength}"))}");
                 workflow = AddLoRAsToWorkflow(workflow, lorasToUse);
             }
         }
@@ -980,6 +1101,7 @@ public class ComfyUIApiService : IImageGenerationProvider
 
         foreach (var lora in loras)
         {
+            var clipStr = lora.ClipStrength ?? lora.Strength;
             workflow[$"{nodeId}"] = new Dictionary<string, object>
             {
                 ["class_type"] = "LoraLoader",
@@ -987,7 +1109,7 @@ public class ComfyUIApiService : IImageGenerationProvider
                 {
                     ["lora_name"] = $"{lora.Name}.safetensors",
                     ["strength_model"] = lora.Strength,
-                    ["strength_clip"] = lora.Strength,
+                    ["strength_clip"] = clipStr,
                     ["model"] = lastModelOutput,
                     ["clip"] = lastClipOutput
                 }
@@ -1004,6 +1126,71 @@ public class ComfyUIApiService : IImageGenerationProvider
         ((Dictionary<string, object>)((Dictionary<string, object>)workflow["7"])["inputs"])["clip"] = lastClipOutput;
 
         return workflow;
+    }
+
+    /// <summary>
+    /// Checkpoint selection: uses explicitly requested model if available, otherwise configured default.
+    /// Star Trek style is achieved via LoRAs (StarTrek_TNG_SDXL), not a separate checkpoint.
+    /// </summary>
+    private string GetOptimalCheckpoint(GenerationRequest request)
+    {
+        // If request explicitly specifies a model, resolve it
+        if (!string.IsNullOrEmpty(request.Model))
+        {
+            var explicitCheckpoint = ResolveCheckpointFilename(request.Model);
+            if (explicitCheckpoint != null)
+            {
+                OnStatusMessage?.Invoke($"Using requested checkpoint: {explicitCheckpoint}");
+                return explicitCheckpoint;
+            }
+        }
+
+        // Default: use configured model (typically Juggernaut XL — best for sci-fi with Trek LoRA)
+        return GetCheckpointName();
+    }
+
+    private static bool IsShipAssetCategory(string? category)
+    {
+        if (string.IsNullOrEmpty(category)) return false;
+        var lower = category.ToLowerInvariant();
+        return lower.Contains("ship") || lower.Contains("fleet") || lower.Contains("military") ||
+               lower.Contains("vessel") || lower.Contains("cruiser") || lower.Contains("frigate");
+    }
+
+    /// <summary>
+    /// Resolves a model identifier (ID or partial filename) to an actual checkpoint filename.
+    /// </summary>
+    private string? ResolveCheckpointFilename(string modelId)
+    {
+        // Direct match by ID
+        var model = _availableModels.FirstOrDefault(m => m.Id == modelId);
+        if (model?.LocalPath != null) return model.LocalPath;
+
+        // Match by switch mapping
+        var mapped = modelId switch
+        {
+            "juggernaut-xl" => "juggernautXL_v9Rundiffusion.safetensors",
+            "flux-dev" => "flux1-dev.safetensors",
+            "sdxl" => "sd_xl_base_1.0.safetensors",
+            "sdxl-turbo" => "sd_xl_turbo_1.0_fp16.safetensors",
+            _ => null
+        };
+
+        if (mapped != null)
+        {
+            // Verify it exists in available models
+            var found = _availableModels.FirstOrDefault(m =>
+                m.LocalPath?.Contains(mapped, StringComparison.OrdinalIgnoreCase) == true ||
+                m.Id.Contains(mapped, StringComparison.OrdinalIgnoreCase));
+            if (found?.LocalPath != null) return found.LocalPath;
+            return mapped; // Return mapped name even if not in list (might still work)
+        }
+
+        // Partial match
+        var partial = _availableModels.FirstOrDefault(m =>
+            m.LocalPath?.Contains(modelId, StringComparison.OrdinalIgnoreCase) == true ||
+            m.Id.Contains(modelId, StringComparison.OrdinalIgnoreCase));
+        return partial?.LocalPath;
     }
 
     private string GetCheckpointName()

@@ -1,46 +1,122 @@
 @page "/game/events"
+@layout StellarisLayout
+@using StarTrekGame.Web.Services
+@using Blazored.LocalStorage
+@inject IGameApiClient Api
 @inject NavigationManager Nav
+@inject ILocalStorageService LocalStorage
+
+<PageTitle>Events & Decisions</PageTitle>
 
 <div class="events-screen">
+
+    @* ─── Active Crisis Banner ─── *@
+    @if (_crisis != null)
+    {
+        <div class="crisis-banner threat-@_crisis.ThreatLevel">
+            <div class="crisis-icon">@GetCrisisIcon(_crisis.Type)</div>
+            <div class="crisis-info">
+                <h2>@_crisis.Name</h2>
+                <p>@_crisis.Description</p>
+                <div class="crisis-stats">
+                    <span class="stat">Phase <strong>@_crisis.Phase/4</strong></span>
+                    <span class="stat">Threat <strong class="threat">@GetThreatLabel(_crisis.ThreatLevel)</strong></span>
+                    <span class="stat">Turn <strong>@_crisis.TurnsSinceStart</strong></span>
+                    <span class="stat">Enemy Fleets <strong>@_crisis.EnemyFleets</strong></span>
+                    <span class="stat">Systems Lost <strong>@_crisis.SystemsLost</strong></span>
+                </div>
+            </div>
+            <div class="crisis-escalation">
+                <div class="escalation-label">CURRENT PHASE</div>
+                <div class="escalation-text">@_crisis.CurrentEscalation</div>
+                <div class="victory-condition">
+                    <span class="cond-label">🏆 Victory:</span> @_crisis.VictoryCondition
+                </div>
+            </div>
+        </div>
+    }
+
+    @* ─── Events Header ─── *@
     <div class="events-header">
         <h1>📜 Events & Decisions</h1>
-        <button class="btn-back" @onclick="GoBack">← Back</button>
+        <div class="events-controls">
+            @if (_events.Any())
+            {
+                <span class="event-count">@_events.Count pending</span>
+            }
+        </div>
     </div>
 
+    @* ─── Loading State ─── *@
     @if (_loading)
     {
-        <div class="loading">Loading events...</div>
+        <div class="loading">
+            <div class="loading-spinner"></div>
+            <p>Scanning subspace channels...</p>
+        </div>
+    }
+    else if (_error != null)
+    {
+        <div class="error-state">
+            <span class="icon">⚠️</span>
+            <p>@_error</p>
+            <button class="btn-retry" @onclick="LoadEvents">Retry</button>
+        </div>
     }
     else if (!_events.Any())
     {
         <div class="no-events">
-            <span class="icon">✓</span>
-            <p>No pending events</p>
+            <span class="icon">✧</span>
+            <p>All quiet on the subspace front</p>
+            <span class="hint">Events trigger during turn processing based on your empire's situation</span>
         </div>
     }
     else
     {
+        @* ─── Event Cards ─── *@
         <div class="events-list">
             @foreach (var evt in _events)
             {
-                <div class="event-card @(evt.IsMajor ? "major" : "")">
+                <div class="event-card @(evt.IsMajor ? "major" : "") @GetCategoryTheme(evt.Category)">
                     <div class="event-icon">@GetCategoryIcon(evt.Category)</div>
                     <div class="event-content">
-                        <h3>@evt.Title</h3>
-                        <p>@evt.Description</p>
+                        <div class="event-title-row">
+                            <h3>@evt.Title</h3>
+                            @if (evt.ChainStep > 0)
+                            {
+                                <span class="chain-badge">Chapter @(evt.ChainStep + 1)</span>
+                            }
+                        </div>
+                        <p class="event-description">@evt.Description</p>
                         <div class="event-meta">
-                            <span class="category">@evt.Category</span>
-                            <span class="turn">Turn @evt.TurnCreated</span>
+                            <span class="category-tag">@evt.Category</span>
+                            <span class="turn-tag">Turn @evt.TurnCreated</span>
+                            @if (evt.TurnExpires.HasValue)
+                            {
+                                <span class="expires-tag">⏳ Expires turn @evt.TurnExpires</span>
+                            }
                         </div>
                     </div>
                     <div class="event-options">
                         @foreach (var opt in evt.Options)
                         {
-                            <button class="option-btn" @onclick="() => SelectOption(evt.Id, opt.Id)" title="@opt.Tooltip">
-                                @opt.Text
+                            <button class="option-btn @(opt.RequiresFaction != null ? "faction-locked" : "")"
+                                    @onclick="() => SelectOption(evt, opt)"
+                                    title="@opt.Tooltip"
+                                    disabled="@_resolving">
+                                <span class="option-text">@opt.Text</span>
+                                @if (opt.Effects.Length > 0)
+                                {
+                                    <div class="option-effects-preview">
+                                        @foreach (var eff in opt.Effects.Take(3))
+                                        {
+                                            <span class="mini-effect @GetEffectClass(eff)">@FormatEffectCompact(eff)</span>
+                                        }
+                                    </div>
+                                }
                                 @if (opt.RiskChance > 0)
                                 {
-                                    <span class="risk">⚠️ @((int)(opt.RiskChance * 100))% risk</span>
+                                    <span class="risk-badge">⚠️ @((int)(opt.RiskChance * 100))% risk</span>
                                 }
                             </button>
                         }
@@ -50,36 +126,65 @@
         </div>
     }
 
-    @if (_showConfirmModal && _selectedOption != null)
+    @* ─── Confirmation Modal ─── *@
+    @if (_showConfirmModal && _selectedOption != null && _selectedEvent != null)
     {
         <div class="modal-overlay" @onclick="CancelSelection">
-            <div class="modal" @onclick:stopPropagation="true">
-                <h2>Confirm Decision</h2>
-                <p>@_selectedOption.Text</p>
-                <div class="effects">
-                    @foreach (var effect in _selectedOption.Effects)
-                    {
-                        <span class="effect @GetEffectClass(effect)">@FormatEffect(effect)</span>
-                    }
+            <div class="modal confirm-modal" @onclick:stopPropagation="true">
+                <div class="modal-header">
+                    <h2>Confirm Decision</h2>
+                    <span class="modal-event-title">@_selectedEvent.Title</span>
                 </div>
+                <p class="modal-choice">@_selectedOption.Text</p>
+
+                @if (_selectedOption.Effects.Length > 0)
+                {
+                    <div class="effects-section">
+                        <h4>Expected Effects</h4>
+                        <div class="effects">
+                            @foreach (var effect in _selectedOption.Effects)
+                            {
+                                <span class="effect @GetEffectClass(effect)">@FormatEffect(effect)</span>
+                            }
+                        </div>
+                    </div>
+                }
+
+                @if (_selectedOption.RiskChance > 0 && _selectedOption.RiskEffects?.Length > 0)
+                {
+                    <div class="risk-section">
+                        <h4>⚠️ Risk (@((int)(_selectedOption.RiskChance * 100))% chance)</h4>
+                        <div class="effects">
+                            @foreach (var effect in _selectedOption.RiskEffects)
+                            {
+                                <span class="effect negative">@FormatEffect(effect)</span>
+                            }
+                        </div>
+                    </div>
+                }
+
                 <div class="modal-buttons">
-                    <button class="btn-confirm" @onclick="ConfirmSelection">Confirm</button>
+                    <button class="btn-confirm" @onclick="ConfirmSelection" disabled="@_resolving">
+                        @if (_resolving) { <span>Processing...</span> } else { <span>Confirm</span> }
+                    </button>
                     <button class="btn-cancel" @onclick="CancelSelection">Cancel</button>
                 </div>
             </div>
         </div>
     }
 
+    @* ─── Result Modal ─── *@
     @if (_showResultModal && _eventResult != null)
     {
         <div class="modal-overlay" @onclick="CloseResult">
-            <div class="modal result" @onclick:stopPropagation="true">
-                <h2>@(_eventResult.RiskTriggered ? "⚠️ Unexpected Outcome" : "✓ Decision Implemented")</h2>
-                <p>@_eventResult.Message</p>
+            <div class="modal result-modal @(_eventResult.RiskTriggered ? "risk-triggered" : "success")" @onclick:stopPropagation="true">
+                <div class="result-icon">@(_eventResult.RiskTriggered ? "⚠️" : "✧")</div>
+                <h2>@(_eventResult.RiskTriggered ? "Unforeseen Consequences" : "Decision Enacted")</h2>
+                <p class="result-message">@_eventResult.Message</p>
                 <div class="effects">
                     @foreach (var effect in _eventResult.Effects)
                     {
-                        <span class="effect">@effect</span>
+                        <span class="effect @GetEffectClass(effect)">@FormatEffect(effect)</span>
                     }
                 </div>
                 <button class="btn-close" @onclick="CloseResult">Continue</button>
@@ -90,296 +195,413 @@
 
 <style>
     .events-screen {
-        min-height: 100vh;
         padding: 20px;
-        background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3a 100%);
         color: white;
+        min-height: 100%;
     }
+
+    /* ─── Crisis Banner ─── */
+    .crisis-banner {
+        display: grid;
+        grid-template-columns: 60px 1fr 1fr;
+        gap: 20px;
+        padding: 20px;
+        margin-bottom: 25px;
+        border-radius: 12px;
+        background: rgba(180, 40, 40, 0.15);
+        border: 1px solid rgba(220, 50, 50, 0.4);
+        animation: crisis-pulse 3s ease-in-out infinite;
+    }
+    .crisis-banner.threat-1 { border-color: rgba(241, 196, 15, 0.4); background: rgba(241, 196, 15, 0.08); }
+    .crisis-banner.threat-2 { border-color: rgba(243, 156, 18, 0.4); background: rgba(243, 156, 18, 0.1); }
+    .crisis-banner.threat-3 { border-color: rgba(231, 76, 60, 0.4); background: rgba(231, 76, 60, 0.12); }
+    .crisis-banner.threat-4, .crisis-banner.threat-5 {
+        border-color: rgba(192, 57, 43, 0.6);
+        background: rgba(192, 57, 43, 0.15);
+    }
+    @@keyframes crisis-pulse {
+        0%, 100% { box-shadow: 0 0 10px rgba(220, 50, 50, 0.1); }
+        50% { box-shadow: 0 0 25px rgba(220, 50, 50, 0.25); }
+    }
+    .crisis-icon { font-size: 2.5em; display: flex; align-items: flex-start; justify-content: center; padding-top: 5px; }
+    .crisis-info h2 { margin: 0 0 5px 0; color: #e74c3c; font-size: 1.3em; }
+    .crisis-info p { margin: 0 0 10px 0; color: #ccc; font-size: 0.9em; }
+    .crisis-stats { display: flex; flex-wrap: wrap; gap: 15px; }
+    .crisis-stats .stat { font-size: 0.85em; color: #999; }
+    .crisis-stats .stat strong { color: #ddd; }
+    .crisis-stats .stat strong.threat { color: #e74c3c; }
+    .crisis-escalation { padding-left: 20px; border-left: 2px solid rgba(255,255,255,0.1); }
+    .escalation-label { font-size: 0.75em; text-transform: uppercase; letter-spacing: 1px; color: #888; margin-bottom: 5px; }
+    .escalation-text { color: #f39c12; font-size: 0.95em; margin-bottom: 10px; }
+    .victory-condition { font-size: 0.85em; color: #888; }
+    .cond-label { color: #f1c40f; }
+
+    /* ─── Header ─── */
     .events-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
         margin-bottom: 25px;
     }
-    .events-header h1 { margin: 0; }
-    .btn-back {
-        padding: 10px 20px;
-        background: rgba(255,255,255,0.1);
-        border: 1px solid rgba(255,255,255,0.2);
-        border-radius: 5px;
-        color: white;
-        cursor: pointer;
+    .events-header h1 { margin: 0; font-size: 1.5em; }
+    .event-count {
+        padding: 5px 15px;
+        background: rgba(243, 156, 18, 0.2);
+        border: 1px solid rgba(243, 156, 18, 0.3);
+        border-radius: 20px;
+        font-size: 0.85em;
+        color: #f39c12;
     }
-    .events-list {
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
+
+    /* ─── Loading ─── */
+    .loading { text-align: center; padding: 60px; color: #888; }
+    .loading-spinner {
+        width: 40px; height: 40px; margin: 0 auto 15px;
+        border: 3px solid rgba(255,255,255,0.1);
+        border-top: 3px solid #3498db;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
     }
+    @@keyframes spin { to { transform: rotate(360deg); } }
+
+    .error-state { text-align: center; padding: 50px; }
+    .error-state .icon { font-size: 3em; display: block; margin-bottom: 10px; }
+    .btn-retry {
+        margin-top: 15px; padding: 10px 25px;
+        background: rgba(52, 152, 219, 0.3); border: 1px solid #3498db;
+        border-radius: 8px; color: white; cursor: pointer;
+    }
+
+    /* ─── No Events ─── */
+    .no-events { text-align: center; padding: 60px; color: #888; }
+    .no-events .icon { font-size: 4em; display: block; margin-bottom: 15px; color: #2ecc71; }
+    .no-events .hint { font-size: 0.85em; color: #666; display: block; margin-top: 10px; }
+
+    /* ─── Event Cards ─── */
+    .events-list { display: flex; flex-direction: column; gap: 16px; }
     .event-card {
         display: grid;
-        grid-template-columns: 60px 1fr auto;
-        gap: 20px;
-        padding: 20px;
-        background: rgba(0,0,0,0.4);
-        border: 1px solid rgba(255,255,255,0.1);
-        border-radius: 12px;
-    }
-    .event-card.major {
-        border-color: #f39c12;
-        background: rgba(243, 156, 18, 0.1);
-    }
-    .event-icon {
-        font-size: 2.5em;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    .event-content h3 { margin: 0 0 10px 0; }
-    .event-content p { color: #aaa; margin: 0 0 10px 0; }
-    .event-meta {
-        display: flex;
+        grid-template-columns: 55px 1fr auto;
         gap: 15px;
-        font-size: 0.85em;
-        color: #888;
+        padding: 18px;
+        background: rgba(0,0,0,0.35);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 10px;
+        transition: border-color 0.2s;
     }
-    .event-options {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
+    .event-card:hover { border-color: rgba(255,255,255,0.15); }
+    .event-card.major {
+        border-color: rgba(243, 156, 18, 0.4);
+        background: rgba(243, 156, 18, 0.06);
     }
+    /* Category-specific subtle accents */
+    .event-card.cat-military { border-left: 3px solid rgba(231, 76, 60, 0.5); }
+    .event-card.cat-colony { border-left: 3px solid rgba(46, 204, 113, 0.5); }
+    .event-card.cat-exploration { border-left: 3px solid rgba(52, 152, 219, 0.5); }
+    .event-card.cat-diplomatic { border-left: 3px solid rgba(155, 89, 182, 0.5); }
+    .event-card.cat-economic { border-left: 3px solid rgba(241, 196, 15, 0.5); }
+    .event-card.cat-research { border-left: 3px solid rgba(26, 188, 156, 0.5); }
+    .event-card.cat-story { border-left: 3px solid rgba(243, 156, 18, 0.7); }
+
+    .event-icon { font-size: 2.2em; display: flex; align-items: flex-start; justify-content: center; padding-top: 3px; }
+    .event-title-row { display: flex; align-items: center; gap: 10px; }
+    .event-content h3 { margin: 0; font-size: 1.1em; }
+    .chain-badge {
+        padding: 2px 8px; font-size: 0.7em; text-transform: uppercase;
+        background: rgba(155, 89, 182, 0.3); border-radius: 10px; color: #bb8fce;
+    }
+    .event-description { color: #aaa; margin: 8px 0; font-size: 0.9em; line-height: 1.5; }
+    .event-meta { display: flex; gap: 10px; flex-wrap: wrap; }
+    .category-tag, .turn-tag, .expires-tag {
+        padding: 2px 10px; border-radius: 12px; font-size: 0.75em;
+    }
+    .category-tag { background: rgba(255,255,255,0.08); color: #999; }
+    .turn-tag { background: rgba(52, 152, 219, 0.15); color: #5dade2; }
+    .expires-tag { background: rgba(243, 156, 18, 0.15); color: #f39c12; }
+
+    /* ─── Option Buttons ─── */
+    .event-options { display: flex; flex-direction: column; gap: 8px; min-width: 200px; }
     .option-btn {
-        padding: 10px 15px;
-        background: rgba(52, 152, 219, 0.3);
-        border: 1px solid #3498db;
+        padding: 10px 14px;
+        background: rgba(52, 152, 219, 0.15);
+        border: 1px solid rgba(52, 152, 219, 0.3);
         border-radius: 8px;
         color: white;
         cursor: pointer;
         text-align: left;
+        transition: all 0.15s;
     }
-    .option-btn:hover { background: rgba(52, 152, 219, 0.5); }
-    .risk {
-        display: block;
-        color: #f39c12;
-        font-size: 0.85em;
-        margin-top: 5px;
+    .option-btn:hover:not(:disabled) {
+        background: rgba(52, 152, 219, 0.3);
+        border-color: rgba(52, 152, 219, 0.5);
     }
+    .option-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .option-btn.faction-locked { border-color: rgba(155, 89, 182, 0.3); }
+    .option-text { display: block; font-size: 0.9em; }
+    .option-effects-preview { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 5px; }
+    .mini-effect { font-size: 0.7em; padding: 1px 6px; border-radius: 8px; }
+    .mini-effect.positive { background: rgba(46, 204, 113, 0.2); color: #2ecc71; }
+    .mini-effect.negative { background: rgba(231, 76, 60, 0.2); color: #e74c3c; }
+    .mini-effect.neutral { background: rgba(255,255,255,0.05); color: #888; }
+    .risk-badge {
+        display: inline-block; margin-top: 5px;
+        font-size: 0.75em; color: #f39c12;
+    }
+
+    /* ─── Modals ─── */
     .modal-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
+        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
         background: rgba(0,0,0,0.85);
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        display: flex; align-items: center; justify-content: center;
         z-index: 1000;
     }
     .modal {
-        background: #1a1a2e;
+        background: #151525;
+        border: 1px solid rgba(255,255,255,0.1);
         border-radius: 15px;
         padding: 25px;
-        max-width: 500px;
+        max-width: 520px;
         width: 90%;
     }
-    .modal h2 { margin-top: 0; }
-    .effects {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
+    .modal-header h2 { margin: 0; }
+    .modal-event-title { color: #888; font-size: 0.85em; }
+    .modal-choice {
         margin: 15px 0;
-    }
-    .effect {
-        padding: 5px 12px;
-        border-radius: 15px;
-        font-size: 0.9em;
-    }
-    .effect.positive { background: rgba(46, 204, 113, 0.3); color: #2ecc71; }
-    .effect.negative { background: rgba(231, 76, 60, 0.3); color: #e74c3c; }
-    .effect.neutral { background: rgba(255,255,255,0.1); }
-    .modal-buttons {
-        display: flex;
-        gap: 15px;
-        margin-top: 20px;
-    }
-    .modal-buttons button {
-        flex: 1;
         padding: 12px;
-        border: none;
+        background: rgba(52, 152, 219, 0.1);
         border-radius: 8px;
-        cursor: pointer;
+        font-size: 1.05em;
     }
+    .effects-section h4, .risk-section h4 { margin: 15px 0 8px; font-size: 0.9em; }
+    .risk-section { margin-top: 10px; }
+    .risk-section h4 { color: #f39c12; }
+    .effects { display: flex; flex-wrap: wrap; gap: 8px; }
+    .effect {
+        padding: 5px 12px; border-radius: 15px; font-size: 0.85em;
+    }
+    .effect.positive { background: rgba(46, 204, 113, 0.2); color: #2ecc71; }
+    .effect.negative { background: rgba(231, 76, 60, 0.2); color: #e74c3c; }
+    .effect.neutral { background: rgba(255,255,255,0.08); color: #999; }
+    .modal-buttons { display: flex; gap: 12px; margin-top: 20px; }
+    .modal-buttons button { flex: 1; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-size: 0.95em; }
     .btn-confirm { background: #27ae60; color: white; }
-    .btn-cancel { background: #7f8c8d; color: white; }
-    .btn-close { width: 100%; padding: 12px; background: #3498db; border: none; border-radius: 8px; color: white; cursor: pointer; }
-    .no-events {
-        text-align: center;
-        padding: 60px;
-        color: #888;
+    .btn-confirm:disabled { background: #1a7040; }
+    .btn-cancel { background: rgba(255,255,255,0.1); color: #ccc; }
+
+    /* Result Modal */
+    .result-modal { text-align: center; }
+    .result-modal.risk-triggered { border-color: rgba(243, 156, 18, 0.4); }
+    .result-modal.success { border-color: rgba(46, 204, 113, 0.3); }
+    .result-icon { font-size: 3em; margin-bottom: 10px; }
+    .result-message { color: #aaa; margin: 10px 0 15px; }
+    .btn-close {
+        width: 100%; padding: 12px;
+        background: #3498db; border: none; border-radius: 8px;
+        color: white; cursor: pointer; font-size: 0.95em; margin-top: 10px;
     }
-    .no-events .icon { font-size: 4em; display: block; margin-bottom: 15px; }
-    .loading { text-align: center; padding: 50px; color: #888; }
 </style>
 
 @code {
     private bool _loading = true;
-    private List<GameEventDisplay> _events = new();
-    private Guid _selectedEventId;
-    private EventOptionDisplay? _selectedOption;
+    private string? _error;
+    private bool _resolving = false;
+    private List<GameEventDto> _events = new();
+    private CrisisReportDto? _crisis;
+
+    // Modal state
+    private GameEventDto? _selectedEvent;
+    private EventOptionDto? _selectedOption;
     private bool _showConfirmModal = false;
     private bool _showResultModal = false;
-    private EventResultDisplay? _eventResult;
+    private EventResolutionDto? _eventResult;
+
+    // Session IDs
+    private Guid? _factionId;
+    private Guid? _houseId;
+    private Guid? _gameId;
 
     protected override async Task OnInitializedAsync()
     {
+        _factionId = await LocalStorage.GetItemAsync<Guid?>("currentFactionId");
+        _houseId = await LocalStorage.GetItemAsync<Guid?>("currentHouseId");
+
+        try
+        {
+            var games = await Api.GetGamesAsync();
+            var game = games.FirstOrDefault();
+            if (game != null) _gameId = game.Id;
+        }
+        catch { }
+
         await LoadEvents();
     }
 
     private async Task LoadEvents()
     {
         _loading = true;
-        await Task.Delay(300);
-        
-        _events = new List<GameEventDisplay>
+        _error = null;
+        StateHasChanged();
+
+        try
         {
-            new GameEventDisplay
+            // Load pending events
+            if (_houseId.HasValue)
             {
-                Id = Guid.NewGuid(),
-                Title = "Colony Crisis",
-                Description = "A disease outbreak threatens our colony. We must act quickly.",
-                Category = "Colony",
-                TurnCreated = 15,
-                IsMajor = true,
-                Options = new List<EventOptionDisplay>
-                {
-                    new EventOptionDisplay { Id = "quarantine", Text = "Implement quarantine", Tooltip = "Safe but slow recovery", Effects = new[] { "credits:-200", "stability:-10" }, RiskChance = 0 },
-                    new EventOptionDisplay { Id = "medicine", Text = "Rush experimental medicine", Tooltip = "Fast but risky", Effects = new[] { "credits:-500", "pop_happiness:+10" }, RiskChance = 0.3 }
-                }
-            },
-            new GameEventDisplay
-            {
-                Id = Guid.NewGuid(),
-                Title = "Abandoned Station",
-                Description = "Scouts discovered an abandoned space station with active power.",
-                Category = "Exploration",
-                TurnCreated = 14,
-                IsMajor = false,
-                Options = new List<EventOptionDisplay>
-                {
-                    new EventOptionDisplay { Id = "salvage", Text = "Send salvage team", Tooltip = "Recover materials", Effects = new[] { "minerals:+200" }, RiskChance = 0.2 },
-                    new EventOptionDisplay { Id = "study", Text = "Send scientists", Tooltip = "Research insights", Effects = new[] { "research:+150" }, RiskChance = 0.05 }
-                }
+                _events = await Api.GetPendingEventsAsync(_houseId.Value);
             }
-        };
-        
-        _loading = false;
-    }
+            else if (_factionId.HasValue)
+            {
+                // Fallback: try loading by factionId (controller may need to handle this)
+                _events = await Api.GetPendingEventsAsync(_factionId.Value);
+            }
 
-    private void GoBack() => Nav.NavigateTo("/game/galaxy");
-
-    private string GetCategoryIcon(string category) => category.ToLower() switch
-    {
-        "colony" => "🏠",
-        "exploration" => "🔭",
-        "diplomatic" => "🤝",
-        "military" => "⚔️",
-        "economic" => "💰",
-        "research" => "🔬",
-        "crisis" => "⚠️",
-        _ => "📜"
-    };
-
-    private string GetEffectClass(string effect)
-    {
-        if (effect.Contains('+') || effect.Contains("gain")) return "positive";
-        if (effect.Contains('-') || effect.Contains("lose")) return "negative";
-        return "neutral";
-    }
-
-    private string FormatEffect(string effect)
-    {
-        var parts = effect.Split(':');
-        if (parts.Length < 2) return effect;
-        var type = parts[0];
-        var value = parts[1];
-        var icon = type.ToLower() switch
+            // Load active crisis
+            if (_gameId.HasValue)
+            {
+                _crisis = await Api.GetActiveCrisisAsync(_gameId.Value);
+            }
+        }
+        catch (Exception ex)
         {
-            "credits" => "💰",
-            "minerals" => "🔩",
-            "food" => "🌾",
-            "energy" => "⚡",
-            "stability" => "⚖️",
-            "pop" => "👥",
-            "pop_happiness" => "😊",
-            "research" => "🔬",
-            _ => "•"
-        };
-        return $"{icon} {value} {type}";
+            _error = $"Failed to load events: {ex.Message}";
+            _events = new();
+        }
+        finally
+        {
+            _loading = false;
+        }
     }
 
-    private void SelectOption(Guid eventId, string optionId)
+    // ─── Option Selection Flow ───
+
+    private void SelectOption(GameEventDto evt, EventOptionDto option)
     {
-        var evt = _events.FirstOrDefault(e => e.Id == eventId);
-        if (evt == null) return;
-        _selectedEventId = eventId;
-        _selectedOption = evt.Options.FirstOrDefault(o => o.Id == optionId);
+        _selectedEvent = evt;
+        _selectedOption = option;
         _showConfirmModal = true;
     }
 
     private void CancelSelection()
     {
         _showConfirmModal = false;
+        _selectedEvent = null;
         _selectedOption = null;
     }
 
     private async Task ConfirmSelection()
     {
-        _showConfirmModal = false;
-        await Task.Delay(500);
-        
-        var riskTriggered = _selectedOption?.RiskChance > 0 && Random.Shared.NextDouble() < _selectedOption.RiskChance;
-        
-        _eventResult = new EventResultDisplay
+        if (_selectedEvent == null || _selectedOption == null) return;
+
+        _resolving = true;
+        StateHasChanged();
+
+        try
         {
-            Message = riskTriggered ? "Unexpected consequences..." : "Decision implemented.",
-            RiskTriggered = riskTriggered,
-            Effects = _selectedOption?.Effects.Select(FormatEffect).ToList() ?? new List<string>()
-        };
-        
-        _showResultModal = true;
-        _events.RemoveAll(e => e.Id == _selectedEventId);
+            var result = await Api.ResolveEventAsync(_selectedEvent.Id, _selectedOption.Id);
+            _showConfirmModal = false;
+            _eventResult = result;
+            _showResultModal = true;
+
+            // Remove resolved event from list
+            _events.RemoveAll(e => e.Id == _selectedEvent.Id);
+        }
+        catch (Exception ex)
+        {
+            _error = $"Failed to resolve event: {ex.Message}";
+            _showConfirmModal = false;
+        }
+        finally
+        {
+            _resolving = false;
+        }
     }
 
     private void CloseResult()
     {
         _showResultModal = false;
         _eventResult = null;
+        _selectedEvent = null;
+        _selectedOption = null;
     }
 
-    public class GameEventDisplay
+    // ─── Formatting Helpers ───
+
+    private string GetCategoryIcon(string category) => category.ToLower() switch
     {
-        public Guid Id { get; set; }
-        public string Title { get; set; } = "";
-        public string Description { get; set; } = "";
-        public string Category { get; set; } = "";
-        public int TurnCreated { get; set; }
-        public bool IsMajor { get; set; }
-        public List<EventOptionDisplay> Options { get; set; } = new();
+        "colony" => "🏠",
+        "exploration" or "anomaly" => "🔭",
+        "diplomatic" => "🤝",
+        "military" => "⚔️",
+        "economic" => "💰",
+        "research" => "🔬",
+        "crisis" => "🔥",
+        "story" => "📖",
+        _ => "📜"
+    };
+
+    private string GetCategoryTheme(string category) => "cat-" + category.ToLower();
+
+    private string GetCrisisIcon(string type) => type.ToLower() switch
+    {
+        "borginvasion" => "🟩",    // Borg green
+        "dominionwar" => "💀",
+        "temporalanomaly" => "🌀",
+        "synthrebellion" => "🤖",
+        "extragalacticinvasion" => "👽",
+        _ => "🔥"
+    };
+
+    private string GetThreatLabel(int level) => level switch
+    {
+        1 => "LOW",
+        2 => "MODERATE",
+        3 => "HIGH",
+        4 => "CRITICAL",
+        5 => "EXTINCTION",
+        _ => "UNKNOWN"
+    };
+
+    private string GetEffectClass(string effect)
+    {
+        if (effect.Contains('+') || effect.Contains("gain")) return "positive";
+        if (effect.Contains('-') || effect.Contains("lose") || effect.StartsWith("⚠️")) return "negative";
+        return "neutral";
     }
 
-    public class EventOptionDisplay
+    private string FormatEffect(string effect)
     {
-        public string Id { get; set; } = "";
-        public string Text { get; set; } = "";
-        public string Tooltip { get; set; } = "";
-        public string[] Effects { get; set; } = Array.Empty<string>();
-        public double RiskChance { get; set; }
+        // Handle "⚠️ effect" prefix from risk effects
+        if (effect.StartsWith("⚠️"))
+            return effect;
+
+        var parts = effect.Split(':');
+        if (parts.Length < 2) return effect;
+        var type = parts[0];
+        var value = parts[1];
+        var icon = GetEffectIcon(type);
+        return $"{icon} {value} {type}";
     }
 
-    public class EventResultDisplay
+    private string FormatEffectCompact(string effect)
     {
-        public string Message { get; set; } = "";
-        public bool RiskTriggered { get; set; }
-        public List<string> Effects { get; set; } = new();
+        var parts = effect.Split(':');
+        if (parts.Length < 2) return effect;
+        return $"{GetEffectIcon(parts[0])}{parts[1]}";
     }
+
+    private string GetEffectIcon(string type) => type.ToLower() switch
+    {
+        "credits" => "💰",
+        "minerals" => "⛏️",
+        "food" => "🌾",
+        "energy" => "⚡",
+        "consumer_goods" => "📦",
+        "stability" => "⚖️",
+        "pop" => "👥",
+        "pop_happiness" => "😊",
+        "research" => "🔬",
+        "diplomacy" => "🤝",
+        "influence" => "🏛️",
+        _ => "•"
+    };
 }

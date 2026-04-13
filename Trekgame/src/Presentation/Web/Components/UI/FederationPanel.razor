@@ -1,6 +1,6 @@
 @namespace StarTrekGame.Web.Components.UI
 
-<div class="federation-panel @PanelClass @TextureClass" style="@Style">
+<div class="federation-panel @PanelClass @TextureClass @Class" style="@Style">
     @if (!string.IsNullOrEmpty(Title))
     {
         <div class="federation-header">
@@ -25,6 +25,7 @@
     [Parameter] public string Texture { get; set; } = ""; // noise, scanlines, brushed-metal, hex-grid, circuit
     [Parameter] public string Padding { get; set; } = "16px";
     [Parameter] public string? Style { get; set; }
+    [Parameter] public string? Class { get; set; }
 
     private string PanelClass
     {

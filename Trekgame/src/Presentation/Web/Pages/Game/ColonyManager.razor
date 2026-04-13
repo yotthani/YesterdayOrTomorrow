@@ -1,10 +1,14 @@
 @page "/game/colony/{ColonyId:guid}"
 @page "/game/colony-manager"
+@page "/game/colony-detail/{ColonyId:guid}"
 @layout StellarisLayout
 @using MudBlazor
 @using Microsoft.AspNetCore.Components
+@using Blazored.LocalStorage
 @inject NavigationManager Navigation
 @inject ISnackbar Snackbar
+@inject IGameApiClient Api
+@inject ILocalStorageService LocalStorage
 
 <PageTitle>Colony Manager - Galactic Strategy</PageTitle>
 
@@ -1370,8 +1374,147 @@
     private async Task LoadColonyData()
     {
         _loading = true;
-        await Task.Delay(100);
 
+        try
+        {
+            // Try to load real data from API
+            if (ColonyId.HasValue)
+            {
+                await LoadFromApi(ColonyId.Value);
+                return;
+            }
+
+            // No ColonyId parameter — try getting first colony from faction
+            var factionIdStr = await LocalStorage.GetItemAsStringAsync("currentFactionId");
+            if (Guid.TryParse(factionIdStr?.Trim('"'), out var factionId))
+            {
+                var colonies = await Api.GetColoniesAsync(factionId);
+                if (colonies.Count > 0)
+                {
+                    await LoadFromApi(colonies[0].Id);
+                    return;
+                }
+            }
+
+            // Fallback to mock data if API fails
+            LoadMockData();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Colony API error: {ex.Message}");
+            LoadMockData();
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private async Task LoadFromApi(Guid colonyId)
+    {
+        // Load colony detail + population report in parallel
+        var colonyTask = Api.GetColonyAsync(colonyId);
+        var popTask = Api.GetPopulationReportAsync(colonyId);
+
+        await Task.WhenAll(colonyTask, popTask);
+
+        var colony = colonyTask.Result;
+        var popReport = popTask.Result;
+
+        if (colony != null)
+        {
+            _colony = new ColonyData
+            {
+                Id = colony.Id,
+                Name = colony.Name,
+                PlanetClass = "Class M",
+                SystemName = colony.SystemName,
+                ColonyType = "Colony",
+                Morale = popReport != null ? (int)popReport.AverageHappiness : 50,
+                Stability = popReport?.Stability ?? 50,
+                Habitability = popReport != null ? (int)popReport.Habitability : 50,
+                InfrastructureLevel = 1,
+                DefenseRating = 0,
+                FoundedTurn = 1,
+                Age = 0
+            };
+
+            _resources = new List<ResourceData>
+            {
+                new() { Icon = "⚙️", Name = "Production", Value = colony.ProductionCapacity, Change = 0, Tooltip = "Manufacturing output" },
+                new() { Icon = "🔬", Name = "Research", Value = colony.ResearchCapacity, Change = 0, Tooltip = "Science output" }
+            };
+
+            // Populate from resource output if available
+            if (colony.Resources != null)
+            {
+                _resources = new List<ResourceData>
+                {
+                    new() { Icon = "🌾", Name = "Food", Value = colony.Resources.Food, Change = 0, Tooltip = "Food production" },
+                    new() { Icon = "⚙️", Name = "Production", Value = colony.Resources.Industry, Change = 0, Tooltip = "Manufacturing output" },
+                    new() { Icon = "🔬", Name = "Research", Value = colony.Resources.Science, Change = 0, Tooltip = "Science output" },
+                    new() { Icon = "⚡", Name = "Energy", Value = colony.Resources.Energy, Change = 0, Tooltip = "Power grid" }
+                };
+            }
+        }
+
+        // Population data from enriched report
+        if (popReport != null)
+        {
+            _totalPops = popReport.TotalPopulation;
+            _maxPops = Math.Max(1, popReport.HousingCapacity);
+            _popGrowth = (int)Math.Ceiling(popReport.GrowthRate);
+            _unemployedPops = popReport.Unemployed;
+            _employmentRate = (_totalPops > 0)
+                ? (int)((popReport.Employed * 100.0) / _totalPops)
+                : 100;
+
+            // Species from API
+            _species = popReport.Species.Select(s => new SpeciesData
+            {
+                Name = s.Name,
+                Icon = s.Icon,
+                Count = s.Count,
+                Percentage = s.Percentage,
+                Color = s.Color
+            }).ToList();
+
+            // Jobs from API
+            _jobs = popReport.Jobs.Select(j => new JobData
+            {
+                Id = Guid.NewGuid(), // UI-internal ID for selection
+                JobTypeId = j.JobId, // Backend job type for API calls
+                Name = j.Name,
+                Icon = j.Icon,
+                Filled = j.Filled,
+                Total = j.Total,
+                CategoryColor = j.CategoryColor,
+                OutputText = j.OutputText
+            }).ToList();
+        }
+
+        // Build queue from colony detail
+        if (colony?.BuildQueue != null)
+        {
+            _constructionQueue = colony.BuildQueue.Select(q => new QueueItem
+            {
+                Id = q.Id,
+                Name = q.Name,
+                Icon = "🔨",
+                Cost = q.TotalTurns * 50,
+                Progress = q.TotalTurns > 0 ? ((q.TotalTurns - q.TurnsRemaining) * 100 / q.TotalTurns) : 0,
+                TurnsLeft = q.TurnsRemaining,
+                BuildTime = q.TotalTurns
+            }).ToList();
+        }
+
+        // Keep districts, buildings, modifiers, events, and available buildings as
+        // fallback/mock since colony detail report doesn't include that granularity yet
+        InitializeStaticBuildingData();
+    }
+
+    private void LoadMockData()
+    {
         _colony = new ColonyData
         {
             Id = ColonyId ?? Guid.NewGuid(),
@@ -1408,14 +1551,44 @@
 
         _jobs = new List<JobData>
         {
-            new() { Id = Guid.NewGuid(), Name = "Administrator", Icon = "👔", Filled = 2, Total = 2, CategoryColor = "#3b82f6", OutputText = "+10 Stability" },
-            new() { Id = Guid.NewGuid(), Name = "Scientist", Icon = "🔬", Filled = 3, Total = 4, CategoryColor = "#8b5cf6", OutputText = "+8 Research each" },
-            new() { Id = Guid.NewGuid(), Name = "Engineer", Icon = "🔧", Filled = 4, Total = 5, CategoryColor = "#f59e0b", OutputText = "+6 Production each" },
-            new() { Id = Guid.NewGuid(), Name = "Farmer", Icon = "🌾", Filled = 5, Total = 5, CategoryColor = "#10b981", OutputText = "+4 Food each" },
-            new() { Id = Guid.NewGuid(), Name = "Miner", Icon = "⛏️", Filled = 4, Total = 6, CategoryColor = "#10b981", OutputText = "+5 Minerals each" },
-            new() { Id = Guid.NewGuid(), Name = "Soldier", Icon = "🛡️", Filled = 3, Total = 3, CategoryColor = "#ef4444", OutputText = "+15 Defense each" }
+            new() { Id = Guid.NewGuid(), JobTypeId = "Administrator", Name = "Administrator", Icon = "👔", Filled = 2, Total = 2, CategoryColor = "#3b82f6", OutputText = "+10 Stability" },
+            new() { Id = Guid.NewGuid(), JobTypeId = "Scientist", Name = "Scientist", Icon = "🔬", Filled = 3, Total = 4, CategoryColor = "#8b5cf6", OutputText = "+8 Research each" },
+            new() { Id = Guid.NewGuid(), JobTypeId = "Engineer", Name = "Engineer", Icon = "🔧", Filled = 4, Total = 5, CategoryColor = "#f59e0b", OutputText = "+6 Production each" },
+            new() { Id = Guid.NewGuid(), JobTypeId = "Farmer", Name = "Farmer", Icon = "🌾", Filled = 5, Total = 5, CategoryColor = "#10b981", OutputText = "+4 Food each" },
+            new() { Id = Guid.NewGuid(), JobTypeId = "Miner", Name = "Miner", Icon = "⛏️", Filled = 4, Total = 6, CategoryColor = "#10b981", OutputText = "+5 Minerals each" },
+            new() { Id = Guid.NewGuid(), JobTypeId = "Soldier", Name = "Soldier", Icon = "🛡️", Filled = 3, Total = 3, CategoryColor = "#ef4444", OutputText = "+15 Defense each" }
         };
 
+        InitializeStaticBuildingData();
+
+        _constructionQueue = new List<QueueItem>
+        {
+            new() { Id = Guid.NewGuid(), Name = "Dilithium Refinery", Icon = "💎", Cost = 300, Progress = 65, TurnsLeft = 2, BuildTime = 5 },
+            new() { Id = Guid.NewGuid(), Name = "Shield Generator", Icon = "🔰", Cost = 400, Progress = 0, TurnsLeft = 6, BuildTime = 6 }
+        };
+
+        _constructingBuilding = new AvailableBuilding { Name = "Dilithium Refinery", Icon = "💎" };
+
+        _events = new List<ColonyEvent>
+        {
+            new() { Title = "Population Boom", Type = "positive", Turn = 52 },
+            new() { Title = "Trade Agreement", Type = "positive", Turn = 50 },
+            new() { Title = "Power Fluctuation", Type = "negative", Turn = 48 },
+            new() { Title = "Scientific Discovery", Type = "positive", Turn = 45 },
+            new() { Title = "Festival", Type = "neutral", Turn = 43 }
+        };
+
+        _modifiers = new List<ModifierData>
+        {
+            new() { Text = "+20% Production (Industrial Focus)", IsPositive = true },
+            new() { Text = "+15% Research (Science Council)", IsPositive = true },
+            new() { Text = "+10% Food (Fertile Soil)", IsPositive = true },
+            new() { Text = "-5% Morale (Overcrowding)", IsPositive = false }
+        };
+    }
+
+    private void InitializeStaticBuildingData()
+    {
         _districts = new List<DistrictData>
         {
             new() { Id = "core", Name = "Core", Icon = "🏛️", Used = 5, Total = 5 },
@@ -1457,71 +1630,22 @@
                 ProvidedJobs = new List<JobInfo> { new() { Name = "Soldier", Slots = 3 } } }
         };
 
-        _constructionQueue = new List<QueueItem>
-        {
-            new() { Id = Guid.NewGuid(), Name = "Dilithium Refinery", Icon = "💎", Cost = 300, Progress = 65, TurnsLeft = 2, BuildTime = 5 },
-            new() { Id = Guid.NewGuid(), Name = "Shield Generator", Icon = "🔰", Cost = 400, Progress = 0, TurnsLeft = 6, BuildTime = 6 }
-        };
-
-        _constructingBuilding = new AvailableBuilding { Name = "Dilithium Refinery", Icon = "💎" };
-
-        _events = new List<ColonyEvent>
-        {
-            new() { Title = "Population Boom", Type = "positive", Turn = 52 },
-            new() { Title = "Trade Agreement", Type = "positive", Turn = 50 },
-            new() { Title = "Power Fluctuation", Type = "negative", Turn = 48 },
-            new() { Title = "Scientific Discovery", Type = "positive", Turn = 45 },
-            new() { Title = "Festival", Type = "neutral", Turn = 43 }
-        };
-
-        _modifiers = new List<ModifierData>
-        {
-            new() { Text = "+20% Production (Industrial Focus)", IsPositive = true },
-            new() { Text = "+15% Research (Science Council)", IsPositive = true },
-            new() { Text = "+10% Food (Fertile Soil)", IsPositive = true },
-            new() { Text = "-5% Morale (Overcrowding)", IsPositive = false }
-        };
+        _events = new List<ColonyEvent>();
+        _modifiers = new List<ModifierData>();
 
         _availableBuildings = new List<AvailableBuilding>
         {
             new() { Type = "starfleet_hq", Name = "Starfleet HQ", Icon = "🏛️", Category = "civic", ShortDesc = "Command center", Description = "Central command for all operations.", Cost = 500, BuildTime = 8, CanBuild = true, SpriteRow = 0, SpriteCol = 0 },
             new() { Type = "academy", Name = "Academy", Icon = "🎓", Category = "civic", ShortDesc = "Training facility", Description = "Trains officers and crew.", Cost = 300, BuildTime = 5, CanBuild = true, SpriteRow = 0, SpriteCol = 1 },
-            new() { Type = "warp_factory", Name = "Warp Core Factory", Icon = "⚡", Category = "production", ShortDesc = "Warp cores", Description = "Produces warp cores for starships.", Cost = 400, BuildTime = 6, CanBuild = true, SpriteRow = 0, SpriteCol = 2 },
-            new() { Type = "shipyard", Name = "Shipyard", Icon = "🚀", Category = "production", ShortDesc = "Construct ships", Description = "Orbital shipyard for vessel construction.", Cost = 500, BuildTime = 8, CanBuild = false, Requirement = "Requires: Starport", SpriteRow = 0, SpriteCol = 3 },
+            new() { Type = "warp_factory", Name = "Warp Core Factory", Icon = "⚡", Category = "production", ShortDesc = "Warp cores", Description = "Produces warp cores.", Cost = 400, BuildTime = 6, CanBuild = true, SpriteRow = 0, SpriteCol = 2 },
             new() { Type = "resource_processor", Name = "Resource Processor", Icon = "⚙️", Category = "resource", ShortDesc = "Process raw materials", Description = "Refines raw materials.", Cost = 150, BuildTime = 4, CanBuild = true, SpriteRow = 0, SpriteCol = 4 },
-            new() { Type = "power_generator", Name = "Power Generator", Icon = "🔋", Category = "resource", ShortDesc = "Energy production", Description = "Fusion power plant.", Cost = 120, BuildTime = 3, CanBuild = true, SpriteRow = 0, SpriteCol = 5 },
-            new() { Type = "power_generator_adv", Name = "Advanced Generator", Icon = "⚡", Category = "resource", ShortDesc = "Advanced energy", Description = "Matter/antimatter reactor.", Cost = 250, BuildTime = 5, CanBuild = true, SpriteRow = 1, SpriteCol = 0 },
             new() { Type = "habitat_ring", Name = "Habitat Ring", Icon = "🏠", Category = "civic", ShortDesc = "Housing", Description = "Orbital habitat for population.", Cost = 200, BuildTime = 4, CanBuild = true, SpriteRow = 1, SpriteCol = 1 },
             new() { Type = "medical_center", Name = "Medical Center", Icon = "🏥", Category = "civic", ShortDesc = "Healthcare", Description = "Advanced medical facility.", Cost = 180, BuildTime = 4, CanBuild = true, SpriteRow = 1, SpriteCol = 2 },
             new() { Type = "science_lab", Name = "Science Lab", Icon = "🔬", Category = "research", ShortDesc = "Research", Description = "Scientific research laboratory.", Cost = 150, BuildTime = 4, CanBuild = true, SpriteRow = 1, SpriteCol = 3 },
             new() { Type = "defensive_array", Name = "Defensive Array", Icon = "🛡️", Category = "military", ShortDesc = "Orbital defense", Description = "Planetary defense grid.", Cost = 300, BuildTime = 5, CanBuild = true, SpriteRow = 1, SpriteCol = 4 },
-            new() { Type = "phaser_turret", Name = "Phaser Turret", Icon = "🔫", Category = "military", ShortDesc = "Ground defense", Description = "Phaser defense emplacement.", Cost = 150, BuildTime = 3, CanBuild = true, SpriteRow = 1, SpriteCol = 5 },
-            new() { Type = "phaser_turret_heavy", Name = "Heavy Phaser", Icon = "💥", Category = "military", ShortDesc = "Heavy defense", Description = "Heavy phaser battery.", Cost = 250, BuildTime = 4, CanBuild = true, SpriteRow = 2, SpriteCol = 0 },
-            new() { Type = "shield_emitter", Name = "Shield Emitter", Icon = "🛡️", Category = "military", ShortDesc = "Shields", Description = "Planetary shield generator.", Cost = 350, BuildTime = 5, CanBuild = true, SpriteRow = 2, SpriteCol = 1 },
-            new() { Type = "trade_station", Name = "Trade Station", Icon = "💰", Category = "production", ShortDesc = "Commerce", Description = "Trade and commerce hub.", Cost = 200, BuildTime = 4, CanBuild = true, SpriteRow = 2, SpriteCol = 2 },
-            new() { Type = "supply_depot", Name = "Supply Depot", Icon = "📦", Category = "resource", ShortDesc = "Storage", Description = "Resource storage facility.", Cost = 100, BuildTime = 3, CanBuild = true, SpriteRow = 2, SpriteCol = 3 },
-            new() { Type = "comm_relay", Name = "Communications Relay", Icon = "📡", Category = "civic", ShortDesc = "Communications", Description = "Subspace comm array.", Cost = 150, BuildTime = 3, CanBuild = true, SpriteRow = 2, SpriteCol = 4 },
-            new() { Type = "sensor_array", Name = "Sensor Array", Icon = "📡", Category = "research", ShortDesc = "Long-range sensors", Description = "Deep space sensor array.", Cost = 200, BuildTime = 4, CanBuild = true, SpriteRow = 2, SpriteCol = 5 },
-            new() { Type = "diplomatic_center", Name = "Diplomatic Center", Icon = "🤝", Category = "civic", ShortDesc = "Diplomacy", Description = "Embassy and diplomatic hub.", Cost = 250, BuildTime = 5, CanBuild = true, SpriteRow = 3, SpriteCol = 0 },
-            new() { Type = "diplomatic_center_adv", Name = "Embassy Complex", Icon = "🏛️", Category = "civic", ShortDesc = "Advanced diplomacy", Description = "Full diplomatic complex.", Cost = 400, BuildTime = 6, CanBuild = true, SpriteRow = 3, SpriteCol = 1 },
-            new() { Type = "security_outpost", Name = "Security Outpost", Icon = "👮", Category = "military", ShortDesc = "Security", Description = "Internal security facility.", Cost = 150, BuildTime = 3, CanBuild = true, SpriteRow = 3, SpriteCol = 2 },
-            new() { Type = "detention_facility", Name = "Detention Facility", Icon = "🔒", Category = "military", ShortDesc = "Prison", Description = "High-security detention.", Cost = 180, BuildTime = 4, CanBuild = true, SpriteRow = 3, SpriteCol = 3 },
-            new() { Type = "reeducation_center", Name = "Re-Education Center", Icon = "📚", Category = "civic", ShortDesc = "Training", Description = "Workforce training center.", Cost = 200, BuildTime = 4, CanBuild = true, SpriteRow = 3, SpriteCol = 4 },
-            new() { Type = "monument", Name = "Monument to Exploration", Icon = "🗽", Category = "civic", ShortDesc = "Morale boost", Description = "Inspirational monument.", Cost = 300, BuildTime = 5, CanBuild = true, SpriteRow = 3, SpriteCol = 5 },
-            new() { Type = "atmospheric_stabilizer", Name = "Atmospheric Stabilizer", Icon = "🌡️", Category = "resource", ShortDesc = "Terraforming", Description = "Climate control system.", Cost = 350, BuildTime = 6, CanBuild = true, SpriteRow = 4, SpriteCol = 1 },
-            new() { Type = "geothermal_plant", Name = "Geothermal Plant", Icon = "🌋", Category = "resource", ShortDesc = "Geothermal energy", Description = "Geothermal power extraction.", Cost = 200, BuildTime = 4, CanBuild = true, SpriteRow = 4, SpriteCol = 2 },
-            new() { Type = "transporter_pad", Name = "Transporter Pad", Icon = "✨", Category = "civic", ShortDesc = "Transport hub", Description = "Personnel transport system.", Cost = 150, BuildTime = 3, CanBuild = true, SpriteRow = 4, SpriteCol = 3 },
-            new() { Type = "shuttle_hangar", Name = "Shuttle Hangar", Icon = "🛸", Category = "production", ShortDesc = "Shuttlecraft", Description = "Shuttle maintenance bay.", Cost = 180, BuildTime = 4, CanBuild = true, SpriteRow = 4, SpriteCol = 4 },
-            new() { Type = "storage_silos", Name = "Storage Silos", Icon = "🏭", Category = "resource", ShortDesc = "Bulk storage", Description = "Industrial storage facility.", Cost = 100, BuildTime = 2, CanBuild = true, SpriteRow = 4, SpriteCol = 5 },
-            new() { Type = "research_facility", Name = "Research Facility", Icon = "🔬", Category = "research", ShortDesc = "Advanced research", Description = "Cutting-edge research complex.", Cost = 300, BuildTime = 5, CanBuild = true, SpriteRow = 5, SpriteCol = 0 },
             new() { Type = "agricultural_dome", Name = "Agricultural Dome", Icon = "🌾", Category = "resource", ShortDesc = "Food production", Description = "Hydroponic farming dome.", Cost = 120, BuildTime = 3, CanBuild = true, SpriteRow = 5, SpriteCol = 1 },
-            new() { Type = "fabrication_plant", Name = "Fabrication Plant", Icon = "🏭", Category = "production", ShortDesc = "Manufacturing", Description = "Industrial replicator complex.", Cost = 250, BuildTime = 5, CanBuild = true, SpriteRow = 5, SpriteCol = 2 },
-            new() { Type = "training_facility", Name = "Training Facility", Icon = "🎯", Category = "military", ShortDesc = "Military training", Description = "Combat training center.", Cost = 200, BuildTime = 4, CanBuild = true, SpriteRow = 5, SpriteCol = 3 },
-            new() { Type = "bunker", Name = "Bunker", Icon = "🏰", Category = "military", ShortDesc = "Fortification", Description = "Hardened defensive structure.", Cost = 180, BuildTime = 4, CanBuild = true, SpriteRow = 5, SpriteCol = 4 },
-            new() { Type = "barracks", Name = "Barracks", Icon = "🛏️", Category = "military", ShortDesc = "Troop housing", Description = "Military personnel quarters.", Cost = 120, BuildTime = 3, CanBuild = true, SpriteRow = 5, SpriteCol = 5 }
+            new() { Type = "fabrication_plant", Name = "Fabrication Plant", Icon = "🏭", Category = "production", ShortDesc = "Manufacturing", Description = "Industrial replicator complex.", Cost = 250, BuildTime = 5, CanBuild = true, SpriteRow = 5, SpriteCol = 2 }
         };
-
-        _loading = false;
     }
 
     private void SelectSlot(int index)
@@ -1567,24 +1691,46 @@
     private async Task AssignWorker(Guid jobId)
     {
         var job = _jobs.FirstOrDefault(j => j.Id == jobId);
-        if (job != null && job.Filled < job.Total && _unemployedPops > 0)
+        if (job == null || job.Filled >= job.Total || _unemployedPops <= 0) return;
+
+        try
         {
+            if (_colony.Id != Guid.Empty && !string.IsNullOrEmpty(job.JobTypeId))
+            {
+                await Api.AutoAssignJobAsync(_colony.Id, job.JobTypeId);
+            }
+            // Update local state optimistically
             job.Filled++;
             _unemployedPops--;
             _employmentRate = (int)((_totalPops - _unemployedPops) * 100.0 / _totalPops);
             Snackbar.Add($"Worker assigned to {job.Name}", Severity.Success);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Failed to assign worker: {ex.Message}", Severity.Error);
         }
     }
 
     private async Task RemoveWorker(Guid jobId)
     {
         var job = _jobs.FirstOrDefault(j => j.Id == jobId);
-        if (job != null && job.Filled > 0)
+        if (job == null || job.Filled <= 0) return;
+
+        try
         {
+            if (_colony.Id != Guid.Empty && !string.IsNullOrEmpty(job.JobTypeId))
+            {
+                await Api.AutoRemoveJobAsync(_colony.Id, job.JobTypeId);
+            }
+            // Update local state optimistically
             job.Filled--;
             _unemployedPops++;
             _employmentRate = (int)((_totalPops - _unemployedPops) * 100.0 / _totalPops);
             Snackbar.Add($"Worker removed from {job.Name}", Severity.Info);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Failed to remove worker: {ex.Message}", Severity.Error);
         }
     }
 
@@ -1683,7 +1829,7 @@
 
     private class ResourceData { public string Icon { get; set; } = ""; public string Name { get; set; } = ""; public int Value { get; set; } public int Change { get; set; } public string Tooltip { get; set; } = ""; }
     private class SpeciesData { public string Name { get; set; } = ""; public string Icon { get; set; } = ""; public int Count { get; set; } public int Percentage { get; set; } public string Color { get; set; } = ""; }
-    private class JobData { public Guid Id { get; set; } public string Name { get; set; } = ""; public string Icon { get; set; } = ""; public int Filled { get; set; } public int Total { get; set; } public string CategoryColor { get; set; } = ""; public string OutputText { get; set; } = ""; }
+    private class JobData { public Guid Id { get; set; } public string JobTypeId { get; set; } = ""; public string Name { get; set; } = ""; public string Icon { get; set; } = ""; public int Filled { get; set; } public int Total { get; set; } public string CategoryColor { get; set; } = ""; public string OutputText { get; set; } = ""; }
     private class DistrictData { public string Id { get; set; } = ""; public string Name { get; set; } = ""; public string Icon { get; set; } = ""; public int Used { get; set; } public int Total { get; set; } }
     private class BuildingData { public Guid Id { get; set; } public int SlotIndex { get; set; } public string Name { get; set; } = ""; public string ShortName { get; set; } = ""; public string Icon { get; set; } = ""; public int Level { get; set; } public int MaxLevel { get; set; } public string Category { get; set; } = ""; public bool IsActive { get; set; } public bool IsDamaged { get; set; } public string Description { get; set; } = ""; public int MaintenanceCost { get; set; } public int UpgradeCost { get; set; } public List<OutputData> Outputs { get; set; } = new(); public List<JobInfo> ProvidedJobs { get; set; } = new(); public int SpriteRow { get; set; } public int SpriteCol { get; set; } }
     private class OutputData { public string Icon { get; set; } = ""; public string Name { get; set; } = ""; public int Amount { get; set; } }

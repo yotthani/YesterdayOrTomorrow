@@ -11,6 +11,12 @@ public interface ICombatService
     Task<CombatSimulation> SimulateCombatAsync(Guid attackerFleetId, Guid defenderFleetId);
     int CalculateFleetPower(FleetEntity fleet);
     int CalculateShipPower(ShipEntity ship);
+
+    // Tactical combat
+    double CalculateDisorder(double currentDisorder, bool isManualOrder, bool commanderPresent, int totalManualOrders, int drillLevel);
+    double GetFormationBonus(FormationType attacker, FormationType defender);
+    (double accuracyMod, double damageMod, double evasionMod, double orderReliability) GetDisorderEffects(double disorder);
+    TacticalRoundResult SimulateTacticalRound(FleetCombatState attacker, FleetCombatState defender, int roundNum, TacticalBattleState tacticalState);
 }
 
 public class CombatService : ICombatService
@@ -49,6 +55,10 @@ public class CombatService : ICombatService
         ApplyStanceModifiers(defenderState, defender.Stance);
         ApplyExperienceModifiers(attackerState, attacker.ExperienceLevel);
         ApplyExperienceModifiers(defenderState, defender.ExperienceLevel);
+
+        // Apply faction tech modifiers (weapon_damage, shield_hp, hull_hp, etc.)
+        await ApplyTechModifiersAsync(attackerState, attacker.FactionId);
+        await ApplyTechModifiersAsync(defenderState, defender.FactionId);
 
         // Combat rounds
         for (int round = 1; round <= 10 && attackerState.IsAlive && defenderState.IsAlive; round++)
@@ -293,6 +303,35 @@ public class CombatService : ICombatService
         foreach (var ship in state.Ships)
         {
             ship.Firepower = (int)(ship.Firepower * mod);
+        }
+    }
+
+    /// <summary>
+    /// Apply faction tech modifiers to combat state (weapon_damage, shield_hp, hull_hp, etc.)
+    /// </summary>
+    private async Task ApplyTechModifiersAsync(FleetCombatState state, Guid factionId)
+    {
+        var faction = await _db.Factions.FindAsync(factionId);
+        if (faction == null) return;
+
+        var weaponMod = 1.0 + faction.WeaponDamageModifier / 100.0;
+        var shieldMod = 1.0 + faction.ShieldHpModifier / 100.0;
+        var hullMod = 1.0 + faction.HullHpModifier / 100.0;
+        var armorFlat = faction.ArmorBonus;
+        var shieldRegenFlat = faction.ShieldRegenBonus;
+        var hullRegenFlat = faction.HullRegenBonus;
+
+        foreach (var ship in state.Ships)
+        {
+            ship.Firepower = (int)(ship.Firepower * weaponMod);
+            ship.Shields = (int)(ship.Shields * shieldMod);
+            ship.MaxShields = (int)(ship.MaxShields * shieldMod);
+            ship.Hull = (int)(ship.Hull * hullMod);
+            ship.MaxHull = (int)(ship.MaxHull * hullMod);
+            ship.RegenerationRate += hullRegenFlat;
+            // Armor reduces incoming damage — we add it as effective HP
+            ship.Hull += armorFlat;
+            ship.MaxHull += armorFlat;
         }
     }
 
@@ -571,6 +610,98 @@ public class CombatService : ICombatService
         > 0.6 => "Disadvantage - Reinforce first",
         _ => "Severe disadvantage - Avoid engagement"
     };
+
+    // --- Tactical Combat ---
+
+    private static readonly double[,] FormationBonusMatrix = {
+        //           Wedge  Sphere  Line  Dispersed  Echelon
+        /* Wedge */    { 0.00, 0.15, -0.10,  0.05,  0.10 },
+        /* Sphere */   {-0.15, 0.00,  0.10, -0.05,  0.05 },
+        /* Line */     { 0.10,-0.10,  0.00,  0.15, -0.05 },
+        /* Dispersed */{-0.05, 0.05, -0.15,  0.00,  0.10 },
+        /* Echelon */  {-0.10,-0.05,  0.05, -0.10,  0.00 },
+    };
+
+    public double CalculateDisorder(double currentDisorder, bool isManualOrder, bool commanderPresent, int totalManualOrders, int drillLevel)
+    {
+        if (!isManualOrder) return Math.Max(0, currentDisorder - 5); // decay per round
+
+        var delta = 15.0; // base per manual order
+        if (!commanderPresent && totalManualOrders == 0) delta += 25; // first order without commander
+        delta += totalManualOrders * 5; // cumulative penalty
+        delta -= Math.Min(20, drillLevel * 0.2); // drill reduction
+
+        return Math.Clamp(currentDisorder + delta, 0, 100);
+    }
+
+    public double GetFormationBonus(FormationType attacker, FormationType defender)
+        => FormationBonusMatrix[(int)attacker, (int)defender];
+
+    public (double accuracyMod, double damageMod, double evasionMod, double orderReliability) GetDisorderEffects(double disorder)
+    {
+        return disorder switch
+        {
+            < 25 => (1.0, 1.0, 1.0, 1.0),
+            < 50 => (0.90, 1.0, 1.0, 1.0),
+            < 75 => (0.85, 0.75, 0.85, 1.0),
+            < 100 => (0.75, 0.50, 0.70, 0.80),
+            _ => (0.60, 0.40, 0.60, 0.0)
+        };
+    }
+
+    public TacticalRoundResult SimulateTacticalRound(FleetCombatState attacker, FleetCombatState defender, int roundNum, TacticalBattleState tacticalState)
+    {
+        var result = new TacticalRoundResult { Round = roundNum };
+
+        // 1. Apply disorder decay (no manual order this round = decay)
+        tacticalState.AttackerDisorder = Math.Max(0, tacticalState.AttackerDisorder - 5);
+        tacticalState.DefenderDisorder = Math.Max(0, tacticalState.DefenderDisorder - 5);
+
+        // 2. Get disorder effects for both sides
+        var (atkAccMod, atkDmgMod, atkEvaMod, _) = GetDisorderEffects(tacticalState.AttackerDisorder);
+        var (defAccMod, defDmgMod, defEvaMod, _) = GetDisorderEffects(tacticalState.DefenderDisorder);
+
+        // 3. Calculate formation bonus
+        var formationBonus = GetFormationBonus(tacticalState.AttackerFormation, tacticalState.DefenderFormation);
+
+        // 4. Temporarily adjust ship stats for this round
+        // Attacker gets formation bonus + disorder penalty
+        foreach (var ship in attacker.Ships.Where(s => s.Hull > 0))
+        {
+            ship.Firepower = (int)(ship.Firepower * atkDmgMod * (1.0 + formationBonus));
+            ship.Evasion = (int)(ship.Evasion * atkEvaMod);
+        }
+        // Defender gets inverse formation bonus + disorder penalty
+        foreach (var ship in defender.Ships.Where(s => s.Hull > 0))
+        {
+            ship.Firepower = (int)(ship.Firepower * defDmgMod * (1.0 - formationBonus));
+            ship.Evasion = (int)(ship.Evasion * defEvaMod);
+        }
+
+        // 5. Run the standard round simulation (reuses ALL existing combat logic)
+        result.CombatRound = SimulateRound(attacker, defender, roundNum);
+
+        // 6. Count losses
+        var atkLost = attacker.Ships.Count(s => s.Hull <= 0 && !s.Destroyed);
+        var defLost = defender.Ships.Count(s => s.Hull <= 0 && !s.Destroyed);
+        tacticalState.AttackerShipsLost += atkLost;
+        tacticalState.DefenderShipsLost += defLost;
+
+        // 7. Update disorder values in result
+        result.AttackerDisorder = tacticalState.AttackerDisorder;
+        result.DefenderDisorder = tacticalState.DefenderDisorder;
+
+        // 8. Check victory/completion
+        if (!attacker.IsAlive || !defender.IsAlive)
+        {
+            result.IsComplete = true;
+            result.WinnerId = attacker.IsAlive ? attacker.FleetId : defender.FleetId;
+        }
+
+        tacticalState.Round = roundNum;
+
+        return result;
+    }
 }
 
 public class FleetCombatState
@@ -642,4 +773,34 @@ public class CombatSimulation
     public int ExpectedAttackerLosses { get; set; }
     public int ExpectedDefenderLosses { get; set; }
     public string Recommendation { get; set; } = "";
+}
+
+public class TacticalBattleState
+{
+    public double AttackerDisorder { get; set; }
+    public double DefenderDisorder { get; set; }
+    public FormationType AttackerFormation { get; set; } = FormationType.Line;
+    public FormationType DefenderFormation { get; set; } = FormationType.Line;
+    public int AttackerManualOrders { get; set; }
+    public int DefenderManualOrders { get; set; }
+    public bool AttackerCommanderPresent { get; set; }
+    public bool DefenderCommanderPresent { get; set; }
+    public int AttackerDrillLevel { get; set; }
+    public int DefenderDrillLevel { get; set; }
+    public int Round { get; set; }
+    public int AttackerShipsLost { get; set; }
+    public int DefenderShipsLost { get; set; }
+    public int AttackerOriginalShipCount { get; set; }
+    public int DefenderOriginalShipCount { get; set; }
+}
+
+public class TacticalRoundResult
+{
+    public int Round { get; set; }
+    public CombatRound CombatRound { get; set; } = new();
+    public double AttackerDisorder { get; set; }
+    public double DefenderDisorder { get; set; }
+    public List<string> TriggeredOrders { get; set; } = new();
+    public bool IsComplete { get; set; }
+    public Guid? WinnerId { get; set; }
 }

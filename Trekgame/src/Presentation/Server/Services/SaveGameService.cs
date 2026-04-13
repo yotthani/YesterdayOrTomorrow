@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using StarTrekGame.Server.Data;
+using StarTrekGame.Server.Data.Definitions;
 using StarTrekGame.Server.Data.Entities;
 using System.IO.Compression;
 using System.Text.Json;
@@ -481,30 +482,243 @@ public class SaveGameService : ISaveGameService
 
     private async Task<Guid> RestoreGameStateAsync(GameStateData data)
     {
-        // For now, create a new game from the save data
-        // In production, you'd want to clear and restore the existing game
-        
+        var gameId = Guid.NewGuid();
+
+        // 1. Create game session
         var game = new GameSessionEntity
         {
-            Id = Guid.NewGuid(),
+            Id = gameId,
             Name = data.GameName + " (Loaded)",
             CurrentTurn = data.CurrentTurn,
             Difficulty = data.Difficulty,
             GalaxySize = (int)data.GalaxySize,
             VictoryConditions = data.VictoryConditions,
             ActiveCrisisType = data.ActiveCrisis,
-            MarketPrices = string.IsNullOrEmpty(data.MarketPrices) ? new MarketPricesData() : System.Text.Json.JsonSerializer.Deserialize<MarketPricesData>(data.MarketPrices) ?? new MarketPricesData(),
+            MarketPrices = string.IsNullOrEmpty(data.MarketPrices)
+                ? new MarketPricesData()
+                : JsonSerializer.Deserialize<MarketPricesData>(data.MarketPrices) ?? new MarketPricesData(),
             CreatedAt = DateTime.UtcNow,
             Status = "InProgress"
         };
-
         _db.Games.Add(game);
-        
-        // Restore systems, factions, etc.
-        // This would be a full implementation restoring all entities
-        
+
+        // 2. Restore star systems + planets + anomalies
+        foreach (var sys in data.Systems)
+        {
+            var system = new StarSystemEntity
+            {
+                Id = sys.Id,
+                GameId = gameId,
+                Name = sys.Name,
+                X = sys.X,
+                Y = sys.Y,
+                StarType = sys.StarType,
+                ControllingFactionId = sys.ControllingFactionId,
+                IsScanned = sys.IsScanned,
+                IsDeepScanned = sys.IsDeepScanned,
+                PlanetCount = sys.Planets.Count,
+                HasHabitablePlanet = sys.Planets.Any(p => p.Habitability > 50)
+            };
+            _db.Systems.Add(system);
+
+            foreach (var pl in sys.Planets)
+            {
+                _db.Planets.Add(new PlanetEntity
+                {
+                    Id = pl.Id,
+                    SystemId = sys.Id,
+                    Name = pl.Name,
+                    PlanetType = pl.PlanetType,
+                    Size = pl.Size,
+                    BaseHabitability = pl.Habitability,
+                    HasDilithium = pl.HasDilithium,
+                    HasDeuterium = pl.HasDeuterium
+                });
+            }
+
+            foreach (var an in sys.Anomalies)
+            {
+                _db.Anomalies.Add(new AnomalyEntity
+                {
+                    Id = Guid.NewGuid(),
+                    SystemId = sys.Id,
+                    AnomalyTypeId = an.TypeId,
+                    IsDiscovered = an.IsDiscovered,
+                    IsResearched = an.IsResearched,
+                    ResearchProgress = an.Progress
+                });
+            }
+        }
+
+        // 3. Restore factions + houses + colonies + fleets + techs + agents
+        foreach (var fData in data.Factions)
+        {
+            var faction = new FactionEntity
+            {
+                Id = fData.Id,
+                GameId = gameId,
+                Name = fData.Name,
+                RaceId = fData.RaceId,
+                IsAI = fData.IsAI,
+                IsDefeated = fData.IsDefeated
+            };
+            _db.Factions.Add(faction);
+
+            // Technologies
+            foreach (var tech in fData.Technologies)
+            {
+                _db.Technologies.Add(new TechnologyEntity
+                {
+                    Id = Guid.NewGuid(),
+                    FactionId = fData.Id,
+                    TechId = tech.TechId,
+                    IsResearched = tech.IsResearched,
+                    ResearchProgress = tech.Progress,
+                    ResearchCost = TechnologyDefinitions.Get(tech.TechId)?.Cost ?? 500
+                });
+            }
+
+            // Agents
+            foreach (var ag in fData.Agents)
+            {
+                _db.Agents.Add(new AgentEntity
+                {
+                    Id = Guid.NewGuid(),
+                    FactionId = fData.Id,
+                    Name = ag.Name,
+                    Type = ag.Type,
+                    Status = ag.Status,
+                    Skill = ag.Skill,
+                    Subterfuge = ag.Subterfuge,
+                    Network = ag.Network
+                });
+            }
+
+            // Houses
+            foreach (var hData in fData.Houses)
+            {
+                var house = new HouseEntity
+                {
+                    Id = hData.Id,
+                    FactionId = fData.Id,
+                    Name = hData.Name,
+                    Treasury = hData.Treasury,
+                    Influence = hData.Influence
+                };
+                _db.Houses.Add(house);
+
+                // Colonies
+                foreach (var cData in hData.Colonies)
+                {
+                    var colony = new ColonyEntity
+                    {
+                        Id = cData.Id,
+                        FactionId = fData.Id,
+                        HouseId = hData.Id,
+                        SystemId = Guid.Empty, // Will be resolved from PlanetId
+                        PlanetId = cData.PlanetId,
+                        Name = cData.Name,
+                        Stability = cData.Stability,
+                        Designation = cData.Designation
+                    };
+
+                    // Resolve system from planet
+                    var planet = data.Systems
+                        .SelectMany(s => s.Planets.Select(p => (SystemId: s.Id, Planet: p)))
+                        .FirstOrDefault(x => x.Planet.Id == cData.PlanetId);
+                    if (planet.Planet != null)
+                        colony.SystemId = planet.SystemId;
+
+                    _db.Colonies.Add(colony);
+
+                    // Pops
+                    foreach (var pop in cData.Pops)
+                    {
+                        _db.Pops.Add(new PopEntity
+                        {
+                            Id = Guid.NewGuid(),
+                            ColonyId = cData.Id,
+                            HomeColonyId = cData.Id,
+                            SpeciesId = pop.SpeciesId,
+                            Size = pop.Size,
+                            Stratum = pop.Stratum,
+                            Happiness = pop.Happiness
+                        });
+                    }
+
+                    // Buildings
+                    foreach (var bld in cData.Buildings)
+                    {
+                        _db.Buildings.Add(new BuildingEntity
+                        {
+                            Id = Guid.NewGuid(),
+                            ColonyId = cData.Id,
+                            BuildingTypeId = bld.TypeId,
+                            Level = bld.Level,
+                            JobsFilled = bld.JobsFilled,
+                            IsActive = true
+                        });
+                    }
+                }
+
+                // Fleets + Ships
+                foreach (var fltData in hData.Fleets)
+                {
+                    var fleet = new FleetEntity
+                    {
+                        Id = fltData.Id,
+                        FactionId = fData.Id,
+                        HouseId = hData.Id,
+                        CurrentSystemId = fltData.SystemId,
+                        Name = fltData.Name,
+                        Stance = fltData.Stance,
+                        Role = fltData.Role,
+                        Morale = fltData.Morale,
+                        ExperiencePoints = fltData.Experience
+                    };
+                    _db.Fleets.Add(fleet);
+
+                    foreach (var ship in fltData.Ships)
+                    {
+                        _db.Ships.Add(new ShipEntity
+                        {
+                            Id = Guid.NewGuid(),
+                            FleetId = fltData.Id,
+                            Name = ship.Name,
+                            DesignId = ship.DesignId,
+                            DesignName = ship.DesignId,
+                            HullPoints = ship.Hull,
+                            MaxHullPoints = ship.Hull,
+                            ShieldPoints = ship.Shields,
+                            MaxShieldPoints = ship.Shields
+                        });
+                    }
+                }
+            }
+        }
+
+        // 4. Restore diplomatic relations
+        foreach (var rel in data.DiplomaticRelations)
+        {
+            _db.DiplomaticRelations.Add(new DiplomaticRelationEntity
+            {
+                Id = Guid.NewGuid(),
+                FactionId = rel.FactionId,
+                OtherFactionId = rel.OtherFactionId,
+                Opinion = rel.Opinion,
+                Trust = rel.Trust,
+                Status = rel.Status,
+                AtWar = rel.AtWar,
+                WarScore = rel.WarScore,
+                ActiveTreaties = rel.Treaties ?? "[]"
+            });
+        }
+
         await _db.SaveChangesAsync();
-        return game.Id;
+        _logger.LogInformation("Game restored: {Systems} systems, {Factions} factions",
+            data.Systems.Count, data.Factions.Count);
+
+        return gameId;
     }
 
     private byte[] CompressData(string data)

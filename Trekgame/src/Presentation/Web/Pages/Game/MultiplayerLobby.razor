@@ -1,7 +1,10 @@
 @page "/multiplayer"
 @page "/multiplayer/{LobbyId:guid}"
+@using Microsoft.AspNetCore.SignalR.Client
 @inject NavigationManager Nav
 @inject IJSRuntime JS
+@inject IGameApiClient Api
+@inject ILocalStorageService LocalStorage
 @implements IAsyncDisposable
 
 <div class="multiplayer-screen">
@@ -197,7 +200,7 @@
                                         }
                                     </span>
                                     <span class="player-faction @player.Faction?.ToLower()">
-                                        @(player.Faction ?? "Selecting...")
+                                        @(GetFactionDisplayName(player.Faction))
                                     </span>
                                 </div>
                                 <div class="player-status">
@@ -225,7 +228,7 @@
                     <div class="faction-grid">
                         @foreach (var faction in _availableFactions)
                         {
-                            var taken = _players.Any(p => p.Faction == faction.Id && p.Id != _myPlayerId);
+                            var taken = _players.Any(p => p.Faction == faction.Id && p.Id != _myFactionId);
                             <div class="faction-card @faction.Id.ToLower() @(_selectedFaction == faction.Id ? "selected" : "") @(taken ? "taken" : "")"
                                  @onclick="() => SelectFaction(faction.Id)">
                                 <div class="faction-emblem">@faction.Emblem</div>
@@ -279,6 +282,14 @@
                     </button>
                 }
             </div>
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty(_errorMessage))
+    {
+        <div class="error-banner">
+            <span>@_errorMessage</span>
+            <button @onclick='() => _errorMessage = ""'>✕</button>
         </div>
     }
 
@@ -683,6 +694,29 @@
         color: #888;
     }
 
+    .error-banner {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 12px 20px;
+        background: rgba(231, 76, 60, 0.9);
+        border-radius: 10px;
+        z-index: 1000;
+        max-width: 600px;
+    }
+
+    .error-banner button {
+        background: none;
+        border: none;
+        color: white;
+        cursor: pointer;
+        font-size: 1.2em;
+    }
+
     @@media (max-width: 1000px) {
         .lobby-content {
             grid-template-columns: 1fr;
@@ -694,6 +728,10 @@
     [Parameter]
     public Guid? LobbyId { get; set; }
 
+    // --- SignalR connection ---
+    private HubConnection? _hubConnection;
+
+    // --- UI state ---
     private string _currentView = "browser";
     private bool _loading = true;
     private List<LobbyDisplay> _lobbies = new();
@@ -709,12 +747,18 @@
     private CreateLobbyModel _newLobby = new();
     private string _selectedFaction = "";
     private string _chatInput = "";
-    
-    private Guid _myPlayerId = Guid.NewGuid();
+
+    // --- Player identity ---
+    private Guid _myFactionId;
+    private Guid _currentGameId;
+    private string _myPlayerName = "Player";
     private bool _isHost = false;
     private bool _isReady = false;
-    private string _connectionStatus = "Connecting";
+    private bool _hasJoinedGame = false;
+    private string _connectionStatus = "Disconnected";
+    private string _errorMessage = "";
 
+    // --- Computed ---
     private IEnumerable<LobbyDisplay> FilteredLobbies => _lobbies
         .Where(l => string.IsNullOrEmpty(_searchFilter) || l.Name.Contains(_searchFilter, StringComparison.OrdinalIgnoreCase))
         .Where(l => string.IsNullOrEmpty(_gameTypeFilter) || l.GameType == _gameTypeFilter)
@@ -722,6 +766,12 @@
 
     private bool CanStartGame => _players.Count >= 2 && _players.All(p => p.IsReady || p.IsHost);
 
+    private string GetFactionDisplayName(string? factionId) =>
+        _availableFactions.FirstOrDefault(f => f.Id == factionId)?.Name ?? factionId ?? "Selecting...";
+
+    // ====================================================
+    // Lifecycle
+    // ====================================================
     protected override async Task OnInitializedAsync()
     {
         _availableFactions = new List<FactionOption>
@@ -734,34 +784,304 @@
             new() { Id = "dominion", Name = "Dominion", Emblem = "👁️" }
         };
 
+        // Load player name from storage
+        try
+        {
+            var storedName = await LocalStorage.GetItemAsStringAsync("currentPlayerName");
+            if (!string.IsNullOrEmpty(storedName))
+                _myPlayerName = storedName.Trim('"');
+        }
+        catch { /* LocalStorage may not be available during prerender */ }
+
         if (LobbyId.HasValue)
         {
-            await JoinLobby(new LobbyDisplay { Id = LobbyId.Value });
+            await EnterLobby(LobbyId.Value);
         }
         else
         {
             await RefreshLobbies();
         }
-
-        _connectionStatus = "Connected";
     }
 
+    // ====================================================
+    // SignalR Hub Connection
+    // ====================================================
+    private async Task ConnectToHub(Guid gameId)
+    {
+        if (_hubConnection != null) return;
+
+        _connectionStatus = "Connecting";
+        StateHasChanged();
+
+        var baseUri = Nav.BaseUri;
+        _hubConnection = new HubConnectionBuilder()
+            .WithUrl($"{baseUri}hubs/game?gameId={gameId}")
+            .WithAutomaticReconnect()
+            .Build();
+
+        // --- Hub event handlers ---
+        _hubConnection.On<object>("PlayerJoined", async _ =>
+        {
+            await RefreshLobbyPlayers();
+            _chatMessages.Add(new ChatMessageDisplay { IsSystem = true, Text = "A player joined the game" });
+            await InvokeAsync(StateHasChanged);
+        });
+
+        _hubConnection.On<object>("PlayerLeft", async _ =>
+        {
+            await RefreshLobbyPlayers();
+            _chatMessages.Add(new ChatMessageDisplay { IsSystem = true, Text = "A player left the game" });
+            await InvokeAsync(StateHasChanged);
+        });
+
+        _hubConnection.On<object>("PlayerReadyChanged", async _ =>
+        {
+            await RefreshLobbyPlayers();
+            await InvokeAsync(StateHasChanged);
+        });
+
+        _hubConnection.On<HubChatMessage>("ChatMessage", msg =>
+        {
+            _chatMessages.Add(new ChatMessageDisplay
+            {
+                Sender = msg.SenderName,
+                Text = msg.Message
+            });
+            InvokeAsync(StateHasChanged);
+        });
+
+        _hubConnection.On<object>("GameStarted", async _ =>
+        {
+            _chatMessages.Add(new ChatMessageDisplay { IsSystem = true, Text = "Game is starting!" });
+            // Persist faction selection before navigating
+            try
+            {
+                if (!string.IsNullOrEmpty(_selectedFaction))
+                {
+                    await LocalStorage.SetItemAsStringAsync("selectedFaction", _selectedFaction);
+                    await LocalStorage.SetItemAsStringAsync("selectedRaceId", _selectedFaction);
+                }
+            }
+            catch { /* prerender guard */ }
+            await InvokeAsync(() => Nav.NavigateTo("/game/galaxy"));
+        });
+
+        _hubConnection.Reconnecting += _ =>
+        {
+            _connectionStatus = "Connecting";
+            return InvokeAsync(StateHasChanged);
+        };
+
+        _hubConnection.Reconnected += _ =>
+        {
+            _connectionStatus = "Connected";
+            return InvokeAsync(StateHasChanged);
+        };
+
+        _hubConnection.Closed += _ =>
+        {
+            _connectionStatus = "Disconnected";
+            return InvokeAsync(StateHasChanged);
+        };
+
+        try
+        {
+            await _hubConnection.StartAsync();
+            _connectionStatus = "Connected";
+        }
+        catch (Exception ex)
+        {
+            _connectionStatus = "Disconnected";
+            _errorMessage = $"Hub connection failed: {ex.Message}";
+        }
+    }
+
+    private async Task DisconnectHub()
+    {
+        if (_hubConnection != null)
+        {
+            try { await _hubConnection.StopAsync(); } catch { }
+            try { await _hubConnection.DisposeAsync(); } catch { }
+            _hubConnection = null;
+        }
+        _connectionStatus = "Disconnected";
+    }
+
+    // ====================================================
+    // Lobby Browser
+    // ====================================================
     private async Task RefreshLobbies()
     {
         _loading = true;
-        await Task.Delay(500);
+        StateHasChanged();
 
-        _lobbies = new List<LobbyDisplay>
+        try
         {
-            new() { Id = Guid.NewGuid(), Name = "Galactic Conquest", HostName = "Captain_Kirk", GameType = "standard", GalaxySize = "Large", CurrentPlayers = 2, MaxPlayers = 4, Ping = 45 },
-            new() { Id = Guid.NewGuid(), Name = "Federation vs Empire", HostName = "Picard2024", GameType = "conquest", GalaxySize = "Medium", CurrentPlayers = 4, MaxPlayers = 4, Ping = 78 },
-            new() { Id = Guid.NewGuid(), Name = "Beginners Welcome", HostName = "NewPlayer123", GameType = "standard", GalaxySize = "Small", CurrentPlayers = 1, MaxPlayers = 2, Ping = 23 },
-            new() { Id = Guid.NewGuid(), Name = "Crisis Challenge", HostName = "BorgSlayer", GameType = "crisis", GalaxySize = "Huge", CurrentPlayers = 3, MaxPlayers = 6, Ping = 112, HasPassword = true }
-        };
+            var games = await Api.GetGamesAsync();
+            _lobbies = games
+                .Where(g => g.Phase == "Lobby")
+                .Select(g => new LobbyDisplay
+                {
+                    Id = g.Id,
+                    Name = g.Name,
+                    HostName = "",
+                    GameType = "standard",
+                    GalaxySize = "Standard",
+                    CurrentPlayers = g.PlayerCount,
+                    MaxPlayers = 8
+                })
+                .ToList();
+
+            // Enrich with host names from game details (first faction's player)
+            foreach (var lobby in _lobbies)
+            {
+                try
+                {
+                    var detail = await Api.GetGameAsync(lobby.Id);
+                    if (detail != null)
+                    {
+                        var host = detail.Factions.FirstOrDefault(f => f.PlayerName != null);
+                        lobby.HostName = host?.PlayerName ?? "Unknown";
+                        lobby.GalaxySize = detail.SystemCount <= 50 ? "Small" : detail.SystemCount <= 100 ? "Medium" : detail.SystemCount <= 200 ? "Large" : "Huge";
+                    }
+                }
+                catch { /* skip enrichment on error */ }
+            }
+
+            _connectionStatus = "Connected";
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Could not reach server: {ex.Message}";
+            // Fallback to mock data if API unavailable
+            _lobbies = new List<LobbyDisplay>
+            {
+                new() { Id = Guid.NewGuid(), Name = "Galactic Conquest", HostName = "Captain_Kirk", GameType = "standard", GalaxySize = "Large", CurrentPlayers = 2, MaxPlayers = 4, Ping = 45 },
+                new() { Id = Guid.NewGuid(), Name = "Federation vs Empire", HostName = "Picard2024", GameType = "conquest", GalaxySize = "Medium", CurrentPlayers = 4, MaxPlayers = 4, Ping = 78 },
+                new() { Id = Guid.NewGuid(), Name = "Beginners Welcome", HostName = "NewPlayer123", GameType = "standard", GalaxySize = "Small", CurrentPlayers = 1, MaxPlayers = 2, Ping = 23 },
+                new() { Id = Guid.NewGuid(), Name = "Crisis Challenge", HostName = "BorgSlayer", GameType = "crisis", GalaxySize = "Huge", CurrentPlayers = 3, MaxPlayers = 6, Ping = 112, HasPassword = true }
+            };
+        }
 
         _loading = false;
     }
 
+    // ====================================================
+    // Enter / Join a Lobby
+    // ====================================================
+    private async Task EnterLobby(Guid gameId)
+    {
+        try
+        {
+            _currentGameId = gameId;
+            var game = await Api.GetGameAsync(gameId);
+            if (game == null) { LoadMockLobby(gameId); return; }
+
+            _currentLobby = new LobbyDisplay
+            {
+                Id = game.Id,
+                Name = game.Name,
+                GameType = "standard",
+                GalaxySize = game.SystemCount <= 50 ? "Small" : game.SystemCount <= 100 ? "Medium" : game.SystemCount <= 200 ? "Large" : "Huge",
+                MaxPlayers = 8,
+                CurrentPlayers = game.Factions.Count(f => f.PlayerName != null)
+            };
+
+            BuildPlayerListFromGame(game);
+
+            // Check if we're already in this game (reconnect)
+            try
+            {
+                var storedFactionId = await LocalStorage.GetItemAsync<Guid?>("currentFactionId");
+                var storedGameId = await LocalStorage.GetItemAsync<Guid?>("currentGameId");
+                if (storedFactionId.HasValue && storedGameId == gameId)
+                {
+                    _myFactionId = storedFactionId.Value;
+                    _hasJoinedGame = true;
+                    var myFaction = game.Factions.FirstOrDefault(f => f.Id == _myFactionId);
+                    if (myFaction != null)
+                        _selectedFaction = myFaction.RaceId;
+
+                    _isHost = game.Factions.FirstOrDefault(f => f.PlayerName != null)?.Id == _myFactionId;
+
+                    await LocalStorage.SetItemAsStringAsync("isMultiplayer", "true");
+                    await LocalStorage.SetItemAsStringAsync("gameMode", "TurnBased");
+                    await LocalStorage.SetItemAsStringAsync("isHost", _isHost.ToString().ToLower());
+                }
+            }
+            catch { /* prerender guard */ }
+
+            // Connect SignalR and join hub room
+            await ConnectToHub(gameId);
+            if (_hasJoinedGame && _hubConnection != null)
+            {
+                try { await _hubConnection.InvokeAsync("JoinGame", gameId, _myFactionId, _myPlayerName); }
+                catch { /* hub call failed, continue */ }
+            }
+
+            _currentView = "lobby";
+            _chatMessages.Add(new ChatMessageDisplay { IsSystem = true, Text = "Entered game lobby" });
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Failed to load lobby: {ex.Message}";
+            LoadMockLobby(gameId);
+        }
+    }
+
+    private void BuildPlayerListFromGame(GameDetailDto game)
+    {
+        _players = game.Factions
+            .Where(f => f.PlayerName != null)
+            .Select((f, idx) => new PlayerDisplay
+            {
+                Id = f.Id,
+                Name = f.PlayerName!,
+                Faction = f.RaceId,
+                IsHost = idx == 0,
+                IsReady = f.HasSubmittedOrders
+            })
+            .ToList();
+    }
+
+    private async Task RefreshLobbyPlayers()
+    {
+        if (_currentGameId == Guid.Empty) return;
+        try
+        {
+            var game = await Api.GetGameAsync(_currentGameId);
+            if (game != null)
+            {
+                BuildPlayerListFromGame(game);
+                if (_currentLobby != null)
+                    _currentLobby.CurrentPlayers = _players.Count;
+            }
+        }
+        catch { /* keep current player list */ }
+    }
+
+    private void LoadMockLobby(Guid gameId)
+    {
+        _currentGameId = gameId;
+        _currentLobby = new LobbyDisplay
+        {
+            Id = gameId, Name = "Game Lobby", HostName = "Host",
+            GameType = "standard", GalaxySize = "Medium", MaxPlayers = 4, CurrentPlayers = 1
+        };
+        _isHost = false;
+        _myFactionId = Guid.NewGuid();
+        _players = new List<PlayerDisplay>
+        {
+            new() { Id = Guid.NewGuid(), Name = "Host", IsHost = true, Faction = "federation", IsReady = true },
+            new() { Id = _myFactionId, Name = _myPlayerName, IsHost = false }
+        };
+        _chatMessages.Add(new ChatMessageDisplay { IsSystem = true, Text = "Joined game (offline mode)" });
+        _currentView = "lobby";
+    }
+
+    // ====================================================
+    // Navigation
+    // ====================================================
     private void GoBack() => Nav.NavigateTo("/");
 
     private void ShowCreateLobby()
@@ -770,100 +1090,248 @@
         _currentView = "create";
     }
 
+    // ====================================================
+    // Create Game
+    // ====================================================
     private async Task CreateLobby()
     {
-        _currentLobby = new LobbyDisplay
+        try
         {
-            Id = Guid.NewGuid(),
-            Name = _newLobby.Name,
-            GameType = _newLobby.GameType,
-            GalaxySize = _newLobby.GalaxySize,
-            MaxPlayers = _newLobby.MaxPlayers,
-            TurnTimer = _newLobby.TurnTimer,
-            CurrentPlayers = 1
-        };
+            var galaxySize = _newLobby.GalaxySize switch
+            {
+                "small" => 50, "medium" => 100, "large" => 200, "huge" => 400, _ => 100
+            };
 
-        _isHost = true;
-        _players = new List<PlayerDisplay>
+            // Create game on server
+            var game = await Api.CreateGameAsync(_newLobby.Name, galaxySize);
+            _currentGameId = game.Id;
+
+            // Join as first player (host) with Federation as default
+            var faction = await Api.JoinGameAsync(game.Id, _myPlayerName, "Federation", "federation");
+            _myFactionId = faction.Id;
+            _hasJoinedGame = true;
+            _isHost = true;
+            _selectedFaction = "federation";
+
+            await LocalStorage.SetItemAsync("currentGameId", game.Id);
+            await LocalStorage.SetItemAsync("currentFactionId", faction.Id);
+            await LocalStorage.SetItemAsStringAsync("isMultiplayer", "true");
+            await LocalStorage.SetItemAsStringAsync("gameMode", "TurnBased");
+            await LocalStorage.SetItemAsStringAsync("isHost", "true");
+
+            _currentLobby = new LobbyDisplay
+            {
+                Id = game.Id, Name = game.Name, GameType = _newLobby.GameType,
+                GalaxySize = _newLobby.GalaxySize, MaxPlayers = _newLobby.MaxPlayers, CurrentPlayers = 1
+            };
+
+            _players = new List<PlayerDisplay>
+            {
+                new() { Id = faction.Id, Name = _myPlayerName, IsHost = true, Faction = "federation", IsReady = true }
+            };
+
+            // Connect SignalR and announce
+            await ConnectToHub(game.Id);
+            if (_hubConnection != null)
+            {
+                try { await _hubConnection.InvokeAsync("JoinGame", game.Id, _myFactionId, _myPlayerName); }
+                catch { }
+            }
+
+            _chatMessages.Add(new ChatMessageDisplay { IsSystem = true, Text = "Game lobby created" });
+            _currentView = "lobby";
+        }
+        catch (Exception ex)
         {
-            new() { Id = _myPlayerId, Name = "You", IsHost = true, IsReady = true }
-        };
-
-        _chatMessages.Add(new ChatMessageDisplay { IsSystem = true, Text = "Game lobby created" });
-        _currentView = "lobby";
+            _errorMessage = $"Failed to create game: {ex.Message}";
+            // Fallback: create offline lobby
+            _currentGameId = Guid.NewGuid();
+            _myFactionId = Guid.NewGuid();
+            _currentLobby = new LobbyDisplay
+            {
+                Id = _currentGameId, Name = _newLobby.Name, GameType = _newLobby.GameType,
+                GalaxySize = _newLobby.GalaxySize, MaxPlayers = _newLobby.MaxPlayers, TurnTimer = _newLobby.TurnTimer, CurrentPlayers = 1
+            };
+            _isHost = true;
+            _players = new List<PlayerDisplay>
+            {
+                new() { Id = _myFactionId, Name = _myPlayerName, IsHost = true, IsReady = true }
+            };
+            _chatMessages.Add(new ChatMessageDisplay { IsSystem = true, Text = "Game lobby created (offline)" });
+            _currentView = "lobby";
+        }
     }
 
+    // ====================================================
+    // Join Lobby (from browser list)
+    // ====================================================
     private async Task JoinLobby(LobbyDisplay lobby)
     {
-        _currentLobby = lobby;
-        _isHost = false;
-        
-        _players = new List<PlayerDisplay>
-        {
-            new() { Id = Guid.NewGuid(), Name = lobby.HostName, IsHost = true, Faction = "federation", IsReady = true },
-            new() { Id = _myPlayerId, Name = "You", IsHost = false }
-        };
-
-        _chatMessages.Add(new ChatMessageDisplay { IsSystem = true, Text = "You joined the game" });
-        _currentView = "lobby";
+        await EnterLobby(lobby.Id);
     }
 
+    // ====================================================
+    // Leave Lobby
+    // ====================================================
     private async Task LeaveLobby()
     {
+        if (_hubConnection != null && _hasJoinedGame)
+        {
+            try { await _hubConnection.InvokeAsync("LeaveGame", _currentGameId); }
+            catch { }
+        }
+        await DisconnectHub();
+
         _currentView = "browser";
         _currentLobby = null;
         _players.Clear();
         _chatMessages.Clear();
         _isReady = false;
         _selectedFaction = "";
+        _hasJoinedGame = false;
+        _currentGameId = Guid.Empty;
+
+        await RefreshLobbies();
     }
 
-    private void SelectFaction(string factionId)
+    // ====================================================
+    // Faction Selection — triggers API JoinGame on first pick
+    // ====================================================
+    private async Task SelectFaction(string factionId)
     {
-        var taken = _players.Any(p => p.Faction == factionId && p.Id != _myPlayerId);
+        var taken = _players.Any(p => p.Faction == factionId && p.Id != _myFactionId);
         if (taken) return;
 
+        if (!_hasJoinedGame && _currentGameId != Guid.Empty)
+        {
+            // First faction selection = actually join the game via API
+            try
+            {
+                var factionName = _availableFactions.FirstOrDefault(f => f.Id == factionId)?.Name ?? factionId;
+                var faction = await Api.JoinGameAsync(_currentGameId, _myPlayerName, factionName, factionId);
+                _myFactionId = faction.Id;
+                _hasJoinedGame = true;
+
+                await LocalStorage.SetItemAsync("currentFactionId", faction.Id);
+                await LocalStorage.SetItemAsync("currentGameId", _currentGameId);
+                await LocalStorage.SetItemAsStringAsync("isMultiplayer", "true");
+                await LocalStorage.SetItemAsStringAsync("gameMode", "TurnBased");
+                await LocalStorage.SetItemAsStringAsync("isHost", _isHost.ToString().ToLower());
+
+                // Announce to hub
+                if (_hubConnection != null)
+                {
+                    try { await _hubConnection.InvokeAsync("JoinGame", _currentGameId, _myFactionId, _myPlayerName); }
+                    catch { }
+                }
+
+                await RefreshLobbyPlayers();
+            }
+            catch (Exception ex)
+            {
+                _errorMessage = $"Failed to join game: {ex.Message}";
+                // Fallback: update local only
+                var me = _players.FirstOrDefault(p => p.Name == _myPlayerName);
+                if (me != null) me.Faction = factionId;
+            }
+        }
+        else
+        {
+            // Already joined — update local display
+            var me = _players.FirstOrDefault(p => p.Id == _myFactionId);
+            if (me != null) me.Faction = factionId;
+        }
+
         _selectedFaction = factionId;
-        var me = _players.FirstOrDefault(p => p.Id == _myPlayerId);
-        if (me != null) me.Faction = factionId;
     }
 
-    private void ToggleReady()
+    // ====================================================
+    // Ready Toggle — via SignalR
+    // ====================================================
+    private async Task ToggleReady()
     {
         if (string.IsNullOrEmpty(_selectedFaction)) return;
-        
+
         _isReady = !_isReady;
-        var me = _players.FirstOrDefault(p => p.Id == _myPlayerId);
+
+        if (_hubConnection != null && _hasJoinedGame)
+        {
+            try { await _hubConnection.InvokeAsync("SetReady", _currentGameId, _isReady); }
+            catch { }
+        }
+
+        var me = _players.FirstOrDefault(p => p.Id == _myFactionId);
         if (me != null) me.IsReady = _isReady;
     }
 
+    // ====================================================
+    // Start Game (host only)
+    // ====================================================
     private async Task StartGame()
     {
-        Nav.NavigateTo($"/game/galaxy?mp=true&lobby={_currentLobby?.Id}");
+        try
+        {
+            // Persist faction selection before starting
+            if (!string.IsNullOrEmpty(_selectedFaction))
+            {
+                await LocalStorage.SetItemAsStringAsync("selectedFaction", _selectedFaction);
+                await LocalStorage.SetItemAsStringAsync("selectedRaceId", _selectedFaction);
+            }
+
+            await Api.StartGameAsync(_currentGameId);
+            // GameStarted hub broadcast will trigger navigation for all players
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Failed to start game: {ex.Message}";
+        }
     }
 
-    private void HandleChatKeyPress(KeyboardEventArgs e)
+    // ====================================================
+    // Chat — via SignalR
+    // ====================================================
+    private async Task HandleChatKeyPress(KeyboardEventArgs e)
     {
-        if (e.Key == "Enter") SendChat();
+        if (e.Key == "Enter") await SendChat();
     }
 
-    private void SendChat()
+    private async Task SendChat()
     {
         if (string.IsNullOrWhiteSpace(_chatInput)) return;
 
-        _chatMessages.Add(new ChatMessageDisplay
+        if (_hubConnection != null && _hasJoinedGame)
         {
-            Sender = "You",
-            Text = _chatInput
-        });
+            try
+            {
+                // 0 = ChatChannel.Global
+                await _hubConnection.InvokeAsync("SendChatMessage", _currentGameId, _chatInput, 0);
+            }
+            catch
+            {
+                // Fallback: add locally
+                _chatMessages.Add(new ChatMessageDisplay { Sender = _myPlayerName, Text = _chatInput });
+            }
+        }
+        else
+        {
+            // Offline mode
+            _chatMessages.Add(new ChatMessageDisplay { Sender = _myPlayerName, Text = _chatInput });
+        }
+
         _chatInput = "";
     }
 
+    // ====================================================
+    // Dispose
+    // ====================================================
     public async ValueTask DisposeAsync()
     {
-        // Cleanup SignalR connection
+        await DisconnectHub();
     }
 
+    // ====================================================
+    // DTOs / Models
+    // ====================================================
     public class LobbyDisplay
     {
         public Guid Id { get; set; }
@@ -912,5 +1380,15 @@
         public string? Sender { get; set; }
         public string Text { get; set; } = "";
         public bool IsSystem { get; set; }
+    }
+
+    /// <summary>DTO matching the server-side ChatMessage for SignalR deserialization</summary>
+    public class HubChatMessage
+    {
+        public Guid SenderId { get; set; }
+        public string SenderName { get; set; } = "";
+        public string Message { get; set; } = "";
+        public int Channel { get; set; }
+        public DateTime Timestamp { get; set; }
     }
 }

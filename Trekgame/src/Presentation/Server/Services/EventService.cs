@@ -300,13 +300,38 @@ public class EventService : IEventService
         gameEvent.IsResolved = true;
         gameEvent.ChosenOption = chosenOptionId;
 
-        // Check for event chains
+        // Check for event chains — schedule follow-up event for 2-4 turns later
         if (eventDef.CanChain && eventDef.ChainEvents != null && eventDef.ChainEvents.Length > 0)
         {
-            // Schedule follow-up event
-            var nextEventId = eventDef.ChainEvents[_random.Next(eventDef.ChainEvents.Length)];
-            // TODO: Schedule for future turn
-            result.Message = $"This story continues...";
+            var nextEventTypeId = eventDef.ChainEvents[_random.Next(eventDef.ChainEvents.Length)];
+            var nextDef = EventDefinitions.Get(nextEventTypeId);
+            if (nextDef != null)
+            {
+                var game = await _db.Games.FindAsync(gameEvent.GameId);
+                var scheduledTurn = (game?.CurrentTurn ?? 0) + _random.Next(2, 5);
+
+                var chainEvent = new GameEventEntity
+                {
+                    Id = Guid.NewGuid(),
+                    GameId = gameEvent.GameId,
+                    TargetFactionId = gameEvent.TargetFactionId,
+                    TargetHouseId = gameEvent.TargetHouseId,
+                    TargetColonyId = gameEvent.TargetColonyId,
+                    EventTypeId = nextEventTypeId,
+                    Title = nextDef.Title,
+                    Description = nextDef.Description,
+                    TurnCreated = scheduledTurn,
+                    Options = System.Text.Json.JsonSerializer.Serialize(nextDef.Options),
+                    ParentEventId = gameEvent.Id,
+                    ChainId = gameEvent.ChainId ?? gameEvent.Id.ToString(),
+                    ChainStep = gameEvent.ChainStep + 1
+                };
+                _db.GameEvents.Add(chainEvent);
+                result.Message = "This story continues...";
+
+                _logger.LogInformation("Chained event '{Next}' scheduled for turn {Turn}",
+                    nextEventTypeId, scheduledTurn);
+            }
         }
 
         await _db.SaveChangesAsync();
@@ -497,8 +522,17 @@ public class EventService : IEventService
     /// </summary>
     public async Task<List<GameEventEntity>> GetPendingEventsAsync(Guid houseId)
     {
+        // Get current turn to filter out future-scheduled chain events
+        var house = await _db.Houses.Include(h => h.Faction).FirstOrDefaultAsync(h => h.Id == houseId);
+        var game = house?.Faction != null
+            ? await _db.Games.FindAsync(house.Faction.GameId)
+            : null;
+        var currentTurn = game?.CurrentTurn ?? int.MaxValue;
+
         return await _db.GameEvents
-            .Where(e => e.TargetHouseId == houseId && !e.IsResolved)
+            .Where(e => e.TargetHouseId == houseId &&
+                       !e.IsResolved &&
+                       e.TurnCreated <= currentTurn)
             .OrderByDescending(e => e.TurnCreated)
             .ToListAsync();
     }

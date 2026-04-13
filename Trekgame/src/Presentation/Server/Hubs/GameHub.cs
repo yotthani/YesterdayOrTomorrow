@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.SignalR;
 using StarTrekGame.Server.Services;
+using System.Collections.Concurrent;
 
 namespace StarTrekGame.Server.Hubs;
 
@@ -9,15 +10,35 @@ namespace StarTrekGame.Server.Hubs;
 public class GameHub : Hub
 {
     private readonly ITurnProcessor _turnProcessor;
+    private readonly IGameClockService _clockService;
     private readonly ILogger<GameHub> _logger;
-    
-    // Track connected players per game
-    private static readonly Dictionary<Guid, HashSet<string>> GamePlayers = new();
-    private static readonly Dictionary<string, PlayerConnection> Connections = new();
 
-    public GameHub(ITurnProcessor turnProcessor, ILogger<GameHub> logger)
+    // Track connected players per game (thread-safe)
+    private static readonly ConcurrentDictionary<Guid, ConcurrentDictionary<string, byte>> GamePlayers = new();
+    private static readonly ConcurrentDictionary<string, PlayerConnection> Connections = new();
+    private static readonly ConcurrentDictionary<Guid, SemaphoreSlim> GameTurnLocks = new();
+    // Track which player is host per game
+    private static readonly ConcurrentDictionary<Guid, Guid> GameHosts = new();
+
+    public static void ResetReadyState(Guid gameId)
+    {
+        if (!GamePlayers.TryGetValue(gameId, out var players))
+            return;
+
+        foreach (var connId in players.Keys)
+        {
+            if (Connections.TryGetValue(connId, out var conn))
+            {
+                conn.IsReady = false;
+                conn.PendingOrders = null;
+            }
+        }
+    }
+
+    public GameHub(ITurnProcessor turnProcessor, IGameClockService clockService, ILogger<GameHub> logger)
     {
         _turnProcessor = turnProcessor;
+        _clockService = clockService;
         _logger = logger;
     }
 
@@ -27,6 +48,39 @@ public class GameHub : Hub
     public async Task JoinGame(Guid gameId, Guid playerId, string playerName)
     {
         var connectionId = Context.ConnectionId;
+
+        if (Connections.TryGetValue(connectionId, out var existingConn))
+        {
+            if (existingConn.GameId == gameId
+                && existingConn.PlayerId == playerId
+                && string.Equals(existingConn.PlayerName, playerName, StringComparison.Ordinal))
+            {
+                _logger.LogDebug(
+                    "Ignoring duplicate JoinGame for connection {ConnectionId} in game {Game}",
+                    connectionId,
+                    gameId);
+
+                // Ensure membership is still present after reconnect edge cases.
+                await AddConnectionToGameGroups(connectionId, gameId);
+                GamePlayers.GetOrAdd(gameId, _ => new ConcurrentDictionary<string, byte>())[connectionId] = 0;
+                return;
+            }
+
+            _logger.LogInformation(
+                "Connection {ConnectionId} switching from game {OldGame} to game {NewGame}",
+                connectionId,
+                existingConn.GameId,
+                gameId);
+
+            await RemoveConnectionFromGameGroups(connectionId, existingConn.GameId);
+            RemoveConnectionFromGamePlayers(existingConn.GameId, connectionId);
+
+            await Clients.Group(GameGroupNames.Canonical(existingConn.GameId)).SendAsync("PlayerLeft", new
+            {
+                PlayerId = existingConn.PlayerId,
+                PlayerName = existingConn.PlayerName
+            });
+        }
         
         // Track connection
         Connections[connectionId] = new PlayerConnection
@@ -38,20 +92,19 @@ public class GameHub : Hub
             IsReady = false
         };
 
-        // Add to game group
-        await Groups.AddToGroupAsync(connectionId, $"game_{gameId}");
+        // Add to all known game group name variants for compatibility.
+        await AddConnectionToGameGroups(connectionId, gameId);
 
         // Track players in game
-        if (!GamePlayers.ContainsKey(gameId))
-            GamePlayers[gameId] = new HashSet<string>();
-        GamePlayers[gameId].Add(connectionId);
+        var players = GamePlayers.GetOrAdd(gameId, _ => new ConcurrentDictionary<string, byte>());
+        players[connectionId] = 0;
 
         // Notify others
-        await Clients.Group($"game_{gameId}").SendAsync("PlayerJoined", new
+        await Clients.Group(GameGroupNames.Canonical(gameId)).SendAsync("PlayerJoined", new
         {
             PlayerId = playerId,
             PlayerName = playerName,
-            TotalPlayers = GamePlayers[gameId].Count
+            TotalPlayers = players.Count
         });
 
         _logger.LogInformation("Player {Name} joined game {Game}", playerName, gameId);
@@ -66,20 +119,29 @@ public class GameHub : Hub
         
         if (Connections.TryGetValue(connectionId, out var conn))
         {
-            await Groups.RemoveFromGroupAsync(connectionId, $"game_{gameId}");
-            
-            if (GamePlayers.ContainsKey(gameId))
-                GamePlayers[gameId].Remove(connectionId);
+            if (conn.GameId != gameId)
+            {
+                _logger.LogDebug(
+                    "Ignoring mismatched LeaveGame gameId {RequestedGame}; using actual game {ActualGame} for connection {ConnectionId}",
+                    gameId,
+                    conn.GameId,
+                    connectionId);
+            }
 
-            Connections.Remove(connectionId);
+            var effectiveGameId = conn.GameId;
 
-            await Clients.Group($"game_{gameId}").SendAsync("PlayerLeft", new
+            await RemoveConnectionFromGameGroups(connectionId, effectiveGameId);
+            RemoveConnectionFromGamePlayers(effectiveGameId, connectionId);
+
+            Connections.TryRemove(connectionId, out _);
+
+            await Clients.Group(GameGroupNames.Canonical(effectiveGameId)).SendAsync("PlayerLeft", new
             {
                 PlayerId = conn.PlayerId,
                 PlayerName = conn.PlayerName
             });
 
-            _logger.LogInformation("Player {Name} left game {Game}", conn.PlayerName, gameId);
+            _logger.LogInformation("Player {Name} left game {Game}", conn.PlayerName, effectiveGameId);
         }
     }
 
@@ -92,9 +154,29 @@ public class GameHub : Hub
         
         if (Connections.TryGetValue(connectionId, out var conn))
         {
+            if (conn.GameId != gameId)
+            {
+                _logger.LogWarning(
+                    "Rejecting SetReady for mismatched game {RequestedGame}. Connection {ConnectionId} belongs to {ActualGame}",
+                    gameId,
+                    connectionId,
+                    conn.GameId);
+                return;
+            }
+
+            if (conn.IsReady == isReady)
+            {
+                _logger.LogDebug(
+                    "Ignoring duplicate ready state from player {PlayerId} in game {Game}: {Ready}",
+                    conn.PlayerId,
+                    gameId,
+                    isReady);
+                return;
+            }
+
             conn.IsReady = isReady;
 
-            await Clients.Group($"game_{gameId}").SendAsync("PlayerReadyChanged", new
+            await Clients.Group(GameGroupNames.Canonical(gameId)).SendAsync("PlayerReadyChanged", new
             {
                 PlayerId = conn.PlayerId,
                 PlayerName = conn.PlayerName,
@@ -119,15 +201,37 @@ public class GameHub : Hub
         if (!Connections.TryGetValue(connectionId, out var conn))
             return;
 
+        if (conn.GameId != gameId)
+        {
+            _logger.LogWarning(
+                "Rejecting SubmitTurnOrders for mismatched game {RequestedGame}. Connection {ConnectionId} belongs to {ActualGame}",
+                gameId,
+                connectionId,
+                conn.GameId);
+            return;
+        }
+
+        var wasReady = conn.IsReady;
+
         // Store orders (would be persisted to database)
         conn.PendingOrders = orders;
         conn.IsReady = true;
 
-        await Clients.Group($"game_{gameId}").SendAsync("OrdersSubmitted", new
+        if (!wasReady)
         {
-            PlayerId = conn.PlayerId,
-            PlayerName = conn.PlayerName
-        });
+            await Clients.Group(GameGroupNames.Canonical(gameId)).SendAsync("OrdersSubmitted", new
+            {
+                PlayerId = conn.PlayerId,
+                PlayerName = conn.PlayerName
+            });
+        }
+        else
+        {
+            _logger.LogDebug(
+                "Ignoring duplicate orders-submitted signal from player {PlayerId} in game {Game}",
+                conn.PlayerId,
+                gameId);
+        }
 
         _logger.LogInformation("Player {Name} submitted orders for game {Game}", 
             conn.PlayerName, gameId);
@@ -149,6 +253,16 @@ public class GameHub : Hub
         if (!Connections.TryGetValue(connectionId, out var conn))
             return;
 
+        if (conn.GameId != gameId)
+        {
+            _logger.LogWarning(
+                "Rejecting SendChatMessage for mismatched game {RequestedGame}. Connection {ConnectionId} belongs to {ActualGame}",
+                gameId,
+                connectionId,
+                conn.GameId);
+            return;
+        }
+
         var chatMessage = new ChatMessage
         {
             SenderId = conn.PlayerId,
@@ -161,12 +275,12 @@ public class GameHub : Hub
         // Send to appropriate recipients
         if (channel == ChatChannel.Global)
         {
-            await Clients.Group($"game_{gameId}").SendAsync("ChatMessage", chatMessage);
+            await Clients.Group(GameGroupNames.Canonical(gameId)).SendAsync("ChatMessage", chatMessage);
         }
         else if (channel == ChatChannel.Alliance)
         {
             // Would filter by alliance members
-            await Clients.Group($"game_{gameId}").SendAsync("ChatMessage", chatMessage);
+            await Clients.Group(GameGroupNames.Canonical(gameId)).SendAsync("ChatMessage", chatMessage);
         }
     }
 
@@ -179,6 +293,16 @@ public class GameHub : Hub
         
         if (!Connections.TryGetValue(connectionId, out var conn))
             return;
+
+        if (conn.GameId != gameId)
+        {
+            _logger.LogWarning(
+                "Rejecting SendDiplomaticProposal for mismatched game {RequestedGame}. Connection {ConnectionId} belongs to {ActualGame}",
+                gameId,
+                connectionId,
+                conn.GameId);
+            return;
+        }
 
         // Find target connection
         var targetConn = Connections.Values
@@ -205,6 +329,16 @@ public class GameHub : Hub
         if (!Connections.TryGetValue(connectionId, out var conn))
             return;
 
+        if (conn.GameId != gameId)
+        {
+            _logger.LogWarning(
+                "Rejecting RespondToDiplomaticProposal for mismatched game {RequestedGame}. Connection {ConnectionId} belongs to {ActualGame}",
+                gameId,
+                connectionId,
+                conn.GameId);
+            return;
+        }
+
         var fromConn = Connections.Values
             .FirstOrDefault(c => c.GameId == gameId && c.PlayerId == fromPlayerId);
 
@@ -220,71 +354,283 @@ public class GameHub : Hub
     }
 
     /// <summary>
-    /// Pause game request (host only)
+    /// Pause game request (any player in real-time mode)
     /// </summary>
     public async Task RequestPause(Guid gameId)
     {
-        await Clients.Group($"game_{gameId}").SendAsync("GamePaused", new
+        if (!Connections.TryGetValue(Context.ConnectionId, out var connection))
+            return;
+
+        if (connection.GameId != gameId)
         {
-            RequestedBy = Connections[Context.ConnectionId].PlayerName
+            _logger.LogWarning(
+                "Rejecting RequestPause for mismatched game {RequestedGame}. Connection {ConnectionId} belongs to {ActualGame}",
+                gameId,
+                Context.ConnectionId,
+                connection.GameId);
+            return;
+        }
+
+        _clockService.PauseClock(gameId, connection.PlayerName);
+
+        await Clients.Group(GameGroupNames.Canonical(gameId)).SendAsync("GamePaused", new
+        {
+            RequestedBy = connection.PlayerName
         });
     }
 
     /// <summary>
-    /// Resume game
+    /// Resume game (host only)
     /// </summary>
     public async Task RequestResume(Guid gameId)
     {
-        await Clients.Group($"game_{gameId}").SendAsync("GameResumed");
+        if (!Connections.TryGetValue(Context.ConnectionId, out var connection))
+            return;
+
+        if (connection.GameId != gameId)
+        {
+            _logger.LogWarning(
+                "Rejecting RequestResume for mismatched game {RequestedGame}. Connection {ConnectionId} belongs to {ActualGame}",
+                gameId,
+                Context.ConnectionId,
+                connection.GameId);
+            return;
+        }
+
+        _clockService.ResumeClock(gameId);
+
+        await Clients.Group(GameGroupNames.Canonical(gameId)).SendAsync("GameResumed");
+    }
+
+    // ───────────────────────────────────────────────────────
+    // Real-Time Mode Extensions
+    // ───────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Set game speed (host only, real-time mode)
+    /// </summary>
+    public async Task SetSpeed(Guid gameId, int speed)
+    {
+        if (!Connections.TryGetValue(Context.ConnectionId, out var connection))
+            return;
+
+        if (connection.GameId != gameId) return;
+
+        // Only host can change speed
+        if (!IsHost(gameId, connection.PlayerId))
+        {
+            _logger.LogWarning("Non-host player {Player} attempted to change speed for game {Game}",
+                connection.PlayerName, gameId);
+            return;
+        }
+
+        speed = Math.Clamp(speed, 1, 5);
+        _clockService.SetSpeed(gameId, speed);
+
+        await Clients.Group(GameGroupNames.Canonical(gameId)).SendAsync("SpeedChanged", new
+        {
+            Speed = speed,
+            ChangedBy = connection.PlayerName
+        });
+
+        _logger.LogInformation("Game {Game} speed set to {Speed} by {Player}", gameId, speed, connection.PlayerName);
+    }
+
+    /// <summary>
+    /// Submit an order to be executed immediately (real-time mode only)
+    /// </summary>
+    public async Task SubmitRealtimeOrder(Guid gameId, RealtimeOrder order)
+    {
+        if (!Connections.TryGetValue(Context.ConnectionId, out var connection))
+            return;
+
+        if (connection.GameId != gameId) return;
+
+        _logger.LogInformation("Real-time order '{OrderType}' from {Player} in game {Game}",
+            order.OrderType, connection.PlayerName, gameId);
+
+        // Broadcast the order to all players so their UI updates
+        await Clients.Group(GameGroupNames.Canonical(gameId)).SendAsync("RealtimeOrderExecuted", new
+        {
+            PlayerId = connection.PlayerId,
+            PlayerName = connection.PlayerName,
+            order.OrderType,
+            order.Parameters,
+            Timestamp = DateTime.UtcNow
+        });
+    }
+
+    /// <summary>
+    /// Switch from real-time to turn-based mode (host only)
+    /// </summary>
+    public async Task SwitchToTurnBased(Guid gameId)
+    {
+        if (!Connections.TryGetValue(Context.ConnectionId, out var connection))
+            return;
+
+        if (connection.GameId != gameId) return;
+
+        if (!IsHost(gameId, connection.PlayerId))
+        {
+            _logger.LogWarning("Non-host player {Player} attempted mode switch for game {Game}",
+                connection.PlayerName, gameId);
+            return;
+        }
+
+        _clockService.StopClock(gameId);
+
+        await Clients.Group(GameGroupNames.Canonical(gameId)).SendAsync("ModeChanged", new
+        {
+            Mode = "TurnBased",
+            ChangedBy = connection.PlayerName
+        });
+
+        _logger.LogInformation("Game {Game} switched to TurnBased by {Player}", gameId, connection.PlayerName);
+    }
+
+    /// <summary>
+    /// Switch from turn-based to real-time mode (host only, requires all players online)
+    /// </summary>
+    public async Task SwitchToRealtime(Guid gameId, int speed = 1)
+    {
+        if (!Connections.TryGetValue(Context.ConnectionId, out var connection))
+            return;
+
+        if (connection.GameId != gameId) return;
+
+        if (!IsHost(gameId, connection.PlayerId))
+        {
+            _logger.LogWarning("Non-host player {Player} attempted mode switch for game {Game}",
+                connection.PlayerName, gameId);
+            return;
+        }
+
+        _clockService.StartClock(gameId, speed);
+
+        await Clients.Group(GameGroupNames.Canonical(gameId)).SendAsync("ModeChanged", new
+        {
+            Mode = "RealTime",
+            Speed = speed,
+            ChangedBy = connection.PlayerName
+        });
+
+        _logger.LogInformation("Game {Game} switched to RealTime (speed {Speed}) by {Player}",
+            gameId, speed, connection.PlayerName);
+    }
+
+    /// <summary>
+    /// Register the host for a game
+    /// </summary>
+    public void RegisterHost(Guid gameId, Guid hostPlayerId)
+    {
+        GameHosts[gameId] = hostPlayerId;
+    }
+
+    private static bool IsHost(Guid gameId, Guid playerId)
+    {
+        return GameHosts.TryGetValue(gameId, out var hostId) && hostId == playerId;
     }
 
     // Helper methods
+    private static IEnumerable<string> GetGameGroupNames(Guid gameId)
+        => GameGroupNames.All(gameId);
+
+    private async Task AddConnectionToGameGroups(string connectionId, Guid gameId)
+    {
+        foreach (var groupName in GetGameGroupNames(gameId))
+        {
+            await Groups.AddToGroupAsync(connectionId, groupName);
+        }
+    }
+
+    private async Task RemoveConnectionFromGameGroups(string connectionId, Guid gameId)
+    {
+        foreach (var groupName in GetGameGroupNames(gameId))
+        {
+            await Groups.RemoveFromGroupAsync(connectionId, groupName);
+        }
+    }
+
     private bool AreAllPlayersReady(Guid gameId)
     {
-        if (!GamePlayers.ContainsKey(gameId))
+        if (!GamePlayers.TryGetValue(gameId, out var players) || players.IsEmpty)
             return false;
 
-        return GamePlayers[gameId]
+        return players.Keys
             .All(connId => Connections.TryGetValue(connId, out var c) && c.IsReady);
+    }
+
+    private static void RemoveConnectionFromGamePlayers(Guid gameId, string connectionId)
+    {
+        if (!GamePlayers.TryGetValue(gameId, out var players))
+            return;
+
+        players.TryRemove(connectionId, out _);
+
+        if (players.IsEmpty)
+        {
+            GamePlayers.TryRemove(gameId, out _);
+        }
     }
 
     private async Task ProcessTurnForGame(Guid gameId)
     {
-        _logger.LogInformation("All players ready - processing turn for game {Game}", gameId);
-
-        // Notify turn processing started
-        await Clients.Group($"game_{gameId}").SendAsync("TurnProcessingStarted");
+        var turnLock = GameTurnLocks.GetOrAdd(gameId, _ => new SemaphoreSlim(1, 1));
+        if (!await turnLock.WaitAsync(0))
+        {
+            _logger.LogDebug("Turn processing already active for game {Game}", gameId);
+            return;
+        }
 
         try
         {
+            if (!AreAllPlayersReady(gameId))
+            {
+                _logger.LogDebug("Skip processing for game {Game} because not all players are ready", gameId);
+                return;
+            }
+
+            _logger.LogInformation("All players ready - processing turn for game {Game}", gameId);
+
+            // Notify turn processing started
+            await Clients.Group(GameGroupNames.Canonical(gameId)).SendAsync("TurnProcessingStarted");
+
             // Process the turn
             var result = await _turnProcessor.ProcessTurnAsync(gameId);
-
-            // Reset ready status
-            foreach (var connId in GamePlayers[gameId])
+            if (!result.Success)
             {
-                if (Connections.TryGetValue(connId, out var conn))
+                if (string.Equals(result.Message, TurnProcessor.TurnProcessingAlreadyInProgressMessage, StringComparison.Ordinal))
                 {
-                    conn.IsReady = false;
-                    conn.PendingOrders = null;
+                    _logger.LogDebug("Skip duplicate turn processing trigger for game {Game}", gameId);
+                    return;
+                }
+
+                _logger.LogWarning("Turn processing failed for game {Game}: {Message}", gameId, result.Message);
+                await Clients.Group(GameGroupNames.Canonical(gameId)).SendAsync("TurnProcessingError", result.Message);
+                return;
+            }
+
+            // Reset ready status after successful turn processing
+            ResetReadyState(gameId);
+
+            // Send per-faction payloads with turn report to faction groups
+            if (result.FactionReports.Count > 0)
+            {
+                foreach (var (factionId, report) in result.FactionReports)
+                {
+                    var factionPayload = TurnProcessedPayloadFactory.BuildFactionPayload(result.NewTurn, report);
+                    await Clients.Group(GameGroupNames.Faction(gameId, factionId))
+                        .SendAsync("TurnProcessed", factionPayload);
                 }
             }
 
-            // Broadcast results
-            await Clients.Group($"game_{gameId}").SendAsync("TurnProcessed", new
-            {
-                result.NewTurn,
-                result.Success,
-                result.Message,
-                result.CombatResults,
-                result.GameEnded,
-                result.VictoryType,
-                result.WinnerId
-            });
+            // Always send general payload to canonical group (backwards compat for spectators/admin/GalaxyMap)
+            var turnProcessedPayload = TurnProcessedPayloadFactory.BuildSignalRPayload(result);
+            await Clients.Group(GameGroupNames.Canonical(gameId)).SendAsync("TurnProcessed", turnProcessedPayload);
 
             if (result.GameEnded)
             {
-                await Clients.Group($"game_{gameId}").SendAsync("GameEnded", new
+                await Clients.Group(GameGroupNames.Canonical(gameId)).SendAsync("GameEnded", new
                 {
                     result.VictoryType,
                     result.WinnerId
@@ -294,8 +640,33 @@ public class GameHub : Hub
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error processing turn for game {Game}", gameId);
-            await Clients.Group($"game_{gameId}").SendAsync("TurnProcessingError", ex.Message);
+            await Clients.Group(GameGroupNames.Canonical(gameId)).SendAsync("TurnProcessingError", ex.Message);
         }
+        finally
+        {
+            turnLock.Release();
+        }
+    }
+
+    public override async Task OnConnectedAsync()
+    {
+        // Web client connects with query parameter: /hubs/game?gameId={guid}
+        // Auto-join known group name variants so controller/hub broadcasts are consistently received.
+        var httpContext = Context.GetHttpContext();
+        var gameIdRaw = httpContext?.Request.Query["gameId"].FirstOrDefault();
+
+        if (Guid.TryParse(gameIdRaw, out var gameId))
+        {
+            await AddConnectionToGameGroups(Context.ConnectionId, gameId);
+
+            var factionIdRaw = httpContext?.Request.Query["factionId"].FirstOrDefault();
+            if (Guid.TryParse(factionIdRaw, out var factionId))
+            {
+                await Groups.AddToGroupAsync(Context.ConnectionId, GameGroupNames.Faction(gameId, factionId));
+            }
+        }
+
+        await base.OnConnectedAsync();
     }
 
     public override async Task OnDisconnectedAsync(Exception? exception)
@@ -305,6 +676,17 @@ public class GameHub : Hub
         if (Connections.TryGetValue(connectionId, out var conn))
         {
             await LeaveGame(conn.GameId);
+        }
+        else
+        {
+            // Connection may have joined only via query string auto-grouping.
+            var httpContext = Context.GetHttpContext();
+            var gameIdRaw = httpContext?.Request.Query["gameId"].FirstOrDefault();
+
+            if (Guid.TryParse(gameIdRaw, out var gameId))
+            {
+                await RemoveConnectionFromGameGroups(connectionId, gameId);
+            }
         }
 
         await base.OnDisconnectedAsync(exception);
@@ -378,4 +760,10 @@ public class DiplomaticProposal
     public string Type { get; set; } = ""; // Treaty, TradeAgreement, etc.
     public string? TreatyType { get; set; }
     public Dictionary<string, object> Terms { get; set; } = new();
+}
+
+public class RealtimeOrder
+{
+    public string OrderType { get; set; } = ""; // MoveFleet, StartBuild, SetResearch, etc.
+    public Dictionary<string, object> Parameters { get; set; } = new();
 }

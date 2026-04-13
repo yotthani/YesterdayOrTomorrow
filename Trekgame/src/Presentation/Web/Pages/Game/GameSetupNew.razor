@@ -4,14 +4,90 @@
 @page "/game/new-game"
 @layout MainLayout
 @using StarTrekGame.Web.Components.UI
+@using StarTrekGame.Web.Services
 @inject NavigationManager Nav
+@inject ThemeService ThemeService
+@inject ILocalStorageService LocalStorage
 
 <PageTitle>New Game - Galactic Strategy</PageTitle>
 
 <div class="new-game-container">
     <FederationPanel Title="New Game Setup" HeaderColor="primary" AccentColor="accent" Rounded="tl,tr,bl,br">
+        <div class="setup-section game-type-section">
+            <h3 class="section-title">Game Type</h3>
+            <div class="game-type-cards">
+                <div class="type-card @(_gameType == "single" ? "selected" : "")" @onclick='() => _gameType = "single"'>
+                    <span class="type-icon">&#x1F3AE;</span>
+                    <span class="type-label">Single Player</span>
+                    <span class="type-desc">Play against AI opponents</span>
+                </div>
+                <div class="type-card @(_gameType == "network" ? "selected" : "")" @onclick='() => _gameType = "network"'>
+                    <span class="type-icon">&#x1F310;</span>
+                    <span class="type-label">Network</span>
+                    <span class="type-desc">Play online with others</span>
+                </div>
+                <div class="type-card @(_gameType == "hotseat" ? "selected" : "")" @onclick='() => _gameType = "hotseat"'>
+                    <span class="type-icon">&#x1F504;</span>
+                    <span class="type-label">Hot-Seat</span>
+                    <span class="type-desc">Share one screen locally</span>
+                </div>
+            </div>
+        </div>
+
+        @if (_gameType == "network")
+        {
+            <div class="setup-section mp-options">
+                <h3 class="section-title">Multiplayer Settings</h3>
+                <div class="option-row">
+                    <label>Game Name</label>
+                    <input type="text" @bind="_gameName" class="st-input" placeholder="My Game" />
+                </div>
+                <div class="option-row">
+                    <label>Max Players</label>
+                    <input type="range" min="2" max="8" @bind="_maxPlayers" />
+                    <span>@_maxPlayers</span>
+                </div>
+                <div class="option-row">
+                    <label>Allow Real-Time</label>
+                    <label class="st-toggle">
+                        <input type="checkbox" @bind="_allowRealtime" />
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <div class="option-row">
+                    <label>Turn Timer</label>
+                    <select @bind="_turnTimer" class="st-select">
+                        <option value="0">No Timer</option>
+                        <option value="60">1 Minute</option>
+                        <option value="180">3 Minutes</option>
+                        <option value="300">5 Minutes</option>
+                    </select>
+                </div>
+            </div>
+        }
+
+        @if (_gameType == "hotseat")
+        {
+            <div class="setup-section mp-options">
+                <h3 class="section-title">Hot-Seat Players</h3>
+                <div class="option-row">
+                    <label>Number of Players</label>
+                    <input type="range" min="2" max="4" @bind="_hotSeatPlayerCount" />
+                    <span>@_hotSeatPlayerCount</span>
+                </div>
+                @for (int i = 0; i < _hotSeatPlayerCount; i++)
+                {
+                    var idx = i;
+                    <div class="hotseat-player-row">
+                        <label>Player @(idx + 1)</label>
+                        <input type="text" @bind="_hotSeatNames[idx]" class="st-input" placeholder="@($"Player {idx + 1}")" />
+                    </div>
+                }
+            </div>
+        }
+
         <div class="setup-grid">
-            
+
             <FederationPanel Title="Select Your Empire" HeaderColor="secondary" AccentColor="primary" Padding="0" Class="grid-span-2">
                 <div class="factions-grid">
                     @foreach(var f in _factions)
@@ -227,10 +303,207 @@
         border-top: 1px solid var(--federation-border);
         padding-top: 16px;
     }
+
+    /* Game Type Cards */
+    .setup-section {
+        margin-bottom: 16px;
+    }
+
+    .section-title {
+        font-family: var(--font-display);
+        color: var(--federation-accent-light);
+        margin-bottom: 12px;
+        font-size: 1.1rem;
+    }
+
+    .game-type-cards {
+        display: flex;
+        gap: 16px;
+    }
+
+    .type-card {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        padding: 20px 16px;
+        background: var(--federation-bg-dark, #0a0e17);
+        border: 2px solid var(--federation-border);
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all var(--transition-fast, 0.2s);
+    }
+
+    .type-card:hover {
+        border-color: var(--federation-primary-light);
+        box-shadow: 0 0 12px rgba(255, 153, 0, 0.25);
+    }
+
+    .type-card.selected {
+        border-color: var(--federation-primary-light);
+        box-shadow: 0 0 18px rgba(255, 153, 0, 0.4);
+        background: rgba(255, 153, 0, 0.08);
+    }
+
+    .type-icon {
+        font-size: 2rem;
+    }
+
+    .type-label {
+        font-family: var(--font-display);
+        font-size: 1rem;
+        color: var(--federation-text);
+    }
+
+    .type-desc {
+        font-size: 0.8rem;
+        color: var(--federation-text-dim);
+        text-align: center;
+    }
+
+    /* Multiplayer / Hot-Seat Options */
+    .mp-options {
+        border: 1px solid var(--federation-border);
+        border-radius: 8px;
+        padding: 16px 20px;
+        background: var(--federation-bg-dark, #0a0e17);
+    }
+
+    .option-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 8px 0;
+    }
+
+    .option-row label {
+        min-width: 140px;
+        font-weight: bold;
+        color: var(--federation-text-dim);
+    }
+
+    .option-row span {
+        color: var(--federation-accent-light);
+        font-weight: bold;
+        min-width: 24px;
+    }
+
+    .st-input {
+        background: var(--federation-bg-light, #1a1e2e);
+        border: 1px solid var(--federation-border);
+        color: var(--federation-text);
+        padding: 6px 12px;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        flex: 1;
+        max-width: 300px;
+    }
+
+    .st-input:focus {
+        outline: none;
+        border-color: var(--federation-primary-light);
+        box-shadow: 0 0 6px rgba(255, 153, 0, 0.3);
+    }
+
+    .st-select {
+        background: var(--federation-bg-light, #1a1e2e);
+        border: 1px solid var(--federation-border);
+        color: var(--federation-text);
+        padding: 6px 12px;
+        border-radius: 4px;
+        font-size: 0.9rem;
+    }
+
+    .st-select:focus {
+        outline: none;
+        border-color: var(--federation-primary-light);
+    }
+
+    /* Toggle Switch */
+    .st-toggle {
+        position: relative;
+        display: inline-block;
+        width: 48px;
+        height: 24px;
+        cursor: pointer;
+    }
+
+    .st-toggle input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .toggle-slider {
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: var(--federation-bg-light, #1a1e2e);
+        border: 1px solid var(--federation-border);
+        border-radius: 24px;
+        transition: all var(--transition-fast, 0.2s);
+    }
+
+    .toggle-slider::before {
+        content: "";
+        position: absolute;
+        width: 18px;
+        height: 18px;
+        left: 2px;
+        bottom: 2px;
+        background: var(--federation-text-dim);
+        border-radius: 50%;
+        transition: all var(--transition-fast, 0.2s);
+    }
+
+    .st-toggle input:checked + .toggle-slider {
+        background: rgba(255, 153, 0, 0.3);
+        border-color: var(--federation-primary-light);
+    }
+
+    .st-toggle input:checked + .toggle-slider::before {
+        transform: translateX(24px);
+        background: var(--federation-primary-light);
+    }
+
+    /* Range input styling */
+    .option-row input[type="range"] {
+        flex: 1;
+        max-width: 200px;
+        accent-color: var(--federation-primary-light, #ff9900);
+    }
+
+    /* Hot-Seat Player Rows */
+    .hotseat-player-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 6px 0;
+    }
+
+    .hotseat-player-row label {
+        min-width: 80px;
+        font-weight: bold;
+        color: var(--federation-text-dim);
+    }
 </style>
 
 @code{
+    protected override async Task OnInitializedAsync()
+    {
+        // Main menu pages always use default theme
+        await ThemeService.ApplyTemporaryThemeAsync("default");
+    }
+
     string _selectedFaction="federation";string _galaxySize="Medium";string _starDensity="Normal";int _aiCount=4;string _difficulty="Captain";
+    string _gameType = "single";
+    string _gameName = "My Game";
+    int _maxPlayers = 4;
+    bool _allowRealtime = true;
+    int _turnTimer = 0;
+    int _hotSeatPlayerCount = 2;
+    string[] _hotSeatNames = new[] { "Player 1", "Player 2", "Player 3", "Player 4" };
+
     List<FactionInfo> _factions=new(){
         new(){Id="federation",Name="United Federation",Icon="🌐",Trait="Explorers",Government="Democratic Republic",Military=3,Science=5,Economy=4,Homeworld="Earth",Description="A peaceful alliance of diverse species dedicated to exploration and diplomacy.",Traits=new[]{"+20% Research","+10 Opinion","Diplomatic Focus","-10% Military"}},
         new(){Id="klingon",Name="Klingon Empire",Icon="⚔",Trait="Warriors",Government="Military Empire",Military=5,Science=2,Economy=3,Homeworld="Qo'noS",Description="A proud warrior culture that values honor and combat prowess above all.",Traits=new[]{"+25% Ship Damage","+15% Army Damage","Honor Bound","-15% Research"}},
@@ -239,6 +512,25 @@
         new(){Id="ferengi",Name="Ferengi Alliance",Icon="💰",Trait="Traders",Government="Corporate",Military=2,Science=3,Economy=6,Homeworld="Ferenginar",Description="Profit-driven merchants who see the galaxy as one big marketplace.",Traits=new[]{"+30% Trade","+20% Credits","Rules of Acquisition","-20% Military"}},
         new(){Id="borg",Name="Borg Collective",Icon="🔲",Trait="Assimilators",Government="Hive Mind",Military=5,Science=5,Economy=4,Homeworld="Unimatrix 01",Description="A cybernetic collective seeking perfection through assimilation.",Traits=new[]{"Assimilation","Adaptive Tech","No Diplomacy","-100 Opinion"}}
     };
-    void StartGame()=>Nav.NavigateTo("/game/galaxy");
+    async Task StartGame()
+    {
+        if (_gameType == "network")
+        {
+            await LocalStorage.SetItemAsync("isMultiplayer", true);
+            await LocalStorage.SetItemAsync("gameMode", "TurnBased");
+            await LocalStorage.SetItemAsync("isHost", true);
+            Nav.NavigateTo("/multiplayer");
+        }
+        else if (_gameType == "hotseat")
+        {
+            await LocalStorage.SetItemAsync("isMultiplayer", true);
+            await LocalStorage.SetItemAsync("gameMode", "HotSeat");
+            Nav.NavigateTo("/game/galaxy");
+        }
+        else
+        {
+            Nav.NavigateTo("/game/galaxy");
+        }
+    }
     class FactionInfo{public string Id="";public string Name="";public string Icon="";public string Trait="";public string Government="";public int Military;public int Science;public int Economy;public string Homeworld="";public string Description="";public string[] Traits=Array.Empty<string>();}
 }

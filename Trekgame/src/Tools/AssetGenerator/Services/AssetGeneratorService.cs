@@ -20,6 +20,10 @@ public class AssetGeneratorService
     private long _comfyUISeed = -1;
     private string _comfyUIModel = "";
 
+    // Flux Pro provider support
+    private FluxProApiService? _fluxApi;
+    private long _fluxSeed = -1;
+
     // UI Element generation options
     public bool UseProgrammaticUI { get; set; } = true;  // Use SkiaSharp for all faction UI elements
     public bool UseProgrammaticLCARS { get; set; } = true;  // Legacy: Use SkiaSharp for LCARS elements (Federation)
@@ -67,6 +71,12 @@ public class AssetGeneratorService
         _comfyUIApi = comfyUIApi;
     }
 
+    // Configure Flux Pro provider
+    public void SetFluxProvider(FluxProApiService fluxApi)
+    {
+        _fluxApi = fluxApi;
+    }
+
     public void SetActiveProvider(string provider, string model = "", int steps = 30, double cfg = 7.0, long seed = -1)
     {
         _activeProvider = provider;
@@ -74,6 +84,7 @@ public class AssetGeneratorService
         _comfyUISteps = steps;
         _comfyUICfg = cfg;
         _comfyUISeed = seed;
+        if (provider == "flux-pro") _fluxSeed = seed;
     }
     
     public PromptBuilderService PromptBuilder => _promptBuilder;
@@ -539,6 +550,8 @@ public class AssetGeneratorService
             }
         }
 
+        Console.WriteLine($"[PROVIDER] Active provider: '{_activeProvider}', fluxApi null: {_fluxApi == null}, comfyApi null: {_comfyUIApi == null}");
+
         if (_activeProvider == "comfyui" && _comfyUIApi != null)
         {
             // Use ComfyUI
@@ -575,6 +588,9 @@ public class AssetGeneratorService
                 OnStatusMessage?.Invoke($"Using UI-optimized model: {UIElementModel}");
             }
 
+            // Claymation style: only when user has 2-step enabled AND asset is eligible
+            var wantsClaymation = UseTwoStepGeneration && !isUIElementPrompt && !IsNonClaymationAsset(cleanPrompt);
+
             var request = new GenerationRequest
             {
                 Prompt = cleanPrompt,
@@ -586,14 +602,31 @@ public class AssetGeneratorService
                 Seed = _comfyUISeed,
                 Model = modelToUse,
                 // For UI elements, skip LoRAs entirely to get flat 2D style
-                SkipLoRAs = isUIElementPrompt
+                SkipLoRAs = isUIElementPrompt,
+                // Only apply claymation style when user explicitly opted in
+                UseClaymationStyle = wantsClaymation,
+                // Pass category + faction for smart checkpoint/LoRA selection
+                AssetCategory = category.ToString(),
+                FactionHint = faction.ToString()
             };
+
+            // For ships: populate raw SD data from Ships.json so SDPromptTransformer
+            // can build a compact prompt directly instead of filtering the massive LLM prompt
+            if ((category == AssetCategory.MilitaryShips || category == AssetCategory.CivilianShips)
+                && !string.IsNullOrEmpty(assetName))
+            {
+                var isMilitary = category == AssetCategory.MilitaryShips;
+                var (classVariant, factionColors, shipClassName) = _promptBuilder.GetShipSDData(faction, assetName, isMilitary);
+                request.ShipClassVariant = classVariant;
+                request.ShipFactionColors = factionColors;
+                request.ShipClassName = shipClassName;
+            }
 
             GenerationResult result;
 
             // Determine if we should use 2-Step generation
             // Only for non-UI elements (ships, characters, etc.) when enabled
-            var shouldUseTwoStep = UseTwoStepGeneration && !isUIElementPrompt && !IsNonClaymationAsset(cleanPrompt);
+            var shouldUseTwoStep = wantsClaymation;
 
             if (shouldUseTwoStep)
             {
@@ -625,9 +658,23 @@ public class AssetGeneratorService
 
             return result;
         }
+        else if (_activeProvider == "flux-pro" && _fluxApi != null)
+        {
+            // Use Flux Pro API
+            Console.WriteLine($"[FLUX] Generating with {_fluxApi.CurrentModel}, seed: {_fluxSeed}, configured: {_fluxApi.IsConfigured}");
+            OnStatusMessage?.Invoke($"Generating with FLUX.2 ({_fluxApi.CurrentModel})...");
+            var fluxResult = await _fluxApi.GenerateImageAsync(
+                prompt,
+                GenerationSize, GenerationSize,
+                _fluxSeed, "png", 2,
+                cancellationToken);
+            Console.WriteLine($"[FLUX] Result: success={fluxResult.Success}, error={fluxResult.ErrorMessage ?? "none"}, imageLen={fluxResult.ImageBase64?.Length ?? 0}");
+            return fluxResult;
+        }
         else
         {
             // Use Gemini (default)
+            Console.WriteLine($"[GEMINI] Falling through to Gemini (activeProvider='{_activeProvider}')");
             OnStatusMessage?.Invoke("Generating with Gemini...");
             return await _geminiApi.GenerateImageAsync(prompt, cancellationToken);
         }

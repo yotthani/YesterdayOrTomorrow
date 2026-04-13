@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StarTrekGame.Server.Data;
 using StarTrekGame.Server.Data.Entities;
+using StarTrekGame.Server.Services;
+using System.Text.Json;
 
 namespace StarTrekGame.Server.Controllers;
 
@@ -10,10 +12,32 @@ namespace StarTrekGame.Server.Controllers;
 public class DiplomacyController : ControllerBase
 {
     private readonly GameDbContext _db;
+    private readonly IDiplomacyService _diplomacy;
 
-    public DiplomacyController(GameDbContext db)
+    private static readonly Dictionary<(string, string), int> RaceAffinities = new()
+    {
+        { ("federation", "vulcan"), 75 },
+        { ("federation", "bajoran"), 60 },
+        { ("federation", "ferengi"), 30 },
+        { ("federation", "klingon"), -20 },
+        { ("federation", "romulan"), -40 },
+        { ("federation", "cardassian"), -30 },
+        { ("klingon", "gorn"), -30 },
+        { ("klingon", "romulan"), -50 },
+        { ("klingon", "federation"), -20 },
+        { ("romulan", "federation"), -40 },
+        { ("romulan", "klingon"), -50 },
+        { ("romulan", "vulcan"), -60 },
+        { ("vulcan", "federation"), 75 },
+        { ("ferengi", "federation"), 30 },
+        { ("cardassian", "bajoran"), -80 },
+        { ("bajoran", "cardassian"), -80 }
+    };
+
+    public DiplomacyController(GameDbContext db, IDiplomacyService diplomacy)
     {
         _db = db;
+        _diplomacy = diplomacy;
     }
 
     /// <summary>
@@ -34,11 +58,10 @@ public class DiplomacyController : ControllerBase
 
         foreach (var otherFaction in faction.Game.Factions.Where(f => f.Id != factionId))
         {
-            // Get fleet count for military estimate
             var fleetCount = await _db.Fleets
                 .Where(f => f.FactionId == otherFaction.Id)
                 .CountAsync();
-            
+
             var shipCount = await _db.Ships
                 .Where(s => s.Fleet!.FactionId == otherFaction.Id)
                 .CountAsync();
@@ -47,12 +70,28 @@ public class DiplomacyController : ControllerBase
                 .Where(c => c.FactionId == otherFaction.Id)
                 .CountAsync();
 
-            // Calculate relation value based on race affinities
-            var relationValue = CalculateBaseRelation(faction.RaceId, otherFaction.RaceId);
-            var status = GetRelationStatus(relationValue);
+            // Load real diplomatic relation from DB if it exists
+            var dbRelation = await _diplomacy.GetRelationAsync(factionId, otherFaction.Id);
 
+            int relationValue;
+            string status;
             var treaties = new List<TreatyResponse>();
-            // Would load from actual treaty system
+
+            if (dbRelation != null)
+            {
+                // Use real DB data
+                relationValue = dbRelation.Opinion;
+                status = dbRelation.Status.ToString();
+
+                // Parse active treaties from JSON
+                treaties = ParseTreaties(dbRelation.ActiveTreaties);
+            }
+            else
+            {
+                // Fall back to race affinity for first contact
+                relationValue = CalculateBaseRelation(faction.RaceId, otherFaction.RaceId);
+                status = GetRelationStatus(relationValue);
+            }
 
             relations.Add(new DiplomaticRelationResponse(
                 FactionId: otherFaction.Id,
@@ -61,9 +100,9 @@ public class DiplomacyController : ControllerBase
                 RelationValue: relationValue,
                 Status: status,
                 ActiveTreaties: treaties,
-                MilitaryStrength: shipCount * 10, // Simplified
+                MilitaryStrength: shipCount * 10,
                 EconomicPower: colonyCount * 25,
-                SystemCount: colonyCount // Simplified - colonies = systems
+                SystemCount: colonyCount
             ));
         }
 
@@ -76,11 +115,17 @@ public class DiplomacyController : ControllerBase
     [HttpGet("{factionId:guid}/relations/{otherFactionId:guid}")]
     public async Task<ActionResult<DiplomaticRelationResponse>> GetRelationWith(Guid factionId, Guid otherFactionId)
     {
+        if (factionId == otherFactionId)
+            return BadRequest("Cannot query diplomatic relation with self.");
+
         var faction = await _db.Factions.FindAsync(factionId);
         var otherFaction = await _db.Factions.FindAsync(otherFactionId);
 
         if (faction == null || otherFaction == null)
             return NotFound("Faction not found");
+
+        if (faction.GameId != otherFaction.GameId)
+            return BadRequest("Factions are not part of the same game.");
 
         var shipCount = await _db.Ships
             .Where(s => s.Fleet!.FactionId == otherFactionId)
@@ -90,15 +135,30 @@ public class DiplomacyController : ControllerBase
             .Where(c => c.FactionId == otherFactionId)
             .CountAsync();
 
-        var relationValue = CalculateBaseRelation(faction.RaceId, otherFaction.RaceId);
-        
+        var dbRelation = await _diplomacy.GetRelationAsync(factionId, otherFactionId);
+        int relationValue;
+        string status;
+        var treaties = new List<TreatyResponse>();
+
+        if (dbRelation != null)
+        {
+            relationValue = dbRelation.Opinion;
+            status = dbRelation.Status.ToString();
+            treaties = ParseTreaties(dbRelation.ActiveTreaties);
+        }
+        else
+        {
+            relationValue = CalculateBaseRelation(faction.RaceId, otherFaction.RaceId);
+            status = GetRelationStatus(relationValue);
+        }
+
         return Ok(new DiplomaticRelationResponse(
             FactionId: otherFaction.Id,
             FactionName: otherFaction.Name,
             RaceId: otherFaction.RaceId,
             RelationValue: relationValue,
-            Status: GetRelationStatus(relationValue),
-            ActiveTreaties: new List<TreatyResponse>(),
+            Status: status,
+            ActiveTreaties: treaties,
             MilitaryStrength: shipCount * 10,
             EconomicPower: colonyCount * 25,
             SystemCount: colonyCount
@@ -106,41 +166,94 @@ public class DiplomacyController : ControllerBase
     }
 
     /// <summary>
-    /// Propose a treaty to another faction
+    /// Propose a treaty to another faction (persists via DiplomacyService)
     /// </summary>
     [HttpPost("{factionId:guid}/propose")]
     public async Task<ActionResult> ProposeTreaty(Guid factionId, [FromBody] ProposeTreatyRequest request)
     {
+        if (request == null)
+            return BadRequest("Request body is required.");
+
         var faction = await _db.Factions.FindAsync(factionId);
         var targetFaction = await _db.Factions.FindAsync(request.TargetFactionId);
 
         if (faction == null || targetFaction == null)
             return NotFound("Faction not found");
 
-        // Would create treaty proposal in domain
-        // For now, just acknowledge
+        if (request.TargetFactionId == factionId)
+            return BadRequest("Cannot propose a treaty to self.");
 
-        return Ok(new { 
-            Message = $"Treaty proposal ({request.TreatyType}) sent to {targetFaction.Name}",
-            WillAccept = CalculateAcceptChance(faction.RaceId, targetFaction.RaceId, request.TreatyType) > 50
-        });
+        if (faction.GameId != targetFaction.GameId)
+            return BadRequest("Target faction is not part of the same game.");
+
+        if (faction.IsDefeated || targetFaction.IsDefeated)
+            return BadRequest("Defeated factions cannot engage in diplomacy.");
+
+        // Map string treaty type to enum
+        if (!Enum.TryParse<TreatyType>(request.TreatyType, true, out var treatyType))
+        {
+            // Try common aliases
+            treatyType = (request.TreatyType?.ToLower()) switch
+            {
+                "trade" => TreatyType.OpenBorders,
+                "nap" => TreatyType.NonAggression,
+                "research" => TreatyType.ResearchAgreement,
+                "alliance" => TreatyType.Alliance,
+                _ => TreatyType.NonAggression
+            };
+        }
+
+        var success = await _diplomacy.ProposeTreatyAsync(factionId, request.TargetFactionId, treatyType);
+
+        if (success)
+        {
+            return Ok(new
+            {
+                Message = $"Treaty ({treatyType}) established with {targetFaction.Name}",
+                Accepted = true
+            });
+        }
+        else
+        {
+            return Ok(new
+            {
+                Message = $"Treaty proposal ({treatyType}) rejected by {targetFaction.Name}",
+                Accepted = false
+            });
+        }
     }
 
     /// <summary>
-    /// Declare war on another faction
+    /// Declare war on another faction (persists via DiplomacyService)
     /// </summary>
     [HttpPost("{factionId:guid}/declare-war")]
     public async Task<ActionResult> DeclareWar(Guid factionId, [FromBody] DeclareWarRequest request)
     {
+        if (request == null)
+            return BadRequest("Request body is required.");
+
         var faction = await _db.Factions.FindAsync(factionId);
         var targetFaction = await _db.Factions.FindAsync(request.TargetFactionId);
 
         if (faction == null || targetFaction == null)
             return NotFound("Faction not found");
 
-        // Would update diplomatic state in domain
-        
-        return Ok(new { 
+        if (request.TargetFactionId == factionId)
+            return BadRequest("Cannot declare war on self.");
+
+        if (faction.GameId != targetFaction.GameId)
+            return BadRequest("Target faction is not part of the same game.");
+
+        if (faction.IsDefeated || targetFaction.IsDefeated)
+            return BadRequest("Cannot declare war involving defeated factions.");
+
+        var success = await _diplomacy.DeclareWarAsync(factionId, request.TargetFactionId, CasusBelli.Aggression);
+
+        if (!success)
+            return BadRequest("Cannot declare war. Already at war or other restriction.");
+
+        return Ok(new
+        {
             Message = $"{faction.Name} has declared war on {targetFaction.Name}!",
             RelationChange = -100
         });
@@ -152,58 +265,91 @@ public class DiplomacyController : ControllerBase
     [HttpPost("{factionId:guid}/gift")]
     public async Task<ActionResult> SendGift(Guid factionId, [FromBody] SendGiftRequest request)
     {
+        if (request == null)
+            return BadRequest("Request body is required.");
+
         var faction = await _db.Factions.FindAsync(factionId);
         var targetFaction = await _db.Factions.FindAsync(request.TargetFactionId);
 
         if (faction == null || targetFaction == null)
             return NotFound("Faction not found");
 
-        // Calculate relation improvement based on gift size
-        var improvement = request.Credits / 100; // +1 relation per 100 credits
+        if (request.TargetFactionId == factionId)
+            return BadRequest("Cannot send a gift to self.");
 
-        return Ok(new { 
+        if (faction.GameId != targetFaction.GameId)
+            return BadRequest("Target faction is not part of the same game.");
+
+        if (faction.IsDefeated || targetFaction.IsDefeated)
+            return BadRequest("Defeated factions cannot exchange gifts.");
+
+        if (request.Credits <= 0)
+            return BadRequest("Gift amount must be greater than zero.");
+
+        if (faction.Treasury.Credits < request.Credits)
+            return BadRequest("Insufficient credits.");
+
+        faction.Treasury.Credits -= request.Credits;
+
+        // Improve relation in DB
+        var relation = await _diplomacy.GetRelationAsync(factionId, request.TargetFactionId);
+        var improvement = Math.Max(1, request.Credits / 100);
+        if (relation != null)
+        {
+            relation.Opinion = Math.Min(100, relation.Opinion + improvement);
+            relation.Trust = Math.Min(100, relation.Trust + improvement / 2);
+        }
+
+        await _db.SaveChangesAsync();
+
+        return Ok(new
+        {
             Message = $"Sent {request.Credits} credits to {targetFaction.Name}",
-            RelationChange = improvement
+            RelationChange = improvement,
+            RemainingCredits = faction.Treasury.Credits
         });
     }
 
+    // ═══════════════════════════════════════════════════════════════════════
+    // HELPERS
+    // ═══════════════════════════════════════════════════════════════════════
+
+    private static List<TreatyResponse> ParseTreaties(string? json)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(json) || json == "[]")
+                return new();
+
+            var treatyNames = JsonSerializer.Deserialize<List<string>>(json) ?? new();
+            return treatyNames.Select(t => new TreatyResponse(t, FormatTreatyName(t), null)).ToList();
+        }
+        catch { return new(); }
+    }
+
+    private static string FormatTreatyName(string treaty) => treaty switch
+    {
+        "NonAggression" => "Non-Aggression Pact",
+        "OpenBorders" => "Open Borders Agreement",
+        "ResearchAgreement" => "Research Agreement",
+        "DefensivePact" => "Defensive Pact",
+        "Alliance" => "Full Alliance",
+        "Federation" => "Federation Membership",
+        _ => treaty
+    };
+
     private int CalculateBaseRelation(string race1, string race2)
     {
-        // Race affinities
-        var affinities = new Dictionary<(string, string), int>
-        {
-            // Federation relations
-            { ("Federation", "Vulcan"), 75 },
-            { ("Federation", "Bajoran"), 60 },
-            { ("Federation", "Ferengi"), 30 },
-            { ("Federation", "Klingon"), -20 },
-            { ("Federation", "Romulan"), -40 },
-            { ("Federation", "Cardassian"), -30 },
-            
-            // Klingon relations
-            { ("Klingon", "Gorn"), -30 },
-            { ("Klingon", "Romulan"), -50 },
-            { ("Klingon", "Federation"), -20 },
-            
-            // Romulan relations
-            { ("Romulan", "Federation"), -40 },
-            { ("Romulan", "Klingon"), -50 },
-            { ("Romulan", "Vulcan"), -60 },
-            
-            // Others
-            { ("Vulcan", "Federation"), 75 },
-            { ("Ferengi", "Federation"), 30 },
-            { ("Cardassian", "Bajoran"), -80 },
-            { ("Bajoran", "Cardassian"), -80 },
-        };
+        var r1 = NormalizeKey(race1);
+        var r2 = NormalizeKey(race2);
+        if (string.IsNullOrWhiteSpace(r1) || string.IsNullOrWhiteSpace(r2))
+            return 0;
 
-        // Check both directions
-        if (affinities.TryGetValue((race1, race2), out var value))
+        if (RaceAffinities.TryGetValue((r1, r2), out var value))
             return value;
-        if (affinities.TryGetValue((race2, race1), out value))
+        if (RaceAffinities.TryGetValue((r2, r1), out value))
             return value;
 
-        // Default neutral
         return 0;
     }
 
@@ -218,20 +364,7 @@ public class DiplomacyController : ControllerBase
         _ => "At War"
     };
 
-    private int CalculateAcceptChance(string proposerRace, string targetRace, string treatyType)
-    {
-        var baseRelation = CalculateBaseRelation(proposerRace, targetRace);
-        var baseChance = 50 + baseRelation / 2;
-
-        return treatyType switch
-        {
-            "trade" => Math.Min(90, baseChance + 20),
-            "nap" => Math.Min(85, baseChance + 10),
-            "research" => Math.Min(80, baseChance + 15),
-            "alliance" => Math.Min(70, baseChance - 10),
-            _ => baseChance
-        };
-    }
+    private static string NormalizeKey(string? value) => value?.Trim().ToLowerInvariant() ?? string.Empty;
 }
 
 // Request/Response records

@@ -7,7 +7,7 @@ namespace StarTrekGame.Server.Services;
 
 public interface IPopulationService
 {
-    Task ProcessPopulationGrowthAsync(Guid gameId);
+    Task<PopulationPhaseResult> ProcessPopulationGrowthAsync(Guid gameId);
     Task<bool> AssignPopToJobAsync(Guid popId, Guid buildingId, string jobType);
     Task<bool> CreateCommuterRouteAsync(Guid sourceColonyId, Guid targetColonyId, int popCount);
     Task<bool> MigratePopAsync(Guid popId, Guid targetColonyId);
@@ -28,8 +28,10 @@ public class PopulationService : IPopulationService
     /// <summary>
     /// Process population growth for all colonies in a game
     /// </summary>
-    public async Task ProcessPopulationGrowthAsync(Guid gameId)
+    public async Task<PopulationPhaseResult> ProcessPopulationGrowthAsync(Guid gameId)
     {
+        var popChange = new Dictionary<Guid, int>();
+
         var colonies = await _db.Colonies
             .Include(c => c.Pops)
             .Include(c => c.Buildings)
@@ -40,13 +42,14 @@ public class PopulationService : IPopulationService
 
         foreach (var colony in colonies)
         {
-            await ProcessColonyGrowthAsync(colony);
+            await ProcessColonyGrowthAsync(colony, popChange);
         }
 
         await _db.SaveChangesAsync();
+        return new PopulationPhaseResult(popChange);
     }
 
-    private async Task ProcessColonyGrowthAsync(ColonyEntity colony)
+    private async Task ProcessColonyGrowthAsync(ColonyEntity colony, Dictionary<Guid, int> popChange)
     {
         // Check if there's room for growth
         var currentPop = colony.TotalPopulation;
@@ -105,7 +108,16 @@ public class PopulationService : IPopulationService
             ? colony.Pops.Average(p => SpeciesDefinitions.Get(p.SpeciesId)?.GrowthRateModifier ?? 1.0)
             : 1.0;
 
-        var finalGrowthRate = baseGrowth * habitabilityModifier * stabilityModifier * speciesModifier * (1 + medicalBonus);
+        // Faction tech modifier for pop growth
+        var factionGrowthMod = 1.0;
+        if (colony.FactionId != Guid.Empty)
+        {
+            var faction = await _db.Factions.FindAsync(colony.FactionId);
+            if (faction != null && faction.PopGrowthModifier != 0)
+                factionGrowthMod = 1.0 + faction.PopGrowthModifier / 100.0;
+        }
+
+        var finalGrowthRate = baseGrowth * habitabilityModifier * stabilityModifier * speciesModifier * (1 + medicalBonus) * factionGrowthMod;
         var growthAmount = currentPop * finalGrowthRate;
 
         // Check if we've accumulated enough for a new pop
@@ -139,7 +151,13 @@ public class PopulationService : IPopulationService
                 _db.Pops.Add(newPop);
             }
 
-            _logger.LogInformation("Colony {Colony} grew by 1 pop (rate: {Rate:P1})", 
+            // Track population change per faction
+            var factionId = colony.FactionId;
+            if (!popChange.ContainsKey(factionId))
+                popChange[factionId] = 0;
+            popChange[factionId]++;
+
+            _logger.LogInformation("Colony {Colony} grew by 1 pop (rate: {Rate:P1})",
                 colony.Name, finalGrowthRate);
         }
 
@@ -259,9 +277,25 @@ public class PopulationService : IPopulationService
         
         if (!sameSystem)
         {
-            // TODO: Check for transport ship or shuttle service
-            _logger.LogWarning("Inter-system commuting requires transport infrastructure");
-            return false;
+            // Inter-system commuting requires transport infrastructure:
+            // Either a spaceport/trade_hub at source, or an active trade route between systems
+            var hasSpaceport = await _db.Buildings
+                .AnyAsync(b => b.Colony.SystemId == sourceColony.SystemId &&
+                              b.Colony.HouseId == sourceColony.HouseId &&
+                              (b.BuildingTypeId == "spaceport" || b.BuildingTypeId == "trade_hub") &&
+                              b.IsActive);
+
+            var hasTradeRoute = await _db.TradeRoutes
+                .AnyAsync(r => r.HouseId == sourceColony.HouseId &&
+                              r.Status == TradeRouteStatus.Active &&
+                              ((r.SourceSystemId == sourceColony.SystemId && r.DestinationSystemId == targetColony.SystemId) ||
+                               (r.SourceSystemId == targetColony.SystemId && r.DestinationSystemId == sourceColony.SystemId)));
+
+            if (!hasSpaceport && !hasTradeRoute)
+            {
+                _logger.LogWarning("Inter-system commuting requires a spaceport/trade hub or active trade route");
+                return false;
+            }
         }
 
         // Find unemployed pops to make commuters

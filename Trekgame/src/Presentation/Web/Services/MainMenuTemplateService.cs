@@ -14,14 +14,19 @@ public class MainMenuTemplateService
         _templates = InitializeTemplates();
     }
 
+    /// <summary>
+    /// Main menu nutzt aktuell nur lcars – Fraktions-Styles sind noch nicht fertig und werden ignoriert.
+    /// </summary>
     public MenuTemplate GetTemplate(string styleId = "lcars")
     {
-        return _templates.TryGetValue(styleId, out var template)
-            ? template
-            : _templates["lcars"];
+        const string defaultStyle = "lcars";
+        return _templates[defaultStyle];
     }
 
-    public IEnumerable<string> GetAllStyleIds() => _templates.Keys;
+    /// <summary>
+    /// Liefert nur das aktive Theme – Fraktions-Styles werden ausgeblendet, da noch nicht fertig.
+    /// </summary>
+    public IEnumerable<string> GetAllStyleIds() => new[] { "lcars" };
 
     private Dictionary<string, MenuTemplate> InitializeTemplates()
     {

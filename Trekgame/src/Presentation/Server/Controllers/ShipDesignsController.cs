@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StarTrekGame.Server.Data;
 using StarTrekGame.Server.Data.Entities;
+using System.Text.Json;
 
 namespace StarTrekGame.Server.Controllers;
 
@@ -17,7 +18,7 @@ public class ShipDesignsController : ControllerBase
     }
 
     /// <summary>
-    /// Get all ship designs for a faction (including race defaults)
+    /// Get all ship designs for a faction (race defaults + custom from DB)
     /// </summary>
     [HttpGet("designs/{factionId:guid}")]
     public async Task<ActionResult<List<ShipDesignResponse>>> GetShipDesigns(Guid factionId)
@@ -28,18 +29,35 @@ public class ShipDesignsController : ControllerBase
 
         // Get default designs based on race
         var designs = GetDefaultDesigns(faction.RaceId);
-        
-        // Would also load custom designs from database
-        
+
+        // Load custom designs from database
+        var customDesigns = await _db.ShipDesigns
+            .Where(d => d.FactionId == factionId && !d.IsObsolete)
+            .ToListAsync();
+
+        designs.AddRange(customDesigns.Select(d => new ShipDesignResponse(
+            d.Id,
+            d.Name,
+            d.ShipClass,
+            d.HullPoints,
+            d.ShieldCapacity,
+            d.Firepower,
+            d.Speed,
+            d.SensorRange,
+            d.ProductionCost,
+            d.BuildTime,
+            DeserializeComponents(d.InstalledComponents)
+        )));
+
         return Ok(designs);
     }
 
     /// <summary>
-    /// Create a new custom ship design
+    /// Create a new custom ship design and persist to DB
     /// </summary>
     [HttpPost("designs/{factionId:guid}")]
     public async Task<ActionResult<ShipDesignResponse>> CreateShipDesign(
-        Guid factionId, 
+        Guid factionId,
         [FromBody] CreateShipDesignRequest request)
     {
         var faction = await _db.Factions.FindAsync(factionId);
@@ -54,35 +72,59 @@ public class ShipDesignsController : ControllerBase
             request.SystemIds
         );
 
-        var design = new ShipDesignResponse(
-            Id: Guid.NewGuid(),
-            Name: request.Name,
-            ShipClass: request.ShipClass,
-            HullPoints: hull,
-            ShieldCapacity: shields,
-            Firepower: firepower,
-            Speed: speed,
-            SensorRange: sensors,
-            ProductionCost: cost,
-            BuildTime: buildTime,
-            InstalledComponents: request.WeaponIds
-                .Concat(request.DefenseIds)
-                .Concat(request.SystemIds)
-                .ToList()
-        );
+        var allComponents = request.WeaponIds
+            .Concat(request.DefenseIds)
+            .Concat(request.SystemIds)
+            .ToList();
 
-        // Would save to database
+        // Save to database
+        var entity = new ShipDesignEntity
+        {
+            Id = Guid.NewGuid(),
+            FactionId = factionId,
+            Name = request.Name,
+            ShipClass = request.ShipClass,
+            HullPoints = hull,
+            ShieldCapacity = shields,
+            Firepower = firepower,
+            Speed = speed,
+            SensorRange = sensors,
+            ProductionCost = cost,
+            BuildTime = buildTime,
+            InstalledComponents = JsonSerializer.Serialize(allComponents)
+        };
 
-        return Ok(design);
+        _db.ShipDesigns.Add(entity);
+        await _db.SaveChangesAsync();
+
+        return Ok(new ShipDesignResponse(
+            entity.Id,
+            entity.Name,
+            entity.ShipClass,
+            entity.HullPoints,
+            entity.ShieldCapacity,
+            entity.Firepower,
+            entity.Speed,
+            entity.SensorRange,
+            entity.ProductionCost,
+            entity.BuildTime,
+            allComponents
+        ));
     }
 
     /// <summary>
-    /// Delete a custom ship design
+    /// Delete a custom ship design from DB
     /// </summary>
     [HttpDelete("designs/{designId:guid}")]
-    public ActionResult DeleteShipDesign(Guid designId)
+    public async Task<ActionResult> DeleteShipDesign(Guid designId)
     {
-        // Would delete from database
+        var design = await _db.ShipDesigns.FindAsync(designId);
+        if (design == null)
+            return NotFound("Design not found or is a default design");
+
+        _db.ShipDesigns.Remove(design);
+        await _db.SaveChangesAsync();
+
         return Ok(new { Message = "Design deleted" });
     }
 
@@ -289,6 +331,15 @@ public class ShipDesignsController : ControllerBase
         "transporter" => (0, 0, 30),
         _ => (0, 0, 0)
     };
+
+    private static List<string> DeserializeComponents(string json)
+    {
+        try
+        {
+            return JsonSerializer.Deserialize<List<string>>(json) ?? [];
+        }
+        catch { return []; }
+    }
 }
 
 // Request/Response records

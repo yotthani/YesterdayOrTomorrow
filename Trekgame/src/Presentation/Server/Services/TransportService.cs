@@ -17,12 +17,14 @@ public class TransportService : ITransportService
 {
     private readonly GameDbContext _db;
     private readonly ILogger<TransportService> _logger;
+    private readonly IEventService _events;
     private readonly Random _random = new();
 
-    public TransportService(GameDbContext db, ILogger<TransportService> logger)
+    public TransportService(GameDbContext db, ILogger<TransportService> logger, IEventService events)
     {
         _db = db;
         _logger = logger;
+        _events = events;
     }
 
     /// <summary>
@@ -156,13 +158,13 @@ public class TransportService : ITransportService
 
         foreach (var route in routes)
         {
-            await ProcessSingleRouteAsync(route);
+            await ProcessSingleRouteAsync(route, gameId);
         }
 
         await _db.SaveChangesAsync();
     }
 
-    private async Task ProcessSingleRouteAsync(TradeRouteEntity route)
+    private async Task ProcessSingleRouteAsync(TradeRouteEntity route, Guid gameId)
     {
         var house = await _db.Houses
             .Include(h => h.Treasury)
@@ -178,8 +180,13 @@ public class TransportService : ITransportService
             {
                 route.Status = TradeRouteStatus.Disrupted;
                 _logger.LogWarning("Trade route {Route} disrupted by pirates!", route.Id);
-                
-                // TODO: Generate piracy event
+
+                // Generate piracy event so the player gets notified
+                await _events.TriggerEventAsync(
+                    gameId,
+                    "pirate_attack",
+                    targetFactionId: route.FactionId,
+                    targetHouseId: route.HouseId);
                 return;
             }
         }
@@ -204,7 +211,7 @@ public class TransportService : ITransportService
 
         // Apply trade income
         var income = route.TradeValue;
-        
+
         // Type bonuses
         income = route.Type switch
         {
@@ -212,6 +219,13 @@ public class TransportService : ITransportService
             TradeRouteType.BlackMarket => (int)(income * 2.0), // Black market very valuable
             _ => income
         };
+
+        // Apply faction tech trade value modifier
+        var faction = await _db.Factions.FindAsync(route.FactionId);
+        if (faction != null && faction.TradeValueModifier != 0)
+        {
+            income = (int)(income * (1.0 + faction.TradeValueModifier / 100.0));
+        }
 
         house.Treasury.Primary.Credits += income;
 
@@ -224,30 +238,47 @@ public class TransportService : ITransportService
         _logger.LogDebug("Trade route {Route} generated {Income} credits", route.Id, income);
     }
 
-    private async Task TransferCargoAsync(TradeRouteEntity route, HouseEntity house)
+    private Task TransferCargoAsync(TradeRouteEntity route, HouseEntity house)
     {
-        // For resource routes, actually move resources between colonies
-        var sourceColony = await _db.Colonies
-            .Include(c => c.House)
-                .ThenInclude(h => h.Treasury)
-            .FirstOrDefaultAsync(c => c.SystemId == route.SourceSystemId && c.HouseId == route.HouseId);
+        // For resource routes, add bonus resources to the faction treasury.
+        // The route's CargoAmount represents how many units are transported per turn.
+        var amount = Math.Max(1, route.CargoAmount);
+        var primary = house.Treasury.Primary;
+        var strategic = house.Treasury.Strategic;
 
-        if (sourceColony == null) return;
-
-        var treasury = house.Treasury.Primary;
-        
         switch (route.CargoType.ToLower())
         {
             case "food":
-                // Surplus food from agricultural colony
+                primary.Food += amount;
                 break;
             case "minerals":
-                // Mining output
+                primary.Minerals += amount;
+                break;
+            case "energy":
+                primary.Energy += amount;
                 break;
             case "consumer_goods":
-                // Factory output
+                primary.ConsumerGoods += amount;
+                break;
+            case "dilithium":
+                strategic.Dilithium += amount;
+                break;
+            case "deuterium":
+                strategic.Deuterium += amount;
+                break;
+            case "duranium":
+                strategic.Duranium += amount;
+                break;
+            default:
+                // Generic cargo → credits bonus
+                primary.Credits += amount;
                 break;
         }
+
+        _logger.LogDebug("Transferred {Amount} {Cargo} via trade route {Route}",
+            amount, route.CargoType, route.Id);
+
+        return Task.CompletedTask;
     }
 
     /// <summary>

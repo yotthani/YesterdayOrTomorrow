@@ -25,6 +25,7 @@ public class VisibilityService : IVisibilityService
     private const int ColonySensorRange = 3;
     private const int FleetSensorRange = 2;
     private const int ScoutSensorRange = 4;
+    private const int StationBaseSensorRange = 2;
 
     public VisibilityService(GameDbContext db, ILogger<VisibilityService> logger)
     {
@@ -78,6 +79,31 @@ public class VisibilityService : IVisibilityService
                     Y = system.Y,
                     Range = hasScout ? ScoutSensorRange : FleetSensorRange,
                     Type = hasScout ? "Scout" : "Fleet"
+                });
+            }
+        }
+
+        // Add stations as sensors
+        var stations = await _db.Stations
+            .Include(s => s.Modules)
+            .Where(s => s.FactionId == factionId && s.IsOperational)
+            .ToListAsync();
+
+        foreach (var station in stations)
+        {
+            var system = allSystems.FirstOrDefault(s => s.Id == station.SystemId);
+            if (system != null)
+            {
+                var sensorRange = StationBaseSensorRange + station.Modules
+                    .Where(m => m.ModuleType == StationModuleType.SensorArray && m.IsOnline && !m.IsUnderConstruction)
+                    .Sum(m => m.Level);
+
+                sensorPositions.Add(new SensorSource
+                {
+                    X = system.X,
+                    Y = system.Y,
+                    Range = sensorRange,
+                    Type = "Station"
                 });
             }
         }

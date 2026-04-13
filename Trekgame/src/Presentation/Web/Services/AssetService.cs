@@ -95,7 +95,7 @@ public class AssetService
                 var name = ExtractNameFromPath(path);
                 _allPlanets.Add(new PlanetAsset
                 {
-                    Id = $"sourced_{path.GetHashCode():X8}",
+                    Id = $"sourced_{StableHash(path):X8}",
                     Name = name,
                     Type = planetType,
                     Source = PlanetAssetSource.Sourced,
@@ -170,9 +170,19 @@ public class AssetService
         var planets = GetPlanetsOfType(planetType).ToList();
         if (planets.Count == 0) return null;
 
-        // Use identifier hash for consistent selection
-        var hash = Math.Abs(identifier.GetHashCode());
+        var hash = StableHash(identifier);
         return planets[hash % planets.Count];
+    }
+
+    private static int StableHash(string s)
+    {
+        uint h = 2166136261u;
+        foreach (var c in s)
+        {
+            h ^= c;
+            h *= 16777619u;
+        }
+        return (int)(h & 0x7FFFFFFF);
     }
 
     /// <summary>

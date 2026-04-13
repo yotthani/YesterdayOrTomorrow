@@ -7,6 +7,7 @@
 @inject ImageProviderManager ProviderManager
 @inject ComfyUIApiService ComfyUIApi
 @inject ComfyUIProcessManager ComfyUIProcessManager
+@inject FluxProApiService FluxApi
 
 <PageTitle>Star Trek Asset Generator</PageTitle>
 
@@ -17,6 +18,9 @@
         <div class="provider-tabs">
             <button class="provider-tab @(_selectedProvider == "gemini" ? "active" : "")" @onclick="@(() => SelectProvider("gemini"))">
                 ☁️ Gemini (Cloud)
+            </button>
+            <button class="provider-tab @(_selectedProvider == "flux-pro" ? "active" : "")" @onclick="@(() => SelectProvider("flux-pro"))">
+                ⚡ FLUX.2 Pro (BFL)
             </button>
             <button class="provider-tab @(_selectedProvider == "comfyui" ? "active" : "")" @onclick="@(() => SelectProvider("comfyui"))">
                 🖥️ ComfyUI (Local)
@@ -45,6 +49,50 @@
                     @(_apiConnected ? "✓ Connected" : "○ Not Connected")
                 </span>
             </div>
+        }
+        else if (_selectedProvider == "flux-pro")
+        {
+            <div class="api-config">
+                <input type="password"
+                       @bind="_fluxApiKey"
+                       @bind:event="oninput"
+                       placeholder="Enter BFL API Key (dashboard.bfl.ai)"
+                       class="api-input" />
+                <button class="btn btn-primary" @onclick="ConfigureFluxApi" disabled="@string.IsNullOrEmpty(_fluxApiKey)">
+                    @if (_isTestingFlux)
+                    {
+                        <span>Testing...</span>
+                    }
+                    else
+                    {
+                        <span>Connect</span>
+                    }
+                </button>
+                <span class="api-status @(_fluxConnected ? "connected" : "disconnected")">
+                    @(_fluxConnected ? "✓ Connected" : "○ Not Connected")
+                </span>
+            </div>
+
+            @if (_fluxConnected)
+            {
+                <div class="comfyui-options">
+                    <div class="setup-item">
+                        <label>Model</label>
+                        <select @bind="_selectedFluxModel" class="select-input">
+                            @foreach (var model in _fluxModels)
+                            {
+                                <option value="@model">@model</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="setup-item">
+                        <label>Seed</label>
+                        <input type="number" @bind="_fluxSeed" class="number-input seed-input" />
+                        <button class="btn btn-small" @onclick="() => _fluxSeed = Random.Shared.NextInt64(0, 999999999)">🎲</button>
+                        <span class="info-hint">-1 for random. Same seed = same image!</span>
+                    </div>
+                </div>
+            }
         }
         else
         {
@@ -107,13 +155,9 @@
             {
                 <div class="comfyui-options">
                     <div class="setup-item">
-                        <label>Checkpoint Model</label>
-                        <select @bind="_selectedComfyUIModel" class="select-input">
-                            @foreach (var model in _comfyUIModels)
-                            {
-                                <option value="@model">@model</option>
-                            }
-                        </select>
+                        <label>Checkpoint</label>
+                        <span class="info-value">Juggernaut XL v9 + Star Trek LoRA</span>
+                        <span class="info-hint">Optimal für Star Trek Assets — Trek-Style wird über LoRA gesteuert</span>
                     </div>
                     <div class="setup-item">
                         <label>Seed</label>
@@ -176,6 +220,13 @@
                             <option value="@model">@model</option>
                         }
                     </select>
+                </div>
+            }
+            else if (_selectedProvider == "flux-pro")
+            {
+                <div class="setup-item">
+                    <label>AI Model</label>
+                    <span class="info-value">FLUX.2 @_selectedFluxModel @(_fluxConnected ? "✓" : "(not connected)")</span>
                 </div>
             }
             else
@@ -262,6 +313,15 @@
             }
         </div>
         
+        <div class="custom-prompt-test" style="margin-bottom: 12px; padding: 8px; border: 1px solid #444; border-radius: 4px; background: #1a1a2e;">
+            <label style="font-size: 0.85em; color: #aaa;">Custom Prompt (direct test - bypasses templates):</label>
+            <textarea @bind="_customTestPrompt" rows="3" style="width: 100%; background: #0d0d1a; color: #eee; border: 1px solid #555; border-radius: 3px; padding: 4px; font-size: 0.85em; margin: 4px 0;"
+                placeholder="Enter a custom prompt to test directly with the active provider..."></textarea>
+            <button class="btn btn-warning" @onclick="GenerateCustomPromptTest" disabled="@(!IsAnyProviderConnected || _isGenerating || string.IsNullOrWhiteSpace(_customTestPrompt))" style="font-size: 0.85em;">
+                🔬 Test Custom Prompt
+            </button>
+        </div>
+
         <div class="action-buttons">
             <button class="btn btn-secondary" @onclick="PreviewPrompts" disabled="@(!IsAnyProviderConnected)">
                 📋 Preview Prompts
@@ -1509,21 +1569,36 @@
     private string _selectedProvider = "gemini";
 
     // Model selection
-    private string _selectedModel = "gemini-3-pro-image-preview";
+    private string _selectedModel = "gemini-3.1-flash-image-preview";
     private readonly string[] _geminiModels = new[]
     {
+        "gemini-3.1-flash-image-preview",
         "gemini-3-pro-image-preview",
+        "gemini-2.5-flash-image",
         "imagen-4.0-generate-001",
-        "gemini-2.0-flash-preview-image-generation",
+        "imagen-4.0-fast-generate-001",
         "imagen-3.0-generate-002"
+    };
+
+    // Flux Pro settings
+    private string _fluxApiKey = string.Empty;
+    private bool _fluxConnected;
+    private bool _isTestingFlux;
+    private string _selectedFluxModel = "flux-2-pro";
+    private long _fluxSeed = -1;
+    private readonly string[] _fluxModels = new[]
+    {
+        "flux-2-pro",
+        "flux-2-max",
+        "flux-2-flex",
+        "flux-2-klein-9b",
+        "flux-2-klein-4b"
     };
 
     // ComfyUI settings
     private string _comfyUIEndpoint = "http://127.0.0.1:8188";
     private bool _comfyUIConnected;
     private bool _isTestingComfyUI;
-    private List<string> _comfyUIModels = new();
-    private string _selectedComfyUIModel = "";
     private long _comfyUISeed = -1;
     private int _comfyUISteps = 30;
     private double _comfyUICfg = 7.0;
@@ -1536,6 +1611,7 @@
     // Helper property: true if any provider is connected OR if LCARS generator is enabled for UI elements
     private bool IsAnyProviderConnected => (_selectedProvider == "gemini" && _apiConnected) ||
                                             (_selectedProvider == "comfyui" && _comfyUIConnected) ||
+                                            (_selectedProvider == "flux-pro" && _fluxConnected) ||
                                             (_useProgrammaticLCARS && _selectedCategory == AssetCategory.UIElements);
     
     private bool _showPromptPreview;
@@ -1544,7 +1620,8 @@
     private GenerationResult? _testResult;
     private GenerationJob? _currentJob;
     private bool _isGenerating;
-    
+    private string _customTestPrompt = "";
+
     // Background removal settings
     private bool _removeBackground = true;
     private int _backgroundTolerance = 25;
@@ -1692,14 +1769,8 @@
             if (isConnected)
             {
                 _comfyUIConnected = true;
-                _comfyUIModels = ComfyUIApi.AvailableModels.Select(m => m.DisplayName).ToList();
-                if (_comfyUIModels.Any())
-                {
-                    _selectedComfyUIModel = _comfyUIModels.First();
-                    // Auto-switch to ComfyUI if connected
-                    _selectedProvider = "comfyui";
-                    _selectedModel = _selectedComfyUIModel;
-                }
+                // Auto-switch to ComfyUI if connected
+                _selectedProvider = "comfyui";
                 Console.WriteLine($"ComfyUI auto-connected: {message}");
                 await InvokeAsync(StateHasChanged);
             }
@@ -1766,7 +1837,6 @@
             if (success)
             {
                 _comfyUIConnected = false;
-                _comfyUIModels.Clear();
                 _comfyUILog = "";
             }
             else
@@ -1844,20 +1914,55 @@
         // Update model selection based on provider
         if (provider == "gemini")
         {
-            _selectedModel = _geminiModels.FirstOrDefault() ?? "gemini-3-pro-image-preview";
+            _selectedModel = _geminiModels.FirstOrDefault() ?? "gemini-3.1-flash-image-preview";
         }
-        else if (provider == "comfyui" && _comfyUIModels.Any())
+        else if (provider == "flux-pro")
         {
-            _selectedModel = _selectedComfyUIModel;
+            _selectedModel = _selectedFluxModel;
+        }
+        else if (provider == "comfyui")
+        {
+            _selectedModel = "juggernaut-xl";
         }
         StateHasChanged();
     }
 
+    private async Task ConfigureFluxApi()
+    {
+        _isTestingFlux = true;
+        _apiError = null;
+        StateHasChanged();
+        await Task.Delay(100); // Let UI update
+
+        try
+        {
+            FluxApi.SetApiKey(_fluxApiKey);
+            FluxApi.SetModel(_selectedFluxModel);
+            _fluxConnected = true;
+            _apiError = null;
+            Console.WriteLine($"[FLUX] Configured with model: {_selectedFluxModel}, key length: {_fluxApiKey.Length}");
+        }
+        catch (Exception ex)
+        {
+            _apiError = $"Failed to configure FLUX API: {ex.Message}";
+            _fluxConnected = false;
+            Console.WriteLine($"[FLUX] Error: {ex.Message}");
+        }
+
+        _isTestingFlux = false;
+        StateHasChanged();
+        await Task.Delay(1); // Ensure final render
+    }
+
     private string[] GetAvailableModels()
     {
-        if (_selectedProvider == "comfyui" && _comfyUIModels.Any())
+        if (_selectedProvider == "comfyui")
         {
-            return _comfyUIModels.ToArray();
+            return new[] { "Juggernaut XL v9 + Star Trek LoRA" };
+        }
+        if (_selectedProvider == "flux-pro")
+        {
+            return _fluxModels;
         }
         return _geminiModels;
     }
@@ -1877,13 +1982,6 @@
             if (isConnected)
             {
                 _comfyUIConnected = true;
-                // Get available models from the provider
-                _comfyUIModels = ComfyUIApi.AvailableModels.Select(m => m.DisplayName).ToList();
-                if (_comfyUIModels.Any())
-                {
-                    _selectedComfyUIModel = _comfyUIModels.First();
-                    _selectedModel = _selectedComfyUIModel;
-                }
             }
             else
             {
@@ -1961,6 +2059,53 @@
         await InvokeAsync(StateHasChanged);
     }
 
+    private async Task GenerateCustomPromptTest()
+    {
+        if (string.IsNullOrWhiteSpace(_customTestPrompt)) return;
+
+        _isGenerating = true;
+        _testResult = null;
+        StateHasChanged();
+
+        ConfigureActiveProvider();
+
+        var prompt = _customTestPrompt.Trim();
+        Console.WriteLine($"[CUSTOM TEST] Prompt: {prompt}");
+
+        var provider = ProviderManager.CurrentProvider;
+        if (provider == null)
+        {
+            _testResult = new GenerationResult { Success = false, ErrorMessage = "No active provider" };
+            _isGenerating = false;
+            StateHasChanged();
+            return;
+        }
+
+        Console.WriteLine($"[CUSTOM TEST] Using provider: {provider.ProviderId}, model: {provider.CurrentModel}");
+        var seed = _fluxSeed;
+
+        var generationTask = Task.Run(async () =>
+        {
+            return await provider.GenerateImageAsync(new GenerationRequest
+            {
+                Prompt = prompt,
+                Width = 1024,
+                Height = 1024,
+                Seed = seed
+            });
+        });
+
+        while (!generationTask.IsCompleted)
+        {
+            await Task.Delay(1000);
+            await InvokeAsync(StateHasChanged);
+        }
+
+        _testResult = await generationTask;
+        _isGenerating = false;
+        await InvokeAsync(StateHasChanged);
+    }
+
     private async Task StartGeneration()
     {
         _isGenerating = true;
@@ -2009,10 +2154,20 @@
 
     private void ConfigureActiveProvider()
     {
+        Console.WriteLine($"[CONFIG] ConfigureActiveProvider: _selectedProvider='{_selectedProvider}'");
+
         if (_selectedProvider == "comfyui")
         {
             AssetGenerator.SetComfyUIProvider(ComfyUIApi);
-            AssetGenerator.SetActiveProvider("comfyui", _selectedComfyUIModel, _comfyUISteps, _comfyUICfg, _comfyUISeed);
+            AssetGenerator.SetActiveProvider("comfyui", "juggernaut-xl", _comfyUISteps, _comfyUICfg, _comfyUISeed);
+        }
+        else if (_selectedProvider == "flux-pro")
+        {
+            Console.WriteLine($"[CONFIG] Flux: model={_selectedFluxModel}, keyLen={_fluxApiKey.Length}, seed={_fluxSeed}");
+            FluxApi.SetApiKey(_fluxApiKey);  // Ensure key is set before generation
+            FluxApi.SetModel(_selectedFluxModel);
+            AssetGenerator.SetFluxProvider(FluxApi);
+            AssetGenerator.SetActiveProvider("flux-pro", _selectedFluxModel, seed: _fluxSeed);
         }
         else
         {

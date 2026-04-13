@@ -188,7 +188,31 @@ public class DiplomacyService : IDiplomacyService
         relation.Trust = -50;
         reverseRelation.Trust = -75;
 
-        // TODO: Notify allies
+        // Notify allies — factions with DefensivePact/Alliance toward the defender
+        // get an opinion hit toward the aggressor
+        var defenderAllies = await _db.DiplomaticRelations
+            .Where(r => r.FactionId == targetId &&
+                       !r.AtWar &&
+                       r.OtherFactionId != factionId &&
+                       (r.ActiveTreaties.Contains("DefensivePact") ||
+                        r.ActiveTreaties.Contains("Alliance") ||
+                        r.ActiveTreaties.Contains("Federation")))
+            .ToListAsync();
+
+        foreach (var allyRelation in defenderAllies)
+        {
+            // Ally's view of the aggressor worsens
+            var allyViewOfAggressor = await _db.DiplomaticRelations
+                .FirstOrDefaultAsync(r => r.FactionId == allyRelation.OtherFactionId &&
+                                         r.OtherFactionId == factionId);
+            if (allyViewOfAggressor != null)
+            {
+                allyViewOfAggressor.Opinion = Math.Max(-100, allyViewOfAggressor.Opinion - 40);
+                allyViewOfAggressor.Trust = Math.Max(-100, allyViewOfAggressor.Trust - 30);
+                _logger.LogInformation("Ally {Ally} notified of war, opinion of aggressor dropped",
+                    allyRelation.OtherFactionId);
+            }
+        }
 
         await _db.SaveChangesAsync();
         _logger.LogInformation("War declared! Casus Belli: {CB}", casusBelli);
@@ -467,7 +491,45 @@ public class DiplomacyService : IDiplomacyService
 
     private async Task<bool> CheckTreatyViolationAsync(Guid factionId, Guid targetId)
     {
-        // Would check for broken treaties
+        // A treaty violation CB is valid when:
+        // 1. We have active treaties with the target, AND
+        // 2. The target has broken trust (hostile fleet in our territory,
+        //    or significantly negative trust despite pact/alliance)
+        var relation = await GetRelationAsync(factionId, targetId);
+        if (relation == null) return false;
+
+        // Parse treaties from JSON array
+        List<string> treaties;
+        try { treaties = System.Text.Json.JsonSerializer.Deserialize<List<string>>(relation.ActiveTreaties ?? "[]") ?? new(); }
+        catch { treaties = new(); }
+
+        if (treaties.Count == 0) return false; // No treaties = nothing to violate
+
+        // Check if target has aggressive fleets in our territory
+        var ourSystemIds = await _db.Systems
+            .Where(s => s.ControllingFactionId == factionId)
+            .Select(s => s.Id)
+            .ToListAsync();
+
+        var hostilePresence = await _db.Fleets
+            .AnyAsync(f => f.FactionId == targetId &&
+                          f.Stance == FleetStance.Aggressive &&
+                          ourSystemIds.Contains(f.CurrentSystemId));
+        if (hostilePresence) return true;
+
+        // Deeply negative trust while having NAP/DefensivePact/Alliance
+        if (relation.Trust < -30 && treaties.Any(t =>
+            t == "NonAggression" || t == "DefensivePact" || t == "Alliance"))
+            return true;
+
+        // Espionage against us despite Alliance/Federation
+        var spyingOnUs = await _db.Agents
+            .AnyAsync(a => a.FactionId == targetId &&
+                          a.TargetFactionId == factionId &&
+                          a.Status == AgentStatus.OnMission);
+        if (spyingOnUs && treaties.Any(t => t == "Alliance" || t == "Federation"))
+            return true;
+
         return false;
     }
 

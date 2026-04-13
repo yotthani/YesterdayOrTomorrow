@@ -1,0 +1,79 @@
+{
+  "3": {
+    "class_type": "KSampler",
+    "inputs": {
+      "seed": 42,
+      "steps": 50,
+      "cfg": 7.5,
+      "sampler_name": "dpmpp_3m_sde_gpu",
+      "scheduler": "karras",
+      "denoise": 1.0,
+      "model": ["21", 0],
+      "positive": ["6", 0],
+      "negative": ["7", 0],
+      "latent_image": ["5", 0]
+    }
+  },
+  "4": {
+    "class_type": "CheckpointLoaderSimple",
+    "inputs": {
+      "ckpt_name": "juggernautXL_v9Rundiffusion.safetensors"
+    }
+  },
+  "5": {
+    "class_type": "EmptyLatentImage",
+    "inputs": {
+      "width": 1024,
+      "height": 1024,
+      "batch_size": 1
+    }
+  },
+  "6": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "text": "Enterprise, Galaxy class starship, light gray hull, centered composition, isometric view, black background, game asset, masterpiece, highly detailed",
+      "clip": ["21", 1]
+    }
+  },
+  "7": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "text": "blurry, low quality, distorted, watermark, text, signature, ugly, deformed, amateur, bad anatomy, bad proportions, duplicate, morbid, mutilated, poorly drawn, mutation, disfigured, gross proportions, malformed limbs, missing arms, missing legs, extra arms, extra legs, fused fingers, too many fingers, long neck, extra head, multiple ships, fleet, formation, group of ships, two ships, three ships, planet, crew members, earth vehicles, submarine, airplane, modern, claymation, clay, plasticine, cartoon",
+      "clip": ["21", 1]
+    }
+  },
+  "8": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": ["3", 0],
+      "vae": ["4", 2]
+    }
+  },
+  "9": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "filename_prefix": "debug_galaxy_WITH_enterprise_lora",
+      "images": ["8", 0]
+    }
+  },
+  "20": {
+    "class_type": "LoraLoader",
+    "inputs": {
+      "lora_name": "Enterprise.safetensors",
+      "strength_model": 1.0,
+      "strength_clip": 1.0,
+      "model": ["4", 0],
+      "clip": ["4", 1]
+    }
+  },
+  "21": {
+    "class_type": "LoraLoader",
+    "inputs": {
+      "lora_name": "StarTrek_TNG_SDXL.safetensors",
+      "strength_model": 0.3,
+      "strength_clip": 0.3,
+      "model": ["20", 0],
+      "clip": ["20", 1]
+    }
+  }
+}

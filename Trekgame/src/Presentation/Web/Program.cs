@@ -38,5 +38,6 @@ builder.Services.AddScoped<ThemeService>();
 builder.Services.AddSingleton<FactionTemplateService>();       // In-game UI templates (faction-specific)
 builder.Services.AddSingleton<MainMenuTemplateService>();      // Main menu UI templates (neutral)
 builder.Services.AddScoped<AssetService>();
+builder.Services.AddScoped<HotSeatService>();
 
 await builder.Build().RunAsync();

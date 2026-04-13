@@ -9,7 +9,7 @@ public interface IResearchService
 {
     Task<List<TechOption>> GetAvailableResearchAsync(Guid factionId);
     Task<bool> StartResearchAsync(Guid factionId, string techId, TechBranch branch);
-    Task ProcessResearchAsync(Guid gameId);
+    Task<ResearchPhaseResult> ProcessResearchAsync(Guid gameId);
     Task<ResearchReport> GetResearchReportAsync(Guid factionId);
     Task<List<TechDef>> GetResearchedTechsAsync(Guid factionId);
 }
@@ -192,8 +192,11 @@ public class ResearchService : IResearchService
     /// <summary>
     /// Process research progress for all factions
     /// </summary>
-    public async Task ProcessResearchAsync(Guid gameId)
+    public async Task<ResearchPhaseResult> ProcessResearchAsync(Guid gameId)
     {
+        var techCompleted = new Dictionary<Guid, string?>();
+        var researchProgress = new Dictionary<Guid, int>();
+
         var factions = await _db.Factions
             .Include(f => f.Technologies)
             .Include(f => f.Houses)
@@ -203,13 +206,15 @@ public class ResearchService : IResearchService
 
         foreach (var faction in factions)
         {
-            await ProcessFactionResearchAsync(faction);
+            await ProcessFactionResearchAsync(faction, techCompleted, researchProgress);
         }
 
         await _db.SaveChangesAsync();
+        return new ResearchPhaseResult(techCompleted, researchProgress);
     }
 
-    private async Task ProcessFactionResearchAsync(FactionEntity faction)
+    private async Task ProcessFactionResearchAsync(FactionEntity faction,
+        Dictionary<Guid, string?> techCompleted, Dictionary<Guid, int> researchProgress)
     {
         // Calculate total research output from all houses
         var totalPhysics = faction.Houses.Sum(h => h.Treasury.Research.PhysicsChange);
@@ -217,12 +222,13 @@ public class ResearchService : IResearchService
         var totalSociety = faction.Houses.Sum(h => h.Treasury.Research.SocietyChange);
 
         // Apply to current research projects
-        await ApplyResearchProgressAsync(faction, TechBranch.Physics, totalPhysics);
-        await ApplyResearchProgressAsync(faction, TechBranch.Engineering, totalEngineering);
-        await ApplyResearchProgressAsync(faction, TechBranch.Society, totalSociety);
+        await ApplyResearchProgressAsync(faction, TechBranch.Physics, totalPhysics, techCompleted, researchProgress);
+        await ApplyResearchProgressAsync(faction, TechBranch.Engineering, totalEngineering, techCompleted, researchProgress);
+        await ApplyResearchProgressAsync(faction, TechBranch.Society, totalSociety, techCompleted, researchProgress);
     }
 
-    private async Task ApplyResearchProgressAsync(FactionEntity faction, TechBranch branch, int points)
+    private async Task ApplyResearchProgressAsync(FactionEntity faction, TechBranch branch, int points,
+        Dictionary<Guid, string?> techCompleted, Dictionary<Guid, int> researchProgress)
     {
         Guid? currentResearchId = branch switch
         {
@@ -249,34 +255,46 @@ public class ResearchService : IResearchService
 
         tech.ResearchProgress += points;
 
+        // Compute progress percentage for this faction's current branch
+        var progressPct = tech.ResearchCost > 0
+            ? tech.ResearchProgress * 100 / tech.ResearchCost
+            : 0;
+        // Store the highest progress across branches for each faction
+        if (!researchProgress.TryGetValue(faction.Id, out var existing) || progressPct > existing)
+            researchProgress[faction.Id] = progressPct;
+
         // Check if complete
         if (tech.ResearchProgress >= tech.ResearchCost)
         {
             tech.IsResearched = true;
-            
+
             var overflow = tech.ResearchProgress - tech.ResearchCost;
-            
+
             // Store overflow
             switch (branch)
             {
-                case TechBranch.Physics: 
+                case TechBranch.Physics:
                     faction.PhysicsProgress = overflow;
                     faction.CurrentPhysicsResearchId = null;
                     break;
-                case TechBranch.Engineering: 
+                case TechBranch.Engineering:
                     faction.EngineeringProgress = overflow;
                     faction.CurrentEngineeringResearchId = null;
                     break;
-                case TechBranch.Society: 
+                case TechBranch.Society:
                     faction.SocietyProgress = overflow;
                     faction.CurrentSocietyResearchId = null;
                     break;
             }
 
+            // Record completed tech name for notifications
+            var techDef = TechnologyDefinitions.Get(tech.TechId);
+            techCompleted[faction.Id] = techDef?.Name ?? tech.TechId;
+
             // Apply tech effects
             await ApplyTechEffectsAsync(faction, tech.TechId);
 
-            _logger.LogInformation("Faction {Faction} completed research: {Tech}", 
+            _logger.LogInformation("Faction {Faction} completed research: {Tech}",
                 faction.Name, tech.TechId);
         }
     }
@@ -288,10 +306,107 @@ public class ResearchService : IResearchService
 
         foreach (var effect in techDef.Effects)
         {
-            _logger.LogDebug("Applying tech effect: {Effect}", effect);
-            // Effects would be applied via game rules engine
-            // e.g., "weapon_damage:+10%" would update faction modifiers
+            ApplySingleEffect(faction, effect);
         }
+
+        _logger.LogInformation("Applied {Count} effects from {Tech} to {Faction}",
+            techDef.Effects.Length, techId, faction.Name);
+    }
+
+    /// <summary>
+    /// Parse a single effect string like "weapon_damage:+10%" and apply it
+    /// to the faction's accumulated modifier fields.
+    /// </summary>
+    private void ApplySingleEffect(FactionEntity faction, string effectString)
+    {
+        var colonIdx = effectString.IndexOf(':');
+        if (colonIdx < 0) return; // Bare flags like "sun_damage_immunity" → no numeric modifier
+
+        var key = effectString[..colonIdx].ToLower();
+        var rawValue = effectString[(colonIdx + 1)..];
+
+        // Parse numeric value from strings like "+10%", "+5/turn", "+2", "-25%"
+        var value = ParseEffectValue(rawValue);
+
+        switch (key)
+        {
+            // ── Combat ──
+            case "weapon_damage":       faction.WeaponDamageModifier += value; break;
+            case "shield_hp":           faction.ShieldHpModifier += value; break;
+            case "hull_hp":             faction.HullHpModifier += value; break;
+            case "shield_regen":        faction.ShieldRegenBonus += value; break;
+            case "hull_regen":          faction.HullRegenBonus += value; break;
+            case "armor":               faction.ArmorBonus += value; break;
+            case "shield_penetration":  faction.ShieldPenetrationModifier += value; break;
+            case "damage_reduction":    faction.ArmorBonus += value; break; // maps to armor
+
+            // ── Ships ──
+            case "ship_speed":
+            case "impulse_speed":       faction.ShipSpeedModifier += value; break;
+            case "ship_build_speed":    faction.ShipBuildSpeedModifier += value; break;
+            case "sensor_range":        faction.SensorRangeBonus += value; break;
+            case "scan_speed":          faction.SensorRangeBonus += value / 5; break; // partial effect
+
+            // ── Economy ──
+            case "energy_production":
+            case "ship_energy":         faction.EnergyProductionModifier += value; break;
+            case "mineral_production":  faction.MineralProductionModifier += value; break;
+            case "research_bonus":      faction.ResearchBonusModifier += value; break;
+            case "trade_value":         faction.TradeValueModifier += value; break;
+            case "trade_routes":        faction.TradeRoutesBonus += value; break;
+
+            // ── Colony ──
+            case "pop_growth":          faction.PopGrowthModifier += value; break;
+            case "habitability":
+            case "ocean_habitability":
+            case "hostile_habitability":
+            case "temperature_habitability": faction.HabitabilityModifier += value; break;
+            case "stability":           faction.StabilityModifier += value; break;
+            case "admin_cap":           faction.AdminCapBonus += value; break;
+            case "pop_happiness":       faction.StabilityModifier += value / 2; break;
+            case "colony_development":  faction.PopGrowthModifier += value / 2; break;
+
+            // ── Diplomacy & Intel ──
+            case "diplomacy_bonus":
+            case "diplomacy_range":
+            case "diplomacy_insight":
+            case "negotiation_skill":   faction.DiplomacyModifier += value; break;
+            case "agent_skill":         faction.AgentSkillModifier += value; break;
+            case "agent_cap":           faction.AgentCapBonus += value; break;
+            case "counter_intel":       faction.CounterIntelModifier += value; break;
+
+            // ── Military ──
+            case "army_damage":         faction.ArmyDamageModifier += value; break;
+            case "army_morale":         faction.ArmyMoraleModifier += value; break;
+            case "system_defense":      faction.SystemDefenseModifier += value; break;
+
+            // ── Unlocks, booleans, and unhandled keys ──
+            // unlock_weapon, unlock_building, unlock_orbital, etc. are checked
+            // dynamically via researched tech list — no modifier field needed.
+            default:
+                _logger.LogDebug("Tech effect not mapped to modifier: {Effect}", effectString);
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Parse effect value from strings like "+10%", "+5/turn", "-25%", "30%", "+2"
+    /// Returns the integer value (stripping %, /turn, and sign characters)
+    /// </summary>
+    private static int ParseEffectValue(string rawValue)
+    {
+        // Take only the numeric prefix: "+10%", "+5/turn" → "+10", "+5"
+        var numChars = new List<char>();
+        foreach (var c in rawValue)
+        {
+            if (c == '+' || c == '-' || char.IsDigit(c))
+                numChars.Add(c);
+            else
+                break; // Stop at first non-numeric character (%, /, :, etc.)
+        }
+
+        if (numChars.Count == 0) return 0;
+        return int.TryParse(new string(numChars.ToArray()), out var v) ? v : 0;
     }
 
     /// <summary>

@@ -23,6 +23,7 @@
     <link href="css/galaxy-visuals.css" rel="stylesheet" />
     <link href="css/system-visuals.css" rel="stylesheet" />
     <link href="css/game-ui-panels.css" rel="stylesheet" />
+    <link href="css/stellaris-ui.css" rel="stylesheet" />
     <link href="css/app.css" rel="stylesheet" />
     <!-- Faction themes MUST load LAST to override all base styles -->
     <link href="css/faction-themes.css" rel="stylesheet" />
@@ -218,6 +219,11 @@
             document.body.className = document.body.className.replace(/theme-\w+/g, '');
         };
 
+        // Responsive breakpoint check (called from Blazor MainLayout)
+        window.checkBreakpoint = function(minWidth) {
+            return window.innerWidth >= minWidth;
+        };
+
         // Theme initialization is now handled by Blazor ThemeService
         // Main menu pages will set 'default' theme, game pages will restore user's theme
         // We no longer auto-apply theme on page load - let Blazor control it
@@ -229,14 +235,18 @@
     </script>
     
     <!-- Galaxy Map Canvas Renderer -->
-    <script src="js/GalaxyRenderer.js"></script>
+    <script type="module" src="js/GalaxyRenderer.js"></script>
+    <!-- Tactical Combat Canvas Renderer -->
+    <script type="module" src="js/tacticalViewer.js"></script>
+    <!-- Tutorial Highlight / Help System -->
+    <script type="module" src="js/tutorial.js"></script>
     
     <!-- Google Fonts for Stellaris-style UI -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Roboto:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <script src="js/sounds.js"></script>
-    <script src="js/tooltips.js"></script>
-    <script src="js/keyboard.js"></script>
+    <script type="module" src="js/sounds.js"></script>
+    <script type="module" src="js/tooltips.js"></script>
+    <script type="module" src="js/keyboard.js"></script>
 </body>
 </html>

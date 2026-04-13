@@ -1,6 +1,7 @@
 @page "/game/theme-showcase"
-@layout StellarisLayout
 @using MudBlazor
+@using StarTrekGame.Web.Services
+@inject ThemeService ThemeService
 
 <PageTitle>Theme Showcase - Real SVG Assets</PageTitle>
 
@@ -1121,3 +1122,11 @@
     }
 }
 </style>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        // Main menu pages always use default theme
+        await ThemeService.ApplyTemporaryThemeAsync("default");
+    }
+}

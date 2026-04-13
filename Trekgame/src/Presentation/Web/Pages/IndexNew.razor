@@ -1,6 +1,7 @@
 @page "/"
 @page "/menu"
 @page "/main-menu"
+@page "/old-menu"
 @layout EmptyLayout
 @using MudBlazor
 @using StarTrekGame.Web.Services
@@ -335,7 +336,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await ThemeService.SetThemeAsync("default");
+        // Menu always uses default theme; game themes stay independent (stored, not overwritten)
+        await ThemeService.ApplyTemporaryThemeAsync("default");
         try
         {
             var games = await Api.GetGamesAsync();
@@ -418,12 +420,15 @@
             var game = await Api.CreateGameAsync("New Galaxy", 30);
             var faction = await Api.JoinGameAsync(game.Id, "Commander", _factions.First(f => f.Id == _selectedFaction).Name, _selectedFaction);
 
+            // Create AI opponents and start the game
+            await Api.QuickStartSinglePlayerAsync(game.Id, 3);
+
             await LocalStorage.SetItemAsync("currentGameId", game.Id);
             await LocalStorage.SetItemAsync("currentFactionId", faction.Id);
             await LocalStorage.SetItemAsync("currentRaceId", _selectedFaction);
 
-            // Set the theme for the newly selected faction
-            await ThemeService.SetThemeForRaceAsync(_selectedFaction);
+            // Kein Auto-Theme-Wechsel – Fraktions-Themes noch nicht fertig
+            // await ThemeService.SetThemeForRaceAsync(_selectedFaction);
 
             Navigation.NavigateTo("/game/galaxy");
         }

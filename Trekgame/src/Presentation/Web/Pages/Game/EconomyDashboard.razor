@@ -622,48 +622,81 @@
         _loading = true;
         try
         {
-            // Mock data for now - would load from API
-            _economy = new EconomyData
+            // Try loading real data from API
+            if (_factionGuid.HasValue)
             {
-                Credits = 5000,
-                CreditsNet = 150,
-                Energy = 50,
-                EnergyIncome = 80,
-                EnergyExpense = 30,
-                EnergyNet = 50,
-                Minerals = 2000,
-                MineralsNet = 75,
-                Food = 100,
-                FoodIncome = 120,
-                FoodExpense = 100,
-                FoodNet = 20,
-                ConsumerGoods = 200,
-                ConsumerGoodsIncome = 40,
-                ConsumerGoodsExpense = 35,
-                ConsumerGoodsNet = 5,
-                Dilithium = 15,
-                DilithiumIncome = 2,
-                Deuterium = 50,
-                PhysicsIncome = 25,
-                EngineeringIncome = 30,
-                SocietyIncome = 20
+                try
+                {
+                    var faction = await Api.GetMyFactionAsync(
+                        await LocalStorage.GetItemAsync<Guid>("currentGameId"),
+                        _factionGuid.Value);
+
+                    if (faction != null)
+                    {
+                        _economy = new EconomyData
+                        {
+                            Credits = faction.Treasury.Credits,
+                            CreditsNet = 0, // Will be populated from economy report
+                            Energy = 0,
+                            Minerals = 0,
+                            Food = 0,
+                            Dilithium = faction.Treasury.Dilithium,
+                            Deuterium = faction.Treasury.Deuterium
+                        };
+                    }
+                }
+                catch { /* Fall through to defaults */ }
+
+                // Load trade routes from API
+                try
+                {
+                    var routes = await Api.GetTradeRoutesAsync(_factionGuid.Value);
+                    var activeRoutes = routes.Where(r => r.Status == "Active").ToList();
+
+                    _tradeReport = new TradeRouteReport
+                    {
+                        ActiveRoutes = activeRoutes.Count,
+                        MaxRoutes = 6, // Server would calculate this
+                        TotalTradeIncome = activeRoutes.Sum(r => r.TradeValue),
+                        InternalRoutes = routes.Count(r => r.ResourceType != "" && r.Status == "Active"),
+                        ExternalRoutes = 0,
+                        DisruptedRoutes = routes.Count(r => r.Status == "Disrupted"),
+                        Routes = routes.Select(r => new TradeRouteInfo
+                        {
+                            Id = r.Id,
+                            SourceSystem = r.SourceSystemName,
+                            DestinationSystem = r.DestinationSystemName,
+                            Type = !string.IsNullOrEmpty(r.ResourceType) ? r.ResourceType : "Credits",
+                            Status = r.Status,
+                            TradeValue = r.TradeValue,
+                            ProtectionLevel = 0
+                        }).ToList()
+                    };
+                }
+                catch
+                {
+                    // Fallback mock trade data
+                    _tradeReport = new TradeRouteReport
+                    {
+                        ActiveRoutes = 0, MaxRoutes = 6, TotalTradeIncome = 0,
+                        Routes = new()
+                    };
+                }
+            }
+
+            // Defaults for economy if API didn't provide
+            _economy ??= new EconomyData
+            {
+                Credits = 5000, CreditsNet = 150,
+                Energy = 50, EnergyIncome = 80, EnergyExpense = 30, EnergyNet = 50,
+                Minerals = 2000, MineralsNet = 75,
+                Food = 100, FoodIncome = 120, FoodExpense = 100, FoodNet = 20,
+                ConsumerGoods = 200, ConsumerGoodsIncome = 40, ConsumerGoodsExpense = 35, ConsumerGoodsNet = 5,
+                Dilithium = 15, DilithiumIncome = 2, Deuterium = 50,
+                PhysicsIncome = 25, EngineeringIncome = 30, SocietyIncome = 20
             };
 
-            _tradeReport = new TradeRouteReport
-            {
-                ActiveRoutes = 3,
-                MaxRoutes = 6,
-                TotalTradeIncome = 45,
-                InternalRoutes = 2,
-                ExternalRoutes = 1,
-                DisruptedRoutes = 0,
-                Routes = new List<TradeRouteInfo>
-                {
-                    new() { SourceSystem = "Sol", DestinationSystem = "Alpha Centauri", Type = "Internal", Status = "Active", TradeValue = 15, ProtectionLevel = 80 },
-                    new() { SourceSystem = "Sol", DestinationSystem = "Vulcan", Type = "Internal", Status = "Active", TradeValue = 20, ProtectionLevel = 60 },
-                    new() { SourceSystem = "Andoria", DestinationSystem = "Tellar", Type = "External", Status = "Active", TradeValue = 10, ProtectionLevel = 40 }
-                }
-            };
+            _tradeReport ??= new TradeRouteReport { ActiveRoutes = 0, MaxRoutes = 6, Routes = new() };
 
             _marketPrices = new MarketPrices
             {

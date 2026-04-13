@@ -1,0 +1,237 @@
+@using StarTrekGame.Web.Services
+
+@if (MpState?.IsMultiplayer == true)
+{
+    <div class="mp-topbar">
+        @if (MpState.Mode == GameMode.TurnBased)
+        {
+            <!-- Turn-Based: Player pills + Ready button -->
+            <div class="mp-players">
+                @foreach (var player in MpState.Players)
+                {
+                    <div class="mp-player-pill @(MpState.ReadyPlayers.Contains(player.PlayerId) ? "ready" : "") @(!player.IsConnected ? "disconnected" : "")">
+                        <span class="mp-player-status">@(MpState.ReadyPlayers.Contains(player.PlayerId) ? "\u2705" : "\u23f3")</span>
+                        <span class="mp-player-name">@player.Name</span>
+                    </div>
+                }
+            </div>
+            <button class="mp-ready-btn @(_isReady ? "active" : "")" @onclick="ToggleReady">
+                @(_isReady ? "\u2713 READY" : "\u2610 READY")
+            </button>
+        }
+        else if (MpState.Mode == GameMode.RealTime)
+        {
+            <!-- Real-Time: Speed controls + Pause + Tick counter -->
+            <div class="mp-speed-controls">
+                @for (int i = 1; i <= 5; i++)
+                {
+                    var speed = i;
+                    <button class="mp-speed-btn @(MpState.GameSpeed == speed ? "active" : "")"
+                            @onclick="() => OnSpeedChanged.InvokeAsync(speed)"
+                            disabled="@(!MpState.IsHost)">
+                        @(new string('\u25b6', speed))
+                    </button>
+                }
+            </div>
+            <button class="mp-pause-btn @(MpState.IsPaused ? "paused" : "")" @onclick="OnPauseClicked">
+                @(MpState.IsPaused ? "\u25b6 RESUME" : "\u23f8 PAUSE")
+            </button>
+            <div class="mp-tick-display">
+                <span class="mp-tick-day">@MpState.CurrentDayDisplay</span>
+                <span class="mp-tick-month">@MpState.CurrentMonthDisplay</span>
+            </div>
+            <div class="mp-player-count">\ud83d\udc64\u00d7@MpState.Players.Count</div>
+        }
+
+        <!-- Chat toggle (both modes) -->
+        <button class="mp-chat-btn" @onclick="OnChatToggled">
+            \ud83d\udcac
+            @if (MpState.UnreadChatCount > 0)
+            {
+                <span class="mp-chat-badge">@MpState.UnreadChatCount</span>
+            }
+        </button>
+    </div>
+}
+
+@code {
+    [CascadingParameter(Name = "MultiplayerState")]
+    public MultiplayerState? MpState { get; set; }
+
+    [Parameter] public EventCallback OnReadyClicked { get; set; }
+    [Parameter] public EventCallback OnChatToggled { get; set; }
+    [Parameter] public EventCallback<int> OnSpeedChanged { get; set; }
+    [Parameter] public EventCallback OnPauseClicked { get; set; }
+
+    private bool _isReady;
+
+    private async Task ToggleReady()
+    {
+        _isReady = !_isReady;
+        await OnReadyClicked.InvokeAsync();
+    }
+}
+
+<style>
+    .mp-topbar {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 6px 16px;
+        background: linear-gradient(180deg, rgba(20, 30, 50, 0.95) 0%, rgba(10, 15, 30, 0.95) 100%);
+        border-bottom: 2px solid rgba(255, 153, 0, 0.3);
+        font-size: 12px;
+    }
+
+    .mp-players {
+        display: flex;
+        gap: 8px;
+        flex: 1;
+    }
+
+    .mp-player-pill {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px;
+        border-radius: 16px;
+        background: rgba(40, 50, 70, 0.8);
+        border: 1px solid rgba(100, 120, 160, 0.3);
+        color: #99aabb;
+        font-size: 11px;
+    }
+    .mp-player-pill.ready {
+        border-color: rgba(0, 200, 0, 0.5);
+        color: #88ff88;
+    }
+    .mp-player-pill.disconnected {
+        opacity: 0.4;
+        border-color: rgba(200, 0, 0, 0.5);
+    }
+
+    .mp-player-status { font-size: 12px; }
+    .mp-player-name { font-weight: 500; }
+
+    .mp-ready-btn {
+        padding: 6px 16px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        cursor: pointer;
+        transition: all 0.15s;
+        background: rgba(40, 50, 70, 0.8);
+        border: 1px solid rgba(100, 120, 160, 0.5);
+        color: #99aabb;
+    }
+    .mp-ready-btn.active {
+        background: linear-gradient(180deg, #228822 0%, #116611 100%);
+        border-color: #44cc44;
+        color: #fff;
+    }
+    .mp-ready-btn:hover {
+        background: linear-gradient(180deg, #338833 0%, #227722 100%);
+        border-color: #55dd55;
+    }
+
+    .mp-speed-controls {
+        display: flex;
+        gap: 4px;
+    }
+    .mp-speed-btn {
+        padding: 4px 8px;
+        border-radius: 3px;
+        font-size: 10px;
+        background: rgba(40, 50, 70, 0.8);
+        border: 1px solid rgba(100, 120, 160, 0.3);
+        color: #7890a8;
+        cursor: pointer;
+        transition: all 0.15s;
+    }
+    .mp-speed-btn.active {
+        background: linear-gradient(180deg, #cc6600 0%, #993300 100%);
+        border-color: #ff8800;
+        color: #fff;
+    }
+    .mp-speed-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .mp-pause-btn {
+        padding: 6px 14px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 600;
+        cursor: pointer;
+        background: rgba(40, 50, 70, 0.8);
+        border: 1px solid rgba(100, 120, 160, 0.5);
+        color: #99aabb;
+        transition: all 0.15s;
+    }
+    .mp-pause-btn.paused {
+        background: linear-gradient(180deg, #cc6600 0%, #993300 100%);
+        border-color: #ff8800;
+        color: #fff;
+        animation: pulse-pause 1.5s infinite;
+    }
+    @@keyframes pulse-pause {
+        0%, 100% { box-shadow: none; }
+        50% { box-shadow: 0 0 12px rgba(255, 136, 0, 0.4); }
+    }
+
+    .mp-tick-display {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 0 12px;
+    }
+    .mp-tick-day {
+        font-size: 12px;
+        font-weight: 600;
+        color: #ffcc00;
+    }
+    .mp-tick-month {
+        font-size: 9px;
+        color: #7890a8;
+        letter-spacing: 1px;
+    }
+
+    .mp-player-count {
+        color: #7890a8;
+        font-size: 12px;
+        padding: 0 8px;
+    }
+
+    .mp-chat-btn {
+        position: relative;
+        padding: 6px 10px;
+        border-radius: 4px;
+        font-size: 14px;
+        background: rgba(40, 50, 70, 0.8);
+        border: 1px solid rgba(100, 120, 160, 0.3);
+        cursor: pointer;
+        transition: all 0.15s;
+    }
+    .mp-chat-btn:hover {
+        border-color: #ff9900;
+        background: rgba(255, 153, 0, 0.1);
+    }
+
+    .mp-chat-badge {
+        position: absolute;
+        top: -4px;
+        right: -4px;
+        min-width: 16px;
+        height: 16px;
+        border-radius: 8px;
+        background: #ff4444;
+        color: #fff;
+        font-size: 9px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 4px;
+    }
+</style>

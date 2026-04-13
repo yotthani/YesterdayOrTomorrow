@@ -13,6 +13,7 @@ public interface IGameApiClient
     Task<GameDetailDto> CreateGameAsync(string name, int galaxySize = 30);
     Task<FactionDetailDto> JoinGameAsync(Guid gameId, string playerName, string factionName, string? raceId);
     Task StartGameAsync(Guid gameId);
+    Task QuickStartSinglePlayerAsync(Guid gameId, int aiCount = 3);
     
     // Player Data
     Task<FactionDetailDto?> GetMyFactionAsync(Guid gameId, Guid factionId);
@@ -56,9 +57,13 @@ public interface IGameApiClient
     Task DeleteShipDesignAsync(Guid designId);
     
     // Combat
-    Task<CombatResultDto?> GetActiveCombatAsync(Guid gameId, Guid systemId);
+    Task<CombatStateDto?> GetActiveCombatAsync(Guid gameId, Guid systemId);
+    Task<CombatStateDto?> GetCombatByIdAsync(Guid combatId);
     Task<CombatActionResultDto> ExecuteCombatActionAsync(Guid combatId, CombatActionRequest request);
-    
+    Task<CombatRoundResultDto?> ExecuteCombatRoundAsync(Guid combatId);
+    Task<CombatAutoResolveResultDto?> AutoResolveCombatAsync(Guid combatId);
+    Task RetreatFromCombatAsync(Guid combatId, Guid factionId);
+
     // Colony Production
     Task StartBuildingAsync(Guid colonyId, string projectName);
     Task CancelBuildingAsync(Guid colonyId);
@@ -84,10 +89,80 @@ public interface IGameApiClient
     Task CancelTradeRouteAsync(Guid routeId);
     Task<TradeRouteDto> CreateTradeRouteAsync(Guid factionId, Guid sourceSystemId, Guid destSystemId, string resourceType);
 
+    // Intelligence - Missions catalog
+    Task<List<MissionDefinitionDto>> GetAvailableMissionsAsync();
+
+    // Population & Jobs
+    Task<PopulationReportDto?> GetPopulationReportAsync(Guid colonyId);
+    Task AutoAssignJobAsync(Guid colonyId, string jobType);
+    Task AutoRemoveJobAsync(Guid colonyId, string jobType);
+
+    // Events & Crises
+    Task<List<GameEventDto>> GetPendingEventsAsync(Guid houseId);
+    Task<EventResolutionDto> ResolveEventAsync(Guid eventId, string chosenOptionId);
+    Task<CrisisReportDto?> GetActiveCrisisAsync(Guid gameId);
+
     // Save/Load
     Task<GameSaveData?> ExportGameAsync(Guid gameId);
     Task<GameDetailDto?> ImportGameAsync(GameSaveData saveData);
     Task<List<SaveSlotInfo>> GetSaveSlotsAsync();
+    Task<SaveResultDto> SaveToServerAsync(Guid gameId, string? name = null, string? description = null);
+    Task<LoadResultDto> LoadFromServerAsync(Guid saveId);
+    Task DeleteSaveAsync(Guid saveId);
+
+    // Victory
+    Task<List<VictoryProgressDto>> GetVictoryProgressAsync(Guid gameId, Guid factionId);
+    Task<List<FactionStandingDto>> GetFactionStandingsAsync(Guid gameId);
+    Task<VictoryCheckResultDto> CheckVictoryAsync(Guid gameId);
+
+    // Leaders
+    Task<List<LeaderDto>> GetLeadersAsync(Guid factionId);
+    Task<LeaderDto?> GetLeaderAsync(Guid leaderId);
+    Task<List<LeaderCandidateDto>> GetRecruitmentPoolAsync(Guid factionId);
+    Task<LeaderDto?> RecruitLeaderAsync(Guid factionId, string classId);
+    Task AssignLeaderToFleetAsync(Guid leaderId, Guid fleetId);
+    Task AssignLeaderToColonyAsync(Guid leaderId, Guid colonyId);
+    Task UnassignLeaderAsync(Guid leaderId);
+    Task LearnSkillAsync(Guid leaderId, string skillId);
+    Task<List<LeaderClassDto>> GetLeaderClassesAsync();
+    Task<List<LeaderSkillDto>> GetAvailableSkillsAsync(Guid leaderId);
+
+    // Species & Traits
+    Task<List<SpeciesDto>> GetAllSpeciesAsync();
+    Task<SpeciesDto?> GetSpeciesAsync(string speciesId);
+    Task<List<TraitDto>> GetAllTraitsAsync();
+    Task<List<TraitDto>> GetTraitsByCategoryAsync(string category);
+    Task<DemographicsDto?> GetDemographicsAsync(Guid factionId);
+    Task SetSpeciesRightsAsync(Guid factionId, SetSpeciesRightsRequest request);
+    Task<bool> ModifyGenesAsync(Guid factionId, GeneModRequest request);
+
+    // Tactical Combat
+    Task<BattleDoctrineDto?> GetDoctrineAsync(Guid fleetId);
+    Task SaveDoctrineAsync(Guid fleetId, SaveDoctrineRequest request);
+    Task<BattleDoctrineDto?> DrillCrewAsync(Guid fleetId, int points = 10);
+    Task<BattleDoctrineDto?> GetDefaultDoctrineAsync(string raceId);
+    Task<TacticalStateDto?> GetTacticalStateAsync(Guid combatId);
+    Task<TacticalRoundResultDto?> ExecuteTacticalRoundAsync(Guid combatId);
+    Task<TacticalOrderResponse?> GiveTacticalOrderAsync(Guid combatId, TacticalOrderRequest order);
+
+    // Stations
+    Task<List<StationSummaryDto>> GetStationsAsync(Guid factionId);
+    Task<StationDetailDto?> GetStationAsync(Guid stationId);
+    Task<StationDetailDto?> BuildStationAsync(Guid gameId, Guid factionId, Guid systemId, string name);
+    Task<StationModuleDto?> AddStationModuleAsync(Guid stationId, StationModuleType moduleType);
+    Task<bool> UpgradeStationModuleAsync(Guid moduleId);
+    Task<bool> RemoveStationModuleAsync(Guid moduleId);
+    Task<bool> ToggleStationModuleAsync(Guid moduleId);
+
+    // Ground Combat
+    Task<GroundCombatResultDto?> GetActiveInvasionAsync(Guid colonyId);
+    Task<List<ArmyDto>> GetGarrisonAsync(Guid colonyId);
+    Task<List<ArmyDto>> GetFactionArmiesAsync(Guid factionId);
+    Task<List<ArmyDto>> GetEmbarkedArmiesAsync(Guid fleetId);
+    Task<ArmyDto> RecruitArmyAsync(Guid colonyId, string armyType);
+    Task EmbarkArmyAsync(Guid armyId, Guid fleetId);
+    Task DisembarkArmyAsync(Guid armyId, Guid colonyId);
+    Task<GroundCombatResultDto> InvadeColonyAsync(Guid fleetId, Guid colonyId, string bombardmentLevel = "standard");
 }
 
 public class GameApiClient : IGameApiClient
@@ -160,6 +235,12 @@ public class GameApiClient : IGameApiClient
     public async Task StartGameAsync(Guid gameId)
     {
         var response = await _http.PostAsync($"api/games/{gameId}/start", null);
+        response.EnsureSuccessStatusCode();
+    }
+
+    public async Task QuickStartSinglePlayerAsync(Guid gameId, int aiCount = 3)
+    {
+        var response = await _http.PostAsync($"api/games/{gameId}/quick-start?aiCount={aiCount}", null);
         response.EnsureSuccessStatusCode();
     }
 
@@ -328,9 +409,14 @@ public class GameApiClient : IGameApiClient
     }
 
     // Combat
-    public async Task<CombatResultDto?> GetActiveCombatAsync(Guid gameId, Guid systemId)
+    public async Task<CombatStateDto?> GetActiveCombatAsync(Guid gameId, Guid systemId)
     {
-        return await GetFromJsonSafeAsync<CombatResultDto>($"api/combat/{gameId}/{systemId}");
+        return await GetFromJsonSafeAsync<CombatStateDto>($"api/combat/{gameId}/{systemId}");
+    }
+
+    public async Task<CombatStateDto?> GetCombatByIdAsync(Guid combatId)
+    {
+        return await GetFromJsonSafeAsync<CombatStateDto>($"api/combat/{combatId}");
     }
 
     public async Task<CombatActionResultDto> ExecuteCombatActionAsync(Guid combatId, CombatActionRequest request)
@@ -339,6 +425,26 @@ public class GameApiClient : IGameApiClient
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<CombatActionResultDto>()
             ?? throw new Exception("Failed to execute combat action");
+    }
+
+    public async Task<CombatRoundResultDto?> ExecuteCombatRoundAsync(Guid combatId)
+    {
+        var response = await _http.PostAsync($"api/combat/{combatId}/round", null);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<CombatRoundResultDto>();
+    }
+
+    public async Task<CombatAutoResolveResultDto?> AutoResolveCombatAsync(Guid combatId)
+    {
+        var response = await _http.PostAsync($"api/combat/{combatId}/auto-resolve", null);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<CombatAutoResolveResultDto>();
+    }
+
+    public async Task RetreatFromCombatAsync(Guid combatId, Guid factionId)
+    {
+        var response = await _http.PostAsync($"api/combat/{combatId}/retreat?factionId={factionId}", null);
+        response.EnsureSuccessStatusCode();
     }
 
     // System Details
@@ -372,6 +478,24 @@ public class GameApiClient : IGameApiClient
         response.EnsureSuccessStatusCode();
     }
 
+    // Population & Jobs
+    public async Task<PopulationReportDto?> GetPopulationReportAsync(Guid colonyId)
+    {
+        return await GetFromJsonSafeAsync<PopulationReportDto>($"api/colonies/{colonyId}/population");
+    }
+
+    public async Task AutoAssignJobAsync(Guid colonyId, string jobType)
+    {
+        var response = await _http.PostAsJsonAsync($"api/colonies/{colonyId}/jobs/auto-assign", new { JobType = jobType });
+        response.EnsureSuccessStatusCode();
+    }
+
+    public async Task AutoRemoveJobAsync(Guid colonyId, string jobType)
+    {
+        var response = await _http.PostAsJsonAsync($"api/colonies/{colonyId}/jobs/auto-remove", new { JobType = jobType });
+        response.EnsureSuccessStatusCode();
+    }
+
     // Save/Load
     public async Task<GameSaveData?> ExportGameAsync(Guid gameId)
     {
@@ -388,6 +512,28 @@ public class GameApiClient : IGameApiClient
     public async Task<List<SaveSlotInfo>> GetSaveSlotsAsync()
     {
         return await GetFromJsonSafeAsync<List<SaveSlotInfo>>("api/games/saves") ?? new();
+    }
+
+    public async Task<SaveResultDto> SaveToServerAsync(Guid gameId, string? name = null, string? description = null)
+    {
+        var response = await _http.PostAsJsonAsync($"api/games/{gameId}/save", new { Name = name, Description = description });
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<SaveResultDto>()
+            ?? new SaveResultDto { Success = false, Message = "Failed to parse response" };
+    }
+
+    public async Task<LoadResultDto> LoadFromServerAsync(Guid saveId)
+    {
+        var response = await _http.PostAsync($"api/games/saves/{saveId}/load", null);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<LoadResultDto>()
+            ?? new LoadResultDto { Success = false, Message = "Failed to parse response" };
+    }
+
+    public async Task DeleteSaveAsync(Guid saveId)
+    {
+        var response = await _http.DeleteAsync($"api/games/saves/{saveId}");
+        response.EnsureSuccessStatusCode();
     }
 
     // Policies
@@ -435,6 +581,38 @@ public class GameApiClient : IGameApiClient
             ?? throw new Exception("Failed to recruit agent");
     }
 
+    // Intelligence - Missions catalog
+    public async Task<List<MissionDefinitionDto>> GetAvailableMissionsAsync()
+    {
+        return await GetFromJsonSafeAsync<List<MissionDefinitionDto>>("api/intelligence/missions") ?? [];
+    }
+
+    // Events & Crises
+    public async Task<List<GameEventDto>> GetPendingEventsAsync(Guid houseId)
+    {
+        return await GetFromJsonSafeAsync<List<GameEventDto>>($"api/events/pending/{houseId}") ?? [];
+    }
+
+    public async Task<EventResolutionDto> ResolveEventAsync(Guid eventId, string chosenOptionId)
+    {
+        var response = await _http.PostAsJsonAsync($"api/events/{eventId}/resolve", new { ChosenOptionId = chosenOptionId });
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<EventResolutionDto>()
+            ?? new EventResolutionDto(false, "Unknown error", "", [], false);
+    }
+
+    public async Task<CrisisReportDto?> GetActiveCrisisAsync(Guid gameId)
+    {
+        try
+        {
+            return await GetFromJsonSafeAsync<CrisisReportDto>($"api/events/crisis/{gameId}");
+        }
+        catch
+        {
+            return null; // No active crisis
+        }
+    }
+
     // Economy / Trade
     public async Task ExecuteTradeAsync(Guid factionId, string resourceType, int amount, bool isBuying)
     {
@@ -459,6 +637,259 @@ public class GameApiClient : IGameApiClient
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<TradeRouteDto>()
             ?? throw new Exception("Failed to create trade route");
+    }
+
+    // Victory
+    public async Task<List<VictoryProgressDto>> GetVictoryProgressAsync(Guid gameId, Guid factionId)
+    {
+        return await GetFromJsonSafeAsync<List<VictoryProgressDto>>($"api/games/{gameId}/victory-progress/{factionId}") ?? [];
+    }
+
+    public async Task<List<FactionStandingDto>> GetFactionStandingsAsync(Guid gameId)
+    {
+        return await GetFromJsonSafeAsync<List<FactionStandingDto>>($"api/games/{gameId}/standings") ?? [];
+    }
+
+    public async Task<VictoryCheckResultDto> CheckVictoryAsync(Guid gameId)
+    {
+        return await GetFromJsonSafeAsync<VictoryCheckResultDto>($"api/games/{gameId}/victory-check")
+            ?? new VictoryCheckResultDto(false, null, null, null);
+    }
+
+    // Leaders
+    public async Task<List<LeaderDto>> GetLeadersAsync(Guid factionId)
+    {
+        return await GetFromJsonSafeAsync<List<LeaderDto>>($"api/leaders/faction/{factionId}") ?? [];
+    }
+
+    public async Task<LeaderDto?> GetLeaderAsync(Guid leaderId)
+    {
+        return await GetFromJsonSafeAsync<LeaderDto>($"api/leaders/{leaderId}");
+    }
+
+    public async Task<List<LeaderCandidateDto>> GetRecruitmentPoolAsync(Guid factionId)
+    {
+        return await GetFromJsonSafeAsync<List<LeaderCandidateDto>>($"api/leaders/faction/{factionId}/recruitment") ?? [];
+    }
+
+    public async Task<LeaderDto?> RecruitLeaderAsync(Guid factionId, string classId)
+    {
+        var response = await _http.PostAsJsonAsync($"api/leaders/faction/{factionId}/recruit", new { ClassId = classId });
+        if (!response.IsSuccessStatusCode) return null;
+        return await response.Content.ReadFromJsonAsync<LeaderDto>();
+    }
+
+    public async Task AssignLeaderToFleetAsync(Guid leaderId, Guid fleetId)
+    {
+        var response = await _http.PostAsJsonAsync($"api/leaders/{leaderId}/assign-fleet", new { FleetId = fleetId });
+        response.EnsureSuccessStatusCode();
+    }
+
+    public async Task AssignLeaderToColonyAsync(Guid leaderId, Guid colonyId)
+    {
+        var response = await _http.PostAsJsonAsync($"api/leaders/{leaderId}/assign-colony", new { ColonyId = colonyId });
+        response.EnsureSuccessStatusCode();
+    }
+
+    public async Task UnassignLeaderAsync(Guid leaderId)
+    {
+        var response = await _http.PostAsync($"api/leaders/{leaderId}/unassign", null);
+        response.EnsureSuccessStatusCode();
+    }
+
+    public async Task LearnSkillAsync(Guid leaderId, string skillId)
+    {
+        var response = await _http.PostAsJsonAsync($"api/leaders/{leaderId}/learn-skill", new { SkillId = skillId });
+        response.EnsureSuccessStatusCode();
+    }
+
+    public async Task<List<LeaderClassDto>> GetLeaderClassesAsync()
+    {
+        return await GetFromJsonSafeAsync<List<LeaderClassDto>>("api/leaders/classes") ?? [];
+    }
+
+    public async Task<List<LeaderSkillDto>> GetAvailableSkillsAsync(Guid leaderId)
+    {
+        return await GetFromJsonSafeAsync<List<LeaderSkillDto>>($"api/leaders/{leaderId}/available-skills") ?? [];
+    }
+
+    // Species & Traits
+    public async Task<List<SpeciesDto>> GetAllSpeciesAsync()
+        => await GetFromJsonSafeAsync<List<SpeciesDto>>("api/species") ?? [];
+
+    public async Task<SpeciesDto?> GetSpeciesAsync(string speciesId)
+        => await GetFromJsonSafeAsync<SpeciesDto>($"api/species/{speciesId}");
+
+    public async Task<List<TraitDto>> GetAllTraitsAsync()
+        => await GetFromJsonSafeAsync<List<TraitDto>>("api/species/traits/all") ?? [];
+
+    public async Task<List<TraitDto>> GetTraitsByCategoryAsync(string category)
+        => await GetFromJsonSafeAsync<List<TraitDto>>($"api/species/traits/category/{category}") ?? [];
+
+    public async Task<DemographicsDto?> GetDemographicsAsync(Guid factionId)
+        => await GetFromJsonSafeAsync<DemographicsDto>($"api/species/demographics/{factionId}");
+
+    public async Task SetSpeciesRightsAsync(Guid factionId, SetSpeciesRightsRequest request)
+    {
+        var response = await _http.PostAsJsonAsync($"api/species/rights/{factionId}", request);
+        response.EnsureSuccessStatusCode();
+    }
+
+    public async Task<bool> ModifyGenesAsync(Guid factionId, GeneModRequest request)
+    {
+        var response = await _http.PostAsJsonAsync($"api/species/gene-mod/{factionId}", request);
+        return response.IsSuccessStatusCode;
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
+    // TACTICAL COMBAT
+    // ═══════════════════════════════════════════════════════════════════
+
+    public async Task<BattleDoctrineDto?> GetDoctrineAsync(Guid fleetId)
+        => await GetFromJsonSafeAsync<BattleDoctrineDto>($"api/combat/doctrine/{fleetId}");
+
+    public async Task SaveDoctrineAsync(Guid fleetId, SaveDoctrineRequest request)
+    {
+        var response = await _http.PostAsJsonAsync($"api/combat/doctrine/{fleetId}", request);
+        response.EnsureSuccessStatusCode();
+    }
+
+    public async Task<BattleDoctrineDto?> DrillCrewAsync(Guid fleetId, int points = 10)
+    {
+        var response = await _http.PostAsync($"api/combat/doctrine/{fleetId}/drill?points={points}", null);
+        return response.IsSuccessStatusCode ? await response.Content.ReadFromJsonAsync<BattleDoctrineDto>() : null;
+    }
+
+    public async Task<BattleDoctrineDto?> GetDefaultDoctrineAsync(string raceId)
+        => await GetFromJsonSafeAsync<BattleDoctrineDto>($"api/combat/doctrine/defaults/{raceId}");
+
+    public async Task<TacticalStateDto?> GetTacticalStateAsync(Guid combatId)
+        => await GetFromJsonSafeAsync<TacticalStateDto>($"api/combat/{combatId}/tactical-state");
+
+    public async Task<TacticalRoundResultDto?> ExecuteTacticalRoundAsync(Guid combatId)
+    {
+        var response = await _http.PostAsync($"api/combat/{combatId}/tactical-round", null);
+        return response.IsSuccessStatusCode ? await response.Content.ReadFromJsonAsync<TacticalRoundResultDto>() : null;
+    }
+
+    public async Task<TacticalOrderResponse?> GiveTacticalOrderAsync(Guid combatId, TacticalOrderRequest order)
+    {
+        var response = await _http.PostAsJsonAsync($"api/combat/{combatId}/tactical-order", order);
+        return response.IsSuccessStatusCode ? await response.Content.ReadFromJsonAsync<TacticalOrderResponse>() : null;
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
+    // STATIONS
+    // ═══════════════════════════════════════════════════════════════════
+
+    public async Task<List<StationSummaryDto>> GetStationsAsync(Guid factionId)
+    {
+        return await _http.GetFromJsonAsync<List<StationSummaryDto>>(
+            $"api/stations/faction/{factionId}") ?? new();
+    }
+
+    public async Task<StationDetailDto?> GetStationAsync(Guid stationId)
+    {
+        return await _http.GetFromJsonAsync<StationDetailDto>($"api/stations/{stationId}");
+    }
+
+    public async Task<StationDetailDto?> BuildStationAsync(Guid gameId, Guid factionId, Guid systemId, string name)
+    {
+        var response = await _http.PostAsJsonAsync("api/stations",
+            new { GameId = gameId, FactionId = factionId, SystemId = systemId, Name = name });
+        return response.IsSuccessStatusCode
+            ? await response.Content.ReadFromJsonAsync<StationDetailDto>()
+            : null;
+    }
+
+    public async Task<StationModuleDto?> AddStationModuleAsync(Guid stationId, StationModuleType moduleType)
+    {
+        var response = await _http.PostAsJsonAsync($"api/stations/{stationId}/modules",
+            new { ModuleType = moduleType });
+        return response.IsSuccessStatusCode
+            ? await response.Content.ReadFromJsonAsync<StationModuleDto>()
+            : null;
+    }
+
+    public async Task<bool> UpgradeStationModuleAsync(Guid moduleId)
+    {
+        var response = await _http.PostAsync($"api/stations/modules/{moduleId}/upgrade", null);
+        return response.IsSuccessStatusCode;
+    }
+
+    public async Task<bool> RemoveStationModuleAsync(Guid moduleId)
+    {
+        var response = await _http.DeleteAsync($"api/stations/modules/{moduleId}");
+        return response.IsSuccessStatusCode;
+    }
+
+    public async Task<bool> ToggleStationModuleAsync(Guid moduleId)
+    {
+        var response = await _http.PostAsync($"api/stations/modules/{moduleId}/toggle", null);
+        return response.IsSuccessStatusCode;
+    }
+
+    // Ground Combat
+    public async Task<GroundCombatResultDto?> GetActiveInvasionAsync(Guid colonyId)
+    {
+        try
+        {
+            return await _http.GetFromJsonAsync<GroundCombatResultDto>($"api/ground-combat/invasion/{colonyId}");
+        }
+        catch (HttpRequestException) { return null; }
+    }
+
+    public async Task<List<ArmyDto>> GetGarrisonAsync(Guid colonyId)
+    {
+        try
+        {
+            return await _http.GetFromJsonAsync<List<ArmyDto>>($"api/ground-combat/garrison/{colonyId}") ?? [];
+        }
+        catch (HttpRequestException) { return []; }
+    }
+
+    public async Task<List<ArmyDto>> GetFactionArmiesAsync(Guid factionId)
+    {
+        try
+        {
+            return await _http.GetFromJsonAsync<List<ArmyDto>>($"api/ground-combat/armies/{factionId}") ?? [];
+        }
+        catch (HttpRequestException) { return []; }
+    }
+
+    public async Task<List<ArmyDto>> GetEmbarkedArmiesAsync(Guid fleetId)
+    {
+        try
+        {
+            return await _http.GetFromJsonAsync<List<ArmyDto>>($"api/ground-combat/embarked/{fleetId}") ?? [];
+        }
+        catch (HttpRequestException) { return []; }
+    }
+
+    public async Task<ArmyDto> RecruitArmyAsync(Guid colonyId, string armyType)
+    {
+        var response = await _http.PostAsJsonAsync("api/ground-combat/recruit", new { ColonyId = colonyId, ArmyType = armyType });
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<ArmyDto>() ?? throw new InvalidOperationException("Failed to recruit army");
+    }
+
+    public async Task EmbarkArmyAsync(Guid armyId, Guid fleetId)
+    {
+        var response = await _http.PostAsJsonAsync("api/ground-combat/embark", new { ArmyId = armyId, FleetId = fleetId });
+        response.EnsureSuccessStatusCode();
+    }
+
+    public async Task DisembarkArmyAsync(Guid armyId, Guid colonyId)
+    {
+        var response = await _http.PostAsJsonAsync("api/ground-combat/disembark", new { ArmyId = armyId, ColonyId = colonyId });
+        response.EnsureSuccessStatusCode();
+    }
+
+    public async Task<GroundCombatResultDto> InvadeColonyAsync(Guid fleetId, Guid colonyId, string bombardmentLevel = "standard")
+    {
+        var response = await _http.PostAsJsonAsync("api/ground-combat/invade", new { FleetId = fleetId, ColonyId = colonyId, BombardmentLevel = bombardmentLevel });
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<GroundCombatResultDto>() ?? throw new InvalidOperationException("Failed to start invasion");
     }
 }
 
@@ -500,7 +931,10 @@ public record FleetDetailDto(
     int Morale,
     int ExperiencePoints,
     List<ShipGroupDto> ShipGroups,
-    int CombatStrength
+    int CombatStrength,
+    int ActionPoints = 3,
+    int MaxActionPoints = 3,
+    string? FlagshipClass = null
 )
 {
     public int ShipCount => ShipGroups?.Sum(g => g.Count) ?? 0;
@@ -572,6 +1006,38 @@ public record FleetOrderDto(Guid FleetId, string OrderType, Guid? TargetSystemId
 public record ColonyOrderDto(Guid ColonyId, string OrderType, string? BuildingType, string? ShipClass, int Quantity);
 
 public record TurnResultDto(int NewTurn, TreasuryDto Resources, List<string> Events);
+
+public record TurnReportDto(
+    int CreditsIncome,
+    int CreditsExpenses,
+    int EnergyBalance,
+    int FoodBalance,
+    List<string> BuildingsCompleted,
+    List<string> ShipsCompleted,
+    List<string> StationsCompleted,
+    List<string> ModulesCompleted,
+    string? TechCompleted,
+    int ResearchProgress,
+    List<TurnCombatDto> Combats,
+    List<string> FleetArrivals,
+    List<string> DiplomacyChanges,
+    int NewEventsCount,
+    List<string> EspionageResults,
+    string? CrisisUpdate,
+    int PopulationChange,
+    List<string> InvasionResults,
+    List<string> ArmiesRecruited,
+    TurnTreasuryDto? Treasury);
+
+public record TurnTreasuryDto(int TreasuryCredits, int TreasuryDilithium, int TreasuryDeuterium, int TreasuryDuranium);
+
+public record TurnCombatDto(
+    string SystemName,
+    string AttackerName,
+    string DefenderName,
+    bool AttackerVictory,
+    int AttackerLosses,
+    int DefenderLosses);
 
 // Research DTOs
 public record ResearchStatusDto(
@@ -686,38 +1152,59 @@ public record CreateShipDesignRequest(
 );
 
 // Combat DTOs
-public record CombatResultDto(
-    Guid CombatId,
-    Guid SystemId,
-    string SystemName,
-    int Round,
-    string Phase,
-    Guid AttackerId,
-    string AttackerName,
-    Guid DefenderId,
-    string DefenderName,
-    List<CombatShipDto> AttackerShips,
-    List<CombatShipDto> DefenderShips,
-    List<CombatLogEntryDto> CombatLog,
-    bool IsResolved,
-    Guid? WinnerId
-);
+public class CombatStateDto
+{
+    public Guid CombatId { get; set; }
+    public Guid SystemId { get; set; }
+    public string SystemName { get; set; } = "";
+    public int Round { get; set; }
+    public string Phase { get; set; } = "";
+    public Guid AttackerId { get; set; }
+    public string AttackerName { get; set; } = "";
+    public Guid DefenderId { get; set; }
+    public string DefenderName { get; set; } = "";
+    public List<CombatShipDto> AttackerShips { get; set; } = new();
+    public List<CombatShipDto> DefenderShips { get; set; } = new();
+    public bool IsResolved { get; set; }
+    public Guid? WinnerId { get; set; }
+}
 
-public record CombatShipDto(
-    Guid ShipId,
-    string Name,
-    string ShipClass,
-    int Health,
-    int MaxHealth,
-    int Shields,
-    int MaxShields,
-    int WeaponPower,
-    bool IsDestroyed,
-    int X,
-    int Y
-);
+public class CombatShipDto
+{
+    public Guid ShipId { get; set; }
+    public string Name { get; set; } = "";
+    public string ShipClass { get; set; } = "";
+    public int Health { get; set; }
+    public int MaxHealth { get; set; }
+    public int Shields { get; set; }
+    public int MaxShields { get; set; }
+    public int WeaponPower { get; set; }
+    public bool IsDestroyed { get; set; }
+    public int X { get; set; }
+    public int Y { get; set; }
+}
 
-public record CombatLogEntryDto(int Round, string Message, string Color);
+public class CombatRoundResultDto
+{
+    public int Round { get; set; }
+    public List<CombatShipDto> AttackerShips { get; set; } = new();
+    public List<CombatShipDto> DefenderShips { get; set; } = new();
+    public List<string> RoundLog { get; set; } = new();
+    public bool CombatEnded { get; set; }
+    public Guid? WinnerId { get; set; }
+    public string? WinnerName { get; set; }
+}
+
+public class CombatAutoResolveResultDto
+{
+    public Guid CombatId { get; set; }
+    public Guid? WinnerId { get; set; }
+    public string? WinnerName { get; set; }
+    public int Rounds { get; set; }
+    public int AttackerLosses { get; set; }
+    public int DefenderLosses { get; set; }
+    public List<string> BattleLog { get; set; } = new();
+}
 
 public record CombatActionRequest(
     Guid AttackerShipId,
@@ -725,12 +1212,15 @@ public record CombatActionRequest(
     string ActionType
 );
 
-public record CombatActionResultDto(
-    bool Success,
-    int DamageDealt,
-    bool TargetDestroyed,
-    string Message
-);
+public class CombatActionResultDto
+{
+    public bool Success { get; set; }
+    public int DamageDealt { get; set; }
+    public bool TargetDestroyed { get; set; }
+    public string Message { get; set; } = "";
+    public bool CombatEnded { get; set; }
+    public Guid? WinnerId { get; set; }
+}
 
 // System Detail DTOs
 public record SystemDetailDto(
@@ -835,11 +1325,27 @@ public class SystemSaveData
 
 public class SaveSlotInfo
 {
+    public Guid? SaveId { get; set; }
     public Guid GameId { get; set; }
     public string Name { get; set; } = "";
     public int Turn { get; set; }
     public DateTime SavedAt { get; set; }
     public int FactionCount { get; set; }
+    public bool IsServerSave { get; set; }
+}
+
+public class SaveResultDto
+{
+    public bool Success { get; set; }
+    public Guid? SaveId { get; set; }
+    public string Message { get; set; } = "";
+}
+
+public class LoadResultDto
+{
+    public bool Success { get; set; }
+    public Guid? GameId { get; set; }
+    public string Message { get; set; } = "";
 }
 
 // Hyperlane DTO
@@ -885,10 +1391,373 @@ public record IntelAgentDto(
 // Trade DTOs
 public record TradeRouteDto(
     Guid Id,
-    string SourceSystem,
-    string DestinationSystem,
+    Guid SourceSystemId,
+    string SourceSystemName,
+    Guid DestinationSystemId,
+    string DestinationSystemName,
     string ResourceType,
-    string Status,
     int TradeValue,
-    int ProtectionLevel
+    string Status
 );
+
+// Mission Definition DTO
+public record MissionDefinitionDto(
+    string Type,
+    string Name,
+    string Icon,
+    string Description,
+    int Duration,
+    int BaseSuccess,
+    int DetectionRisk
+);
+
+// Event & Crisis DTOs
+public record GameEventDto(
+    Guid Id,
+    string EventTypeId,
+    string Title,
+    string Description,
+    string Category,
+    int TurnCreated,
+    int? TurnExpires,
+    bool IsMajor,
+    Guid? TargetColonyId,
+    string? TargetColonyName,
+    Guid? TargetSystemId,
+    string? ChainId,
+    int ChainStep,
+    List<EventOptionDto> Options
+);
+
+public record EventOptionDto(
+    string Id,
+    string Text,
+    string Tooltip,
+    string[] Effects,
+    double RiskChance,
+    string[]? RiskEffects,
+    string? RequiresFaction
+);
+
+public record EventResolutionDto(
+    bool Success,
+    string Message,
+    string ChosenOption,
+    List<string> Effects,
+    bool RiskTriggered
+);
+
+public record CrisisReportDto(
+    Guid Id,
+    string Name,
+    string Description,
+    string Type,
+    int Phase,
+    int ThreatLevel,
+    int TurnsSinceStart,
+    string CurrentEscalation,
+    string VictoryCondition,
+    string DefeatCondition,
+    int EnemyFleets,
+    int SystemsLost
+);
+
+// Population DTOs
+public class PopulationReportDto
+{
+    public Guid ColonyId { get; set; }
+    public string ColonyName { get; set; } = "";
+    public int TotalPopulation { get; set; }
+    public int HousingCapacity { get; set; }
+    public int Stability { get; set; }
+    public double Habitability { get; set; }
+    public double AverageHappiness { get; set; }
+    public double GrowthRate { get; set; }
+    public int Employed { get; set; }
+    public int Unemployed { get; set; }
+    public int Commuters { get; set; }
+    public int TotalJobs { get; set; }
+    public int FilledJobs { get; set; }
+    public List<SpeciesDetailDto> Species { get; set; } = new();
+    public List<JobBreakdownDto> Jobs { get; set; } = new();
+    public Dictionary<string, int> StratumBreakdown { get; set; } = new();
+    public Dictionary<string, int> PoliticalBreakdown { get; set; } = new();
+}
+
+public class SpeciesDetailDto
+{
+    public string SpeciesId { get; set; } = "";
+    public string Name { get; set; } = "";
+    public string Icon { get; set; } = "";
+    public int Count { get; set; }
+    public int Percentage { get; set; }
+    public string Color { get; set; } = "";
+}
+
+public class JobBreakdownDto
+{
+    public string JobId { get; set; } = "";
+    public string Name { get; set; } = "";
+    public string Icon { get; set; } = "";
+    public string CategoryColor { get; set; } = "";
+    public string OutputText { get; set; } = "";
+    public int Filled { get; set; }
+    public int Total { get; set; }
+}
+
+// Victory DTOs
+public record VictoryProgressDto(
+    string Type,
+    string Name,
+    string Description,
+    int Current,
+    int Target,
+    string ProgressText,
+    int Percentage
+);
+
+public record FactionStandingDto(
+    Guid FactionId,
+    string Name,
+    string RaceId,
+    int Score,
+    int Systems,
+    int Colonies,
+    int Fleets,
+    int TechsResearched,
+    bool IsDefeated,
+    bool IsAI
+);
+
+public record VictoryCheckResultDto(
+    bool HasWinner,
+    Guid? WinnerFactionId,
+    string? WinnerName,
+    string? VictoryType
+);
+
+// Leader DTOs
+public record LeaderDto(
+    Guid Id,
+    Guid FactionId,
+    string Name,
+    string ClassId,
+    string ClassName,
+    string Icon,
+    string PortraitId,
+    int Level,
+    int ExperiencePoints,
+    int SkillPoints,
+    int Age,
+    int MaxAge,
+    LeaderStatsDto Stats,
+    Guid? AssignedFleetId,
+    Guid? AssignedColonyId,
+    string? AssignedResearchBranchId,
+    int Upkeep,
+    List<string> Traits,
+    List<SkillEntryDto> Skills,
+    bool IsDead
+);
+
+public record LeaderStatsDto(
+    int Tactics,
+    int Leadership,
+    int Engineering,
+    int Science,
+    int Diplomacy,
+    int Administration,
+    int Subterfuge,
+    int Charisma
+);
+
+public record SkillEntryDto(string SkillId, int Level);
+
+public record LeaderCandidateDto(
+    string ClassId,
+    string ClassName,
+    string Name,
+    int Age,
+    int RecruitCost,
+    int Upkeep,
+    List<string> Traits,
+    string Icon
+);
+
+public record LeaderClassDto(
+    string Id,
+    string Name,
+    string Description,
+    string Icon,
+    int RecruitCost,
+    int UpkeepCredits,
+    bool CanCommandFleet,
+    bool CanCommandShip,
+    bool CanGovernColony,
+    bool CanResearch,
+    List<string> AvailableSkillCategories
+);
+
+public record LeaderSkillDto(
+    string Id,
+    string Name,
+    string Description,
+    string Icon,
+    string Category,
+    int MaxLevel,
+    int CurrentLevel,
+    List<string> Effects
+);
+
+// Species & Trait DTOs
+public record SpeciesDto(
+    string Id, string Name, string Description,
+    string HomeWorld, string IdealClimate,
+    Dictionary<string, double> HabitabilityModifiers,
+    string[] TraitIds, string[] TraitNames,
+    double GrowthRate, double Research, double Military,
+    double Trade, double Diplomacy, double Mining,
+    double Engineering, double Stability, double Spy,
+    double FoodUpkeep, double ConsumerGoodsUpkeep,
+    bool CanBeAssimilated, bool RequiresKetracelWhite,
+    bool RequiresOrgans, int Lifespan,
+    string Icon, string Color
+);
+
+public record TraitDto(
+    string Id, string Name, string Description,
+    string Category, int Cost,
+    Dictionary<string, double> Modifiers
+);
+
+public record DemographicsDto(int TotalPops, List<SpeciesPopDto> SpeciesBreakdown, List<ColonyDemographicsDto> Colonies);
+public record SpeciesPopDto(string SpeciesId, string Name, string Icon, int Count, double Percentage, SpeciesRightsData? Rights, string[] ModifiedTraits);
+public record ColonyDemographicsDto(Guid ColonyId, string ColonyName, List<SpeciesPopDto> Species);
+public record SpeciesRightsData(string Citizenship, string MilitaryService, string LivingStandard);
+public record SetSpeciesRightsRequest(string SpeciesId, string Citizenship, string MilitaryService, string LivingStandard);
+public record GeneModRequest(string SpeciesId, string[]? AddTraitIds, string[]? RemoveTraitIds);
+
+// Tactical Combat DTOs
+public record BattleDoctrineDto(Guid Id, Guid FleetId, string Name, string EngagementPolicy, string Formation, string TargetPriority, int RetreatThreshold, int DrillLevel, List<ConditionalOrderDto> ConditionalOrders);
+public record ConditionalOrderDto(string Name, string Trigger, string Comparison, int Threshold, MidBattleActionDto Action, bool TriggerOnce, bool HasTriggered);
+public record MidBattleActionDto(string? NewFormation, string? NewTargetPriority, string? NewEngagement, bool Retreat);
+public record SaveDoctrineRequest(string Name, string EngagementPolicy, string Formation, string TargetPriority, int RetreatThreshold, List<ConditionalOrderDto>? ConditionalOrders);
+public record TacticalOrderRequest(string? OrderType, string? NewValue, Guid? TargetShipId, string? ShipAction);
+
+public class TacticalOrderResponse
+{
+    public bool Success { get; set; }
+    public double NewDisorderPercent { get; set; }
+    public string Message { get; set; } = "";
+}
+
+public class TacticalStateDto
+{
+    public Guid CombatId { get; set; }
+    public int Round { get; set; }
+    public TacticalSideDto Attacker { get; set; } = new();
+    public TacticalSideDto Defender { get; set; } = new();
+    public bool IsComplete { get; set; }
+    public Guid? WinnerId { get; set; }
+    public List<string> RoundLog { get; set; } = new();
+    public List<string> TriggeredOrders { get; set; } = new();
+}
+
+public class TacticalSideDto
+{
+    public Guid FactionId { get; set; }
+    public string FactionName { get; set; } = "";
+    public double DisorderPercent { get; set; }
+    public string Formation { get; set; } = "";
+    public string TargetPriority { get; set; } = "";
+    public string Engagement { get; set; } = "";
+    public bool CommanderPresent { get; set; }
+    public int DrillLevel { get; set; }
+    public List<TacticalShipDto> Ships { get; set; } = new();
+}
+
+public record TacticalShipDto(Guid ShipId, string Name, string ShipClass, string Role, int Hull, int MaxHull, int Shields, int MaxShields, double X, double Y, bool IsDestroyed, bool IsDisabled, bool IsWebbed, Guid? TargetId);
+
+public class TacticalRoundResultDto
+{
+    public int Round { get; set; }
+    public TacticalSideDto Attacker { get; set; } = new();
+    public TacticalSideDto Defender { get; set; } = new();
+    public List<string> Events { get; set; } = new();
+    public List<string> TriggeredOrders { get; set; } = new();
+    public bool IsComplete { get; set; }
+    public Guid? WinnerId { get; set; }
+}
+
+// Station DTOs
+public record StationDetailDto(
+    Guid Id,
+    string Name,
+    Guid FactionId,
+    Guid SystemId,
+    string SystemName,
+    int HullPoints,
+    int MaxHullPoints,
+    int ShieldPoints,
+    int MaxShieldPoints,
+    int ModuleSlots,
+    bool IsOperational,
+    int ConstructionProgress,
+    int ConstructionTurnsLeft,
+    int SensorRange,
+    int TotalMaintenanceEnergy,
+    int Firepower,
+    List<StationModuleDto> Modules
+);
+
+public record StationSummaryDto(
+    Guid Id,
+    string Name,
+    string SystemName,
+    Guid SystemId,
+    bool IsOperational,
+    int ConstructionProgress,
+    int ModuleCount,
+    int TotalSlots,
+    int SensorRange
+);
+
+public record StationModuleDto(
+    Guid Id,
+    string ModuleType,
+    string Name,
+    int Level,
+    bool IsOnline,
+    bool IsUnderConstruction,
+    int ConstructionTurnsLeft,
+    int MaintenanceEnergy
+);
+
+public enum StationModuleType
+{
+    SensorArray,
+    WeaponsPlatform,
+    ShieldGenerator,
+    Shipyard,
+    TradingHub,
+    ResearchLab,
+    Drydock,
+    HabitatRing,
+    SubspaceComm,
+    StructuralExpansion
+}
+
+// Ground Combat DTOs
+public record ArmyDto(Guid Id, Guid FactionId, string Name, string ArmyType,
+    int AttackPower, int DefensePower, int HitPoints, int MaxHitPoints,
+    int Morale, string Experience, string Status, Guid? ColonyId, Guid? FleetId,
+    bool IsRecruiting, int RecruitmentTurnsLeft, int MaintenanceEnergy);
+
+public record GroundCombatResultDto(Guid Id, Guid ColonyId, Guid AttackerFactionId,
+    Guid DefenderFactionId, string Phase, int BombardmentDamageDealt,
+    bool IsResolved, Guid? WinnerFactionId, int InfrastructureDamage,
+    int PopulationLosses, int StartedOnTurn, int? ResolvedOnTurn);
+
+public record ArmyTypeDefDto(string Name, int AttackPower, int DefensePower,
+    int HitPoints, int RecruitmentTurns, int CostMinerals, int CostAlloys,
+    int MaintenanceEnergy, string Description);

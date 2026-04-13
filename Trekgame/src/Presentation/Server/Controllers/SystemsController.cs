@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using StarTrekGame.Server.Data;
 using StarTrekGame.Server.Data.Entities;
+using StarTrekGame.Server.Services;
 
 namespace StarTrekGame.Server.Controllers;
 
@@ -10,18 +11,46 @@ namespace StarTrekGame.Server.Controllers;
 public class SystemsController : ControllerBase
 {
     private readonly GameDbContext _db;
+    private readonly IVisibilityService _visibility;
 
-    public SystemsController(GameDbContext db)
+    public SystemsController(GameDbContext db, IVisibilityService visibility)
     {
         _db = db;
+        _visibility = visibility;
     }
 
     /// <summary>
     /// Get detailed information about a star system
     /// </summary>
     [HttpGet("{systemId:guid}")]
-    public async Task<ActionResult<SystemDetailResponse>> GetSystemDetail(Guid systemId)
+    public async Task<ActionResult<SystemDetailResponse>> GetSystemDetail(Guid systemId, [FromQuery] Guid factionId)
     {
+        // FoW enforcement
+        if (factionId != Guid.Empty)
+        {
+            var visibleSystems = await _visibility.GetVisibleSystemsAsync(factionId);
+            var visible = visibleSystems.FirstOrDefault(s => s.Id == systemId);
+
+            if (visible == null || visible.VisibilityLevel <= VisibilityLevel.Unknown)
+                return NotFound("System not found");
+
+            if (visible.VisibilityLevel == VisibilityLevel.Detected)
+            {
+                return Ok(new SystemDetailResponse(
+                    Id: systemId,
+                    Name: "Uncharted System",
+                    X: visible.X,
+                    Y: visible.Y,
+                    StarType: "unknown",
+                    ControllingFactionId: null,
+                    ControllingFactionName: null,
+                    Planets: new(),
+                    Fleets: new()
+                ));
+            }
+        }
+        // If factionId is empty or visibility >= Partial, continue with full data...
+
         var system = await _db.StarSystems
             .Include(s => s.Planets)
             .ThenInclude(p => p.Colony)
@@ -101,7 +130,7 @@ public class SystemsController : ControllerBase
     /// Get all systems in a game (for galaxy map)
     /// </summary>
     [HttpGet("game/{gameId:guid}")]
-    public async Task<ActionResult<List<SystemSummaryResponse>>> GetGameSystems(Guid gameId)
+    public async Task<ActionResult<List<SystemSummaryResponse>>> GetGameSystems(Guid gameId, [FromQuery] Guid factionId)
     {
         var systems = await _db.StarSystems
             .Include(s => s.Planets)
@@ -109,24 +138,79 @@ public class SystemsController : ControllerBase
             .Where(s => s.GameId == gameId)
             .ToListAsync();
 
+        // FoW filtering
+        Dictionary<Guid, VisibleSystemDto>? visibilityMap = null;
+        if (factionId != Guid.Empty)
+        {
+            var visibleSystems = await _visibility.GetVisibleSystemsAsync(factionId);
+            visibilityMap = visibleSystems.ToDictionary(s => s.Id);
+        }
+
         var responses = new List<SystemSummaryResponse>();
 
         foreach (var system in systems)
         {
-            var colony = system.Planets
-                .Select(p => p.Colony)
-                .FirstOrDefault(c => c != null);
+            // FoW: skip unknown systems
+            if (visibilityMap != null)
+            {
+                if (!visibilityMap.TryGetValue(system.Id, out var vis))
+                    continue; // Not visible at all
 
-            responses.Add(new SystemSummaryResponse(
-                Id: system.Id,
-                Name: system.Name,
-                X: system.X,
-                Y: system.Y,
-                StarType: system.StarType.ToString(),
-                ControllingFactionId: colony?.FactionId,
-                HasColony: colony != null,
-                PlanetCount: system.Planets.Count
-            ));
+                if (vis.VisibilityLevel <= VisibilityLevel.Unknown)
+                    continue;
+
+                // Detected: show minimal info
+                if (vis.VisibilityLevel == VisibilityLevel.Detected)
+                {
+                    responses.Add(new SystemSummaryResponse(
+                        Id: system.Id,
+                        Name: "Uncharted",
+                        X: system.X,
+                        Y: system.Y,
+                        StarType: "unknown",
+                        ControllingFactionId: null,
+                        HasColony: false,
+                        PlanetCount: 0,
+                        VisibilityLevel: (int)vis.VisibilityLevel
+                    ));
+                    continue;
+                }
+
+                // Partial+ : show real data with visibility level
+                var colony = system.Planets
+                    .Select(p => p.Colony)
+                    .FirstOrDefault(c => c != null);
+
+                responses.Add(new SystemSummaryResponse(
+                    Id: system.Id,
+                    Name: system.Name,
+                    X: system.X,
+                    Y: system.Y,
+                    StarType: system.StarType.ToString(),
+                    ControllingFactionId: colony?.FactionId,
+                    HasColony: colony != null,
+                    PlanetCount: system.Planets.Count,
+                    VisibilityLevel: (int)vis.VisibilityLevel
+                ));
+            }
+            else
+            {
+                // No FoW: show everything (backwards compat)
+                var colony = system.Planets
+                    .Select(p => p.Colony)
+                    .FirstOrDefault(c => c != null);
+
+                responses.Add(new SystemSummaryResponse(
+                    Id: system.Id,
+                    Name: system.Name,
+                    X: system.X,
+                    Y: system.Y,
+                    StarType: system.StarType.ToString(),
+                    ControllingFactionId: colony?.FactionId,
+                    HasColony: colony != null,
+                    PlanetCount: system.Planets.Count
+                ));
+            }
         }
 
         return Ok(responses);
@@ -225,7 +309,8 @@ public record SystemSummaryResponse(
     string StarType,
     Guid? ControllingFactionId,
     bool HasColony,
-    int PlanetCount
+    int PlanetCount,
+    int VisibilityLevel = 3
 );
 
 public record PlanetResponse(

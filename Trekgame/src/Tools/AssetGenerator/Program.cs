@@ -31,9 +31,8 @@ builder.Services.AddScoped<GeminiApiService>();
 builder.Services.AddScoped<SpriteSheetService>();
 builder.Services.AddScoped<ImageProcessingService>();
 
-// ComfyUI Process Manager - Singleton and HostedService for proper lifecycle management
+// ComfyUI Process Manager - Singleton only, no auto-start (start manually from UI when needed)
 builder.Services.AddSingleton<ComfyUIProcessManager>();
-builder.Services.AddHostedService(sp => sp.GetRequiredService<ComfyUIProcessManager>());
 
 // Image Generation Providers
 builder.Services.AddScoped<GeminiImageProvider>(sp =>
@@ -42,12 +41,19 @@ builder.Services.AddScoped<GeminiImageProvider>(sp =>
 builder.Services.AddScoped<ComfyUIApiService>(sp =>
     new ComfyUIApiService(new HttpClient { Timeout = TimeSpan.FromMinutes(5) }));
 
+builder.Services.AddScoped<FluxProApiService>(sp =>
+    new FluxProApiService(new HttpClient { Timeout = TimeSpan.FromMinutes(5) }));
+
+builder.Services.AddScoped<FluxProImageProvider>(sp =>
+    new FluxProImageProvider(sp.GetRequiredService<FluxProApiService>()));
+
 // Provider Manager
 builder.Services.AddScoped<ImageProviderManager>(sp =>
 {
     var manager = new ImageProviderManager();
     manager.RegisterProvider(sp.GetRequiredService<GeminiImageProvider>());
     manager.RegisterProvider(sp.GetRequiredService<ComfyUIApiService>());
+    manager.RegisterProvider(sp.GetRequiredService<FluxProImageProvider>());
     return manager;
 });
 
@@ -83,9 +89,6 @@ app.UseAntiforgery();
 app.MapRazorComponents<StarTrekGame.AssetGenerator.App>()
     .AddInteractiveServerRenderMode();
 
-// Setup ComfyUI logging
-var comfyManager = app.Services.GetRequiredService<ComfyUIProcessManager>();
-comfyManager.OnLogMessage += msg => Console.WriteLine(msg);
-
-// The IHostedService will handle StopAsync automatically when the app stops
+// The ComfyUI process manager is available but does NOT auto-start.
+// Connect via the UI when needed.
 app.Run();

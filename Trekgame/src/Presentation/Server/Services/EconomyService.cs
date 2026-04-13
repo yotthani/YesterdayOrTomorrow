@@ -9,7 +9,7 @@ public interface IEconomyService
 {
     Task<EconomyReport> CalculateHouseEconomyAsync(Guid houseId);
     Task<ColonyEconomyReport> CalculateColonyEconomyAsync(Guid colonyId);
-    Task ProcessEconomyTurnAsync(Guid gameId);
+    Task<EconomyPhaseResult> ProcessEconomyTurnAsync(Guid gameId);
     Task<MarketTransaction> ExecuteMarketTradeAsync(Guid houseId, string resourceType, int amount, bool isBuying);
 }
 
@@ -80,6 +80,24 @@ public class EconomyService : IEconomyService
                 report.EnergyExpense += ship.EnergyUpkeep;
             }
             report.DeuteriumExpense += fleet.DeuteriumUpkeep;
+        }
+
+        // Station maintenance
+        var factionStations = await _db.Stations
+            .Include(s => s.Modules)
+            .Where(s => s.FactionId == house.FactionId && s.IsOperational)
+            .ToListAsync();
+
+        foreach (var station in factionStations)
+        {
+            foreach (var module in station.Modules.Where(m => m.IsOnline && !m.IsUnderConstruction))
+            {
+                var def = StationModuleDefinitions.Get(module.ModuleType);
+                if (def != null)
+                {
+                    report.EnergyExpense += def.MaintenanceEnergy;
+                }
+            }
         }
 
         // Calculate net
@@ -192,21 +210,42 @@ public class EconomyService : IEconomyService
     /// <summary>
     /// Process economy for all houses in a game at turn end
     /// </summary>
-    public async Task ProcessEconomyTurnAsync(Guid gameId)
+    public async Task<EconomyPhaseResult> ProcessEconomyTurnAsync(Guid gameId)
     {
+        var factionEconomy = new Dictionary<Guid, (int Income, int Expenses, int Energy, int Food)>();
+
         var game = await _db.Games
             .Include(g => g.Factions)
                 .ThenInclude(f => f.Houses)
             .FirstOrDefaultAsync(g => g.Id == gameId);
 
-        if (game == null) return;
+        if (game == null) return new EconomyPhaseResult(factionEconomy);
 
         foreach (var faction in game.Factions)
         {
+            // Load faction tech modifiers
+            var factionWithMods = await _db.Factions.FindAsync(faction.Id);
+
+            int factionIncome = 0, factionExpenses = 0, factionEnergy = 0, factionFood = 0;
+
             foreach (var house in faction.Houses)
             {
                 var report = await CalculateHouseEconomyAsync(house.Id);
-                
+
+                // Apply faction tech modifiers to production
+                if (factionWithMods != null)
+                {
+                    report.EnergyIncome = ApplyModifier(report.EnergyIncome, factionWithMods.EnergyProductionModifier);
+                    report.MineralsIncome = ApplyModifier(report.MineralsIncome, factionWithMods.MineralProductionModifier);
+                    report.PhysicsIncome = ApplyModifier(report.PhysicsIncome, factionWithMods.ResearchBonusModifier);
+                    report.EngineeringIncome = ApplyModifier(report.EngineeringIncome, factionWithMods.ResearchBonusModifier);
+                    report.SocietyIncome = ApplyModifier(report.SocietyIncome, factionWithMods.ResearchBonusModifier);
+
+                    // Recalculate net values
+                    report.EnergyNet = report.EnergyIncome - report.EnergyExpense;
+                    report.MineralsNet = report.MineralsIncome - report.MineralsExpense;
+                }
+
                 // Apply changes to treasury
                 var treasury = house.Treasury.Primary;
                 
@@ -258,13 +297,22 @@ public class EconomyService : IEconomyService
                 research.EngineeringChange = report.EngineeringIncome;
                 research.SocietyChange = report.SocietyIncome;
 
+                // Accumulate faction-level totals
+                factionIncome += report.CreditsIncome;
+                factionExpenses += report.CreditsExpense;
+                factionEnergy += report.EnergyNet;
+                factionFood += report.FoodNet;
+
                 _logger.LogInformation(
                     "House {House} economy: Credits {Credits:+#;-#;0}, Energy {Energy:+#;-#;0}, Minerals {Minerals:+#;-#;0}",
                     house.Name, report.CreditsNet, report.EnergyNet, report.MineralsNet);
             }
+
+            factionEconomy[faction.Id] = (factionIncome, factionExpenses, factionEnergy, factionFood);
         }
 
         await _db.SaveChangesAsync();
+        return new EconomyPhaseResult(factionEconomy);
     }
 
     /// <summary>
@@ -366,6 +414,16 @@ public class EconomyService : IEconomyService
             TotalCost = totalCost,
             NewPrice = price
         };
+    }
+
+    /// <summary>
+    /// Apply a percentage modifier to a base value.
+    /// modifierPercent of 15 means +15% → value * 1.15
+    /// </summary>
+    private static int ApplyModifier(int baseValue, int modifierPercent)
+    {
+        if (modifierPercent == 0) return baseValue;
+        return (int)(baseValue * (1.0 + modifierPercent / 100.0));
     }
 }
 

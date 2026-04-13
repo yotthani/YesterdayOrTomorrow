@@ -1,0 +1,577 @@
+@page "/game/leaders"
+@layout StellarisLayout
+@using StarTrekGame.Web.Services
+@using Blazored.LocalStorage
+@using MudBlazor
+@inject IGameApiClient Api
+@inject ILocalStorageService LocalStorage
+@inject ISnackbar Snackbar
+
+<PageTitle>Leaders - Galactic Strategy</PageTitle>
+
+<div class="leaders-page">
+    <div class="leaders-header">
+        <h1>OFFICERS & LEADERS</h1>
+        <p>Recruit, assign, and develop your faction's leadership.</p>
+        <button class="btn-recruit" @onclick="ShowRecruitPanel">
+            + Recruit Officer
+        </button>
+    </div>
+
+    @if (_loading)
+    {
+        <div class="loading-indicator">Scanning personnel records...</div>
+    }
+    else
+    {
+        <!-- Active Leaders Grid -->
+        <div class="leaders-grid">
+            @if (_leaders.Count == 0)
+            {
+                <div class="empty-state">
+                    <span class="empty-icon">👤</span>
+                    <p>No officers recruited yet. Recruit your first leader to gain tactical advantages.</p>
+                </div>
+            }
+
+            @foreach (var leader in _leaders.Where(l => !l.IsDead))
+            {
+                <div class="leader-card @(leader.Id == _selectedLeaderId ? "selected" : "") @GetClassStyle(leader.ClassId)"
+                     @onclick="() => SelectLeader(leader)">
+                    <div class="leader-portrait">
+                        <span class="portrait-icon">@leader.Icon</span>
+                        <span class="leader-level">Lv.@leader.Level</span>
+                    </div>
+                    <div class="leader-info">
+                        <div class="leader-name">@leader.Name</div>
+                        <div class="leader-class">@leader.ClassName</div>
+                        <div class="leader-assignment">
+                            @if (leader.AssignedFleetId.HasValue)
+                            {
+                                <span class="assignment-badge fleet">Commanding Fleet</span>
+                            }
+                            else if (leader.AssignedColonyId.HasValue)
+                            {
+                                <span class="assignment-badge colony">Governing Colony</span>
+                            }
+                            else if (!string.IsNullOrEmpty(leader.AssignedResearchBranchId))
+                            {
+                                <span class="assignment-badge research">Lead Scientist</span>
+                            }
+                            else
+                            {
+                                <span class="assignment-badge idle">Unassigned</span>
+                            }
+                        </div>
+                        <div class="leader-traits">
+                            @foreach (var trait in leader.Traits.Take(3))
+                            {
+                                <span class="trait-tag">@trait</span>
+                            }
+                        </div>
+                    </div>
+                    <div class="leader-stats-mini">
+                        @if (leader.Stats.Tactics > 3) { <span title="Tactics">⚔️@leader.Stats.Tactics</span> }
+                        @if (leader.Stats.Leadership > 3) { <span title="Leadership">👑@leader.Stats.Leadership</span> }
+                        @if (leader.Stats.Science > 3) { <span title="Science">🔬@leader.Stats.Science</span> }
+                        @if (leader.Stats.Engineering > 3) { <span title="Engineering">⚙️@leader.Stats.Engineering</span> }
+                        @if (leader.Stats.Diplomacy > 3) { <span title="Diplomacy">🤝@leader.Stats.Diplomacy</span> }
+                    </div>
+                    <div class="leader-xp-bar">
+                        <div class="xp-fill" style="width: @GetXpPercent(leader)%"></div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Selected Leader Detail Panel -->
+        @if (_selectedLeader != null)
+        {
+            <div class="leader-detail-panel">
+                <div class="detail-header">
+                    <span class="detail-icon">@_selectedLeader.Icon</span>
+                    <div>
+                        <h2>@_selectedLeader.Name</h2>
+                        <span class="detail-class">@_selectedLeader.ClassName &mdash; Level @_selectedLeader.Level</span>
+                        <span class="detail-age">Age @_selectedLeader.Age / @_selectedLeader.MaxAge</span>
+                    </div>
+                    <div class="detail-actions">
+                        @if (_selectedLeader.AssignedFleetId.HasValue || _selectedLeader.AssignedColonyId.HasValue)
+                        {
+                            <button class="btn-action unassign" @onclick="UnassignLeader">Unassign</button>
+                        }
+                        else
+                        {
+                            <button class="btn-action assign" @onclick="() => _showAssignModal = true">Assign</button>
+                        }
+                        @if (_selectedLeader.SkillPoints > 0)
+                        {
+                            <button class="btn-action skill" @onclick="ShowSkillPanel">
+                                Learn Skill (@_selectedLeader.SkillPoints pts)
+                            </button>
+                        }
+                    </div>
+                </div>
+
+                <div class="detail-body">
+                    <!-- Stats -->
+                    <div class="stats-panel">
+                        <h3>Attributes</h3>
+                        <div class="stat-bars">
+                            <div class="stat-row"><span class="stat-label">Tactics</span><div class="stat-bar"><div class="stat-fill tactics" style="width: @(_selectedLeader.Stats.Tactics * 10)%"></div></div><span class="stat-val">@_selectedLeader.Stats.Tactics</span></div>
+                            <div class="stat-row"><span class="stat-label">Leadership</span><div class="stat-bar"><div class="stat-fill leadership" style="width: @(_selectedLeader.Stats.Leadership * 10)%"></div></div><span class="stat-val">@_selectedLeader.Stats.Leadership</span></div>
+                            <div class="stat-row"><span class="stat-label">Engineering</span><div class="stat-bar"><div class="stat-fill engineering" style="width: @(_selectedLeader.Stats.Engineering * 10)%"></div></div><span class="stat-val">@_selectedLeader.Stats.Engineering</span></div>
+                            <div class="stat-row"><span class="stat-label">Science</span><div class="stat-bar"><div class="stat-fill science" style="width: @(_selectedLeader.Stats.Science * 10)%"></div></div><span class="stat-val">@_selectedLeader.Stats.Science</span></div>
+                            <div class="stat-row"><span class="stat-label">Diplomacy</span><div class="stat-bar"><div class="stat-fill diplomacy" style="width: @(_selectedLeader.Stats.Diplomacy * 10)%"></div></div><span class="stat-val">@_selectedLeader.Stats.Diplomacy</span></div>
+                            <div class="stat-row"><span class="stat-label">Administration</span><div class="stat-bar"><div class="stat-fill admin" style="width: @(_selectedLeader.Stats.Administration * 10)%"></div></div><span class="stat-val">@_selectedLeader.Stats.Administration</span></div>
+                            <div class="stat-row"><span class="stat-label">Subterfuge</span><div class="stat-bar"><div class="stat-fill subterfuge" style="width: @(_selectedLeader.Stats.Subterfuge * 10)%"></div></div><span class="stat-val">@_selectedLeader.Stats.Subterfuge</span></div>
+                            <div class="stat-row"><span class="stat-label">Charisma</span><div class="stat-bar"><div class="stat-fill charisma" style="width: @(_selectedLeader.Stats.Charisma * 10)%"></div></div><span class="stat-val">@_selectedLeader.Stats.Charisma</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Skills -->
+                    <div class="skills-panel">
+                        <h3>Learned Skills</h3>
+                        @if (_selectedLeader.Skills.Any())
+                        {
+                            <div class="skills-list">
+                                @foreach (var skill in _selectedLeader.Skills)
+                                {
+                                    <div class="skill-entry">
+                                        <span class="skill-name">@skill.SkillId</span>
+                                        <span class="skill-level">Lv.@skill.Level</span>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <p class="no-skills">No skills learned yet. Gain experience to earn skill points.</p>
+                        }
+                    </div>
+
+                    <!-- Traits -->
+                    <div class="traits-panel">
+                        <h3>Traits</h3>
+                        <div class="traits-list">
+                            @foreach (var trait in _selectedLeader.Traits)
+                            {
+                                <span class="trait-chip">@trait</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- Recruitment Panel -->
+        @if (_showRecruitPanel)
+        {
+            <div class="modal-overlay" @onclick="() => _showRecruitPanel = false">
+                <div class="modal recruit-modal" @onclick:stopPropagation="true">
+                    <h2>Recruit Officer</h2>
+                    <p class="modal-subtitle">Select an officer class to add to your faction.</p>
+
+                    <div class="candidates-grid">
+                        @foreach (var candidate in _recruitPool)
+                        {
+                            <div class="candidate-card" @onclick="() => RecruitLeader(candidate.ClassId)">
+                                <span class="candidate-icon">@candidate.Icon</span>
+                                <div class="candidate-info">
+                                    <span class="candidate-name">@candidate.Name</span>
+                                    <span class="candidate-class">@candidate.ClassName</span>
+                                    <div class="candidate-traits">
+                                        @foreach (var trait in candidate.Traits.Take(2))
+                                        {
+                                            <span class="trait-tag small">@trait</span>
+                                        }
+                                    </div>
+                                    <span class="candidate-cost">Cost: @candidate.RecruitCost 💰 | Upkeep: @candidate.Upkeep/turn</span>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <button class="btn-close" @onclick="() => _showRecruitPanel = false">Close</button>
+                </div>
+            </div>
+        }
+
+        <!-- Assignment Modal -->
+        @if (_showAssignModal && _selectedLeader != null)
+        {
+            <div class="modal-overlay" @onclick="() => _showAssignModal = false">
+                <div class="modal assign-modal" @onclick:stopPropagation="true">
+                    <h2>Assign @_selectedLeader.Name</h2>
+
+                    <div class="assign-tabs">
+                        <button class="tab @(_assignTab == "fleet" ? "active" : "")" @onclick='() => _assignTab = "fleet"'>Fleets</button>
+                        <button class="tab @(_assignTab == "colony" ? "active" : "")" @onclick='() => _assignTab = "colony"'>Colonies</button>
+                    </div>
+
+                    <div class="assign-list">
+                        @if (_assignTab == "fleet")
+                        {
+                            @foreach (var fleet in _availableFleets)
+                            {
+                                <div class="assign-option" @onclick="() => AssignToFleet(fleet.Id)">
+                                    <span>🚀 @fleet.Name</span>
+                                    <span class="assign-detail">@fleet.ShipCount ships</span>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            @foreach (var colony in _availableColonies)
+                            {
+                                <div class="assign-option" @onclick="() => AssignToColony(colony.Id)">
+                                    <span>🌍 @colony.Name</span>
+                                    <span class="assign-detail">Pop: @colony.Population</span>
+                                </div>
+                            }
+                        }
+                    </div>
+
+                    <button class="btn-close" @onclick="() => _showAssignModal = false">Close</button>
+                </div>
+            </div>
+        }
+
+        <!-- Skill Learning Modal -->
+        @if (_showSkillPanel && _selectedLeader != null)
+        {
+            <div class="modal-overlay" @onclick="() => _showSkillPanel = false">
+                <div class="modal skill-modal" @onclick:stopPropagation="true">
+                    <h2>Learn Skill (@_selectedLeader.SkillPoints skill points)</h2>
+
+                    <div class="available-skills">
+                        @foreach (var skill in _availableSkills)
+                        {
+                            <div class="skill-option" @onclick="() => LearnSkill(skill.Id)">
+                                <span class="skill-icon">@skill.Icon</span>
+                                <div class="skill-info">
+                                    <span class="skill-name">@skill.Name</span>
+                                    <span class="skill-desc">@skill.Description</span>
+                                    <span class="skill-category">@skill.Category &mdash; Lv.@skill.CurrentLevel/@skill.MaxLevel</span>
+                                    <div class="skill-effects">
+                                        @foreach (var effect in skill.Effects.Take(2))
+                                        {
+                                            <span class="effect-tag">@effect</span>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <button class="btn-close" @onclick="() => _showSkillPanel = false">Close</button>
+                </div>
+            </div>
+        }
+    }
+</div>
+
+<style>
+.leaders-page { flex: 1; padding: 24px; background: linear-gradient(180deg, #080c14, #040608); overflow-y: auto; color: #c8d4e8; }
+.leaders-header { display: flex; align-items: center; gap: 20px; margin-bottom: 24px; flex-wrap: wrap; }
+.leaders-header h1 { font-family: var(--st-font-display); font-size: 24px; color: #ff9900; letter-spacing: 3px; margin: 0; }
+.leaders-header p { color: #a8c0d8; margin: 0; flex: 1; }
+.btn-recruit { padding: 10px 20px; background: linear-gradient(135deg, #1a6b3a, #0d4d26); border: 1px solid #2a8b4a; border-radius: 6px; color: #7cfc7c; font-size: 13px; cursor: pointer; letter-spacing: 1px; }
+.btn-recruit:hover { background: linear-gradient(135deg, #228b42, #1a6b3a); }
+.loading-indicator { text-align: center; padding: 60px; color: #667788; font-size: 14px; }
+
+/* Leaders Grid */
+.leaders-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 12px; margin-bottom: 20px; }
+.leader-card { background: rgba(20, 30, 45, 0.9); border: 1px solid rgba(60, 90, 130, 0.4); border-radius: 8px; padding: 14px; display: flex; gap: 12px; cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden; }
+.leader-card:hover { border-color: rgba(74, 158, 255, 0.5); background: rgba(25, 40, 60, 0.9); }
+.leader-card.selected { border-color: #4a9eff; box-shadow: 0 0 12px rgba(74, 158, 255, 0.2); }
+.leader-card.admiral { border-left: 3px solid #e74c3c; }
+.leader-card.governor { border-left: 3px solid #2ecc71; }
+.leader-card.scientist { border-left: 3px solid #3498db; }
+.leader-card.general { border-left: 3px solid #e67e22; }
+.leader-card.diplomat { border-left: 3px solid #9b59b6; }
+.leader-card.spymaster { border-left: 3px solid #1abc9c; }
+
+.leader-portrait { display: flex; flex-direction: column; align-items: center; min-width: 50px; }
+.portrait-icon { font-size: 32px; }
+.leader-level { font-size: 10px; color: #ff9900; font-weight: bold; margin-top: 4px; background: rgba(255,153,0,0.15); padding: 1px 6px; border-radius: 8px; }
+
+.leader-info { flex: 1; min-width: 0; }
+.leader-name { font-weight: bold; font-size: 14px; color: #e8ecf0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.leader-class { font-size: 11px; color: #667788; margin-bottom: 4px; }
+.leader-assignment { margin-bottom: 4px; }
+.assignment-badge { font-size: 10px; padding: 2px 8px; border-radius: 10px; }
+.assignment-badge.fleet { background: rgba(231, 76, 60, 0.2); color: #e74c3c; }
+.assignment-badge.colony { background: rgba(46, 204, 113, 0.2); color: #2ecc71; }
+.assignment-badge.research { background: rgba(52, 152, 219, 0.2); color: #3498db; }
+.assignment-badge.idle { background: rgba(127, 140, 141, 0.2); color: #7f8c8d; }
+.leader-traits { display: flex; gap: 4px; flex-wrap: wrap; }
+.trait-tag { font-size: 9px; padding: 1px 6px; background: rgba(74, 158, 255, 0.12); border: 1px solid rgba(74, 158, 255, 0.25); border-radius: 6px; color: #88bbff; }
+.trait-tag.small { font-size: 8px; }
+.leader-stats-mini { display: flex; flex-direction: column; gap: 2px; font-size: 11px; }
+.leader-stats-mini span { white-space: nowrap; }
+.leader-xp-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: rgba(255,255,255,0.05); }
+.xp-fill { height: 100%; background: linear-gradient(90deg, #ff9900, #ffcc00); border-radius: 0 0 8px 8px; }
+
+/* Empty state */
+.empty-state { grid-column: 1 / -1; text-align: center; padding: 60px 20px; }
+.empty-icon { font-size: 48px; display: block; margin-bottom: 16px; opacity: 0.5; }
+.empty-state p { color: #667788; max-width: 400px; margin: 0 auto; }
+
+/* Detail Panel */
+.leader-detail-panel { background: rgba(15, 22, 35, 0.95); border: 1px solid rgba(60, 90, 130, 0.5); border-radius: 10px; padding: 20px; margin-top: 4px; }
+.detail-header { display: flex; align-items: center; gap: 16px; padding-bottom: 16px; border-bottom: 1px solid rgba(60, 90, 130, 0.3); }
+.detail-icon { font-size: 48px; }
+.detail-header h2 { margin: 0; font-size: 20px; color: #e8ecf0; }
+.detail-class { font-size: 12px; color: #88aacc; display: block; }
+.detail-age { font-size: 11px; color: #667788; display: block; }
+.detail-actions { margin-left: auto; display: flex; gap: 8px; }
+.btn-action { padding: 8px 16px; border: 1px solid rgba(60, 90, 130, 0.5); border-radius: 6px; font-size: 12px; cursor: pointer; background: transparent; color: #c8d4e8; }
+.btn-action.assign { border-color: #2ecc71; color: #2ecc71; }
+.btn-action.assign:hover { background: rgba(46, 204, 113, 0.15); }
+.btn-action.unassign { border-color: #e67e22; color: #e67e22; }
+.btn-action.skill { border-color: #3498db; color: #3498db; }
+.btn-action.skill:hover { background: rgba(52, 152, 219, 0.15); }
+
+.detail-body { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-top: 16px; }
+.detail-body h3 { font-size: 12px; color: #667788; text-transform: uppercase; letter-spacing: 2px; margin: 0 0 12px; }
+
+/* Stats bars */
+.stat-bars { display: flex; flex-direction: column; gap: 6px; }
+.stat-row { display: flex; align-items: center; gap: 8px; }
+.stat-label { font-size: 11px; color: #88aacc; min-width: 80px; }
+.stat-bar { flex: 1; height: 6px; background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden; }
+.stat-fill { height: 100%; border-radius: 3px; }
+.stat-fill.tactics { background: #e74c3c; }
+.stat-fill.leadership { background: #f39c12; }
+.stat-fill.engineering { background: #e67e22; }
+.stat-fill.science { background: #3498db; }
+.stat-fill.diplomacy { background: #9b59b6; }
+.stat-fill.admin { background: #2ecc71; }
+.stat-fill.subterfuge { background: #1abc9c; }
+.stat-fill.charisma { background: #e91e63; }
+.stat-val { font-size: 11px; color: #c8d4e8; min-width: 16px; text-align: right; }
+
+/* Skills */
+.skills-list { display: flex; flex-direction: column; gap: 6px; }
+.skill-entry { display: flex; justify-content: space-between; padding: 6px 10px; background: rgba(52, 152, 219, 0.08); border-radius: 4px; font-size: 12px; }
+.skill-level { color: #3498db; font-weight: bold; }
+.no-skills { font-size: 12px; color: #556677; font-style: italic; }
+
+/* Traits */
+.traits-list { display: flex; flex-wrap: wrap; gap: 6px; }
+.trait-chip { padding: 4px 10px; background: rgba(155, 89, 182, 0.12); border: 1px solid rgba(155, 89, 182, 0.3); border-radius: 12px; font-size: 11px; color: #bb88ee; }
+
+/* Modals */
+.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.75); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+.modal { background: #0d1420; border: 1px solid rgba(60, 90, 130, 0.5); border-radius: 12px; padding: 24px; min-width: 450px; max-width: 600px; max-height: 80vh; overflow-y: auto; }
+.modal h2 { margin: 0 0 4px; font-size: 18px; color: #ff9900; }
+.modal-subtitle { font-size: 12px; color: #667788; margin-bottom: 16px; }
+.btn-close { width: 100%; padding: 10px; margin-top: 16px; background: rgba(60, 90, 130, 0.3); border: 1px solid rgba(60, 90, 130, 0.5); border-radius: 6px; color: #c8d4e8; cursor: pointer; }
+
+/* Recruitment */
+.candidates-grid { display: flex; flex-direction: column; gap: 8px; }
+.candidate-card { display: flex; gap: 12px; padding: 12px; background: rgba(20, 30, 45, 0.9); border: 1px solid rgba(60, 90, 130, 0.3); border-radius: 8px; cursor: pointer; }
+.candidate-card:hover { border-color: #2ecc71; background: rgba(46, 204, 113, 0.05); }
+.candidate-icon { font-size: 28px; }
+.candidate-info { flex: 1; }
+.candidate-name { font-weight: bold; font-size: 13px; color: #e8ecf0; display: block; }
+.candidate-class { font-size: 11px; color: #88aacc; display: block; margin-bottom: 4px; }
+.candidate-cost { font-size: 10px; color: #667788; display: block; margin-top: 4px; }
+
+/* Assignment */
+.assign-tabs { display: flex; gap: 4px; margin-bottom: 12px; }
+.tab { padding: 8px 16px; background: transparent; border: 1px solid rgba(60, 90, 130, 0.3); border-radius: 6px; color: #88aacc; cursor: pointer; font-size: 12px; }
+.tab.active { background: rgba(74, 158, 255, 0.15); border-color: #4a9eff; color: #4a9eff; }
+.assign-list { display: flex; flex-direction: column; gap: 6px; max-height: 300px; overflow-y: auto; }
+.assign-option { display: flex; justify-content: space-between; padding: 10px 14px; background: rgba(20, 30, 45, 0.9); border: 1px solid rgba(60, 90, 130, 0.3); border-radius: 6px; cursor: pointer; font-size: 13px; }
+.assign-option:hover { border-color: #4a9eff; }
+.assign-detail { font-size: 11px; color: #667788; }
+
+/* Skill Learning */
+.available-skills { display: flex; flex-direction: column; gap: 8px; }
+.skill-option { display: flex; gap: 12px; padding: 12px; background: rgba(20, 30, 45, 0.9); border: 1px solid rgba(60, 90, 130, 0.3); border-radius: 8px; cursor: pointer; }
+.skill-option:hover { border-color: #3498db; }
+.skill-icon { font-size: 24px; }
+.skill-info { flex: 1; }
+.skill-info .skill-name { font-weight: bold; font-size: 13px; color: #e8ecf0; display: block; }
+.skill-desc { font-size: 11px; color: #88aacc; display: block; margin: 2px 0; }
+.skill-category { font-size: 10px; color: #667788; }
+.skill-effects { display: flex; gap: 4px; margin-top: 4px; }
+.effect-tag { font-size: 9px; padding: 1px 6px; background: rgba(46, 204, 113, 0.12); border-radius: 4px; color: #7cfc7c; }
+
+@@media (max-width: 900px) {
+    .detail-body { grid-template-columns: 1fr; }
+    .leaders-grid { grid-template-columns: 1fr; }
+}
+</style>
+
+@code {
+    private Guid? _factionId;
+    private bool _loading = true;
+    private List<LeaderDto> _leaders = [];
+    private LeaderDto? _selectedLeader;
+    private Guid? _selectedLeaderId;
+
+    // Recruitment
+    private bool _showRecruitPanel;
+    private List<LeaderCandidateDto> _recruitPool = [];
+
+    // Assignment
+    private bool _showAssignModal;
+    private string _assignTab = "fleet";
+    private List<FleetInfo> _availableFleets = [];
+    private List<ColonyInfo> _availableColonies = [];
+
+    // Skills
+    private bool _showSkillPanel;
+    private List<LeaderSkillDto> _availableSkills = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        _factionId = await LocalStorage.GetItemAsync<Guid?>("currentFactionId");
+        await LoadLeaders();
+    }
+
+    private async Task LoadLeaders()
+    {
+        _loading = true;
+        if (_factionId.HasValue)
+        {
+            try
+            {
+                _leaders = await Api.GetLeadersAsync(_factionId.Value);
+            }
+            catch { _leaders = []; }
+        }
+        _loading = false;
+    }
+
+    private void SelectLeader(LeaderDto leader)
+    {
+        _selectedLeaderId = leader.Id;
+        _selectedLeader = leader;
+    }
+
+    private async Task ShowRecruitPanel()
+    {
+        if (_factionId.HasValue)
+        {
+            try { _recruitPool = await Api.GetRecruitmentPoolAsync(_factionId.Value); }
+            catch { _recruitPool = []; }
+        }
+        _showRecruitPanel = true;
+    }
+
+    private async Task RecruitLeader(string classId)
+    {
+        if (!_factionId.HasValue) return;
+        try
+        {
+            var leader = await Api.RecruitLeaderAsync(_factionId.Value, classId);
+            if (leader != null)
+            {
+                Snackbar.Add($"Recruited {leader.Name} ({leader.ClassName})", Severity.Success);
+                _showRecruitPanel = false;
+                await LoadLeaders();
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Recruitment failed: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private async Task UnassignLeader()
+    {
+        if (_selectedLeader == null) return;
+        try
+        {
+            await Api.UnassignLeaderAsync(_selectedLeader.Id);
+            Snackbar.Add($"{_selectedLeader.Name} unassigned", Severity.Info);
+            await LoadLeaders();
+            _selectedLeader = _leaders.FirstOrDefault(l => l.Id == _selectedLeaderId);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Failed: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private async Task AssignToFleet(Guid fleetId)
+    {
+        if (_selectedLeader == null) return;
+        try
+        {
+            await Api.AssignLeaderToFleetAsync(_selectedLeader.Id, fleetId);
+            Snackbar.Add($"{_selectedLeader.Name} assigned to fleet", Severity.Success);
+            _showAssignModal = false;
+            await LoadLeaders();
+            _selectedLeader = _leaders.FirstOrDefault(l => l.Id == _selectedLeaderId);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Failed: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private async Task AssignToColony(Guid colonyId)
+    {
+        if (_selectedLeader == null) return;
+        try
+        {
+            await Api.AssignLeaderToColonyAsync(_selectedLeader.Id, colonyId);
+            Snackbar.Add($"{_selectedLeader.Name} assigned as governor", Severity.Success);
+            _showAssignModal = false;
+            await LoadLeaders();
+            _selectedLeader = _leaders.FirstOrDefault(l => l.Id == _selectedLeaderId);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Failed: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private async Task ShowSkillPanel()
+    {
+        if (_selectedLeader == null) return;
+        try { _availableSkills = await Api.GetAvailableSkillsAsync(_selectedLeader.Id); }
+        catch { _availableSkills = []; }
+        _showSkillPanel = true;
+    }
+
+    private async Task LearnSkill(string skillId)
+    {
+        if (_selectedLeader == null) return;
+        try
+        {
+            await Api.LearnSkillAsync(_selectedLeader.Id, skillId);
+            Snackbar.Add($"Skill learned!", Severity.Success);
+            _showSkillPanel = false;
+            await LoadLeaders();
+            _selectedLeader = _leaders.FirstOrDefault(l => l.Id == _selectedLeaderId);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Failed: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private int GetXpPercent(LeaderDto leader) =>
+        leader.Level >= 10 ? 100 : Math.Min(100, leader.ExperiencePoints % 100);
+
+    private string GetClassStyle(string classId) => classId?.ToLower() switch
+    {
+        "admiral" or "fleet_commander" => "admiral",
+        "governor" or "administrator" => "governor",
+        "scientist" or "researcher" => "scientist",
+        "general" or "ground_commander" => "general",
+        "diplomat" or "ambassador" => "diplomat",
+        "spymaster" or "agent_handler" => "spymaster",
+        _ => ""
+    };
+
+    // Helper types for assignment modal
+    public class FleetInfo { public Guid Id { get; set; } public string Name { get; set; } = ""; public int ShipCount { get; set; } }
+    public class ColonyInfo { public Guid Id { get; set; } public string Name { get; set; } = ""; public int Population { get; set; } }
+}

@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Star Trek Ship Generator — ComfyUI Playground</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0e14;
+    --surface: #131924;
+    --surface2: #1a2233;
+    --border: #2a3545;
+    --text: #c8d0dc;
+    --text-dim: #6b7a8d;
+    --accent: #4a9eff;
+    --accent2: #ff6b4a;
+    --success: #4aff8b;
+    --warn: #ffb84a;
+    --font: system-ui, -apple-system, sans-serif;
+    --mono: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 13px;
+    line-height: 1.5;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* Layout */
+  .app {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    grid-template-rows: auto 1fr auto;
+    height: 100vh;
+    gap: 0;
+  }
+
+  /* Header */
+  .header {
+    grid-column: 1 / -1;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .header h1 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 0.5px;
+  }
+
+  .header h1 span { color: var(--text-dim); font-weight: 400; }
+
+  .connection {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+  }
+
+  .status-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--accent2);
+  }
+
+  .status-dot.ok { background: var(--success); }
+
+  /* Controls Panel */
+  .controls {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .section {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .section-header {
+    padding: 8px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--accent);
+    background: rgba(74, 158, 255, 0.05);
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .section-header::after { content: '▾'; color: var(--text-dim); }
+  .section.collapsed .section-header::after { content: '▸'; }
+  .section.collapsed .section-body { display: none; }
+
+  .section-body {
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  /* Controls */
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+
+  label .label-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  label .val {
+    font-family: var(--mono);
+    color: var(--accent);
+    font-size: 11px;
+  }
+
+  select, input[type="number"], textarea {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 4px;
+    padding: 6px 8px;
+    font-family: var(--font);
+    font-size: 12px;
+    width: 100%;
+  }
+
+  textarea {
+    font-family: var(--mono);
+    font-size: 11px;
+    resize: vertical;
+    min-height: 60px;
+  }
+
+  select:focus, input:focus, textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  input[type="range"] {
+    width: 100%;
+    height: 4px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: var(--border);
+    border-radius: 2px;
+    outline: none;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .row-3 { grid-template-columns: 1fr 1fr 1fr; }
+
+  /* Presets */
+  .presets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .preset-btn {
+    padding: 4px 8px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-dim);
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .preset-btn:hover { border-color: var(--accent); color: var(--text); }
+  .preset-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(74,158,255,0.1); }
+
+  /* Generate Button */
+  .generate-btn {
+    padding: 10px;
+    background: var(--accent);
+    border: none;
+    border-radius: 6px;
+    color: #000;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    transition: all 0.15s;
+  }
+
+  .generate-btn:hover { filter: brightness(1.1); }
+  .generate-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .generate-btn.running { background: var(--warn); }
+
+  /* Preview Area */
+  .preview {
+    overflow-y: auto;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .preview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .preview-header h2 { font-size: 13px; font-weight: 600; }
+
+  .clear-btn {
+    padding: 4px 10px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-dim);
+    font-size: 11px;
+    cursor: pointer;
+  }
+
+  .clear-btn:hover { border-color: var(--accent2); color: var(--accent2); }
+
+  .results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px;
+  }
+
+  .result-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .result-card img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: contain;
+    background: #000;
+    display: block;
+  }
+
+  .result-card .meta {
+    padding: 8px 10px;
+    font-size: 10px;
+    font-family: var(--mono);
+    color: var(--text-dim);
+    border-top: 1px solid var(--border);
+    line-height: 1.6;
+  }
+
+  .result-card .meta strong { color: var(--text); }
+
+  .result-card .tag {
+    display: inline-block;
+    padding: 1px 5px;
+    background: rgba(74,158,255,0.15);
+    color: var(--accent);
+    border-radius: 3px;
+    font-size: 9px;
+    margin-right: 3px;
+  }
+
+  .result-card .tag.warn { background: rgba(255,184,74,0.15); color: var(--warn); }
+
+  .result-card .export-btn {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    padding: 3px 7px;
+    background: rgba(0,0,0,0.7);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text);
+    font-size: 10px;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+
+  .result-card:hover .export-btn { opacity: 1; }
+
+  /* Progress */
+  .progress {
+    display: none;
+    padding: 8px 10px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 11px;
+    color: var(--text-dim);
+    animation: pulse 1.5s infinite;
+  }
+
+  .progress.active { display: block; }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+  }
+
+  /* Footer / Prompt Output */
+  .footer {
+    grid-column: 1 / -1;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+
+  .footer code {
+    font-family: var(--mono);
+    background: var(--bg);
+    padding: 2px 6px;
+    border-radius: 3px;
+    color: var(--text);
+  }
+
+  .copy-btn {
+    padding: 4px 10px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text);
+    font-size: 11px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .copy-btn:hover { border-color: var(--accent); }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
+
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 300px;
+    color: var(--text-dim);
+    text-align: center;
+    gap: 8px;
+  }
+
+  .empty-state .icon { font-size: 48px; opacity: 0.3; }
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- Header -->
+  <div class="header">
+    <h1>STAR TREK SHIP GENERATOR <span>— ComfyUI Playground</span></h1>
+    <div class="connection">
+      <div class="status-dot" id="statusDot"></div>
+      <span id="statusText">Checking...</span>
+    </div>
+  </div>
+
+  <!-- Controls -->
+  <div class="controls">
+    <!-- Ship Class Presets -->
+    <div class="section">
+      <div class="section-header" onclick="toggleSection(this)">Ship Class Presets</div>
+      <div class="section-body">
+        <div class="presets" id="presets"></div>
+      </div>
+    </div>
+
+    <!-- Prompt -->
+    <div class="section">
+      <div class="section-header" onclick="toggleSection(this)">Prompt</div>
+      <div class="section-body">
+        <label>
+          Positive Prompt
+          <textarea id="positivePrompt" rows="4"></textarea>
+        </label>
+        <label>
+          Negative Prompt
+          <textarea id="negativePrompt" rows="3"></textarea>
+        </label>
+      </div>
+    </div>
+
+    <!-- Enterprise LoRA -->
+    <div class="section">
+      <div class="section-header" onclick="toggleSection(this)">Enterprise LoRA (Ship Exterior)</div>
+      <div class="section-body">
+        <label>
+          <div class="label-row"><span>Model Strength</span><span class="val" id="entModelVal">0.25</span></div>
+          <input type="range" id="entModel" min="0" max="1" step="0.05" value="0.25" oninput="updateSlider(this,'entModelVal')">
+        </label>
+        <label>
+          <div class="label-row"><span>CLIP Strength</span><span class="val" id="entClipVal">0.15</span></div>
+          <input type="range" id="entClip" min="0" max="1" step="0.05" value="0.15" oninput="updateSlider(this,'entClipVal')">
+        </label>
+      </div>
+    </div>
+
+    <!-- TNG LoRA -->
+    <div class="section">
+      <div class="section-header" onclick="toggleSection(this)">StarTrek TNG LoRA (Aesthetic)</div>
+      <div class="section-body">
+        <label>
+          <div class="label-row"><span>Model Strength</span><span class="val" id="tngModelVal">0.50</span></div>
+          <input type="range" id="tngModel" min="0" max="1" step="0.05" value="0.50" oninput="updateSlider(this,'tngModelVal')">
+        </label>
+        <label>
+          <div class="label-row"><span>CLIP Strength</span><span class="val" id="tngClipVal">0.50</span></div>
+          <input type="range" id="tngClip" min="0" max="1" step="0.05" value="0.50" oninput="updateSlider(this,'tngClipVal')">
+        </label>
+      </div>
+    </div>
+
+    <!-- startrekv14 LoRA -->
+    <div class="section collapsed">
+      <div class="section-header" onclick="toggleSection(this)">startrekv14 LoRA (SD1.5 Ships)</div>
+      <div class="section-body">
+        <label>
+          <div class="label-row"><span>Model Strength</span><span class="val" id="v14ModelVal">0.00</span></div>
+          <input type="range" id="v14Model" min="0" max="1" step="0.05" value="0" oninput="updateSlider(this,'v14ModelVal')">
+        </label>
+        <label>
+          <div class="label-row"><span>CLIP Strength</span><span class="val" id="v14ClipVal">0.00</span></div>
+          <input type="range" id="v14Clip" min="0" max="1" step="0.05" value="0" oninput="updateSlider(this,'v14ClipVal')">
+        </label>
+        <div style="font-size:10px;color:var(--text-dim);padding:4px 0;">
+          SD 1.5 based — may not work well with SDXL. Experiment at low strengths (0.1-0.3).
+        </div>
+      </div>
+    </div>
+
+    <!-- Sampler Settings -->
+    <div class="section collapsed">
+      <div class="section-header" onclick="toggleSection(this)">Sampler Settings</div>
+      <div class="section-body">
+        <div class="row">
+          <label>
+            Steps
+            <input type="number" id="steps" value="50" min="10" max="150">
+          </label>
+          <label>
+            CFG Scale
+            <input type="number" id="cfg" value="7.5" min="1" max="20" step="0.5">
+          </label>
+        </div>
+        <div class="row">
+          <label>
+            Resolution
+            <select id="resolution">
+              <option value="768">768×768</option>
+              <option value="1024" selected>1024×1024</option>
+              <option value="1280">1280×1280</option>
+            </select>
+          </label>
+          <label>
+            Seed (-1 = random)
+            <input type="number" id="seed" value="-1" min="-1">
+          </label>
+        </div>
+        <label>
+          Sampler
+          <select id="sampler">
+            <option value="dpmpp_3m_sde_gpu" selected>DPM++ 3M SDE GPU</option>
+            <option value="dpmpp_2m_sde_gpu">DPM++ 2M SDE GPU</option>
+            <option value="euler">Euler</option>
+            <option value="euler_ancestral">Euler Ancestral</option>
+            <option value="dpmpp_2m">DPM++ 2M</option>
+          </select>
+        </label>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <button class="generate-btn" id="generateBtn" onclick="generate()">▶ GENERATE</button>
+    <div class="progress" id="progress">Generating... polling for result</div>
+  </div>
+
+  <!-- Preview -->
+  <div class="preview">
+    <div class="preview-header">
+      <h2>Results</h2>
+      <button class="clear-btn" onclick="clearResults()">Clear All</button>
+    </div>
+    <div class="results-grid" id="resultsGrid">
+      <div class="empty-state" id="emptyState">
+        <div class="icon">🚀</div>
+        <div>No results yet</div>
+        <div style="font-size:11px;">Select a ship class preset and click Generate</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <span>ComfyUI endpoint:</span>
+    <code>http://127.0.0.1:8188</code>
+    <span style="flex:1"></span>
+    <span id="workflowSummary" style="color:var(--text-dim);font-family:var(--mono);font-size:10px;"></span>
+    <button class="copy-btn" onclick="copyWorkflow()">Copy Workflow JSON</button>
+  </div>
+</div>
+
+<script>
+const API = 'http://127.0.0.1:8188';
+const CLIENT_ID = 'playground-' + Math.random().toString(36).substring(7);
+
+// Default negative prompt
+const DEFAULT_NEGATIVE = 'blurry, low quality, distorted, watermark, text, signature, ugly, deformed, amateur, bad anatomy, bad proportions, duplicate, morbid, mutilated, poorly drawn, mutation, disfigured, gross proportions, malformed limbs, missing arms, missing legs, extra arms, extra legs, fused fingers, too many fingers, long neck, extra head, multiple ships, fleet, formation, group of ships, two ships, three ships, planet, crew members, earth vehicles, submarine, airplane, modern, claymation, clay, plasticine, cartoon';
+
+// Ship class presets — each has optimal LoRA settings + prompt
+const PRESETS = {
+  'Constitution': {
+    prompt: 'star trek original series Constitution class starship, round saucer section, light gray hull, centered composition, isometric view, black background, game asset, masterpiece, highly detailed',
+    entModel: 0.25, entClip: 0.15,
+    tngModel: 0.5, tngClip: 0.5,
+    v14Model: 0, v14Clip: 0,
+  },
+  'Galaxy': {
+    prompt: 'Enterprise, Galaxy class starship, light gray hull, centered composition, isometric view, black background, game asset, masterpiece, highly detailed',
+    entModel: 1.0, entClip: 1.0,
+    tngModel: 0.3, tngClip: 0.3,
+    v14Model: 0, v14Clip: 0,
+  },
+  'Sovereign': {
+    prompt: 'star trek movie era Sovereign class starship, sleek elongated hull, light gray hull, centered composition, isometric view, black background, game asset, masterpiece, highly detailed',
+    entModel: 0.25, entClip: 0.15,
+    tngModel: 0.5, tngClip: 0.5,
+    v14Model: 0, v14Clip: 0,
+  },
+  'Defiant': {
+    prompt: 'star trek DS9 era Defiant class starship, compact warship, dark gray hull, centered composition, isometric view, black background, game asset, masterpiece, highly detailed',
+    entModel: 0.25, entClip: 0.15,
+    tngModel: 0.5, tngClip: 0.5,
+    v14Model: 0, v14Clip: 0,
+  },
+  'Intrepid': {
+    prompt: 'star trek Intrepid class starship, variable geometry nacelles, light gray hull, centered composition, isometric view, black background, game asset, masterpiece, highly detailed',
+    entModel: 0.25, entClip: 0.15,
+    tngModel: 0.5, tngClip: 0.5,
+    v14Model: 0, v14Clip: 0,
+  },
+  'Bird of Prey': {
+    prompt: 'star trek Klingon Bird of Prey class starship, bird-shaped wings, dark green hull, centered composition, isometric view, black background, game asset, masterpiece, highly detailed',
+    entModel: 0.25, entClip: 0.15,
+    tngModel: 0.5, tngClip: 0.5,
+    v14Model: 0, v14Clip: 0,
+  },
+  "D'Deridex": {
+    prompt: "star trek Romulan D'Deridex class warbird, double-hull warbird with open center, green hull, centered composition, isometric view, black background, game asset, masterpiece, highly detailed",
+    entModel: 0.25, entClip: 0.15,
+    tngModel: 0.5, tngClip: 0.5,
+    v14Model: 0, v14Clip: 0,
+  },
+  'No LoRA': {
+    prompt: 'star trek Constitution class starship, USS Enterprise NCC-1701, round saucer section, cylindrical nacelles, light gray hull, centered composition, isometric view, black background, game asset, masterpiece, highly detailed',
+    entModel: 0, entClip: 0,
+    tngModel: 0, tngClip: 0,
+    v14Model: 0, v14Clip: 0,
+  },
+  'v14 Only': {
+    prompt: 'star trek Constitution class starship, round saucer section, light gray hull, centered composition, isometric view, black background, game asset, masterpiece, highly detailed',
+    entModel: 0, entClip: 0,
+    tngModel: 0, tngClip: 0,
+    v14Model: 0.5, v14Clip: 0.5,
+  },
+  'Ent High': {
+    prompt: 'Enterprise, Constitution class starship, light gray hull, centered composition, isometric view, black background, game asset, masterpiece, highly detailed',
+    entModel: 0.9, entClip: 0.8,
+    tngModel: 0.3, tngClip: 0.3,
+    v14Model: 0, v14Clip: 0,
+  },
+};
+
+let activePreset = null;
+let generating = false;
+let resultCount = 0;
+
+// --- Init ---
+function init() {
+  // Build preset buttons
+  const container = document.getElementById('presets');
+  for (const name of Object.keys(PRESETS)) {
+    const btn = document.createElement('button');
+    btn.className = 'preset-btn';
+    btn.textContent = name;
+    btn.onclick = () => applyPreset(name);
+    container.appendChild(btn);
+  }
+
+  // Set default prompt
+  document.getElementById('negativePrompt').value = DEFAULT_NEGATIVE;
+  applyPreset('Constitution');
+  checkConnection();
+  updateFooter();
+}
+
+function applyPreset(name) {
+  const p = PRESETS[name];
+  if (!p) return;
+
+  activePreset = name;
+
+  document.getElementById('positivePrompt').value = p.prompt;
+  setSlider('entModel', p.entModel, 'entModelVal');
+  setSlider('entClip', p.entClip, 'entClipVal');
+  setSlider('tngModel', p.tngModel, 'tngModelVal');
+  setSlider('tngClip', p.tngClip, 'tngClipVal');
+  setSlider('v14Model', p.v14Model, 'v14ModelVal');
+  setSlider('v14Clip', p.v14Clip, 'v14ClipVal');
+
+  // Update active button
+  document.querySelectorAll('.preset-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.textContent === name);
+  });
+
+  updateFooter();
+}
+
+function setSlider(id, val, labelId) {
+  const el = document.getElementById(id);
+  el.value = val;
+  document.getElementById(labelId).textContent = val.toFixed(2);
+}
+
+function updateSlider(el, labelId) {
+  document.getElementById(labelId).textContent = parseFloat(el.value).toFixed(2);
+  activePreset = null;
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  updateFooter();
+}
+
+function toggleSection(header) {
+  header.parentElement.classList.toggle('collapsed');
+}
+
+// --- Connection ---
+async function checkConnection() {
+  const dot = document.getElementById('statusDot');
+  const text = document.getElementById('statusText');
+  try {
+    const resp = await fetch(`${API}/system_stats`, { signal: AbortSignal.timeout(3000) });
+    if (resp.ok) {
+      dot.classList.add('ok');
+      text.textContent = 'Connected';
+    } else {
+      dot.classList.remove('ok');
+      text.textContent = 'Error';
+    }
+  } catch {
+    dot.classList.remove('ok');
+    text.textContent = 'Offline — start ComfyUI';
+  }
+}
+
+// --- Workflow Builder ---
+function buildWorkflow() {
+  const positivePrompt = document.getElementById('positivePrompt').value;
+  const negativePrompt = document.getElementById('negativePrompt').value;
+  const steps = parseInt(document.getElementById('steps').value);
+  const cfg = parseFloat(document.getElementById('cfg').value);
+  const res = parseInt(document.getElementById('resolution').value);
+  const sampler = document.getElementById('sampler').value;
+  let seed = parseInt(document.getElementById('seed').value);
+  if (seed < 0) seed = Math.floor(Math.random() * 2147483647);
+
+  const entModel = parseFloat(document.getElementById('entModel').value);
+  const entClip = parseFloat(document.getElementById('entClip').value);
+  const tngModel = parseFloat(document.getElementById('tngModel').value);
+  const tngClip = parseFloat(document.getElementById('tngClip').value);
+  const v14Model = parseFloat(document.getElementById('v14Model').value);
+  const v14Clip = parseFloat(document.getElementById('v14Clip').value);
+
+  // Build LoRA chain dynamically
+  // Each active LoRA chains from the previous one
+  const loras = [];
+  if (entModel > 0 || entClip > 0) {
+    loras.push({ name: 'Enterprise.safetensors', model: entModel, clip: entClip });
+  }
+  if (tngModel > 0 || tngClip > 0) {
+    loras.push({ name: 'StarTrek_TNG_SDXL.safetensors', model: tngModel, clip: tngClip });
+  }
+  if (v14Model > 0 || v14Clip > 0) {
+    loras.push({ name: 'startrekv14.safetensors', model: v14Model, clip: v14Clip });
+  }
+
+  const workflow = {};
+
+  // Checkpoint loader — always node "4"
+  workflow["4"] = {
+    class_type: "CheckpointLoaderSimple",
+    inputs: { ckpt_name: "juggernautXL_v9Rundiffusion.safetensors" }
+  };
+
+  // Build LoRA chain: each connects to previous
+  let lastModelOutput = ["4", 0]; // [nodeId, outputIndex]
+  let lastClipOutput = ["4", 1];
+
+  loras.forEach((lora, idx) => {
+    const nodeId = String(20 + idx);
+    workflow[nodeId] = {
+      class_type: "LoraLoader",
+      inputs: {
+        lora_name: lora.name,
+        strength_model: lora.model,
+        strength_clip: lora.clip,
+        model: lastModelOutput,
+        clip: lastClipOutput
+      }
+    };
+    lastModelOutput = [nodeId, 0];
+    lastClipOutput = [nodeId, 1];
+  });
+
+  // CLIP text encode — connects to last LoRA (or checkpoint if no LoRAs)
+  workflow["6"] = {
+    class_type: "CLIPTextEncode",
+    inputs: { text: positivePrompt, clip: lastClipOutput }
+  };
+  workflow["7"] = {
+    class_type: "CLIPTextEncode",
+    inputs: { text: negativePrompt, clip: lastClipOutput }
+  };
+
+  // Empty latent
+  workflow["5"] = {
+    class_type: "EmptyLatentImage",
+    inputs: { width: res, height: res, batch_size: 1 }
+  };
+
+  // KSampler — connects to last LoRA model (or checkpoint if no LoRAs)
+  workflow["3"] = {
+    class_type: "KSampler",
+    inputs: {
+      seed: seed,
+      steps: steps,
+      cfg: cfg,
+      sampler_name: sampler,
+      scheduler: "karras",
+      denoise: 1.0,
+      model: lastModelOutput,
+      positive: ["6", 0],
+      negative: ["7", 0],
+      latent_image: ["5", 0]
+    }
+  };
+
+  // VAE Decode
+  workflow["8"] = {
+    class_type: "VAEDecode",
+    inputs: { samples: ["3", 0], vae: ["4", 2] }
+  };
+
+  // Save
+  workflow["9"] = {
+    class_type: "SaveImage",
+    inputs: { filename_prefix: "playground", images: ["8", 0] }
+  };
+
+  return { workflow, seed, loras };
+}
+
+// --- Generate ---
+async function generate() {
+  if (generating) return;
+  generating = true;
+
+  const btn = document.getElementById('generateBtn');
+  const progress = document.getElementById('progress');
+  btn.disabled = true;
+  btn.classList.add('running');
+  btn.textContent = '⏳ GENERATING...';
+  progress.classList.add('active');
+
+  try {
+    const { workflow, seed, loras } = buildWorkflow();
+
+    // Queue prompt
+    progress.textContent = 'Queuing prompt...';
+    const queueResp = await fetch(`${API}/prompt`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt: workflow, client_id: CLIENT_ID })
+    });
+
+    if (!queueResp.ok) {
+      const err = await queueResp.text();
+      throw new Error(`Queue failed: ${err}`);
+    }
+
+    const queueData = await queueResp.json();
+    const promptId = queueData.prompt_id;
+    progress.textContent = `Generating... (prompt: ${promptId.substring(0,8)})`;
+
+    // Poll for completion
+    const result = await pollForResult(promptId);
+
+    if (result) {
+      addResult(result.url, seed, loras);
+    }
+  } catch (err) {
+    progress.textContent = `Error: ${err.message}`;
+    setTimeout(() => progress.classList.remove('active'), 3000);
+  } finally {
+    generating = false;
+    btn.disabled = false;
+    btn.classList.remove('running');
+    btn.textContent = '▶ GENERATE';
+    setTimeout(() => progress.classList.remove('active'), 500);
+  }
+}
+
+async function pollForResult(promptId) {
+  const maxWait = 300000; // 5 minutes
+  const pollInterval = 1000;
+  const start = Date.now();
+  const progress = document.getElementById('progress');
+
+  while (Date.now() - start < maxWait) {
+    try {
+      const resp = await fetch(`${API}/history/${promptId}`);
+      if (resp.ok) {
+        const data = await resp.json();
+        if (data[promptId]) {
+          const entry = data[promptId];
+
+          // Check for error
+          if (entry.status?.status_str === 'error') {
+            throw new Error('ComfyUI generation failed');
+          }
+
+          // Check for outputs
+          if (entry.outputs) {
+            for (const nodeId of Object.keys(entry.outputs)) {
+              const output = entry.outputs[nodeId];
+              if (output.images && output.images.length > 0) {
+                const img = output.images[0];
+                const url = `${API}/view?filename=${encodeURIComponent(img.filename)}&subfolder=${encodeURIComponent(img.subfolder || '')}&type=${encodeURIComponent(img.type || 'output')}`;
+                return { url };
+              }
+            }
+          }
+        }
+      }
+    } catch (err) {
+      if (err.message.includes('generation failed')) throw err;
+    }
+
+    const elapsed = Math.floor((Date.now() - start) / 1000);
+    progress.textContent = `Generating... ${elapsed}s elapsed`;
+    await new Promise(r => setTimeout(r, pollInterval));
+  }
+
+  throw new Error('Generation timed out (5 min)');
+}
+
+function addResult(imageUrl, seed, loras) {
+  const empty = document.getElementById('emptyState');
+  if (empty) empty.remove();
+
+  resultCount++;
+  const grid = document.getElementById('resultsGrid');
+  const card = document.createElement('div');
+  card.className = 'result-card';
+
+  const prompt = document.getElementById('positivePrompt').value;
+  const shortPrompt = prompt.length > 80 ? prompt.substring(0, 80) + '...' : prompt;
+
+  const loraInfo = loras.map(l => {
+    const name = l.name.replace('.safetensors', '');
+    return `<span class="tag">${name} ${l.model}/${l.clip}</span>`;
+  }).join('');
+
+  const noLora = loras.length === 0 ? '<span class="tag warn">No LoRA</span>' : '';
+
+  card.innerHTML = `
+    <img src="${imageUrl}" alt="Result ${resultCount}" loading="lazy">
+    <button class="export-btn" onclick="exportSingle(this)" data-seed="${seed}">Export JSON</button>
+    <div class="meta">
+      <div><strong>#${resultCount}</strong> · Seed: ${seed} · ${document.getElementById('steps').value} steps · CFG ${document.getElementById('cfg').value}</div>
+      <div>${loraInfo}${noLora}</div>
+      <div style="margin-top:2px;opacity:0.7;">${shortPrompt}</div>
+    </div>
+  `;
+
+  // Insert at the beginning
+  grid.insertBefore(card, grid.firstChild);
+}
+
+function clearResults() {
+  const grid = document.getElementById('resultsGrid');
+  grid.innerHTML = `
+    <div class="empty-state" id="emptyState">
+      <div class="icon">🚀</div>
+      <div>No results yet</div>
+      <div style="font-size:11px;">Select a ship class preset and click Generate</div>
+    </div>
+  `;
+  resultCount = 0;
+}
+
+function exportSingle(btn) {
+  const { workflow } = buildWorkflow();
+  // Override seed with the one used for this result
+  workflow["3"].inputs.seed = parseInt(btn.dataset.seed);
+  const json = JSON.stringify(workflow, null, 2);
+  navigator.clipboard.writeText(json).then(() => {
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = 'Export JSON', 1500);
+  });
+}
+
+function copyWorkflow() {
+  const { workflow } = buildWorkflow();
+  const json = JSON.stringify(workflow, null, 2);
+  navigator.clipboard.writeText(json).then(() => {
+    const btn = event.target;
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = 'Copy Workflow JSON', 1500);
+  });
+}
+
+function updateFooter() {
+  const entM = parseFloat(document.getElementById('entModel').value);
+  const tngM = parseFloat(document.getElementById('tngModel').value);
+  const v14M = parseFloat(document.getElementById('v14Model').value);
+
+  const parts = [];
+  if (entM > 0) parts.push(`Ent:${entM}`);
+  if (tngM > 0) parts.push(`TNG:${tngM}`);
+  if (v14M > 0) parts.push(`v14:${v14M}`);
+  if (parts.length === 0) parts.push('No LoRA');
+
+  const preset = activePreset ? ` [${activePreset}]` : '';
+  document.getElementById('workflowSummary').textContent = parts.join(' + ') + preset;
+}
+
+// Keyboard shortcut
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+    e.preventDefault();
+    generate();
+  }
+});
+
+init();
+</script>
+</body>
+</html>

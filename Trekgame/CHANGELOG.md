@@ -1,5 +1,313 @@
 # Changelog
 
+## [1.48.0] - 2026-03-17 - "Economy Bootstrap & Live Resources"
+
+### Fixed
+- **Starting Colony Economy** — CreateStartingAssetsAsync now creates 4 buildings (mine, farm, power_plant, research_lab) with 2 jobs each + 8 Pops (6 Worker, 2 Specialist) per starting colony. Economy loop is self-sustaining from Turn 1.
+- **Topbar Resource Update** — Resources in topbar now update after each turn via SignalR TurnProcessed payload (Treasury totals + Research progress + net income)
+- **AI Building Names** — Fixed AI service using non-existent building IDs (`mining_network` → `mine`, `energy_grid` → `power_plant`), added `farm` to AI build options
+- **Diplomatic Relations Init** — QuickStartSinglePlayer now initializes bilateral DiplomaticRelation entities for all faction pairs, enabling AI diplomacy from Turn 1
+
+### Added
+- **TurnTreasuryDto** — New DTO carrying post-turn treasury totals (Credits, Dilithium, Deuterium, Duranium) in the SignalR TurnProcessed payload
+- **FactionTurnReport Treasury fields** — TreasuryCredits, TreasuryDilithium, TreasuryDeuterium, TreasuryDuranium populated from faction.Treasury after each turn
+
+### Changed
+- StellarisLayout.OnTurnProcessed now updates `_gameState.Energy`, `Minerals`, `Food`, `Alloys`, `Research`, and `EnergyIncome` from turn report
+- TurnProcessedPayloadFactory includes Treasury object in faction-specific payload
+
+## [1.47.0] - 2026-03-17 - "First Playable — Galaxy Generation & Game Start"
+
+### Fixed
+- **Planet Generation** — GenerateGalaxy now creates actual PlanetEntity rows (1-8 per system) with procedural types by orbit zone, weighted sizes, habitability, and resource modifiers
+- **Hyperlane Generation** — Systems connected via nearest-neighbor algorithm with union-find connectivity guarantee; travel time based on distance
+- **Faction-Specific Starter Fleets** — All 14 factions now get thematic starting ships from ShipDefinitions (e.g., Klingon gets Bird-of-Prey, Federation gets Galaxy Class)
+- **Single-Player Quick-Start** — New `POST /api/games/{id}/quick-start` endpoint creates 3 AI factions with starting assets and auto-starts the game
+- **Game Start Flow** — IndexNew.razor now calls QuickStartSinglePlayerAsync after creating game, so turns process immediately
+
+### Changed
+- GenerateGalaxy sets GameId explicitly on all systems
+- HasHabitablePlanet computed from actual planet data instead of random chance
+- CreateStartingShips uses ShipDefinitions for hull/shield values instead of hardcoded stats
+
+## [1.46.0] - 2026-03-17 - "Ground Combat & Planetary Invasion MVP"
+
+### Added
+- **ArmyEntity + GroundCombatEntity** — New entities for ground forces and invasion tracking
+- **ArmyDefinitions.cs** — 6 army types: militia, infantry, spec_ops, heavy_infantry, occupation_force, robotic_army
+- **7 Military Buildings** — barracks, military academy, planetary fortress, underground complex, shield generator, orbital defense grid, planetary defense platform
+- **GroundCombatService** — 12 methods: recruit, embark/disembark, initiate invasion, auto-resolve using domain GroundCombatResolver, turn processing (Phase 7.5)
+- **GroundCombatController** — 8 API endpoints for army management and invasion
+- **GroundCombat.razor** — Full invasion page at `/game/ground-combat/{ColonyId}` with attacker/defender panels, bombardment selector, auto-resolve, army management
+- **ColonyEntity extensions** — PlanetaryShieldHP, FortificationLevel, InvasionInProgress
+- **TurnProcessor Phase 7.5** — Ground operations, army recruitment, auto-garrison (1 militia per 10 pop)
+- **FactionTurnReport** — InvasionResults and ArmiesRecruited fields
+- **Turn Summary integration** — Ground combat section in modal + invasion notifications
+
+### Changed
+- TurnProcessedPayloadFactory includes ground combat data in per-faction payloads
+- GameApiClient extended with 8 ground combat methods + 3 DTOs
+
+## [1.45.0] - 2026-03-17 - "Notifications & Turn Summary"
+
+### Added
+- **Turn Summary Modal** — Stellaris-style modal overlay after each turn showing economy, research, construction, military, population, espionage, diplomacy, events, and crisis updates
+- **Per-Faction SignalR Broadcast** — Each player receives their own faction-specific turn report instead of a single broadcast
+- **FactionTurnReport** — Server collects per-faction data during turn processing from all 11 phases
+- **Phase Result Records** — EconomyService, ColonyService, ResearchService, PopulationService, StationService now return structured completion data
+- **Notification Bell** — Topbar bell icon with unread count badge and dropdown panel showing persistent notifications
+- **NotificationService Integration** — Turn events (tech completed, combat, construction, crises) feed into persistent notification queue
+- **Faction-Specific SignalR Groups** — GameHub now creates per-faction groups for targeted messaging
+- **TurnProcessedPayloadFactory.BuildFactionPayload** — New factory method for faction-specific turn payloads
+
+### Changed
+- TurnProcessor now aggregates all phase results into FactionTurnReport before broadcasting
+- GameHub.OnConnectedAsync accepts factionId query parameter for group assignment
+- OnTurnProcessed handler parses Report field and shows modal instead of simple Snackbar
+
+## [1.44.0] - 2026-03-09 - "Fog of War + Starbases"
+
+### Added - Starbase System (Freely Scalable, Module-Based)
+- **StationEntity + StationModuleEntity**: No fixed tiers — stations have hull + module slots, freely expandable via Structural Expansion modules
+- **StationModuleDefinitions.cs**: 10 module types — Sensor Array, Weapons Platform, Shield Generator, Shipyard, Trading Hub, Research Lab, Drydock, Habitat Ring, Subspace Comm, Structural Expansion
+- **StationService.cs** (279 lines): CRUD, build queue (5 turns), module construction (2-3 turns), module upgrade (Level 1→3), toggle online/offline, sensor range calculation, station maintenance processing
+- **StationsController.cs** (271 lines): 7 API endpoints — GetStation, GetFactionStations, BuildStation, AddModule, UpgradeModule, RemoveModule, ToggleModule
+- **StationDesigner.razor** (407 lines): Module grid UI with live stats, add/upgrade/remove/toggle actions, module type emojis, construction progress display
+- **StationsList.razor** (250 lines): Station overview page with build dialog, system selection, status display
+- **Sidebar Entry**: ⚓ Stations (after Intel, 14 entries total)
+
+### Added - Fog of War Server-Side Enforcement
+- **SystemsController FoW**: `GetSystemDetail()` and `GetGameSystems()` now accept `factionId` parameter — enforces IntelLevel filtering (Unknown=404, Detected=masked data, Partial+=real data)
+- **VisibilityService Station Sensors**: Stations as sensor sources (Range = 2 + Sensor Array module levels), integrated into `GetVisibleSystemsAsync()`
+- **SystemSummaryResponse.VisibilityLevel**: New field for client-side rendering decisions (default=3 for backwards compat)
+
+### Added - Galaxy Map FoW Visuals (GalaxyRenderer.ts)
+- **Alpha-Based Rendering**: Unknown=hidden, Detected=0.3 (gray circle), Partial=0.6, Full=1.0, FogOfWar=0.5 (dashed border)
+- **Station Icons**: Diamond shape (◆) offset from star, color-coded (own=#00ccff, foreign=faction color), name labels at zoom>1.2
+- **Hyperlane FoW**: Lanes to Unknown systems hidden, Detected=0.15 alpha, FogOfWar=0.25 alpha
+- **StationMarker interface + setStations()**: Blazor interop for station rendering
+
+### Changed - Turn Processing Integration
+- **TurnProcessor Phase 2b**: Station Construction — processes station build countdown + module build countdown after Colony Build Queues
+- **EconomyService**: Station maintenance costs — deducts energy per online module from faction treasury
+
+### Technical
+- New files: 5 (StationModuleDefinitions.cs, StationService.cs, StationsController.cs, StationsList.razor, StationDesigner.razor)
+- Modified files: 10 (Entities.cs, GameDbContext.cs, Program.cs, SystemsController.cs, VisibilityService.cs, TurnProcessor.cs, EconomyService.cs, StellarisLayout.razor, GameApiClient.cs, GalaxyRenderer.ts)
+- Build: 0 errors, 0 warnings (both .NET and TypeScript)
+
+---
+
+## [1.43.89] - 2026-03-07 - "Tutorial System + Multiplayer (Dual-Mode)"
+
+### Added - Interactive Tutorial System
+- **TutorialOverlay.razor**: Evolved from static component to JSON-driven walkthrough overlay on real game pages — spotlight highlight with pulsing animation, JS interop for element positioning (`getBoundingClientRect`), route navigation between steps, MutationObserver for dynamic elements, auto-show on first visit, localStorage persistence
+- **tutorial.ts**: TypeScript interop module (7 functions) — `getElementBounds`, `scrollToElement`, `observeElement`, `stopObserving`, `getDialogPosition` (9 positions with auto-flip), `onResize`/`offResize` (debounced)
+- **first-game.json**: 9-step onboarding tutorial covering Welcome → Galaxy → System → Colony → Build → Fleets → Research → Diplomacy → End Turn → Complete
+- **Tutorial.razor Wiki**: 5 new MudTabPanels (11 total) — Species & Traits, Tactical Combat, Leaders, Crisis & Events, Economy & Policies
+
+### Added - Multiplayer System (Dual-Mode: Real-Time + Turn-Based)
+- **MultiplayerState.cs**: Client-side state class — GameMode enum (SinglePlayer/TurnBased/RealTime/HotSeat), PlayerInfo, ChatMessageDto, IsAllReady, tick/day/month display helpers
+- **GameClockService.cs**: Server-side Stellaris-style real-time tick loop — ConcurrentDictionary of GameClocks, speed 1-5 (2000ms→100ms per tick), 30 ticks = 1 month = full TurnProcessor run, pause/resume/speed change, IHubContext broadcasting
+- **GameHub Real-Time Extensions**: 6 new hub methods — SetSpeed (host-only), SubmitRealtimeOrder, SwitchToTurnBased, SwitchToRealtime, RegisterHost, IsHost validation
+- **MultiplayerTopbar.razor**: Dual-mode topbar — Turn-Based: player pills (✅/⏳) + READY button; Real-Time: speed controls (1-5, host-only) + PAUSE/RESUME + Day/Month counter
+- **ChatPanel.razor**: Slide-in chat panel (300px) — Global/Alliance channels, auto-scroll, Enter-to-send, unread count, Stellaris-themed dark styling
+- **MultiplayerLobby.razor**: Wired existing 52KB lobby UI with real API + Hub calls — RefreshLobbies, CreateGame, JoinGame, StartGame, SendMessage, localStorage multiplayer state keys, error handling
+
+### Added - Hot-Seat Mode (Local Multiplayer)
+- **HotSeatService.cs**: Player rotation, turn cycling, splash visibility management
+- **HotSeatSplash.razor**: Full-screen dark overlay for player switching — faction emoji icon, "{Name} ist an der Reihe", Begin Turn button, z-index 10000
+
+### Changed - StellarisLayout.razor (Central Integration)
+- HubConnection with 12 event handlers (PlayerJoined/Left, ReadyChanged, TurnProcessed, ChatMessage, SpeedChanged, Paused/Resumed, TickUpdate, ModeChanged, RealtimeOrderExecuted)
+- Dual CascadingValue: GameState + MultiplayerState
+- MultiplayerTopbar + ChatPanel conditionally rendered in multiplayer mode
+- HotSeatSplash + TutorialOverlay embedded
+- EndTurn branches: SinglePlayer (API), TurnBased (Hub SetReady), HotSeat (API + player switch)
+- Theme switching on hot-seat player change
+- IAsyncDisposable with full cleanup
+
+### Changed - GameSetupNew.razor
+- Game Type selection: Single Player / Network / Hot-Seat (radio cards)
+- Network options: Game Name, Max Players (2-8), Allow Real-Time toggle, Turn Timer
+- Hot-Seat options: Player count (2-4), player name inputs
+- Start Game branches per game type with localStorage state persistence
+
+### Changed - GameHub.cs
+- Injected `IGameClockService` for clock control
+- RequestPause/Resume now control GameClockService
+- Host tracking via `GameHosts` ConcurrentDictionary
+- `RealtimeOrder` class for immediate order submission
+
+### Infrastructure
+- `GameGroupNames.cs`: Canonical SignalR group naming
+- `TurnProcessedPayloadFactory.cs`: BuildSignalRPayload() for turn result broadcasting
+- Program.cs: GameClockService (Singleton), HotSeatService (Scoped) registered
+
+## [1.43.88] - 2026-03-06 - "Tactical Combat System"
+
+### Added - Tactical Combat Pages
+- **CombatDoctrine.razor** (`/game/combat-doctrine/{FleetId}`): Per-fleet doctrine editor — engagement policy (5 types), formation (5 types), target priority (5 types), retreat threshold, conditional orders (trigger-based mid-battle automation), drill gauge
+- **TacticalBattle.razor** (`/game/tactical-battle/{CombatId}`): Real-time tactical view — Canvas 2D ship renderer (65%/35% layout), order panel with disorder cost, battle log, ship detail popup
+
+### Added - tacticalViewer.ts (Canvas 2D Renderer)
+- Ship rendering: colored triangles by faction (green/red), sizes by ship class
+- 5 formation layouts: Wedge, Sphere, Line, Dispersed, Echelon with smooth tweening
+- Weapon fire animations (phaser beams, torpedo arcs, disruptor bolts), shield impacts, explosions
+- Blazor JS Interop: `window.TacticalViewer = { init, updateRound, updateFormation, highlightShip, selectShip, setDisorder, dispose }`
+
+### Added - BattleDoctrineService.cs
+- `IBattleDoctrineService` with 5 methods: GetDoctrineAsync, SaveDoctrineAsync, GetFactionDefaultDoctrine, DrillCrewAsync, EvaluateConditionalOrders
+- 7 faction defaults: Federation (Balanced/Line), Klingon (Aggressive/Wedge), Romulan (HitAndRun/Dispersed), Cardassian (Defensive/Line), Dominion (Aggressive/Echelon), Borg (Aggressive/Sphere), Ferengi (Standoff/Dispersed)
+- Conditional order evaluation: parse JSON triggers (ShipsLostPercent, FlagshipDamaged, EnemyRetreat, RoundNumber, ShieldsBelow)
+
+### Added - CombatService Extensions
+- Disorder system: cumulative penalty for mid-battle orders (+15 base, +25 without commander, +5 per prior order, −drillLevel×0.2)
+- Formation bonus matrix: 5×5 Rock-Paper-Scissors (Wedge/Sphere/Line/Dispersed/Echelon)
+- `SimulateTacticalRound`: wraps existing combat with disorder + formation modifiers
+
+### Added - CombatController Extensions (7 Endpoints)
+- `GET /api/combat/doctrine/{fleetId}` — Get fleet doctrine
+- `POST /api/combat/doctrine/{fleetId}` — Save fleet doctrine
+- `POST /api/combat/doctrine/{fleetId}/drill` — Drill crew (+10 points)
+- `GET /api/combat/doctrine/defaults/{raceId}` — Faction default doctrine
+- `GET /api/combat/{combatId}/tactical-state` — Tactical battle state
+- `POST /api/combat/{combatId}/tactical-order` — Issue mid-battle order (with disorder)
+- `POST /api/combat/{combatId}/tactical-round` — Execute tactical round
+
+### Added - Entity Changes
+- `BattleDoctrineEntity`: FleetId, Name, EngagementPolicy, Formation, TargetPriority, RetreatThreshold, DrillLevel, ConditionalOrdersJson
+- Enums: `EngagementPolicy`, `FormationType`, `TargetPriorityType`, `TriggerCondition`, `TriggerComparison`
+- `DbSet<BattleDoctrineEntity>` in GameDbContext
+
+### Changed
+- `GameApiClient`: 7 new tactical methods + 10 DTO records
+- `CombatNew.razor`: Added ⚔️ TACTICAL VIEW link button
+- `FleetsNew.razor`: Added 📋 DOCTRINE link button in fleet orders
+- `vite.config.ts`: Added tacticalViewer entry point
+- `index.html`: Added tacticalViewer.js script tag
+
+### Technical
+- Builds: 0 Errors, 0 Warnings (TypeScript + .NET)
+- VERSION: 1.43.87 → 1.43.88
+
+## [1.43.87] - 2026-03-06 - "Species & Traits UI"
+
+### Added - Species.razor Page (`/game/species`)
+- **Tab 1: Database (Encyclopedia)**: Browse all 38 species with card grid, quadrant filter (Alpha/Beta/Gamma/Delta/Borg/Xindi), text search, detail panel with modifier bars, habitability chart, traits list, special flags
+- **Tab 2: Demographics**: Empire-wide species distribution bar chart, per-colony breakdown, Species Rights system (Citizenship, Military Service, Living Standards) with per-species dropdowns and Apply
+- **Tab 3: Gene Modification**: Add/remove traits with point budget system (5 base + 2 per genetic tech), trait category filter, pending changes preview, credit cost (500/mod)
+
+### Added - SpeciesController.cs (7 Endpoints)
+- `GET /api/species` — All 38 species definitions
+- `GET /api/species/{id}` — Single species with full detail
+- `GET /api/species/traits/all` — All ~100 trait definitions
+- `GET /api/species/traits/category/{cat}` — Traits by category
+- `GET /api/species/demographics/{factionId}` — Empire demographics
+- `POST /api/species/rights/{factionId}` — Set species rights
+- `POST /api/species/gene-mod/{factionId}` — Gene modification with tech prerequisite + point budget validation
+
+### Added - Entity Changes
+- `FactionEntity.SpeciesRightsJson` — Species rights per faction (JSON)
+- `FactionEntity.GeneModificationsJson` — Modified traits per species (JSON)
+- Enums: `Citizenship`, `MilitaryServiceLevel`, `LivingStandard`
+
+### Changed
+- `GameApiClient`: 7 new methods + 7 DTO records (SpeciesDto, TraitDto, DemographicsDto, etc.)
+- `StellarisLayout` sidebar: Added 🧬 Species link (13 entries total)
+
+### Technical
+- Builds: 0 Errors, 0 Warnings
+- VERSION: 1.43.86 → 1.43.87
+
+---
+
+## [1.43.86] - 2026-03-06 - "Layout Consolidation"
+
+### Changed - StellarisLayout Override System
+- **GameLayoutState extended** with 6 override properties: TopbarIcon, TopbarTitle, TopbarSubtitle, TopbarCssClass, ShowResources, ShowEndTurn
+- **OnLayoutChanged event**: Bidirectional communication — pages trigger layout re-renders via CascadingValue
+- **SetTopbarOverride() / ResetTopbar()**: Pages customize topbar without duplicating layout HTML
+- **Conditional topbar rendering**: Empire badge, resources, EndTurn all respect override values with null-coalescing defaults
+
+### Fixed - SystemViewNew.razor
+- Removed ~22 lines of duplicate layout HTML (topbar + 2-link sidebar)
+- Now uses GameLayoutState override: "🌐 {SystemName} System — Stellar Cartography"
+- All 12 sidebar links now visible (was: only Galaxy + Planets)
+- Resources and stardate visible (was: missing)
+- "Back to Galaxy" button moved to page-internal breadcrumb element
+- Implements IDisposable with ResetTopbar() cleanup
+
+### Fixed - CombatNew.razor
+- Removed duplicate `<div class="stellaris-layout">` and `<header class="st-topbar combat-header">`
+- Now uses GameLayoutState override: "⚠ COMBAT ENGAGEMENT — {SystemName}", showEndTurn: false
+- All 12 sidebar links now visible (was: missing entirely)
+- Resources visible during combat (was: missing)
+- Combat alert bar moved to page-internal element (title, location, timer)
+- `::deep` CSS for combat-header styling on parent layout topbar
+- Implements IDisposable with ResetTopbar() cleanup
+
+### Documentation
+- Created `docs/plans/2026-03-05-layout-consolidation-design.md` (Ansatz B design doc)
+
+### Technical
+- Builds: 0 Errors, 4 pre-existing warnings
+- VERSION: 1.43.85 → 1.43.86
+
+---
+
+## [1.43.85] - 2026-03-05 - "Full Gameplay Wiring & New Pages"
+
+### Added - New Game Pages
+- **Leaders.razor** (`/game/leaders`): Full leader management UI
+  - Leader grid with class-specific card styling (admiral=red, governor=green, scientist=blue, general=orange, diplomat=purple, spymaster=teal)
+  - Detail panel with stat bars, skills, traits display
+  - Recruitment modal with candidate pool from API
+  - Assignment modal (fleet/colony tabs)
+  - Skill learning modal
+  - All API methods wired: GetLeadersAsync, RecruitLeaderAsync, AssignLeaderToFleetAsync/ColonyAsync, UnassignLeaderAsync, LearnSkillAsync
+- **CrisisMonitor.razor** (`/game/crisis`): Dual-state crisis monitoring
+  - Active crisis state: alert banner with severity classes, threat gauge (5 levels GUARDED→CRITICAL), escalation panel with phase progress, stats grid, victory/defeat conditions
+  - Peaceful state: "ALL CLEAR" banner, 6 known threat cards (Borg, Dominion, Temporal, Synth, Kelvan, Species 8472), readiness tips
+  - Uses CascadingParameter GameState from StellarisLayout
+- **StellarisLayout sidebar**: Added Leaders (👤) and Crisis (🚨) nav links, now 12 entries total
+
+### Added - Research Effects into Gameplay
+- **27 modifier fields on FactionEntity**: WeaponDamageBonus, ShieldStrengthBonus, SensorRangeBonus, WarpSpeedBonus, MiningEfficiencyBonus, EnergyEfficiencyBonus, FoodProductionBonus, ResearchSpeedBonus, DiplomacyBonus, TradeIncomeBonus, SpyEffectivenessBonus, FleetCapacityBonus, ArmyDamageBonus, BuildSpeedBonus, PopGrowthBonus, StabilityBonus, CrimeReductionBonus, AmenityBonus, NavalCapacityBonus, StarbaseCapacityBonus, JumpDriveRange, CloakDetectionBonus, SubspaceCommsRange, ReplicationEfficiency, HullRegenerationRate, BoardingStrengthBonus, OrbitalBombardmentBonus
+- **ApplyTechEffectsAsync()**: Parses effect strings like `"weapon_damage:+10%"` into integer modifiers on FactionEntity
+- ResearchService auto-calls ApplyTechEffectsAsync after tech completion
+
+### Added - Policy System
+- **Revert-then-Apply pattern**: Old policy modifiers subtracted (sign=-1) before new ones added (sign=+1)
+- PolicyEffects Dictionary maps policy choices to modifier fields
+- Supports all 27 modifier fields
+
+### Fixed - Stub Implementations
+- **CheckTreatyViolationAsync** (DiplomacyService): Full treaty breach detection with opinion penalties and war declaration triggers
+- **Piracy Events** (EventService): Pirate attack events with fleet spawning and trade route disruption
+- **Event Chaining**: Chain events scheduled with future TurnCreated, filtered by `e.TurnCreated <= currentTurn`
+- **Inter-System Commuting** (TransportService): Population commuting between connected systems
+- **Ally Notifications** (DiplomacyService): War/crisis notifications to allied factions
+
+### Changed - Ship Designer Persistence
+- Ship designs now saved/loaded to/from database
+- Custom designs persist across sessions
+
+### Changed - SaveGameService
+- **RestoreGameAsync**: Full entity graph restoration preserving original IDs for FK references
+- Handles all entity types: Games, Factions, Colonies, Fleets, Ships, Research, Diplomacy, Events, Leaders
+
+### Verified - Server Audit (Grade: A-)
+- All 18 server services fully implemented: Zero TODOs, Zero Stubs, Zero NotImplementedException
+- Only micro-gap: GenerateThumbnailAsync() returns null (cosmetic)
+- Services audited: TurnProcessor, EconomyService, PopulationService, ColonyService, ResearchService, ExplorationService, EventService, CombatService, DiplomacyService, EspionageService, TransportService, VictoryService, CrisisService, AiService, LeaderService, SaveGameService
+
+### Technical
+- Builds: 0 Errors, 4 pre-existing warnings (unrelated)
+- VERSION: 1.43.82 → 1.43.85
+
+---
+
 ## [1.43.82] - 2026-02-12 - "UI Findings & Hirogen Complete"
 
 ### Added - Hirogen Race Complete (1.43.80)

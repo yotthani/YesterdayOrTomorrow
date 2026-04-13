@@ -1,0 +1,145 @@
+@using StarTrekGame.Web.Services
+
+@if (IsVisible && NextPlayer != null)
+{
+    <div class="hotseat-overlay" @onclick:stopPropagation="true">
+        <div class="hotseat-card">
+            <div class="hotseat-icon">@GetFactionIcon(NextPlayer.RaceId)</div>
+            <div class="hotseat-player-name">@NextPlayer.Name</div>
+            <div class="hotseat-faction">@NextPlayer.RaceId</div>
+            <div class="hotseat-message">@NextPlayer.Name ist an der Reihe</div>
+            <button class="hotseat-confirm-btn" @onclick="OnConfirm">
+                Begin Turn
+            </button>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public HotSeatPlayer? NextPlayer { get; set; }
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public EventCallback OnConfirm { get; set; }
+
+    private string GetFactionIcon(string raceId) => raceId?.ToLowerInvariant() switch
+    {
+        "federation" => "\ud83c\udf10",
+        "klingon" => "\u2694\ufe0f",
+        "romulan" => "\ud83e\udd85",
+        "cardassian" => "\ud83d\udee1\ufe0f",
+        "ferengi" => "\ud83d\udcb0",
+        "dominion" => "\ud83d\udc41\ufe0f",
+        "borg" => "\ud83e\udd16",
+        "bajoran" => "\ud83d\udd6f\ufe0f",
+        "gorn" => "\ud83e\udd96",
+        "tholian" => "\ud83d\udc8e",
+        "breen" => "\u2744\ufe0f",
+        "orion" => "\ud83d\udc9a",
+        "hirogen" => "\ud83c\udfaf",
+        "kazon" => "\ud83d\udd25",
+        _ => "\ud83d\ude80"
+    };
+}
+
+<style>
+    .hotseat-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.9);
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: hotseat-fade-in 0.4s ease-out;
+    }
+
+    @@keyframes hotseat-fade-in {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    .hotseat-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+        padding: 48px 64px;
+        background: linear-gradient(180deg, rgba(30, 40, 60, 0.95) 0%, rgba(15, 20, 35, 0.98) 100%);
+        border: 2px solid rgba(255, 153, 0, 0.6);
+        border-radius: 16px;
+        box-shadow: 0 0 40px rgba(255, 153, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        animation: hotseat-card-in 0.5s ease-out 0.1s both;
+        min-width: 400px;
+    }
+
+    @@keyframes hotseat-card-in {
+        from {
+            opacity: 0;
+            transform: scale(0.9) translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+    }
+
+    .hotseat-icon {
+        font-size: 64px;
+        line-height: 1;
+        filter: drop-shadow(0 0 12px rgba(255, 153, 0, 0.4));
+    }
+
+    .hotseat-player-name {
+        font-size: 32px;
+        font-weight: 700;
+        color: #ff9900;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        text-shadow: 0 0 20px rgba(255, 153, 0, 0.3);
+    }
+
+    .hotseat-faction {
+        font-size: 14px;
+        font-weight: 500;
+        color: #7890a8;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+    }
+
+    .hotseat-message {
+        font-size: 18px;
+        color: #99aabb;
+        margin-top: 8px;
+        font-style: italic;
+    }
+
+    .hotseat-confirm-btn {
+        margin-top: 24px;
+        padding: 14px 48px;
+        font-size: 16px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: #fff;
+        background: linear-gradient(180deg, #cc6600 0%, #993300 100%);
+        border: 2px solid #ff8800;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 0 4px 16px rgba(255, 136, 0, 0.3);
+    }
+
+    .hotseat-confirm-btn:hover {
+        background: linear-gradient(180deg, #dd7700 0%, #aa4400 100%);
+        border-color: #ffaa33;
+        box-shadow: 0 4px 24px rgba(255, 136, 0, 0.5);
+        transform: translateY(-1px);
+    }
+
+    .hotseat-confirm-btn:active {
+        transform: translateY(1px);
+        box-shadow: 0 2px 8px rgba(255, 136, 0, 0.3);
+    }
+</style>

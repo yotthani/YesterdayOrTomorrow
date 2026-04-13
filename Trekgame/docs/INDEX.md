@@ -9,6 +9,8 @@
 | Ich will... | Dokument |
 |-------------|----------|
 | **Projekt-Status & Roadmap sehen** | [ROADMAP.md](ROADMAP.md) |
+| **Feature-Details & Entscheidungen** | [features/INDEX.md](features/INDEX.md) |
+| **Features einheitlich definieren** | [FEATURE_PLANNING_FRAMEWORK.md](FEATURE_PLANNING_FRAMEWORK.md) |
 | **System-Design verstehen** | [COMPLETE_SYSTEMS_AUDIT.md](COMPLETE_SYSTEMS_AUDIT.md) |
 | **Code-Architektur lernen** | [DOCUMENTATION.md](DOCUMENTATION.md) |
 | **Art Style Guidelines** | [ART_STYLE_GUIDE_V2.md](ART_STYLE_GUIDE_V2.md) |
@@ -21,6 +23,9 @@
 
 ### 📋 Roadmap & Status
 - **[ROADMAP.md](ROADMAP.md)** - Offizielle Projekt-Roadmap (EINZIGE QUELLE)
+- **[features/INDEX.md](features/INDEX.md)** - Detaillierte Feature-Dokumentation (46 Docs, aktiv gepflegt)
+- **[FEATURE_PLANNING_FRAMEWORK.md](FEATURE_PLANNING_FRAMEWORK.md)** - Verbindlicher Prozess + Template für Feature-Definitionen
+- **[feature-specs/README.md](feature-specs/README.md)** - Katalog und Ablageformat für konkrete Feature-Spezifikationen
 - ~~PROGRESS.md~~ - Veraltet, siehe ROADMAP.md
 
 ### 🎮 Game Design
@@ -75,4 +80,4 @@ Diese Dokumente sind veraltet und durch neuere ersetzt:
 
 ---
 
-*Letzte Aktualisierung: 2026-02-11*
+*Letzte Aktualisierung: 2026-03-04*

@@ -236,6 +236,30 @@ public class PromptBuilderService
     }
     
     /// <summary>
+    /// Get raw ship data from Ships.json for direct SD prompt building.
+    /// Returns (classVariant, factionColors, shipClassName) or nulls if not found.
+    /// This bypasses the massive LLM prompt and gives SDPromptTransformer the raw data
+    /// to build a compact ~35-token prompt that fits entirely within CLIP's 77-token window.
+    /// </summary>
+    public (string? classVariant, string? factionColors, string shipClassName) GetShipSDData(
+        Faction faction, string shipName, bool isMilitary = true)
+    {
+        if (!_jsonDataLoaded)
+            return (null, null, shipName);
+
+        var factionKey = faction.ToString().ToLower();
+
+        // Get class variant (e.g., "CYLINDRICAL engineering hull, CIRCULAR saucer, TWO nacelles on ANGLED pylons")
+        var classVariant = _promptData.GetShipClassVariant(factionKey, shipName);
+
+        // Get faction colors from profile
+        var profile = _factionProfiles.GetValueOrDefault(faction);
+        var colors = profile?.ColorScheme;
+
+        return (classVariant, colors, shipName);
+    }
+
+    /// <summary>
     /// Try to build prompt from JSON data
     /// </summary>
     private string TryBuildFromJson(AssetCategory category, string assetName, Faction faction)
@@ -387,7 +411,23 @@ public class PromptBuilderService
         // Throw error if JSON data is missing so we notice immediately
         var geometryParts = new List<string>();
 
-        // Get faction-wide design language from JSON (designLanguage, colors, features, important)
+        // CRITICAL: Class variant FIRST, faction style SECOND!
+        // SDPromptTransformer extracts concepts in order → what comes first gets prime
+        // CLIP token positions. The class-specific geometry (CYLINDRICAL hull, CIRCULAR saucer,
+        // TWO nacelles) MUST come before generic faction style (Saucer + engineering hull + nacelles).
+
+        // 1. Get ship class variant from JSON (more specific — this is the ship's unique silhouette)
+        var jsonClassVariant = _promptData.GetShipClassVariant(profile.Faction.ToString(), shipName);
+        if (!string.IsNullOrEmpty(jsonClassVariant))
+        {
+            geometryParts.Add(jsonClassVariant);
+        }
+        else
+        {
+            Console.WriteLine($"[INFO] No specific classVariant for '{shipName}' in {profile.Faction} - using faction default");
+        }
+
+        // 2. Get faction-wide design language from JSON (generic faction aesthetic — lower priority)
         var jsonFactionStyle = _promptData.GetFactionStyle("ships", profile.Faction.ToString(), isMilitary: true);
         if (string.IsNullOrEmpty(jsonFactionStyle))
         {
@@ -396,18 +436,6 @@ public class PromptBuilderService
                 $"Please add faction style definition for {profile.Faction} in Data/Prompts/Ships.json");
         }
         geometryParts.Add(jsonFactionStyle);
-
-        // Get ship class variant from JSON (more specific than faction default) - optional but logged
-        var jsonClassVariant = _promptData.GetShipClassVariant(profile.Faction.ToString(), shipName);
-        if (!string.IsNullOrEmpty(jsonClassVariant))
-        {
-            geometryParts.Add(jsonClassVariant);
-        }
-        else
-        {
-            // Log info - not every ship needs a specific class variant, faction default is used
-            Console.WriteLine($"[INFO] No specific classVariant for '{shipName}' in {profile.Faction} - using faction default");
-        }
 
         var geometryDescription = string.Join("\n\n", geometryParts);
         var geometrySection = $"\n\n{geometryDescription}\n";
@@ -454,8 +482,8 @@ CRITICAL RULES:
 3. Count components carefully before generating
 4. Ship MUST face BOTTOM-LEFT, engines toward TOP-RIGHT
 
-**single spacecraft miniature model, rendered in high-quality stylized claymation 3D style, game asset, isometric view, ship facing bottom-left**
---no funny, thumbprints, exaggerated features, multiple ships, fleet, grid, shiny plastic, CGI look, action figure, base, stand, table surface, tilt-shift, blurry background, frame, border, text, label, pedestal, extra engines, wrong number of nacelles, stacked hulls, ship facing right, ship facing up, frontal view, rear view{factionNegativePrompt}";
+**star trek starship model, detailed spacecraft, game asset, isometric view, ship facing bottom-left**
+--no funny, thumbprints, exaggerated features, multiple ships, fleet, grid, shiny plastic, CGI look, action figure, base, stand, table surface, tilt-shift, blurry background, frame, border, text, label, pedestal, extra engines, wrong number of nacelles, stacked hulls, ship facing right, ship facing up, frontal view, rear view, claymation, clay, plasticine{factionNegativePrompt}";
     }
     
     /// <summary>
@@ -507,8 +535,8 @@ CRITICAL CIVILIAN SHIP RULES:
 5. Cargo bays, fuel tanks, passenger areas should be visible where appropriate
 6. {shipCategory} should look like a {shipCategory}, NOT like a warship
 
-**single spacecraft miniature model, {sizeClass} civilian vessel, rendered in high-quality stylized claymation 3D style, game asset**
---no weapons, no military, no warship, no saucer section, no nacelles on pylons, no battleship, funny, thumbprints, exaggerated features, multiple ships, fleet, grid, shiny plastic, CGI look, action figure, base, stand, table surface, tilt-shift, blurry background, frame, border, text, label, pedestal";
+**star trek civilian spacecraft, {sizeClass} vessel, detailed model, game asset**
+--no weapons, no military, no warship, no saucer section, no nacelles on pylons, no battleship, funny, thumbprints, exaggerated features, multiple ships, fleet, grid, shiny plastic, CGI look, action figure, base, stand, table surface, tilt-shift, blurry background, frame, border, text, label, pedestal, claymation, clay, plasticine";
     }
     
     /// <summary>

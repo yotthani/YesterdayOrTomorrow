@@ -238,7 +238,16 @@ public class FactionEntity
     
     // Faction traits and bonuses (from race)
     public string FactionTraits { get; set; } = "[]";
-    
+
+    // Active policies (JSON: {"economic":"Mixed Economy","military":"Balanced",...})
+    public string ActivePolicies { get; set; } = "{}";
+
+    // Species rights per species (JSON: {"human":{"Citizenship":"Full","MilitaryService":"Full","LivingStandard":"Normal"},...})
+    public string SpeciesRightsJson { get; set; } = "{}";
+
+    // Gene modifications per species (JSON: {"human":["trait1","trait2"],...})
+    public string GeneModificationsJson { get; set; } = "{}";
+
     // Government type affects mechanics
     public GovernmentType Government { get; set; } = GovernmentType.Council;
     
@@ -254,16 +263,58 @@ public class FactionEntity
     public int PhysicsProgress { get; set; }
     public int EngineeringProgress { get; set; }
     public int SocietyProgress { get; set; }
-    
+
+    // ═══ Technology Modifiers (accumulated from researched techs) ═══
+    // Combat
+    public int WeaponDamageModifier { get; set; }       // % bonus
+    public int ShieldHpModifier { get; set; }           // % bonus
+    public int HullHpModifier { get; set; }             // % bonus
+    public int ShieldRegenBonus { get; set; }           // flat per turn
+    public int HullRegenBonus { get; set; }             // flat per turn
+    public int ArmorBonus { get; set; }                 // flat
+    public int ShieldPenetrationModifier { get; set; }  // %
+
+    // Ships
+    public int ShipSpeedModifier { get; set; }          // % bonus
+    public int ShipBuildSpeedModifier { get; set; }     // % bonus
+    public int SensorRangeBonus { get; set; }           // flat
+
+    // Economy
+    public int EnergyProductionModifier { get; set; }   // % bonus
+    public int MineralProductionModifier { get; set; }  // % bonus
+    public int ResearchBonusModifier { get; set; }      // % bonus
+    public int TradeValueModifier { get; set; }         // % bonus
+    public int TradeRoutesBonus { get; set; }           // flat
+
+    // Colony
+    public int PopGrowthModifier { get; set; }          // % bonus
+    public int HabitabilityModifier { get; set; }       // % bonus
+    public int StabilityModifier { get; set; }          // flat
+    public int AdminCapBonus { get; set; }              // flat
+
+    // Diplomacy & Intel
+    public int DiplomacyModifier { get; set; }          // % bonus
+    public int AgentSkillModifier { get; set; }         // % bonus
+    public int AgentCapBonus { get; set; }              // flat
+    public int CounterIntelModifier { get; set; }       // % bonus
+
+    // Military
+    public int ArmyDamageModifier { get; set; }         // % bonus
+    public int ArmyMoraleModifier { get; set; }         // % bonus
+    public int SystemDefenseModifier { get; set; }      // % bonus
+
     public GameSessionEntity Game { get; set; } = null!;
     public List<HouseEntity> Houses { get; set; } = [];
     public List<TechnologyEntity> Technologies { get; set; } = [];
     public List<KnownSystemEntity> KnownSystems { get; set; } = [];
     public List<DiplomaticRelationEntity> DiplomaticRelations { get; set; } = [];
     public List<AgentEntity> Agents { get; set; } = [];
+    public List<LeaderEntity> Leaders { get; set; } = [];
+    public List<ShipDesignEntity> ShipDesigns { get; set; } = [];
     public List<FleetEntity> Fleets { get; set; } = [];
     public List<ColonyEntity> Colonies { get; set; } = [];
-    
+    public List<StationEntity> Stations { get; set; } = [];
+
     // Player navigation property
     public PlayerEntity? Player { get; set; }
 }
@@ -452,7 +503,11 @@ public class ColonyEntity
     
     // Orbital bombardment damage (repairs over time)
     public int Devastation { get; set; }
-    
+
+    // Governor — assigned leader
+    public Guid? GovernorId { get; set; }
+    public LeaderEntity? Governor { get; set; }
+
     public PlanetEntity Planet { get; set; } = null!;
     public StarSystemEntity System { get; set; } = null!;
     public FactionEntity Faction { get; set; } = null!;
@@ -461,6 +516,13 @@ public class ColonyEntity
     public List<PopEntity> Pops { get; set; } = [];
     public List<BuildingEntity> Buildings { get; set; } = [];
     public List<BuildQueueItemEntity> BuildQueue { get; set; } = [];
+
+    // Ground Combat
+    public int PlanetaryShieldHP { get; set; }
+    public int MaxPlanetaryShieldHP { get; set; }
+    public int FortificationLevel { get; set; }
+    public bool InvasionInProgress { get; set; }
+    public List<ArmyEntity> Armies { get; set; } = [];
 }
 
 public enum ColonyDesignation
@@ -723,13 +785,82 @@ public class FleetEntity
     
     // Fuel consumption
     public int DeuteriumUpkeep { get; set; }
-    
+
+    // Action Points — reset each round
+    public int ActionPoints { get; set; } = 3;
+    public int MaxActionPoints { get; set; } = 3;
+
+    // Flagship — the lead ship whose symbol appears on the galaxy map
+    public Guid? FlagshipId { get; set; }
+
+    // Commander — assigned leader (admiral/captain)
+    public Guid? CommanderId { get; set; }
+    public LeaderEntity? Commander { get; set; }
+
     public FactionEntity Faction { get; set; } = null!;
     public HouseEntity House { get; set; } = null!;
     public StarSystemEntity CurrentSystem { get; set; } = null!;
     public StarSystemEntity? DestinationSystem { get; set; }
     public StarSystemEntity? Destination => DestinationSystem;  // Alias
     public List<ShipEntity> Ships { get; set; } = [];
+
+    // Ground Combat — embarked armies
+    public List<ArmyEntity> Armies { get; set; } = [];
+}
+
+public class ArmyEntity
+{
+    public Guid Id { get; set; }
+    public Guid GameId { get; set; }
+    public Guid FactionId { get; set; }
+    public string Name { get; set; } = "";
+    public string ArmyType { get; set; } = "infantry";
+    public int AttackPower { get; set; }
+    public int DefensePower { get; set; }
+    public int HitPoints { get; set; }
+    public int MaxHitPoints { get; set; }
+    public int Morale { get; set; } = 80;
+    public string Experience { get; set; } = "Regular";
+    public string Status { get; set; } = "Stationed";
+
+    // Location — exactly one of these is set
+    public Guid? ColonyId { get; set; }
+    public Guid? FleetId { get; set; }
+
+    // Recruitment
+    public bool IsRecruiting { get; set; }
+    public int RecruitmentTurnsLeft { get; set; }
+
+    // Maintenance
+    public int MaintenanceEnergy { get; set; }
+
+    // Navigation
+    public FactionEntity? Faction { get; set; }
+    public ColonyEntity? Colony { get; set; }
+    public FleetEntity? Fleet { get; set; }
+}
+
+public class GroundCombatEntity
+{
+    public Guid Id { get; set; }
+    public Guid GameId { get; set; }
+    public Guid ColonyId { get; set; }
+    public Guid AttackerFactionId { get; set; }
+    public Guid DefenderFactionId { get; set; }
+    public string Phase { get; set; } = "Bombardment";
+    public int BombardmentDamageDealt { get; set; }
+    public bool IsResolved { get; set; }
+    public Guid? WinnerFactionId { get; set; }
+    public int InfrastructureDamage { get; set; }
+    public int PopulationLosses { get; set; }
+    public int StartedOnTurn { get; set; }
+    public int? ResolvedOnTurn { get; set; }
+    public string CombatLogJson { get; set; } = "[]";
+
+    // Navigation
+    public ColonyEntity? Colony { get; set; }
+    public FactionEntity? AttackerFaction { get; set; }
+    public FactionEntity? DefenderFaction { get; set; }
 }
 
 public enum FleetStance
@@ -806,6 +937,36 @@ public enum ShipClass
     ColonyShip,
     Transport,
     Freighter
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// SHIP DESIGNS - Custom blueprints created by players
+// ═══════════════════════════════════════════════════════════════════════════
+
+public class ShipDesignEntity
+{
+    public Guid Id { get; set; }
+    public Guid FactionId { get; set; }
+
+    public string Name { get; set; } = "";
+    public string ShipClass { get; set; } = "";  // Explorer, Cruiser, Escort, etc.
+
+    // Calculated stats (stored for quick access)
+    public int HullPoints { get; set; }
+    public int ShieldCapacity { get; set; }
+    public int Firepower { get; set; }
+    public int Speed { get; set; }
+    public int SensorRange { get; set; }
+    public int ProductionCost { get; set; }
+    public int BuildTime { get; set; }
+
+    // Installed component IDs (JSON array)
+    public string InstalledComponents { get; set; } = "[]";
+
+    public bool IsObsolete { get; set; }
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+    public FactionEntity Faction { get; set; } = null!;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -978,6 +1139,59 @@ public enum IntelLevel
     Infiltrated     // Spy network
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// LEADERS
+// ═══════════════════════════════════════════════════════════════════════════
+
+public class LeaderEntity
+{
+    public Guid Id { get; set; }
+    public Guid FactionId { get; set; }
+
+    public string Name { get; set; } = "";
+    public string ClassId { get; set; } = "";       // "admiral", "governor", "scientist", etc.
+    public string PortraitId { get; set; } = "";
+
+    // Stats (from LeaderDefinitions.LeaderStats)
+    public int Tactics { get; set; }
+    public int Leadership { get; set; }
+    public int Engineering { get; set; }
+    public int Science { get; set; }
+    public int Diplomacy { get; set; }
+    public int Administration { get; set; }
+    public int Subterfuge { get; set; }
+    public int Charisma { get; set; }
+
+    // Level & Experience
+    public int Level { get; set; } = 1;
+    public int ExperiencePoints { get; set; }
+    public int SkillPoints { get; set; }
+
+    // Age & lifespan
+    public int Age { get; set; } = 30;
+    public int MaxAge { get; set; } = 80;
+
+    // Assignment
+    public Guid? AssignedFleetId { get; set; }
+    public Guid? AssignedColonyId { get; set; }
+    public Guid? AssignedResearchBranchId { get; set; }
+
+    // Skills (JSON: ["fleet_logistics:2", "aggressive_tactics:3"])
+    public string Skills { get; set; } = "[]";
+
+    // Traits (JSON: ["genius", "brave"])
+    public string Traits { get; set; } = "[]";
+
+    // State
+    public bool IsRecruited { get; set; } = true;
+    public bool IsDead { get; set; }
+    public int Upkeep { get; set; }
+
+    public DateTime RecruitedAt { get; set; }
+
+    public FactionEntity Faction { get; set; } = null!;
+}
+
 public class HyperlaneEntity
 {
     public Guid Id { get; set; }
@@ -1122,4 +1336,92 @@ public enum GameStatus
     Paused,
     Completed,
     Abandoned
+}
+
+// Species rights system
+public enum Citizenship { Full, Resident, Slave, Undesirable }
+public enum MilitaryServiceLevel { Full, Limited, None }
+public enum LivingStandard { Academic, Normal, Basic, Subsistence }
+
+// ═══════════════════════════════════════════════════════════════════════════
+// TACTICAL COMBAT SYSTEM
+// ═══════════════════════════════════════════════════════════════════════════
+
+public enum EngagementPolicy { Aggressive, Defensive, HitAndRun, Standoff, Balanced }
+public enum FormationType { Wedge, Sphere, Line, Dispersed, Echelon }
+public enum TargetPriorityType { HighestThreat, Weakest, Capitals, Flagships, Random }
+public enum TriggerCondition { ShipsLostPercent, FlagshipDamaged, EnemyRetreat, RoundNumber, ShieldsBelow }
+public enum TriggerComparison { GreaterThan, LessThan, Equals }
+public enum GameMode { SinglePlayer, TurnBased, RealTime, HotSeat }
+
+public class BattleDoctrineEntity
+{
+    public Guid Id { get; set; }
+    public Guid FleetId { get; set; }
+    public string Name { get; set; } = "Standard Doctrine";
+    public EngagementPolicy EngagementPolicy { get; set; } = EngagementPolicy.Balanced;
+    public FormationType Formation { get; set; } = FormationType.Line;
+    public TargetPriorityType TargetPriority { get; set; } = TargetPriorityType.HighestThreat;
+    public int RetreatThreshold { get; set; } = 50;
+    public int DrillLevel { get; set; } = 0;
+    public string ConditionalOrdersJson { get; set; } = "[]";
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// STARBASES
+// ═══════════════════════════════════════════════════════════════════════════
+
+public enum StationModuleType
+{
+    SensorArray,
+    WeaponsPlatform,
+    ShieldGenerator,
+    Shipyard,
+    TradingHub,
+    ResearchLab,
+    Drydock,
+    HabitatRing,
+    SubspaceComm,
+    StructuralExpansion
+}
+
+public class StationEntity
+{
+    public Guid Id { get; set; }
+    public Guid GameId { get; set; }
+    public Guid FactionId { get; set; }
+    public Guid SystemId { get; set; }
+
+    public string Name { get; set; } = "Starbase";
+
+    public int HullPoints { get; set; } = 200;
+    public int MaxHullPoints { get; set; } = 200;
+    public int ShieldPoints { get; set; }
+    public int MaxShieldPoints { get; set; }
+
+    public int ModuleSlots { get; set; } = 4;
+
+    public bool IsOperational { get; set; }
+    public int ConstructionProgress { get; set; }  // 0-100, 100 = done
+    public int ConstructionTurnsLeft { get; set; }  // countdown
+
+    // Navigation
+    public FactionEntity Faction { get; set; } = null!;
+    public StarSystemEntity System { get; set; } = null!;
+    public List<StationModuleEntity> Modules { get; set; } = [];
+}
+
+public class StationModuleEntity
+{
+    public Guid Id { get; set; }
+    public Guid StationId { get; set; }
+
+    public StationModuleType ModuleType { get; set; }
+    public int Level { get; set; } = 1;           // 1-3
+    public bool IsOnline { get; set; } = true;     // can disable to save maintenance
+    public bool IsUnderConstruction { get; set; }
+    public int ConstructionTurnsLeft { get; set; }
+
+    // Navigation
+    public StationEntity Station { get; set; } = null!;
 }

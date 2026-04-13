@@ -2,11 +2,18 @@
 @using MudBlazor
 @using StarTrekGame.Web.Services
 @using Blazored.LocalStorage
+@using Microsoft.AspNetCore.SignalR.Client
+@using System.Text.Json
+@using StarTrekGame.Web.Components.UI
 @inject ThemeService ThemeService
 @inject IGameApiClient Api
 @inject NavigationManager Navigation
 @inject ILocalStorageService LocalStorage
 @inject ISnackbar Snackbar
+@inject IJSRuntime JS
+@inject HotSeatService HotSeatService
+@inject INotificationService NotificationSvc
+@implements IAsyncDisposable
 
 <MudThemeProvider IsDarkMode="true" />
 <MudPopoverProvider />
@@ -14,41 +21,100 @@
 <MudSnackbarProvider />
 
 <CascadingValue Name="GameState" Value="@_gameState">
+<CascadingValue Name="MultiplayerState" Value="@_mpState">
 <div class="stellaris-app" data-theme="@ThemeService.CurrentTheme">
     <div class="stellaris-layout">
         @* ═══════════════════════════════════════════════════════════════════
            TOP BAR - Empire Badge, Resources, Game Controls
            ═══════════════════════════════════════════════════════════════════ *@
-        <header class="st-topbar">
+        <header class="st-topbar @_gameState.TopbarCssClass">
             <div class="st-empire-badge">
-                <div class="st-empire-flag">🌐</div>
+                <div class="st-empire-flag">@(_gameState.TopbarIcon ?? "🌐")</div>
                 <div class="st-empire-info">
-                    <span class="st-empire-name">@_gameState.FactionName</span>
-                    <span class="st-empire-type">@_gameState.GovernmentType</span>
+                    <span class="st-empire-name">@(_gameState.TopbarTitle ?? _gameState.FactionName)</span>
+                    <span class="st-empire-type">@(_gameState.TopbarSubtitle ?? _gameState.GovernmentType)</span>
                 </div>
             </div>
 
-            <div class="st-resources">
-                <div class="st-resource"><span class="st-resource-icon">⚡</span><div class="st-resource-values"><span class="st-resource-current">@_gameState.Energy.ToString("N0")</span>@if(_gameState.EnergyIncome!=0){<span class="st-resource-income @(_gameState.EnergyIncome>0?"positive":"negative")">@FormatIncome(_gameState.EnergyIncome)</span>}</div></div>
-                <div class="st-resource"><span class="st-resource-icon">💎</span><div class="st-resource-values"><span class="st-resource-current">@_gameState.Minerals.ToString("N0")</span></div></div>
-                <div class="st-resource"><span class="st-resource-icon">🌾</span><div class="st-resource-values"><span class="st-resource-current">@_gameState.Food.ToString("N0")</span></div></div>
-                <div class="st-resource"><span class="st-resource-icon">🔩</span><div class="st-resource-values"><span class="st-resource-current">@_gameState.Alloys.ToString("N0")</span></div></div>
-                <div class="st-resource"><span class="st-resource-icon">🔬</span><div class="st-resource-values"><span class="st-resource-current">@_gameState.Research.ToString("N0")</span></div></div>
-            </div>
+            @if (_gameState.ShowResources)
+            {
+                <div class="st-resources">
+                    <div class="st-resource"><span class="st-resource-icon">⚡</span><div class="st-resource-values"><span class="st-resource-current">@_gameState.Energy.ToString("N0")</span>@if(_gameState.EnergyIncome!=0){<span class="st-resource-income @(_gameState.EnergyIncome>0?"positive":"negative")">@FormatIncome(_gameState.EnergyIncome)</span>}</div></div>
+                    <div class="st-resource"><span class="st-resource-icon">💎</span><div class="st-resource-values"><span class="st-resource-current">@_gameState.Minerals.ToString("N0")</span></div></div>
+                    <div class="st-resource"><span class="st-resource-icon">🌾</span><div class="st-resource-values"><span class="st-resource-current">@_gameState.Food.ToString("N0")</span></div></div>
+                    <div class="st-resource"><span class="st-resource-icon">🔩</span><div class="st-resource-values"><span class="st-resource-current">@_gameState.Alloys.ToString("N0")</span></div></div>
+                    <div class="st-resource"><span class="st-resource-icon">🔬</span><div class="st-resource-values"><span class="st-resource-current">@_gameState.Research.ToString("N0")</span></div></div>
+                </div>
+            }
 
             <div class="st-game-controls">
+                <div class="st-notification-bell" @onclick="ToggleNotificationPanel" @onclick:stopPropagation="true">
+                    <span class="st-bell-icon">&#x1F514;</span>
+                    @if (NotificationSvc.UnreadCount > 0)
+                    {
+                        <span class="st-bell-badge">@(NotificationSvc.UnreadCount > 99 ? "99+" : NotificationSvc.UnreadCount.ToString())</span>
+                    }
+                    @if (_showNotifications)
+                    {
+                        <div class="st-notification-dropdown" @onclick:stopPropagation="true">
+                            <div class="st-notification-header">
+                                <span>Notifications</span>
+                                @if (NotificationSvc.UnreadCount > 0)
+                                {
+                                    <button class="st-notification-mark-read" @onclick="() => NotificationSvc.MarkAllAsRead()">Mark all read</button>
+                                }
+                            </div>
+                            <div class="st-notification-list">
+                                @if (!NotificationSvc.Notifications.Any())
+                                {
+                                    <div class="st-notification-empty">No notifications</div>
+                                }
+                                else
+                                {
+                                    @foreach (var n in NotificationSvc.Notifications.Take(15))
+                                    {
+                                        <div class="st-notification-item @(!n.IsRead ? "unread" : "")" @onclick="() => OnNotificationClick(n)">
+                                            <span class="st-notification-icon" style="color: @n.TypeColor">@n.TypeIcon</span>
+                                            <div class="st-notification-content">
+                                                <div class="st-notification-title">@n.Title</div>
+                                                <div class="st-notification-message">@n.Message</div>
+                                            </div>
+                                            <span class="st-notification-time">@FormatTimeAgo(n.Timestamp)</span>
+                                        </div>
+                                    }
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
                 <div class="st-date-display">
                     <span class="st-date-label">STARDATE</span>
                     <span class="st-date-value">@_gameState.Stardate</span>
                 </div>
-                <button class="st-end-turn-btn" @onclick="EndTurn" disabled="@_processingTurn">END TURN</button>
+                @if (_gameState.ShowEndTurn)
+                {
+                    <button class="st-end-turn-btn" @onclick="EndTurn" disabled="@_processingTurn">END TURN</button>
+                }
                 <a href="/game/settings" class="st-btn sm settings-btn" title="Settings">⚙</a>
-                @if (_gameState.IsAdmin)
+                @if (_gameState.IsAdmin && _gameState.ShowEndTurn)
                 {
                     <button class="admin-force-btn" @onclick="ForceProcessTurn" disabled="@_processingTurn" title="Admin: Force process turn immediately">⚡ FORCE</button>
                 }
             </div>
         </header>
+
+        @if (_mpState.IsMultiplayer)
+        {
+            <MultiplayerTopbar OnReadyClicked="ToggleReady"
+                               OnChatToggled="ToggleChat"
+                               OnSpeedChanged="SetGameSpeed"
+                               OnPauseClicked="TogglePause" />
+        }
+
+        @if (_mpState.IsMultiplayer)
+        {
+            <ChatPanel IsOpen="_chatOpen" IsOpenChanged="OnChatOpenChanged" OnSendMessage="OnChatSendMessage" />
+        }
 
         @* ═══════════════════════════════════════════════════════════════════
            MAIN AREA - Sidebar + Content
@@ -63,8 +129,12 @@
                     <a href="/game/contacts" class="st-nav-btn @IsActive("/game/contacts","/game/diplomacy")"><span class="st-nav-icon">👥</span><span class="st-nav-label">Diplomacy</span></a>
                     <a href="/game/economy" class="st-nav-btn @IsActive("/game/economy")"><span class="st-nav-icon">💰</span><span class="st-nav-label">Economy</span></a>
                     <a href="/game/intelligence" class="st-nav-btn @IsActive("/game/intelligence")"><span class="st-nav-icon">👁</span><span class="st-nav-label">Intel</span></a>
+                    <a href="/game/stations" class="st-nav-btn @IsActive("/game/stations","/game/station-designer")"><span class="st-nav-icon">⚓</span><span class="st-nav-label">Stations</span></a>
+                    <a href="/game/leaders" class="st-nav-btn @IsActive("/game/leaders")"><span class="st-nav-icon">👤</span><span class="st-nav-label">Leaders</span></a>
+                    <a href="/game/species" class="st-nav-btn @IsActive("/game/species")"><span class="st-nav-icon">🧬</span><span class="st-nav-label">Species</span></a>
                     <a href="/game/ship-designer" class="st-nav-btn @IsActive("/game/ship-designer","/game/designer")"><span class="st-nav-icon">🔧</span><span class="st-nav-label">Designer</span></a>
                     <a href="/game/policies" class="st-nav-btn @IsActive("/game/policies")"><span class="st-nav-icon">📜</span><span class="st-nav-label">Policies</span></a>
+                    <a href="/game/crisis" class="st-nav-btn @IsActive("/game/crisis")"><span class="st-nav-icon">🚨</span><span class="st-nav-label">Crisis</span></a>
                     <a href="/game/victory-status" class="st-nav-btn @IsActive("/game/victory-status","/game/victory")"><span class="st-nav-icon">🏆</span><span class="st-nav-label">Victory</span></a>
                 </nav>
             </aside>
@@ -81,10 +151,191 @@
             <div class="st-notifications"></div>
             <div class="st-bottom-actions">
                 <button class="st-btn sm" @onclick='() => Navigation.NavigateTo("/")'>☰ MENU</button>
+                <a href="/game/help" class="st-btn sm">? HELP</a>
+                <button class="st-btn sm" @onclick="StartTutorial">📚 TUTORIAL</button>
             </div>
         </footer>
     </div>
 </div>
+@if (_mpState.Mode == GameMode.HotSeat && HotSeatService.ShowSplash)
+{
+    <HotSeatSplash NextPlayer="HotSeatService.CurrentPlayer"
+                   IsVisible="true"
+                   OnConfirm="OnHotSeatConfirm" />
+}
+<TutorialOverlay @ref="_tutorialOverlay" />
+@if (_showTurnSummary && _turnReport != null)
+{
+    <div class="turn-summary-overlay" @onclick="DismissTurnSummary">
+        <div class="turn-summary-modal" @onclick:stopPropagation="true">
+            <div class="turn-summary-header">
+                <span class="turn-summary-title">TURN @_summaryTurn REPORT</span>
+                <button class="turn-summary-close" @onclick="DismissTurnSummary">&times;</button>
+            </div>
+            <div class="turn-summary-body">
+                @* ECONOMY *@
+                @if (_turnReport.CreditsIncome != 0 || _turnReport.CreditsExpenses != 0 || _turnReport.EnergyBalance != 0 || _turnReport.FoodBalance != 0)
+                {
+                    <div class="turn-summary-section">
+                        <div class="turn-summary-section-title"><span class="turn-summary-icon">💰</span> Economy</div>
+                        <div class="turn-summary-grid">
+                            <span class="ts-label">Income:</span><span class="ts-value ts-positive">+@_turnReport.CreditsIncome ₵</span>
+                            <span class="ts-label">Expenses:</span><span class="ts-value ts-negative">-@_turnReport.CreditsExpenses ₵</span>
+                            <span class="ts-label">Net:</span><span class="ts-value @(_turnReport.CreditsIncome - _turnReport.CreditsExpenses >= 0 ? "ts-positive" : "ts-negative")">@((_turnReport.CreditsIncome - _turnReport.CreditsExpenses >= 0 ? "+" : ""))@(_turnReport.CreditsIncome - _turnReport.CreditsExpenses) ₵</span>
+                            @if (_turnReport.EnergyBalance != 0)
+                            {
+                                <span class="ts-label">Energy:</span><span class="ts-value @(_turnReport.EnergyBalance >= 0 ? "ts-positive" : "ts-negative")">@(_turnReport.EnergyBalance >= 0 ? "+" : "")@_turnReport.EnergyBalance ⚡</span>
+                            }
+                            @if (_turnReport.FoodBalance != 0)
+                            {
+                                <span class="ts-label">Food:</span><span class="ts-value @(_turnReport.FoodBalance >= 0 ? "ts-positive" : "ts-negative")">@(_turnReport.FoodBalance >= 0 ? "+" : "")@_turnReport.FoodBalance 🍞</span>
+                            }
+                        </div>
+                    </div>
+                }
+
+                @* RESEARCH *@
+                @if (_turnReport.TechCompleted != null || _turnReport.ResearchProgress > 0)
+                {
+                    <div class="turn-summary-section">
+                        <div class="turn-summary-section-title"><span class="turn-summary-icon">🔬</span> Research</div>
+                        @if (_turnReport.TechCompleted != null)
+                        {
+                            <div class="turn-summary-highlight">Completed: @_turnReport.TechCompleted</div>
+                        }
+                        @if (_turnReport.ResearchProgress > 0 && _turnReport.TechCompleted == null)
+                        {
+                            <div class="ts-progress">Current research: @_turnReport.ResearchProgress%</div>
+                        }
+                    </div>
+                }
+
+                @* CONSTRUCTION *@
+                @if (_turnReport.BuildingsCompleted.Any() || _turnReport.ShipsCompleted.Any() || _turnReport.StationsCompleted.Any() || _turnReport.ModulesCompleted.Any())
+                {
+                    <div class="turn-summary-section">
+                        <div class="turn-summary-section-title"><span class="turn-summary-icon">🏗️</span> Construction</div>
+                        @foreach (var b in _turnReport.BuildingsCompleted)
+                        {
+                            <div class="turn-summary-item">@b</div>
+                        }
+                        @foreach (var s in _turnReport.ShipsCompleted)
+                        {
+                            <div class="turn-summary-item">@s</div>
+                        }
+                        @foreach (var st in _turnReport.StationsCompleted)
+                        {
+                            <div class="turn-summary-item turn-summary-highlight">@st</div>
+                        }
+                        @foreach (var m in _turnReport.ModulesCompleted)
+                        {
+                            <div class="turn-summary-item">@m</div>
+                        }
+                    </div>
+                }
+
+                @* MILITARY *@
+                @if (_turnReport.Combats.Any() || _turnReport.FleetArrivals.Any())
+                {
+                    <div class="turn-summary-section">
+                        <div class="turn-summary-section-title"><span class="turn-summary-icon">⚔️</span> Military</div>
+                        @foreach (var c in _turnReport.Combats)
+                        {
+                            <div class="turn-summary-item @(c.AttackerVictory ? "ts-positive" : "ts-negative")">
+                                @c.SystemName: @c.AttackerName vs @c.DefenderName — @(c.AttackerVictory ? "Victory!" : "Defeat") (Losses: @(c.AttackerVictory ? c.DefenderLosses : c.AttackerLosses))
+                            </div>
+                        }
+                        @foreach (var f in _turnReport.FleetArrivals)
+                        {
+                            <div class="turn-summary-item">@f</div>
+                        }
+                    </div>
+                }
+
+                @* Ground Combat *@
+                @if ((_turnReport?.InvasionResults?.Count ?? 0) > 0 || (_turnReport?.ArmiesRecruited?.Count ?? 0) > 0)
+                {
+                    <div class="turn-summary-section">
+                        <div class="turn-summary-section-title"><span class="turn-summary-icon">⚔️</span> Ground Combat</div>
+                        <div class="turn-summary-section-content">
+                            @if (_turnReport?.InvasionResults != null)
+                            {
+                                @foreach (var result in _turnReport.InvasionResults)
+                                {
+                                    <div class="turn-summary-highlight">@result</div>
+                                }
+                            }
+                            @if (_turnReport?.ArmiesRecruited != null)
+                            {
+                                @foreach (var recruited in _turnReport.ArmiesRecruited)
+                                {
+                                    <div>@recruited</div>
+                                }
+                            }
+                        </div>
+                    </div>
+                }
+
+                @* POPULATION *@
+                @if (_turnReport.PopulationChange != 0)
+                {
+                    <div class="turn-summary-section">
+                        <div class="turn-summary-section-title"><span class="turn-summary-icon">👥</span> Population</div>
+                        <div class="ts-value @(_turnReport.PopulationChange > 0 ? "ts-positive" : "ts-negative")">
+                            @(_turnReport.PopulationChange > 0 ? "+" : "")@_turnReport.PopulationChange pops
+                        </div>
+                    </div>
+                }
+
+                @* ESPIONAGE *@
+                @if (_turnReport.EspionageResults.Any())
+                {
+                    <div class="turn-summary-section">
+                        <div class="turn-summary-section-title"><span class="turn-summary-icon">🕵️</span> Espionage</div>
+                        @foreach (var e in _turnReport.EspionageResults)
+                        {
+                            <div class="turn-summary-item">@e</div>
+                        }
+                    </div>
+                }
+
+                @* DIPLOMACY *@
+                @if (_turnReport.DiplomacyChanges.Any())
+                {
+                    <div class="turn-summary-section">
+                        <div class="turn-summary-section-title"><span class="turn-summary-icon">🌐</span> Diplomacy</div>
+                        @foreach (var d in _turnReport.DiplomacyChanges)
+                        {
+                            <div class="turn-summary-item">@d</div>
+                        }
+                    </div>
+                }
+
+                @* EVENTS *@
+                @if (_turnReport.NewEventsCount > 0)
+                {
+                    <div class="turn-summary-section turn-summary-clickable" @onclick="NavigateToEvents">
+                        <div class="turn-summary-section-title"><span class="turn-summary-icon">📜</span> Events</div>
+                        <div class="turn-summary-item">@_turnReport.NewEventsCount new event@(_turnReport.NewEventsCount > 1 ? "s" : "") pending</div>
+                    </div>
+                }
+
+                @* CRISIS *@
+                @if (_turnReport.CrisisUpdate != null)
+                {
+                    <div class="turn-summary-section turn-summary-crisis">
+                        <div class="turn-summary-section-title"><span class="turn-summary-icon">⚠️</span> Crisis</div>
+                        <div class="turn-summary-item">@_turnReport.CrisisUpdate</div>
+                    </div>
+                }
+            </div>
+            <div class="turn-summary-footer">
+                <button class="st-btn st-btn-primary turn-summary-acknowledge" @onclick="DismissTurnSummary">ACKNOWLEDGE</button>
+            </div>
+        </div>
+    </div>
+}
+</CascadingValue>
 </CascadingValue>
 
 <style>
@@ -113,17 +364,164 @@
         opacity: 0.5;
         cursor: not-allowed;
     }
+
+    /* ── Notification Bell ─────────────────────────────────── */
+    .st-notification-bell {
+        position: relative;
+        cursor: pointer;
+        padding: 4px 8px;
+        display: flex;
+        align-items: center;
+    }
+    .st-bell-icon {
+        font-size: 18px;
+        filter: grayscale(0.3);
+        transition: filter 0.15s;
+    }
+    .st-notification-bell:hover .st-bell-icon {
+        filter: grayscale(0);
+    }
+    .st-bell-badge {
+        position: absolute;
+        top: -2px;
+        right: 0;
+        background: #ff4455;
+        color: #fff;
+        font-size: 10px;
+        font-weight: 700;
+        min-width: 16px;
+        height: 16px;
+        line-height: 16px;
+        text-align: center;
+        border-radius: 8px;
+        padding: 0 4px;
+        pointer-events: none;
+    }
+    .st-notification-dropdown {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        width: 360px;
+        max-height: 480px;
+        background: var(--st-bg-darker, #0a0e14);
+        border: 1px solid var(--st-border, #1a2a3a);
+        border-radius: 6px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+    .st-notification-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 14px;
+        border-bottom: 1px solid var(--st-border, #1a2a3a);
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--st-text, #c8d6e5);
+        letter-spacing: 0.5px;
+    }
+    .st-notification-mark-read {
+        background: none;
+        border: none;
+        color: var(--st-accent, #4a9eff);
+        font-size: 11px;
+        cursor: pointer;
+        padding: 2px 6px;
+    }
+    .st-notification-mark-read:hover {
+        text-decoration: underline;
+    }
+    .st-notification-list {
+        overflow-y: auto;
+        flex: 1;
+    }
+    .st-notification-empty {
+        padding: 24px;
+        text-align: center;
+        color: #556;
+        font-size: 12px;
+    }
+    .st-notification-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 10px 14px;
+        border-bottom: 1px solid rgba(255,255,255,0.04);
+        cursor: pointer;
+        transition: background 0.1s;
+    }
+    .st-notification-item:hover {
+        background: rgba(255,255,255,0.04);
+    }
+    .st-notification-item.unread {
+        background: rgba(74, 158, 255, 0.06);
+        border-left: 2px solid var(--st-accent, #4a9eff);
+    }
+    .st-notification-icon {
+        font-size: 16px;
+        flex-shrink: 0;
+        margin-top: 2px;
+    }
+    .st-notification-content {
+        flex: 1;
+        min-width: 0;
+    }
+    .st-notification-title {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--st-text, #c8d6e5);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .st-notification-message {
+        font-size: 11px;
+        color: #889;
+        margin-top: 2px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .st-notification-time {
+        font-size: 10px;
+        color: #556;
+        flex-shrink: 0;
+        margin-top: 2px;
+    }
 </style>
 
 @code {
     private GameLayoutState _gameState = new();
+    private MultiplayerState _mpState = new();
+    private HubConnection? _hub;
     private bool _processingTurn;
+    private TutorialOverlay? _tutorialOverlay;
+    private bool _showNotifications;
+    private bool _showTurnSummary;
+    private TurnReportDto? _turnReport;
+    private int _summaryTurn;
 
     protected override async Task OnInitializedAsync()
     {
         await ThemeService.InitializeAsync();
         await LoadGameState();
         Navigation.LocationChanged += OnLocationChanged;
+        _gameState.OnLayoutChanged += OnLayoutChanged;
+        HotSeatService.OnPlayerChanged += OnHotSeatPlayerChanged;
+        NotificationSvc.OnNotificationsChanged += OnNotificationsChanged;
+    }
+
+    private void OnLayoutChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void OnHotSeatPlayerChanged()
+    {
+        InvokeAsync(StateHasChanged);
     }
 
     private async Task LoadGameState()
@@ -159,10 +557,23 @@
                             _gameState.Alloys = faction.Treasury.Dilithium;
                         }
 
-                        // Apply theme for faction
-                        await ThemeService.SetThemeForRaceAsync(_gameState.RaceId);
+                        // Do NOT auto-switch theme to faction - user's choice in Settings is respected
+                        // await ThemeService.SetThemeForRaceAsync(_gameState.RaceId);
                     }
                 }
+            }
+
+            // Load multiplayer state from localStorage
+            var isMultiplayer = await LocalStorage.GetItemAsync<bool>("isMultiplayer");
+            var gameModeStr = await LocalStorage.GetItemAsync<string>("gameMode");
+            _mpState.IsMultiplayer = isMultiplayer;
+            _mpState.Mode = Enum.TryParse<GameMode>(gameModeStr, out var gm) ? gm : GameMode.SinglePlayer;
+            _mpState.CurrentPlayerId = _gameState.FactionId ?? Guid.Empty;
+            _mpState.IsHost = await LocalStorage.GetItemAsync<bool>("isHost");
+
+            if (_mpState.IsMultiplayer && _mpState.Mode != GameMode.HotSeat)
+            {
+                await InitializeHubConnection();
             }
         }
         catch
@@ -178,7 +589,23 @@
         StateHasChanged();
         try
         {
-            if (_gameState.FactionId.HasValue && _gameState.GameId.HasValue)
+            if (_mpState.IsMultiplayer && _mpState.Mode == GameMode.TurnBased && _hub?.State == HubConnectionState.Connected)
+            {
+                // Multiplayer turn-based: signal ready via SignalR
+                await _hub.InvokeAsync("SetReady", _gameState.GameId, true);
+                Snackbar.Add("Ready! Waiting for other players...", Severity.Info);
+            }
+            else if (_mpState.Mode == GameMode.HotSeat)
+            {
+                // Hot-Seat: process turn via normal API, then trigger player switch
+                if (_gameState.FactionId.HasValue && _gameState.GameId.HasValue)
+                {
+                    await Api.EndTurnAsync(_gameState.GameId.Value, _gameState.FactionId.Value);
+                }
+                HotSeatService.EndTurn();
+                Snackbar.Add("Turn ended. Pass to next player!", Severity.Info);
+            }
+            else if (_gameState.FactionId.HasValue && _gameState.GameId.HasValue)
             {
                 await Api.EndTurnAsync(_gameState.GameId.Value, _gameState.FactionId.Value);
                 Snackbar.Add("Orders submitted!", Severity.Success);
@@ -214,6 +641,11 @@
         return routes.Any(r => currentPath.StartsWith(r, StringComparison.OrdinalIgnoreCase)) ? "active" : "";
     }
 
+    private void StartTutorial()
+    {
+        _tutorialOverlay?.ShowTutorial();
+    }
+
     private string FormatIncome(int income) => income > 0 ? $"+{income}" : income.ToString();
 
     private void OnLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
@@ -221,9 +653,370 @@
         InvokeAsync(StateHasChanged);
     }
 
-    public void Dispose()
+    public async ValueTask DisposeAsync()
     {
         Navigation.LocationChanged -= OnLocationChanged;
+        _gameState.OnLayoutChanged -= OnLayoutChanged;
+        HotSeatService.OnPlayerChanged -= OnHotSeatPlayerChanged;
+        NotificationSvc.OnNotificationsChanged -= OnNotificationsChanged;
+
+        if (_hub != null)
+        {
+            try { await _hub.DisposeAsync(); }
+            catch { }
+        }
+    }
+
+    private async Task InitializeHubConnection()
+    {
+        try
+        {
+            var baseUri = Navigation.BaseUri.TrimEnd('/');
+            _hub = new HubConnectionBuilder()
+                .WithUrl($"{baseUri}/hubs/game?gameId={_gameState.GameId}&factionId={_gameState.FactionId}")
+                .WithAutomaticReconnect()
+                .Build();
+
+            // Register event handlers
+            _hub.On<JsonElement>("PlayerJoined", OnPlayerJoined);
+            _hub.On<JsonElement>("PlayerLeft", OnPlayerLeft);
+            _hub.On<JsonElement>("PlayerReadyChanged", OnPlayerReadyChanged);
+            _hub.On<JsonElement>("TurnProcessed", OnTurnProcessed);
+            _hub.On("TurnProcessingStarted", () => InvokeAsync(StateHasChanged));
+            _hub.On<JsonElement>("ChatMessage", OnChatMessage);
+            _hub.On<JsonElement>("SpeedChanged", OnSpeedChanged);
+            _hub.On<JsonElement>("GamePaused", OnGamePaused);
+            _hub.On("GameResumed", OnGameResumed);
+            _hub.On<JsonElement>("TickUpdate", OnTickUpdate);
+            _hub.On<JsonElement>("ModeChanged", OnModeChanged);
+            _hub.On<JsonElement>("RealtimeOrderExecuted", OnRealtimeOrderExecuted);
+
+            _hub.Reconnecting += _ => { Snackbar.Add("Reconnecting...", Severity.Warning); return Task.CompletedTask; };
+            _hub.Reconnected += _ => { Snackbar.Add("Reconnected!", Severity.Success); return Task.CompletedTask; };
+
+            await _hub.StartAsync();
+
+            var playerName = _gameState.FactionName ?? "Player";
+            await _hub.InvokeAsync("JoinGame", _gameState.GameId, _mpState.CurrentPlayerId, playerName);
+        }
+        catch (Exception ex)
+        {
+            // Hub connection optional — game works without it in single-player
+            Console.WriteLine($"Hub connection failed: {ex.Message}");
+        }
+    }
+
+    private void OnPlayerJoined(JsonElement data)
+    {
+        var playerId = data.GetProperty("PlayerId").GetGuid();
+        var playerName = data.GetProperty("PlayerName").GetString() ?? "";
+        if (!_mpState.Players.Any(p => p.PlayerId == playerId))
+        {
+            _mpState.Players.Add(new PlayerInfo { PlayerId = playerId, Name = playerName, IsConnected = true });
+        }
+        _mpState.NotifyStateChanged();
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void OnPlayerLeft(JsonElement data)
+    {
+        var playerId = data.GetProperty("PlayerId").GetGuid();
+        _mpState.Players.RemoveAll(p => p.PlayerId == playerId);
+        _mpState.ReadyPlayers.Remove(playerId);
+        _mpState.NotifyStateChanged();
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void OnPlayerReadyChanged(JsonElement data)
+    {
+        var playerId = data.GetProperty("PlayerId").GetGuid();
+        var isReady = data.GetProperty("IsReady").GetBoolean();
+        if (isReady) _mpState.ReadyPlayers.Add(playerId);
+        else _mpState.ReadyPlayers.Remove(playerId);
+
+        var player = _mpState.Players.FirstOrDefault(p => p.PlayerId == playerId);
+        if (player != null) player.IsReady = isReady;
+        _mpState.NotifyStateChanged();
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void OnTurnProcessed(JsonElement data)
+    {
+        if (data.TryGetProperty("NewTurn", out var newTurnEl))
+        {
+            _gameState.CurrentTurn = newTurnEl.GetInt32();
+            _gameState.Stardate = $"{_gameState.CurrentTurn / 10}.{_gameState.CurrentTurn % 10:D2}";
+            _summaryTurn = _gameState.CurrentTurn;
+        }
+        _mpState.ReadyPlayers.Clear();
+        foreach (var p in _mpState.Players) p.IsReady = false;
+        _mpState.NotifyStateChanged();
+
+        // Parse turn report if present (faction-specific payload)
+        if (data.TryGetProperty("Report", out var reportEl))
+        {
+            try
+            {
+                _turnReport = System.Text.Json.JsonSerializer.Deserialize<TurnReportDto>(reportEl.GetRawText(),
+                    new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                _showTurnSummary = true;
+                if (_turnReport != null)
+                {
+                    FeedTurnNotifications(_turnReport, _summaryTurn);
+
+                    // Update topbar resources from post-turn treasury
+                    if (_turnReport.Treasury != null)
+                    {
+                        _gameState.Energy = _turnReport.Treasury.TreasuryCredits;
+                        _gameState.Minerals = _turnReport.Treasury.TreasuryDuranium;
+                        _gameState.Food = _turnReport.Treasury.TreasuryDeuterium;
+                        _gameState.Alloys = _turnReport.Treasury.TreasuryDilithium;
+                    }
+                    _gameState.Research = _turnReport.ResearchProgress;
+                    _gameState.EnergyIncome = _turnReport.CreditsIncome - _turnReport.CreditsExpenses;
+                }
+            }
+            catch { /* fallback: no modal */ }
+        }
+
+        if (!_showTurnSummary)
+            Snackbar.Add("Turn processed!", Severity.Success);
+
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void DismissTurnSummary()
+    {
+        _showTurnSummary = false;
+        _turnReport = null;
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void NavigateToEvents()
+    {
+        DismissTurnSummary();
+        Navigation.NavigateTo("/game/events");
+    }
+
+    private void OnChatMessage(JsonElement data)
+    {
+        var msg = new ChatMessageDto
+        {
+            SenderId = data.GetProperty("SenderId").GetGuid(),
+            SenderName = data.GetProperty("SenderName").GetString() ?? "",
+            Message = data.GetProperty("Message").GetString() ?? "",
+            Channel = data.TryGetProperty("Channel", out var ch) ? ch.ToString() : "Global",
+            Timestamp = DateTime.UtcNow
+        };
+        _mpState.ChatMessages.Add(msg);
+        _mpState.UnreadChatCount++;
+        _mpState.NotifyStateChanged();
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void OnSpeedChanged(JsonElement data)
+    {
+        if (data.TryGetProperty("Speed", out var speedEl))
+        {
+            _mpState.GameSpeed = speedEl.GetInt32();
+        }
+        _mpState.NotifyStateChanged();
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void OnGamePaused(JsonElement data)
+    {
+        _mpState.IsPaused = true;
+        var by = data.TryGetProperty("RequestedBy", out var byEl) ? byEl.GetString() : "someone";
+        Snackbar.Add($"Game paused by {by}", Severity.Info);
+        _mpState.NotifyStateChanged();
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void OnGameResumed()
+    {
+        _mpState.IsPaused = false;
+        _mpState.NotifyStateChanged();
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void OnTickUpdate(JsonElement data)
+    {
+        if (data.TryGetProperty("Tick", out var tickEl))
+        {
+            _mpState.CurrentTick = tickEl.GetInt64();
+        }
+        _mpState.NotifyStateChanged();
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void OnModeChanged(JsonElement data)
+    {
+        if (data.TryGetProperty("Mode", out var modeEl))
+        {
+            var modeStr = modeEl.GetString() ?? "";
+            _mpState.Mode = Enum.TryParse<GameMode>(modeStr, true, out var mode) ? mode : _mpState.Mode;
+        }
+        _mpState.NotifyStateChanged();
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void OnRealtimeOrderExecuted(JsonElement data)
+    {
+        // Currently a no-op; UI responds to state changes from turn processing.
+        // Can be extended later to show real-time order confirmations.
+        Console.WriteLine($"RealtimeOrderExecuted: {data}");
+    }
+
+    public async Task SendChatMessage(string message, string channel)
+    {
+        if (_hub?.State == HubConnectionState.Connected)
+        {
+            await _hub.InvokeAsync("SendChatMessage", _gameState.GameId, message, channel == "Alliance" ? 1 : 0);
+        }
+    }
+
+    public async Task SetGameSpeed(int speed)
+    {
+        if (_hub?.State == HubConnectionState.Connected)
+        {
+            await _hub.InvokeAsync("SetSpeed", _gameState.GameId, speed);
+        }
+    }
+
+    public async Task TogglePause()
+    {
+        if (_hub?.State == HubConnectionState.Connected)
+        {
+            if (_mpState.IsPaused)
+                await _hub.InvokeAsync("RequestResume", _gameState.GameId);
+            else
+                await _hub.InvokeAsync("RequestPause", _gameState.GameId);
+        }
+    }
+
+    public async Task ToggleReady()
+    {
+        if (_hub?.State == HubConnectionState.Connected)
+        {
+            var isReady = _mpState.ReadyPlayers.Contains(_mpState.CurrentPlayerId);
+            await _hub.InvokeAsync("SetReady", _gameState.GameId, !isReady);
+        }
+    }
+
+    private bool _chatOpen;
+
+    private async Task OnChatOpenChanged(bool isOpen)
+    {
+        _chatOpen = isOpen;
+        if (_chatOpen)
+        {
+            _mpState.UnreadChatCount = 0;
+            _mpState.NotifyStateChanged();
+        }
+        StateHasChanged();
+    }
+
+    private async Task OnChatSendMessage((string message, string channel) args)
+    {
+        await SendChatMessage(args.message, args.channel);
+    }
+
+    private async Task OnHotSeatConfirm()
+    {
+        HotSeatService.ConfirmTurnSwitch();
+
+        // Switch to next player's faction
+        if (HotSeatService.CurrentPlayer != null)
+        {
+            _gameState.FactionId = HotSeatService.CurrentPlayer.FactionId;
+            _gameState.RaceId = HotSeatService.CurrentPlayer.RaceId;
+            _gameState.FactionName = HotSeatService.CurrentPlayer.Name;
+
+            // Switch theme
+            await ThemeService.SetThemeForRaceAsync(HotSeatService.CurrentPlayer.RaceId);
+        }
+
+        StateHasChanged();
+    }
+
+    // ── Notification Bell ──────────────────────────────────────────────
+
+    private void ToggleNotificationPanel()
+    {
+        _showNotifications = !_showNotifications;
+    }
+
+    private void OnNotificationClick(GameNotification notification)
+    {
+        NotificationSvc.MarkAsRead(notification.Id);
+        if (!string.IsNullOrEmpty(notification.ActionUrl))
+        {
+            _showNotifications = false;
+            Navigation.NavigateTo(notification.ActionUrl);
+        }
+    }
+
+    private string FormatTimeAgo(DateTime timestamp)
+    {
+        var diff = DateTime.UtcNow - timestamp;
+        if (diff.TotalMinutes < 1) return "now";
+        if (diff.TotalMinutes < 60) return $"{(int)diff.TotalMinutes}m";
+        if (diff.TotalHours < 24) return $"{(int)diff.TotalHours}h";
+        return $"{(int)diff.TotalDays}d";
+    }
+
+    private void OnNotificationsChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    /// <summary>
+    /// Called after turn processing to persist key items as notifications.
+    /// Task 10's OnTurnProcessed can call this with the parsed TurnReportDto.
+    /// </summary>
+    private void FeedTurnNotifications(TurnReportDto report, int turn)
+    {
+        if (report.TechCompleted != null)
+            NotificationSvc.AddNotification("Research Complete", $"Turn {turn}: {report.TechCompleted}", NotificationType.Research, "/game/research");
+
+        foreach (var combat in report.Combats)
+        {
+            var outcome = combat.AttackerVictory ? "Victory" : "Defeat";
+            NotificationSvc.AddNotification($"Combat: {outcome}", $"Turn {turn}: {combat.SystemName} — {combat.AttackerName} vs {combat.DefenderName}", NotificationType.Combat, "/game/combat");
+        }
+
+        if (report.BuildingsCompleted.Any() || report.ShipsCompleted.Any())
+            NotificationSvc.AddNotification("Construction Complete", $"Turn {turn}: {report.BuildingsCompleted.Count + report.ShipsCompleted.Count} item(s) finished", NotificationType.Colony);
+
+        if (report.StationsCompleted.Any())
+            NotificationSvc.AddNotification("Station Complete", $"Turn {turn}: {string.Join(", ", report.StationsCompleted)}", NotificationType.Info, "/game/stations");
+
+        if (report.NewEventsCount > 0)
+            NotificationSvc.AddNotification("New Events", $"Turn {turn}: {report.NewEventsCount} event(s) pending", NotificationType.Warning, "/game/events");
+
+        if (report.CrisisUpdate != null)
+            NotificationSvc.AddNotification("Crisis Update", $"Turn {turn}: {report.CrisisUpdate}", NotificationType.Error, "/game/crisis");
+
+        // Ground combat
+        if (report.InvasionResults != null)
+        {
+            foreach (var invasion in report.InvasionResults)
+            {
+                NotificationSvc.AddNotification("Ground Combat", invasion, NotificationType.Combat);
+            }
+        }
+    }
+
+    public void ToggleChat()
+    {
+        _chatOpen = !_chatOpen;
+        if (_chatOpen)
+        {
+            _mpState.UnreadChatCount = 0;
+            _mpState.NotifyStateChanged();
+        }
+        StateHasChanged();
     }
 
     /// <summary>
@@ -247,5 +1040,39 @@
         public int Food { get; set; } = 120;
         public int Alloys { get; set; } = 340;
         public int Research { get; set; } = 85;
+
+        // ── Topbar Override (pages can customize the topbar via these) ──
+        public string? TopbarIcon { get; set; }
+        public string? TopbarTitle { get; set; }
+        public string? TopbarSubtitle { get; set; }
+        public string? TopbarCssClass { get; set; }
+        public bool ShowResources { get; set; } = true;
+        public bool ShowEndTurn { get; set; } = true;
+
+        public event Action? OnLayoutChanged;
+
+        public void SetTopbarOverride(string icon, string title,
+            string? subtitle = null, string? cssClass = null,
+            bool showResources = true, bool showEndTurn = true)
+        {
+            TopbarIcon = icon;
+            TopbarTitle = title;
+            TopbarSubtitle = subtitle;
+            TopbarCssClass = cssClass;
+            ShowResources = showResources;
+            ShowEndTurn = showEndTurn;
+            OnLayoutChanged?.Invoke();
+        }
+
+        public void ResetTopbar()
+        {
+            TopbarIcon = null;
+            TopbarTitle = null;
+            TopbarSubtitle = null;
+            TopbarCssClass = null;
+            ShowResources = true;
+            ShowEndTurn = true;
+            OnLayoutChanged?.Invoke();
+        }
     }
 }

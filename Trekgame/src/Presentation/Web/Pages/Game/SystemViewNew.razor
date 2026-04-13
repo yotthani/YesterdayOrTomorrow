@@ -2,6 +2,7 @@
 @page "/game/system/{SystemId:guid}"
 @page "/game/system-view/{SystemId:guid}"
 @layout StellarisLayout
+@implements IDisposable
 @using StarTrekGame.Web.Services
 @inject IGameApiClient Api
 @inject NavigationManager Nav
@@ -9,28 +10,11 @@
 
 <PageTitle>System View - TrekGame</PageTitle>
 
-<div class="stellaris-layout">
-    <header class="st-topbar">
-        <div class="st-empire-badge">
-            <div class="st-empire-flag">🌐</div>
-            <div class="st-empire-info">
-                <span class="st-empire-name">@(_system?.Name ?? "Unknown") System</span>
-                <span class="st-empire-type">Stellar Cartography</span>
-            </div>
-        </div>
-        <div class="st-game-controls">
-            <button class="st-btn" @onclick='() => Nav.NavigateTo("/game/galaxy")'>← BACK TO GALAXY</button>
-        </div>
-    </header>
-    
-    <div class="st-main">
-        <aside class="st-sidebar-left">
-            <nav class="st-nav">
-                <a href="/game/galaxy" class="st-nav-btn"><span class="st-nav-icon">🌌</span><span class="st-nav-label">Galaxy</span></a>
-                <a href="/game/colonies" class="st-nav-btn"><span class="st-nav-icon">🏠</span><span class="st-nav-label">Colonies</span></a>
-            </nav>
-        </aside>
-        
+<div class="system-view-page">
+    <div class="system-breadcrumb">
+        <button class="st-btn sm" @onclick='() => Nav.NavigateTo("/game/galaxy")'>← BACK TO GALAXY</button>
+    </div>
+    <div class="system-main-area">
         <div class="system-content">
             <div class="system-view">
                 <!-- Star (using spritesheet asset) -->
@@ -187,6 +171,24 @@
 </div>
 
 <style>
+    .system-view-page {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    .system-breadcrumb {
+        padding: 8px 16px;
+        background: rgba(0, 0, 0, 0.3);
+        border-bottom: 1px solid var(--st-border-dark, rgba(100, 150, 200, 0.15));
+    }
+
+    .system-main-area {
+        flex: 1;
+        display: flex;
+        overflow: hidden;
+    }
+
     .system-content {
         flex: 1;
         position: relative;
@@ -550,7 +552,8 @@
 
 @code {
     [Parameter] public Guid SystemId { get; set; }
-    
+    [CascadingParameter(Name = "GameState")] public StellarisLayout.GameLayoutState? GameState { get; set; }
+
     private StarSystemDto? _system;
     private string _starType = "Yellow";
     private List<PlanetData> _planets = new();
@@ -580,6 +583,14 @@
         {
             _planetAssets[planet.Id.ToString()] = AssetService.GetPlanetForIdentifier(planet.Type.ToLower(), planet.Name);
         }
+
+        // Override topbar to show system name
+        GameState?.SetTopbarOverride("🌐", $"{_system?.Name ?? "Unknown"} System", "Stellar Cartography");
+    }
+
+    public void Dispose()
+    {
+        GameState?.ResetTopbar();
     }
 
     private string GetPlanetStyle(PlanetData planet, int size)

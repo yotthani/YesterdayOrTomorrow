@@ -1,7 +1,7 @@
 @namespace StarTrekGame.Web.Components.UI
 
-<button class="federation-btn @VariantClass @SizeClass @(GlowPulse ? "glow-pulse" : "")" 
-        style="@Style" 
+<button class="federation-btn @VariantClass @SizeClass @(GlowPulse ? "glow-pulse" : "") @Class"
+        style="@Style"
         disabled="@Disabled"
         @onclick="OnClick">
     @if (!string.IsNullOrEmpty(Icon))
@@ -23,6 +23,7 @@
     [Parameter] public bool GlowPulse { get; set; } = false;
     [Parameter] public bool Disabled { get; set; } = false;
     [Parameter] public string? Style { get; set; }
+    [Parameter] public string? Class { get; set; }
     [Parameter] public EventCallback<MouseEventArgs> OnClick { get; set; }
     [Parameter] public RenderFragment? ChildContent { get; set; }
 

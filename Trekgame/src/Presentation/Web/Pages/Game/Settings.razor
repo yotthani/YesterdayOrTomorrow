@@ -1,5 +1,4 @@
 @page "/game/settings"
-@layout StellarisLayout
 @using MudBlazor
 @using Blazored.LocalStorage
 @using StarTrekGame.Web.Services
@@ -400,6 +399,8 @@
 
     protected override async Task OnInitializedAsync()
     {
+        // Main menu pages always use default theme
+        await ThemeService.ApplyTemporaryThemeAsync("default");
         await LoadSettings();
         _selectedTheme = ThemeService.CurrentTheme;
     }

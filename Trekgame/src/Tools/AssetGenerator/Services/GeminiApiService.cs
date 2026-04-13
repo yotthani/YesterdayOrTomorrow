@@ -16,10 +16,9 @@ public class GeminiApiService
     // Gemini models that support image generation (try in order)
     private static readonly string[] GeminiImageModels = new[]
     {
-        "gemini-3-pro-image-preview",       // Newest model (Jan 2026)
-        "gemini-2.5-flash-image",           // Production model (Oct 2025)
-        "gemini-2.0-flash-exp",             // Experimental
-        "gemini-2.5-flash-preview-image-generation"
+        "gemini-3.1-flash-image-preview",   // Newest (Feb 2026) - replaces 3-pro on Mar 9
+        "gemini-3-pro-image-preview",       // Retiring Mar 9, 2026
+        "gemini-2.5-flash-image",           // Stable GA, free tier 500/day
     };
     
     private int _currentModelIndex = 0;

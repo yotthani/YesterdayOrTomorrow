@@ -7,7 +7,7 @@
 
 ## 📌 Aktuelle Version
 
-**Version:** Aus `VERSION` Datei lesen (aktuell: 1.43.82)
+**Version:** Aus `VERSION` Datei lesen (aktuell: 1.47.0)
 
 ### Versionierung
 
@@ -58,6 +58,11 @@ Bei **jeder signifikanten Änderung**:
    - Services, Components, Patterns die da sind → verwenden
    - Siehe "Existierende Systeme" Sektion
 
+6. **"Visuelle UI-Arbeit = User führt"**
+   - Bei Themes, Layouts, Animationen → User macht das Design
+   - Ich integriere fertige Designs in Blazor — ich erfinde keine visuellen Designs
+   - Wenn ich bei visueller UI nicht vorankomme → sofort sagen statt weiter probieren
+
 ---
 
 ### 1. Asset-Pfade: NIEMALS wwwroot direkt editieren!
@@ -98,6 +103,36 @@ FALSCH (wird beim Build überschrieben):
 
 ---
 
+---
+
+## 🖥️ Frontend Architektur
+
+### Technologie-Entscheidung (2026-02-24, FINAL)
+| Schicht | Technologie | Begründung |
+|---------|------------|------------|
+| Production UI | **Blazor/Razor** | Debuggbar, C# Logik, ein Stack |
+| Design-Sandbox | **TSX/React** | Schnelles visuelles Iterieren |
+| Canvas/Interop | **TypeScript** | GalaxyRenderer, Sounds, Keyboard |
+
+### TSX Verwendungsregel
+- `ts/lcars-test.tsx` = **nur Design-Mockup**, nie Production
+- Wenn Design in TSX finalisiert → **Port nach Razor/CSS**
+- TSX wird Production-Code nur wenn Blazor technisch nicht ausreicht (Ausnahme, nicht Regel)
+
+### Design-Sandbox Workflow
+1. User iteriert Design in `ts/lcars-test.tsx`
+2. Vorschau via `wwwroot/lcars-test.html` (standalone, kein Blazor)
+3. Wenn Design approved → ich portiere zu Razor Component + CSS
+4. TSX-Datei bleibt als Referenz erhalten
+
+### TypeScript Build (Vite)
+- Entry Points: `ts/keyboard.ts`, `ts/sounds.ts`, `ts/tooltips.ts`, `ts/GalaxyRenderer.ts`, `ts/tacticalViewer.ts`, `ts/tutorial.ts`, `ts/lcars-test.tsx`
+- Output: `wwwroot/js/*.js` (gebaut via `npm run build`)
+- MSBuild Integration: `TypeScriptBuild` Target in `.csproj` läuft vor Blazor Build
+- Dev-Watch: `npm run watch` parallel zu `dotnet watch run`
+
+---
+
 ## 🏗️ Existierende Systeme (BENUTZEN!)
 
 ### Theme System
@@ -133,40 +168,58 @@ FALSCH (wird beim Build überschrieben):
 | **ResearchNew** | `/game/research`, `/game/tech` | ✅ Research UI |
 | **DiplomacyNew** | `/game/diplomacy`, `/game/contacts` | ✅ Diplomacy |
 | **EconomyDashboard** | `/game/economy` | ✅ Economy Overview |
-| **Intelligence** | `/game/intelligence` | ⚠️ Espionage (basic) |
-| **ShipDesignerNew** | `/game/ship-designer` | ✅ Ship Designer |
-| **Policies** | `/game/policies` | ⚠️ Policies |
-| **VictoryProgress** | `/game/victory-status` | ⚠️ Victory Tracking |
-| **CombatNew** | `/game/combat` | ⚠️ Combat View |
+| **Intelligence** | `/game/intelligence` | ✅ Espionage (10 Missionstypen, Agent-Management, API-wired) |
+| **Leaders** | `/game/leaders` | ✅ Leader Management (Recruit, Assign, Skills, 6 Klassen) |
+| **ShipDesignerNew** | `/game/ship-designer` | ✅ Ship Designer (Persistence) |
+| **Policies** | `/game/policies` | ✅ Policy Management (Revert-then-Apply Pattern) |
+| **VictoryProgress** | `/game/victory-status` | ✅ Victory Tracking |
+| **CrisisMonitor** | `/game/crisis` | ✅ Crisis Monitor (Dual-State: Active/Peaceful) |
+| **CombatNew** | `/game/combat` | ✅ Combat View (Auto-Resolve + Tactical View Link) |
+| **CombatDoctrine** | `/game/combat-doctrine/{FleetId}` | ✅ Per-fleet Doctrine Editor (Engagement, Formation, Target, Drill, Conditional Orders) |
+| **TacticalBattle** | `/game/tactical-battle/{CombatId}` | ✅ Tactical Combat View (Canvas 2D + Blazor Control Panel, Disorder System) |
 | **ThemeTest** | `/game/theme-test` | ✅ Theme Preview (alle 14) |
 | **MenuStyleTest** | `/game/menu-style-test` | ✅ Main Menu Test |
 | **AssetShowcase** | `/game/assets` | ✅ Asset Gallery |
-| **Tutorial** | `/game/tutorial` | ⚠️ Help/Tutorial |
-| **SaveLoad** | `/game/saves` | ⚠️ Save/Load |
+| **Tutorial** | `/game/tutorial` | ✅ Help/Tutorial (11 Wiki Tabs + Interactive Walkthrough Overlay) |
+| **MultiplayerLobby** | `/multiplayer` | ✅ Lobby Browser, Create/Join/Start, Chat, API+Hub wired |
+| **StationsList** | `/game/stations` | ✅ Station Overview (Build Dialog, System Selection) |
+| **StationDesigner** | `/game/station-designer/{StationId}` | ✅ Module Grid UI (Add/Upgrade/Remove/Toggle, Live Stats) |
+| **SaveLoad** | `/game/saves` | ✅ Save/Load (JSON Serialization, Full Entity Graph Restore) |
+| **GroundCombat** | `/game/ground-combat/{ColonyId}` | ✅ Planetary Invasion (Bombardment, Auto-Resolve, Army Recruit/Embark/Disembark) |
 
 ### Game Services (Client)
 | Komponente | Pfad | Zweck |
 |------------|------|-------|
 | **GameApiClient** | `Web/Services/GameApiClient.cs` | API Kommunikation (inkl. ProcessTurnAsync) |
 | **GameStateService** | `Web/Services/GameStateService.cs` | Client-seitiger Game State |
+| **MultiplayerState** | `Web/Services/MultiplayerState.cs` | ✅ MP State (GameMode, Players, Chat, Speed, Ticks) |
+| **HotSeatService** | `Web/Services/HotSeatService.cs` | ✅ Local Multiplayer Player Rotation |
+| **NotificationService** | `Web/Services/NotificationService.cs` | Notification queue (max 50, 9 types, bell UI) |
 
 ### Server Services (WICHTIG - schon implementiert!)
 | Service | Pfad | Status |
 |---------|------|--------|
-| **TurnProcessor** | `Server/Services/TurnProcessor.cs` | 11 Phasen, orchestriert alles |
+| **TurnProcessor** | `Server/Services/TurnProcessor.cs` | 11 Phasen, orchestriert alles, returns FactionTurnReports |
 | **EconomyService** | `Server/Services/EconomyService.cs` | House/Colony Economy Reports |
 | **PopulationService** | `Server/Services/PopulationService.cs` | Pop Growth |
 | **ColonyService** | `Server/Services/ColonyService.cs` | Build Queues |
 | **ResearchService** | `Server/Services/ResearchService.cs` | Tech Progress |
 | **ExplorationService** | `Server/Services/ExplorationService.cs` | System Exploration |
 | **EventService** | `Server/Services/EventService.cs` | Random Events mit Triggern |
-| **CombatService** | `Server/Services/CombatService.cs` | Auto-Resolve Combat |
+| **CombatService** | `Server/Services/CombatService.cs` | Auto-Resolve + Tactical Combat (Disorder, Formation Bonus, SimulateTacticalRound) |
+| **BattleDoctrineService** | `Server/Services/BattleDoctrineService.cs` | ✅ Per-fleet Doctrine (7 Faction Defaults, Conditional Orders, Drill) |
 | **DiplomacyService** | `Server/Services/DiplomacyService.cs` | Relations |
 | **EspionageService** | `Server/Services/EspionageService.cs` | Agents |
-| **TransportService** | `Server/Services/TransportService.cs` | Trade Routes (leer) |
-| **VictoryService** | `Server/Services/VictoryService.cs` | Win Conditions |
-| **CrisisService** | `Server/Services/CrisisService.cs` | Late-game Crises |
-| **AiService** | `Server/Services/AiService.cs` | AI Turns (leer) |
+| **TransportService** | `Server/Services/TransportService.cs` | ✅ Trade Routes, Inter-System Commuting |
+| **VictoryService** | `Server/Services/VictoryService.cs` | ✅ Win Conditions (5 Victory Types) |
+| **CrisisService** | `Server/Services/CrisisService.cs` | ✅ Late-game Crises (5 Types, 4-Phase Escalation) |
+| **AiService** | `Server/Services/AiService.cs` | ✅ AI Turns (Full AI Decision-Making) |
+| **LeaderService** | `Server/Services/LeaderService.cs` | ✅ Leader Management, Recruitment, Skills |
+| **SaveGameService** | `Server/Services/SaveGameService.cs` | ✅ Save/Load (Full Entity Graph) |
+| **GameClockService** | `Server/Services/GameClockService.cs` | ✅ Stellaris-style Real-Time Tick Loop (Speed 1-5, 30 ticks/month, Pause/Resume) |
+| **StationService** | `Server/Services/StationService.cs` | ✅ Station CRUD, Build Queue, Module Management, Sensor Range Calculation |
+| **VisibilityService** | `Server/Services/VisibilityService.cs` | ✅ FoW (Colony/Fleet/Station Sensors, IntelLevel, Alpha-based rendering) |
+| **GroundCombatService** | `Server/Services/GroundCombatService.cs` | ✅ Army CRUD, Recruit/Embark/Disembark, Invasion (Bombardment + Auto-Resolve via GroundCombatResolver), Phase 7.5 Turn Processing, Auto-Garrison |
 
 ### Domain Models (Core)
 | Model | Pfad | Zweck |
@@ -283,17 +336,24 @@ dotnet run
 
 ## 📋 Aktuelle Prioritäten
 
-Aus `docs/ROADMAP.md`:
+### ✅ Abgeschlossen
+- Turn Processing Engine (11 Phasen) ✅
+- Ressourcen-System (8 Typen + UI) ✅
+- Combat Resolution (Auto-Resolve) ✅
+- Event System (26 Events + Chaining) ✅
+- Research Tree (100 Techs + Effects) ✅
+- Trade Routes (TransportService) ✅
+- Diplomacy (Treaties, Casus Belli) ✅
+- Espionage (10 Missionstypen) ✅
+- Leaders (8 Klassen, Skills, Traits) ✅
+- Save/Load (Full Entity Graph) ✅
 
-### Phase 1 (KRITISCH)
-1. Turn Processing Engine
-2. Ressourcen-System (5+ Typen)
-3. Basic Combat Resolution
-
-### Phase 2 (Dynamik)
-4. Event System
-5. Research Tree
-6. Trade Routes
+### Nächste Phase (UI Polish)
+1. ~~Species/Trait Selection UI~~ ✅ (1.43.87)
+2. Tactical Combat View
+3. ~~Layout Consolidation (StellarisLayout)~~ ✅ (1.43.86)
+4. Tutorial/Help System
+5. Multiplayer (GAP_ANALYSIS_MULTIPLAYER.md)
 
 ---
 
@@ -304,6 +364,7 @@ Aus `docs/ROADMAP.md`:
 | Theme nicht beim ersten Load | Seite refreshen |
 | LocalStorage alte Daten | Browser Storage leeren |
 | Assets in wwwroot editiert | Von /assets/ neu kopieren |
+| `lcars-test.tsx` Design noch nicht nach Razor portiert | Design-Sandbox unter `/lcars-test.html` nutzen |
 
 ---
 
@@ -359,34 +420,34 @@ Aus `docs/ROADMAP.md`:
 | Faction Emblems | ✅ | SVG für alle 11 Core-Factions |
 | Asset Generator UI | ✅ | Blazor App mit Preview |
 
-### ⚠️ Teilweise / Unfertig
+### ✅ Server-seitig komplett (Audit: A-)
+Alle 18 Server Services sind voll implementiert (Zero TODOs, Zero Stubs, Zero NotImplementedException):
+- TurnProcessor (11 Phasen), EconomyService, PopulationService, ColonyService
+- ResearchService (inkl. ApplyTechEffectsAsync mit 27 Modifier-Feldern auf FactionEntity)
+- ExplorationService, EventService (mit Event Chaining + Piracy Events)
+- CombatService, DiplomacyService (Treaty Violations), EspionageService (10 Missionstypen)
+- TransportService (Trade Routes + Inter-System Commuting), VictoryService (5 Victory Types)
+- CrisisService (5 Crisis Types, 4-Phase Escalation), AiService (Full AI Decision-Making)
+- LeaderService, SaveGameService (Full Entity Graph Restore)
+- **Einzige Micro-Gap:** `GenerateThumbnailAsync()` returns null (kosmetisch)
+
+### ⚠️ Teilweise / UI-seitig offen
 | Feature | Status | Was da ist | Was fehlt |
 |---------|--------|------------|-----------|
-| Turn Processing | ⚠️ | 11-Phasen TurnProcessor, Admin Force-Turn ✅ | Services müssen gefüllt werden |
-| Resources | ⚠️ | 8 Ressourcen in ValueObject (Credits, Dilithium, etc.) | UI zeigt alle 11 Ressourcen ✅ |
-| Economy | ⚠️ | EconomyService, Economy Dashboard Page ✅ | Markt, Trade nicht implementiert |
-| Combat | ⚠️ | CombatService mit Auto-Resolve, Ship Abilities | Keine Taktik-View |
-| Events | ⚠️ | EventService mit Triggern & Conditions | 26 Events definiert ✅ |
-| Research | ⚠️ | ResearchService existiert | 100 Techs definiert ✅, UI basic |
-| Ships | ⚠️ | 50 Schiffsklassen definiert ✅ (inkl. 4 Hirogen) | Balance, Combat Integration |
-| Buildings | ⚠️ | 59 Gebäude definiert ✅ (inkl. 5 Hirogen) | UI für alle Gebäude |
-| Species | ⚠️ | 38 Spezies definiert ✅ | Species Creation UI |
+| Combat | ⚠️ | CombatService Auto-Resolve, CombatNew Page | Taktik-View (TACTICAL_SYSTEM.md) |
+| Species | ✅ | 38 Spezies, Encyclopedia, Demographics, Gene Mod, Species Rights | — |
 | Jobs | ⚠️ | 45 Jobs definiert ✅ | Job Assignment UI |
-| Traits | ⚠️ | ~100 Traits + 6 Hirogen Leader Traits ✅ | Trait Selection UI |
-| Diplomacy | ⚠️ | DiplomacyService + 17 Treaties, 15 Casus Belli definiert ✅ | Treaty UI, AI Diplomacy |
-| Leaders | ⚠️ | 8 Classes, 35+ Skills, 25+ Traits definiert ✅ | Leader Recruitment UI |
-| Espionage | ⚠️ | EspionageService, Intelligence Page ✅ | Missions fehlen |
-| Save/Load | ⚠️ | SaveGameService existiert | JSON instabil |
-| Faction Themes | ⚠️ | 14 Themes in CSS + GalaxyMap + ThemeTest ✅ | Einige Pages nutzen noch altes Styling |
-| Admin Controls | ⚠️ | Force-End-Turn Button ✅ | Weitere Admin-Features fehlen |
+| Traits | ✅ | ~100 Traits, Browse + Gene Modification UI | — |
+| Ships/Buildings | ⚠️ | 50 Schiffe, 59 Gebäude definiert ✅ | Balance-Tuning |
+| Faction Themes | ⚠️ | 14 Themes ✅ | Einige Pages nutzen noch altes Styling |
+| Admin Controls | ⚠️ | Force-End-Turn ✅ | Weitere Admin-Features |
 
-### ❌ Fehlt / Nicht verbunden
+### ❌ Fehlt / Zukunft
 | Feature | Was fehlt |
 |---------|-----------|
-| Trade Routes | TransportService existiert, aber keine UI/Routen |
-| AI Logic | IAiService Interface da, aber leer |
 | Multiplayer | GAP_ANALYSIS_MULTIPLAYER.md hat Details |
 | Tactical Combat View | TACTICAL_SYSTEM.md hat Design |
+| Tutorial | Hilfe-System |
 
 ### 🐛 Bekannte Bugs
 | Bug | Schwere | Workaround |
@@ -480,6 +541,18 @@ Aus `docs/ROADMAP.md`:
   - Federation Civil War, Klingon Succession Crisis
 - VERSION: 1.43.76 → 1.43.78
 
+### Session 2026-02-24 (TypeScript + LCARS Design):
+- **TypeScript/Vite Build-Pipeline** vollständig eingerichtet:
+  - 4 JS-Interop-Dateien → TypeScript portiert (keyboard, sounds, tooltips, GalaxyRenderer)
+  - Vite Multi-Entry Build mit React/TSX Support
+  - MSBuild Integration: npm build vor dotnet build
+- **LCARS Design-Sandbox** erstellt:
+  - `ts/lcars-test.tsx` — LCARS Classic Prototype (basierend auf User-Entwurf)
+  - `wwwroot/lcars-test.html` — Standalone Preview ohne Blazor
+  - Erreichbar unter `/lcars-test.html` wenn dotnet run läuft
+- **Architektur-Entscheidung FINAL**: Blazor = Production, TSX = Design-Sandbox only
+- **Offene Aufgabe**: LCARS Classic Design (wenn User finalisiert) → Razor Component portieren
+
 ### Session 2026-02-12 (Hirogen + UI Findings):
 - **Hirogen Race komplett implementiert** (Commit 6258c4c):
   - 6 Leader Traits, Attire in PromptBuilderService
@@ -498,24 +571,67 @@ Aus `docs/ROADMAP.md`:
   - 15 Theme CSS-Dateien
 - VERSION: 1.43.79 → 1.43.82
 
+### Session 2026-03-04/05 (Gameplay Wiring + UI Pages):
+- **Research Effects ins Gameplay gewired**:
+  - 27 Modifier-Felder auf FactionEntity (WeaponDamageBonus, ShieldStrengthBonus, etc.)
+  - `ApplyTechEffectsAsync()` parst Effekt-Strings wie `"weapon_damage:+10%"` in Integer-Modifier
+  - ResearchService ruft nach Tech-Completion automatisch ApplyTechEffectsAsync auf
+- **Policy System gewired**:
+  - Revert-then-Apply Pattern: Alte Modifier subtrahiert (sign=-1), neue addiert (sign=+1)
+  - PolicyEffects Dictionary auf Policies mit Modifier-Feldern
+- **Stub-Fixes**:
+  - CheckTreatyViolationAsync in DiplomacyService (Treaty-Bruch-Erkennung)
+  - Piracy Events in EventService (Piraten-Angriff-Events)
+  - Event Chaining: Chain-Events mit zukünftigem TurnCreated schedulen
+  - Inter-System Commuting in TransportService
+  - Ally Notifications in DiplomacyService
+- **Ship Designer Persistence** (Save/Load von Custom Designs)
+- **SaveGameService.RestoreGameAsync** (Full Entity Graph mit Original-IDs für FK-Referenzen)
+- **Leaders.razor** erstellt: Volle Leader-Management UI (Recruit, Assign, Skills, 6 Klassen)
+- **CrisisMonitor.razor** erstellt: Dual-State Design (Active Crisis / Peaceful Intel Briefing)
+- **Sidebar**: Leaders + Crisis Nav-Links hinzugefügt (12 Einträge gesamt)
+- **Server Audit**: Alle 18 Services voll implementiert, Note: A-
+
+### Session 2026-03-06 (Species & Traits UI):
+- **Species.razor** erstellt (`/game/species`): 3 Tabs (Encyclopedia, Demographics, Gene Modification)
+  - Tab 1: 38 Species browsbar, Quadrant-Filter, Detail-Panel mit Modifier-Bars + Habitability + Traits
+  - Tab 2: Empire Demographics, Species-Verteilung, Per-Colony Breakdown, Species Rights System
+  - Tab 3: Gene Modification mit Trait-Budget-System, Kategorie-Filter, Credit-Kosten
+- **SpeciesController.cs** erstellt: 7 Endpoints (GET species/traits/demographics + POST rights/gene-mod)
+- **Entity Changes**: FactionEntity.SpeciesRightsJson, GeneModificationsJson, 3 neue Enums
+- **GameApiClient**: 7 neue Methoden + 7 DTO-Records
+- **Sidebar**: 🧬 Species Link (13 Einträge gesamt)
+- VERSION: 1.43.86 → 1.43.87
+
+### Session 2026-03-05/06 (Layout Consolidation):
+- **Layout Consolidation (Ansatz B: Layout-Override via CascadingParameter)**:
+  - GameLayoutState erweitert: 6 Override-Properties + OnLayoutChanged Event
+  - SetTopbarOverride() / ResetTopbar() Methoden
+  - StellarisLayout Topbar rendern bedingt (null-coalescing defaults)
+  - SystemViewNew.razor: Duplikat-Layout entfernt, Override für "🌐 {Name} System"
+  - CombatNew.razor: Duplikat-Layout entfernt, Override für "⚠ COMBAT ENGAGEMENT", EndTurn hidden
+  - Beide Pages: IDisposable + ResetTopbar() Cleanup
+  - Design Doc: `docs/plans/2026-03-05-layout-consolidation-design.md`
+- VERSION: 1.43.85 → 1.43.86
+
 ### Aktuelle Arbeit:
+- **Server KOMPLETT** - Alle Services implementiert, Zero Stubs ✅
 - **Data Foundation KOMPLETT** - 11 Definition-Dateien mit ~500+ Einträgen ✅
-- **Hirogen Race KOMPLETT** ✅
-- **UI Themes KOMPLETT** - 14 Themes in GalaxyMap, ThemeTest data-driven ✅
+- **Alle Game Pages vorhanden** - 15+ Pages, alle API-gewired ✅
+- **UI Themes KOMPLETT** - 14 Themes ✅
 - **UI Component System** - TemplatedLayout, FactionUI, MainMenuUI ✅
 
 ### Nächste Schritte (für zukünftige Sessions):
-- Services mit Definitions verbinden (CombatService, DiplomacyService etc. nutzen jetzt teilweise Definitions)
-- UI für Species/Trait Selection
-- Leader Recruitment UI
-- Combat Balance mit ShipDefinitions
-- AI Logic implementieren
-- Weitere Admin-Features (Game Management, Player Kick, etc.)
-- Fehlende Pages: Leaders, Espionage/Agents, Crisis Monitor
+- ~~UI für Species/Trait Selection~~ ✅ — Species.razor mit 3 Tabs (Encyclopedia, Demographics, Gene Mod)
+- Combat Balance + Tactical Combat View
+- ~~Layout Consolidation~~ ✅ — GameLayoutState Override-Pattern (Ansatz B), SystemViewNew + CombatNew refactored
+- Multiplayer-Features (GAP_ANALYSIS_MULTIPLAYER.md)
+- Tutorial/Help System
+- Weitere Admin-Features
 
 ### Offene Fragen an User:
 - (Keine aktuellen Fragen)
 
 ---
 
-*Letzte Aktualisierung: 2026-02-12*
+*Letzte Aktualisierung: 2026-03-06*
